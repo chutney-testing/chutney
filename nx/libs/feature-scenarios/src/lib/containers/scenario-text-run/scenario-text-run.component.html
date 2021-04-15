@@ -1,0 +1,175 @@
+<chutney-page-header [title]="'Scenarios'" [breadcrumbs]="breadcrumbs">
+  <chutney-page-header-extra>
+    <mat-menu #menu="matMenu" xPosition="before">
+      <button
+        mat-menu-item
+        *ngFor="let environment of environments"
+        (click)="selectEnvironment(environment)"
+      >
+        {{ environment }}
+      </button>
+    </mat-menu>
+    <button
+      style="padding: 0"
+      mat-button
+      [matMenuTriggerFor]="menu"
+      aria-label="Open basic menu"
+    >
+      {{ environment }} <mat-icon>center_focus_strong</mat-icon>
+    </button>
+    <button
+      [@animate]="{ value: '*', params: { delay: '300ms', scale: '0.2' } }"
+      [disabled]="!running"
+      mat-icon-button
+      (click)="stopScenario()"
+      matTooltip="Stop scenario"
+    >
+      <mat-icon>stop_circle</mat-icon>
+    </button>
+  </chutney-page-header-extra>
+  <chutney-page-header-action>
+    <button
+      mat-fab
+      class="mat-accent"
+      (click)="runScenario()"
+      aria-label="Run scenario"
+      *ngIf="!running"
+      [@animate]="{ value: '*', params: { delay: '300ms', scale: '0.2' } }"
+    >
+      <mat-icon class="icon-18" svgIcon="restart"></mat-icon>
+    </button>
+    <button
+      mat-fab
+      class="mat-accent"
+      (click)="pauseScenario()"
+      aria-label="Pause scenario"
+      *ngIf="running"
+      [@animate]="{ value: '*', params: { delay: '300ms', scale: '0.2' } }"
+    >
+      <mat-icon>pause</mat-icon>
+    </button>
+  </chutney-page-header-action>
+</chutney-page-header>
+<div *ngIf="scenario$ | async as scenario">
+  <mat-toolbar>
+    <mat-toolbar-row>
+      {{ scenario.title }}&nbsp;<span class="mat-hint">#{{executionId}}</span>
+      <span fxFlex></span>
+    </mat-toolbar-row>
+  </mat-toolbar>
+
+  <div style="align-items: center; width: 100%; height: 500px; display: block">
+    <as-split [direction]="(isHandset$ | async) ? 'vertical' : 'horizontal'">
+      <as-split-area [size]="40" style="padding-top: 15px">
+        <div
+          style="padding-left: 15px; min-height: 28px; max-height: 28px"
+          (click)="activeNode = report"
+        >
+          <chutney-execution-icon
+            [testStatus]="report?.status"
+          ></chutney-execution-icon>
+          <span style="color: #2e7d32; padding-left: 4px">Scenario:&nbsp;</span
+          >{{ scenario.description }}
+          <span fxFlex></span>
+          <span class="mat-hint" style="padding-right: 10px">{{
+            report?.duration | duration
+          }}</span>
+        </div>
+        <mat-tree
+          [dataSource]="dataSource"
+          [treeControl]="treeControl"
+          class="example-tree"
+        >
+          <!-- This is the tree node template for leaf nodes -->
+          <mat-tree-node
+            (click)="selectNode(node);$event.stopPropagation()"
+            [ngClass]="{ 'background-highlight': activeNodeId === node.id }"
+            *matTreeNodeDef="let node"
+            matTreeNodeToggle
+          >
+            <li class="mat-tree-node">
+              <!-- use a disabled button to provide padding for tree leaf -->
+              <button mat-icon-button disabled></button>
+              <chutney-execution-icon
+                [testStatus]="node.status"
+              ></chutney-execution-icon>
+              <span
+                *ngIf="node.keyword"
+                style="color: #2e7d32; text-align: right; width: 45px"
+                >{{ node.keyword }}:&nbsp;</span
+              >{{ node.name }}
+              <span fxFlex></span>
+              <span class="mat-hint" style="padding-right: 10px">{{
+                node.duration | duration
+              }}</span>
+            </li>
+          </mat-tree-node>
+          <!-- This is the tree node template for expandable nodes -->
+          <mat-nested-tree-node *matTreeNodeDef="let node; when: hasChild">
+            <li
+              (click)="selectNode(node);$event.stopPropagation()"
+              [ngClass]="{ 'background-highlight': activeNodeId === node.id }"
+            >
+              <div class="mat-tree-node">
+                <button
+                  mat-icon-button
+                  matTreeNodeToggle
+                  (click)="toggleNode(node)"
+                  [attr.aria-label]="'Toggle ' + node.description"
+                >
+                  <mat-icon class="mat-icon-rtl-mirror">
+                    {{
+                      treeControl.isExpanded(node)
+                        ? 'expand_more'
+                        : 'chevron_right'
+                    }}
+                  </mat-icon>
+                </button>
+                <chutney-execution-icon
+                  [testStatus]="node.status"
+                ></chutney-execution-icon>
+                <span
+                  *ngIf="node.keyword"
+                  style="color: #2e7d32; text-align: right; width: 45px"
+                  >{{ node.keyword }}:&nbsp;</span
+                >
+                {{ node.name }}
+                <span fxFlex></span>
+                <span class="mat-hint" style="padding-right: 10px">{{
+                  node.duration | duration
+                }}</span>
+              </div>
+              <ul
+                [class.example-tree-invisible]="!treeControl.isExpanded(node)"
+              >
+                <ng-container matTreeNodeOutlet></ng-container>
+              </ul>
+            </li>
+          </mat-nested-tree-node>
+        </mat-tree>
+      </as-split-area>
+      <as-split-area [size]="60" style="padding-top: 15px">
+        <div class="my-code-editor">
+          <td-code-editor
+            class="my-code-editor"
+            #monaco
+            fxFlex="grow"
+            editorStyle="border:0;"
+            language="yaml"
+            [value]="toYaml(activeNode)"
+            [editorOptions]="{
+              fontSize: 12,
+              automaticLayout: true,
+              readOnly: true,
+              lineNumbers: false
+            }"
+            [theme]="options.theme === 'light' ? 'vs' : 'vs-dark'"
+            (editorConfigurationChanged)="
+              monacoEditorConfigChanged(monaco.theme)
+            "
+          ></td-code-editor>
+        </div>
+      </as-split-area>
+    </as-split>
+  </div>
+</div>

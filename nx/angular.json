@@ -1,0 +1,597 @@
+{
+  "version": 1,
+  "projects": {
+    "chutney": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "apps/chutney",
+      "sourceRoot": "apps/chutney/src",
+      "prefix": "chutney",
+      "architect": {
+        "build": {
+          "builder": "@angular-builders/custom-webpack:browser",
+          "options": {
+            "customWebpackConfig": {
+              "path": "./monaco-webpack.config.js",
+              "mergeStrategies": {
+                "module.rules": "prepend"
+              }
+            },
+            "outputPath": "dist/apps/chutney",
+            "index": "apps/chutney/src/index.html",
+            "main": "apps/chutney/src/main.ts",
+            "polyfills": "apps/chutney/src/polyfills.ts",
+            "tsConfig": "apps/chutney/tsconfig.app.json",
+            "aot": true,
+            "assets": [
+              {
+                "glob": "favicon.ico",
+                "input": "libs/assets/src/lib",
+                "output": "./"
+              },
+              {
+                "glob": "**/*",
+                "input": "libs/assets/src/lib",
+                "output": "assets"
+              }
+            ],
+            "styles": ["libs/styles/src/lib/styles.scss"],
+            "stylePreprocessorOptions": {
+              "includePaths": ["libs/styles/src/lib/styles"]
+            },
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/chutney/src/environments/environment.ts",
+                  "with": "apps/chutney/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "builder": "@angular-builders/custom-webpack:dev-server",
+          "options": {
+            "customWebpackConfig": {
+              "path": "./monaco-webpack.config.js",
+              "mergeStrategies": {
+                "module.rules": "prepend"
+              }
+            },
+            "browserTarget": "chutney:build",
+            "proxyConfig": "apps/chutney/proxy.conf.json"
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "chutney:build:production"
+            }
+          }
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "chutney:build"
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/chutney/src/**/*.ts",
+              "apps/chutney/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "apps/chutney/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/apps/chutney"]
+        }
+      }
+    },
+    "chutney-e2e": {
+      "root": "apps/chutney-e2e",
+      "sourceRoot": "apps/chutney-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/chutney-e2e/cypress.json",
+            "tsConfig": "apps/chutney-e2e/tsconfig.e2e.json",
+            "devServerTarget": "chutney:serve"
+          },
+          "configurations": {
+            "production": {
+              "devServerTarget": "chutney:serve:production"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/chutney-e2e/**/*.{js,ts}",
+              "apps/chutney-e2e/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
+    "ui-material": {
+      "projectType": "library",
+      "root": "libs/ui-material",
+      "sourceRoot": "libs/ui-material/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/ui-material/src/**/*.ts",
+              "libs/ui-material/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/ui-material/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/ui-material"]
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "ui-layout": {
+      "projectType": "library",
+      "root": "libs/ui-layout",
+      "sourceRoot": "libs/ui-layout/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/ui-layout/src/**/*.ts",
+              "libs/ui-layout/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/ui-layout/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/ui-layout"]
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "data-access": {
+      "projectType": "library",
+      "root": "libs/data-access",
+      "sourceRoot": "libs/data-access/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/data-access/src/**/*.ts",
+              "libs/data-access/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/data-access/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/data-access"]
+        },
+        "generate": {
+          "builder": "@nrwl/workspace:run-commands",
+          "options": {
+            "commands": [
+              {
+                "command": "npx graphql-codegen --config libs/data-access/codegen.yml"
+              }
+            ]
+          }
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "feature-auth": {
+      "projectType": "library",
+      "root": "libs/feature-auth",
+      "sourceRoot": "libs/feature-auth/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/feature-auth/src/**/*.ts",
+              "libs/feature-auth/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-auth/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/feature-auth"]
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "feature-scenarios": {
+      "projectType": "library",
+      "root": "libs/feature-scenarios",
+      "sourceRoot": "libs/feature-scenarios/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/feature-scenarios/src/**/*.ts",
+              "libs/feature-scenarios/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-scenarios/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/feature-scenarios"]
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "utils": {
+      "projectType": "library",
+      "root": "libs/utils",
+      "sourceRoot": "libs/utils/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/utils/src/**/*.ts",
+              "libs/utils/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/utils/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/utils"]
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "ui-commons": {
+      "projectType": "library",
+      "root": "libs/ui-commons",
+      "sourceRoot": "libs/ui-commons/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/ui-commons/src/**/*.ts",
+              "libs/ui-commons/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/ui-commons/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/ui-commons"]
+        },
+        "storybook": {
+          "builder": "@nrwl/storybook:storybook",
+          "options": {
+            "uiFramework": "@storybook/angular",
+            "port": 4400,
+            "config": {
+              "configFolder": "libs/ui-commons/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          }
+        },
+        "build-storybook": {
+          "builder": "@nrwl/storybook:build",
+          "options": {
+            "uiFramework": "@storybook/angular",
+            "outputPath": "dist/storybook/ui-commons",
+            "config": {
+              "configFolder": "libs/ui-commons/.storybook"
+            }
+          },
+          "configurations": {
+            "ci": {
+              "quiet": true
+            }
+          },
+          "outputs": ["{options.outputPath}"]
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "ui-commons-e2e": {
+      "root": "apps/ui-commons-e2e",
+      "sourceRoot": "apps/ui-commons-e2e/src",
+      "projectType": "application",
+      "architect": {
+        "e2e": {
+          "builder": "@nrwl/cypress:cypress",
+          "options": {
+            "cypressConfig": "apps/ui-commons-e2e/cypress.json",
+            "tsConfig": "apps/ui-commons-e2e/tsconfig.e2e.json",
+            "devServerTarget": "ui-commons:storybook"
+          },
+          "configurations": {
+            "ci": {
+              "devServerTarget": "ui-commons:storybook:ci"
+            }
+          }
+        },
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "apps/ui-commons-e2e/**/*.{js,ts}",
+              "apps/ui-commons-e2e/src/**/*.html"
+            ]
+          }
+        }
+      }
+    },
+    "feature-i18n": {
+      "projectType": "library",
+      "root": "libs/feature-i18n",
+      "sourceRoot": "libs/feature-i18n/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/feature-i18n/src/**/*.ts",
+              "libs/feature-i18n/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/feature-i18n/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/feature-i18n"]
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "styles": {
+      "projectType": "library",
+      "root": "libs/styles",
+      "sourceRoot": "libs/styles/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/styles/src/**/*.ts",
+              "libs/styles/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/styles/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/styles"]
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "assets": {
+      "projectType": "library",
+      "root": "libs/assets",
+      "sourceRoot": "libs/assets/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/assets/src/**/*.ts",
+              "libs/assets/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "options": {
+            "jestConfig": "libs/assets/jest.config.js",
+            "passWithNoTests": true
+          },
+          "outputs": ["coverage/libs/assets"]
+        }
+      },
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      }
+    },
+    "feature-campaigns": {
+      "projectType": "library",
+      "root": "libs/feature-campaigns",
+      "sourceRoot": "libs/feature-campaigns/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": [
+              "libs/feature-campaigns/src/**/*.ts",
+              "libs/feature-campaigns/src/**/*.html"
+            ]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/feature-campaigns"],
+          "options": {
+            "jestConfig": "libs/feature-campaigns/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    },
+    "feature-variables": {
+      "projectType": "library",
+      "root": "libs/feature-variables",
+      "sourceRoot": "libs/feature-variables/src",
+      "prefix": "chutney",
+      "architect": {
+        "lint": {
+          "builder": "@angular-devkit/build-angular:tslint",
+          "options": {
+            "tsConfig": [
+              "libs/feature-variables/tsconfig.lib.json",
+              "libs/feature-variables/tsconfig.spec.json"
+            ],
+            "exclude": ["**/node_modules/**", "!libs/feature-variables/**/*"]
+          }
+        },
+        "test": {
+          "builder": "@nrwl/jest:jest",
+          "outputs": ["coverage/libs/feature-variables"],
+          "options": {
+            "jestConfig": "libs/feature-variables/jest.config.js",
+            "passWithNoTests": true
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "defaultCollection": "@nrwl/angular"
+  },
+  "schematics": {
+    "@nrwl/angular": {
+      "application": {
+        "linter": "eslint"
+      },
+      "library": {
+        "linter": "eslint"
+      },
+      "storybook-configuration": {
+        "linter": "eslint"
+      }
+    },
+    "@nrwl/angular:application": {
+      "unitTestRunner": "jest",
+      "e2eTestRunner": "cypress"
+    },
+    "@nrwl/angular:library": {
+      "unitTestRunner": "jest"
+    }
+  },
+  "defaultProject": "chutney"
+}

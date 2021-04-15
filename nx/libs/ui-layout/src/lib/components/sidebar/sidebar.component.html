@@ -1,0 +1,19 @@
+<div class="chutney-sidebar-header" *ngIf="showHeader">
+  <a class="chutney-branding" href="#/">
+    <img
+      src="assets/images/chutney2.svg"
+      class="chutney-branding-logo-expanded"
+      alt="logo"
+    />
+    <span class="chutney-branding-name">CHUTNEY</span>
+  </a>
+  <span fxFlex></span>
+
+  <button mat-icon-button *ngIf="showToggle" (click)="toggleCollapsed.emit()">
+    <mat-icon [svgIcon]="!toggleChecked ? 'pin' : 'pin_off'"></mat-icon>
+  </button>
+</div>
+<div class="chutney-sidebar-main scrollbar-none">
+  <chutney-user-panel *ngIf="showUser"></chutney-user-panel>
+  <chutney-sidemenu></chutney-sidemenu>
+</div>

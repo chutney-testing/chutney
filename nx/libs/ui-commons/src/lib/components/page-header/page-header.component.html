@@ -1,0 +1,34 @@
+<div class="chutney-page-header-inner">
+  <div fxLayout="row" fxLayoutAlign="start center">
+    <button mat-icon-button *ngIf="showBackIcon" (click)="onBack()">
+      <mat-icon *ngIf="showBackIcon">arrow_back</mat-icon>
+    </button>
+    <h1
+      class="chutney-page-title"
+      [@animate]="{ value: '*', params: { delay: '100ms', y: '25px' } }"
+    >
+      {{ title }} <small>{{ subtitle }}</small>
+    </h1>
+    <span fxFlex></span>
+    <ng-content
+      select="chutney-page-header-extra, [chutney-page-header-extra]"
+    ></ng-content>
+  </div>
+  <div fxLayout="row" fxLayoutAlign="start center">
+    <button mat-icon-button disabled *ngIf="showBackIcon"></button>
+    <td-breadcrumbs
+      *ngIf="showBreadCrumb"
+      [@animate]="{ value: '*', params: { delay: '100ms', y: '25px' } }"
+    >
+      <a
+        *ngFor="let breadcrumb of breadcrumbs"
+        td-breadcrumb
+        [routerLink]="breadcrumb.link"
+        >{{ breadcrumb.title }}</a
+      >
+    </td-breadcrumbs>
+  </div>
+  <ng-content
+    select="chutney-page-header-action, [chutney-page-header-action]"
+  ></ng-content>
+</div>

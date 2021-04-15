@@ -1,0 +1,77 @@
+{
+  "npmScope": "chutney",
+  "affected": {
+    "defaultBase": "master"
+  },
+  "implicitDependencies": {
+    "angular.json": "*",
+    "package.json": {
+      "dependencies": "*",
+      "devDependencies": "*"
+    },
+    "tsconfig.base.json": "*",
+    "tslint.json": "*",
+    ".eslintrc.json": "*",
+    "nx.json": "*"
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "@nrwl/nx-cloud",
+      "options": {
+        "accessToken": "MTQ1NDA0M2UtMzU1My00YzVkLTg0MTYtZTAxNDg1YjYyZjVlfHJlYWQtd3JpdGU=",
+        "cacheableOperations": ["build", "test", "lint", "e2e"],
+        "canTrackAnalytics": false,
+        "showUsageWarnings": true
+      }
+    }
+  },
+  "projects": {
+    "chutney": {
+      "tags": []
+    },
+    "chutney-e2e": {
+      "tags": [],
+      "implicitDependencies": ["chutney"]
+    },
+    "ui-material": {
+      "tags": []
+    },
+    "ui-layout": {
+      "tags": []
+    },
+    "data-access": {
+      "tags": []
+    },
+    "feature-auth": {
+      "tags": []
+    },
+    "feature-scenarios": {
+      "tags": []
+    },
+    "utils": {
+      "tags": []
+    },
+    "ui-commons": {
+      "tags": []
+    },
+    "ui-commons-e2e": {
+      "tags": [],
+      "implicitDependencies": ["ui-commons"]
+    },
+    "feature-i18n": {
+      "tags": []
+    },
+    "styles": {
+      "tags": []
+    },
+    "assets": {
+      "tags": []
+    },
+    "feature-campaigns": {
+      "tags": []
+    },
+    "feature-variables": {
+      "tags": []
+    }
+  }
+}

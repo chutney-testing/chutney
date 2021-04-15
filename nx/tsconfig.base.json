@@ -1,0 +1,32 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "node",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "es2015",
+    "module": "esnext",
+    "typeRoots": ["node_modules/@types"],
+    "lib": ["es2017", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@chutney/ui-material": ["libs/ui-material/src/index.ts"],
+      "@chutney/ui-layout": ["libs/ui-layout/src/index.ts"],
+      "@chutney/data-access": ["libs/data-access/src/index.ts"],
+      "@chutney/feature-auth": ["libs/feature-auth/src/index.ts"],
+      "@chutney/feature-scenarios": ["libs/feature-scenarios/src/index.ts"],
+      "@chutney/utils": ["libs/utils/src/index.ts"],
+      "@chutney/ui-commons": ["libs/ui-commons/src/index.ts"],
+      "@chutney/feature-i18n": ["libs/feature-i18n/src/index.ts"],
+      "@chutney/feature-campaigns": ["libs/feature-campaigns/src/index.ts"],
+      "@chutney/feature-variables": ["libs/feature-variables/src/index.ts"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}

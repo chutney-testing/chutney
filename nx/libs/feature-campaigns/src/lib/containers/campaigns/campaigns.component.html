@@ -1,0 +1,27 @@
+<div class="mat-elevation-z8" *transloco="let t; read: 'campaigns'">
+  <chutney-page-header
+    [title]="t('title')"
+    [breadcrumbs]="breadcrumbs"
+    [showBackIcon]="false"
+  >
+    <chutney-page-header-action>
+      <button
+        mat-fab
+        class="mat-accent"
+        (click)="addCampaign()"
+        aria-label="Add campaign"
+        [@animate]="{ value: '*', params: { delay: '300ms', scale: '0.2' } }"
+      >
+        <mat-icon>add</mat-icon>
+      </button>
+    </chutney-page-header-action>
+  </chutney-page-header>
+  <!--<chutney-campaigns-search-form></chutney-campaigns-search-form>-->
+
+  <chutney-campaigns-list
+    [campaigns]="campaigns$ | async"
+    (view)="onView($event)"
+    (edit)="onEdit($event)"
+    (delete)="onDelete($event)"
+  ></chutney-campaigns-list>
+</div>

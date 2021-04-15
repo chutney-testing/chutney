@@ -1,0 +1,7 @@
+query campaigns {
+   campaigns @rest(type: "Campaign", path: "api/ui/campaign/v1") {
+       id
+       title
+       description
+   }
+}

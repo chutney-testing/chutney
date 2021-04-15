@@ -1,0 +1,201 @@
+input LoginInput {
+  username: String!
+  password: String!
+}
+
+type User {
+  id: ID!
+  name: String!
+  firstname: String!
+  lastname: String!
+  mail: String!
+}
+
+type ScenarioExecution {
+  executionId: ID!
+  time: String!
+  duration: Int!
+  status: String
+  info: String
+  error: String
+  testCaseTitle: String!
+  environment: String!
+  report: String
+}
+
+type Scenario {
+  id: ID!
+  title: String!
+  description: String!
+  status: String!
+  executions: [ScenarioExecution]
+  tags: [String]
+  creationDate: String
+  executionDate: String
+  content: String
+  version: Int
+}
+
+input ScenarioInput {
+  id: ID
+  title: String!
+  description: String!
+  tags: [String!]
+  content: String
+}
+
+input CampaignInput {
+  id: ID
+  title: String!
+  description: String!
+  environment: String
+  scenarioIds: [String!]
+}
+
+type ScenariosFilter {
+  text: String
+  tags: [String!]
+  date: String
+  advanced: Boolean
+}
+
+type Campaign{
+  id: ID!
+  title: String!
+  description: String!
+  scenarios: [Scenario]
+}
+
+type CampaignExecution {
+  campaignName: String!
+  executionId: ID!
+  duration: Int!
+  status: String
+  executionEnvironment: String!
+}
+
+type CampaignExecutionReport {
+  campaignName: String!
+  executionEnvironment: String!
+  duration: Int!
+  executionId: ID!
+  status: String
+  startDate: String
+  scenarioExecutionReports: [ScenarioExecutionReport]
+}
+
+type ScenarioExecutionReport {
+  duration: Int!
+  error: String
+  executionId: Int!
+  info: String
+  scenarioId: Int!
+  scenarioName: String
+  startDate: String
+  status: String
+}
+
+type GlobalVariableGroupContent {
+  message: String
+}
+
+input GlobalVariableGroupInput {
+  message: String
+}
+
+type Query {
+  user: User
+  scenarios: [Scenario]
+  campaigns: [Campaign]
+  campaign(campaignId: ID!): Campaign
+  scenariosFilter: ScenariosFilter
+  scenario(scenarioId: ID!): Scenario
+  runScenarioHistory(scenarioId: ID!, executionId: ID!): ScenarioExecution!
+  campaignExecutionReport(campaignId: ID!, executionId: ID!): CampaignExecutionReport!
+  globalVariableGroupContent(groupName: ID!): GlobalVariableGroupContent
+  globalVariableGroupsNames: [ID]
+}
+
+type Mutation {
+  login(input: LoginInput!): User
+  saveCampaign(input: CampaignInput!): Campaign
+  updateCampaign(input: CampaignInput!): Campaign
+  saveScenario(input: ScenarioInput!): Boolean
+  deleteScenario(input: ID!): Boolean
+  runScenario(scenarioId: ID!, environment:String, dataset: [String] ) : ID!
+  pauseScenario(scenarioId: ID!, executionId: ID!): Boolean
+  resumeScenario(scenarioId: ID!, executionId: ID!): Boolean
+  stopScenario(scenarioId: ID!, executionId: ID!): Boolean
+  stopCampaign(campaignId: ID!, executionId: ID!): Boolean
+  runCampaign(campaignId: ID!, environment:String ) : CampaignExecution!
+  deleteCampaign(input: ID!): Boolean
+  deleteGlobalVariableGroup(groupName: ID!): Boolean
+  saveGlobalVariableGroup(groupName: ID!, input: GlobalVariableGroupInput!): Boolean
+  renameGlobalVariableGroup(groupName: ID!, input: GlobalVariableGroupInput!): Boolean
+}
+
+scalar RestFunction
+scalar RestFunctionOrString
+
+"""
+Set up the endpoint you want to fetch over REST. The rest directive could be used
+at any depth in a query, but once it is used, nothing nested in it can be GraphQL
+data, it has to be from the RestLink or other resource (like the @client directive)
+"""
+directive @rest(
+  """
+  The GraphQL type this will return
+  """
+  type: String!
+  """
+  URI-path to the REST API. This could be a path or a full URL. If a path, the
+  endpoint given on link creation or from the context is concatenated with it to
+  produce a full `URI`. See also: `pathBuilder`
+  """
+  path: String!
+  """
+  The HTTP method to send the request via (i.e GET, PUT, POST)
+  """
+  method: String
+  """
+  Key to use when looking up the endpoint in the (optional) `endpoints` table if
+  provided to `RestLink` at creation time.
+  """
+  endpoint: String
+  """
+  If provided, this function gets to control what path is produced for this request.
+  """
+  pathBuilder: RestFunction
+  """
+  This is the name of the variable to use when looking to build a REST request-body
+  for a `PUT` or `POST` request. It defaults to `input` if not supplied.
+  """
+  bodyKey: String = "input"
+  """
+  If provided, this is the name a `function` that you provided to `variables`, that is
+  called when a request-body needs to be built. This lets you combine arguments or
+  encode the body in some format other than JSON.
+  """
+  bodyBuilder: RestFunction
+  """
+  String key to look up a function in `bodySerializers` or a custom serialization
+  function for the body/headers of this request before it is passed to the fetch call.
+  Defaults to `JSON.stringify` and setting `Content-Type: application-json`.
+  """
+  bodySerializer: RestFunctionOrString
+) on FIELD
+
+"Indicates that the client should resolve the field value locally as part of a query, e.g. in a React component"
+directive @client on FIELD
+
+directive @type(
+  """
+  The GraphQL type this will return
+  """
+  name: String!) on FIELD
+
+directive @export(
+  """
+  Name to create this as a variable to be used down the selection set
+  """
+  as: String!) on FIELD
