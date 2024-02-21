@@ -1,7 +1,7 @@
 # Database
 
 [Liquibase](https://www.liquibase.org/){:target="_blank"} is used to manage Chutney RDBMS schema.  
-You can find corresponding changelog [here](https://github.com/chutney-testing/chutney/blob/master/server/src/main/resources/changelog/db.changelog-master.xml){:target="_blank"}.
+You can find corresponding changelog [here](https://github.com/chutney-testing/chutney/blob/main/chutney/server/src/main/resources/changelog/db.changelog-master.xml){:target="_blank"}.
 
 !!! note
     Chutney has been tested with H2 and PostgreSQL databases.

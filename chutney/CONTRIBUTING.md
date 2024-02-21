@@ -311,16 +311,15 @@ Do it first, because changelog updates should be part of the release being made.
 Check page:  [Automatically generated release notes](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes)
 
 Do not hesitate to update the release note generated especially the titles of pull request :) 
-Use it to update [CHANGELOG.md](https://github.com/chutney-testing/chutney/blob/master/CHANGELOG.md)
+Use it to update [CHANGELOG.md](https://github.com/chutney-testing/chutney/blob/main/chutney/CHANGELOG.md)
 
 ### Releasing
 
 In order to avoid committing unwanted files, we prefer to review changes with a pull request.
 
 ```shell
-mvn versions:set -pl '!packaging' -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
 mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false
-mvn versions:set-property -Dproperty=chutney.version -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
 git add .
 git diff --staged
 git commit -m "chore: Release <RELEASE_VERSION>"
@@ -361,9 +360,8 @@ In order to effectively release artifacts :
 ### Prepare next development
 
 ```shell
-mvn versions:set -pl '!packaging' -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false
 mvn versions:set-scm-tag -DnewTag=HEAD -DgenerateBackupPoms=false
-mvn versions:set-property -Dproperty=chutney.version -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false
 git diff HEAD
 git add . && git commit -m "chore: Prepare next development <NEXT_DEV_VERSION>"
 git push origin

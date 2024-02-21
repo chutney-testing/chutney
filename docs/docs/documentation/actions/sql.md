@@ -5,8 +5,8 @@
 
 ??? info "Browse implementations"
 
-    - [Action](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/sql/SqlAction.java){:target="_blank"}
-    - [Client](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/sql/core/SqlClient.java){:target="_blank"}
+    - [Action](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/SqlAction.java){:target="_blank"}
+    - [Client](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/core/SqlClient.java){:target="_blank"}
 
 !!! note "Configuration"
     Most of the configuration is done on the target database.
@@ -72,7 +72,7 @@ When you provide only one statement in input, the following outputs and operatio
 
 ## Rows
 
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/sql/core/Rows.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/core/Rows.java){:target="_blank"}"
 
 One `Rows` instance contains results for **one statement**. Following attributes and methods are available in SpEL :
 
@@ -94,7 +94,7 @@ One `Rows` instance contains results for **one statement**. Following attributes
 
 ## Row
 
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/sql/core/Row.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/core/Row.java){:target="_blank"}"
 
 A `Row` provides you access to a record values.
 
@@ -147,7 +147,7 @@ When you provide more than one statement in input, you get a [`Records`](#record
 
 ## Records
 
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/sql/core/Records.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/core/Records.java){:target="_blank"}"
 
 One `Records` instance contains results for **one statement** and provides methods to retrieve and search them.  
 `Records` is different from [`Rows`](#rows) type, but you can convert it using the `rows()` method.  

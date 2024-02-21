@@ -1,0 +1,31 @@
+name: 'build all projects'
+description: 'build all projects sequentially'
+inputs:
+  goals:
+    default: "clean buildPlugin"
+    description: "Gradle goals to execute"
+  cache-artifacts:
+    default: ""
+    description: "path of artifacts to be cached"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Build Plugin
+      shell: bash
+      run: |
+        cd ./idea-plugin
+        echo "Running: ${{inputs.goals}}"
+        ./gradlew ${{inputs.goals}}
+        cd ..
+
+    - name: Temporarily cache jar artifacts
+      if: inputs.cache-artifacts != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: plugin-artifacts
+        path: ${{inputs.cache-artifacts}}
+        retention-days: 1
+        overwrite: true

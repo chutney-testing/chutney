@@ -3,10 +3,12 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>com.chutneytesting</groupId>
+    <parent>
+        <groupId>com.chutneytesting</groupId>
+        <artifactId>chutney-parent</artifactId>
+        <version>2.7.1-SNAPSHOT</version>
+    </parent>
     <artifactId>packaging</artifactId>
-    <version>0.0.1-never.change</version>
     <packaging>pom</packaging>
 
     <properties>
@@ -15,7 +17,7 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
 
-        <chutney.version>2.7.1-SNAPSHOT</chutney.version>
+        <chutney.version>${project.version}</chutney.version>
         <mainClass>com.chutneytesting.ServerBootstrap</mainClass>
         <spring-boot-maven.version>3.1.2</spring-boot-maven.version>
         <jasypt-spring-boot.version>3.0.5</jasypt-spring-boot.version>

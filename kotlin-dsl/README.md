@@ -10,7 +10,7 @@ This repository aims to add a kotlin flavor for writing and executing chutney sc
 ## Why?
 
 - Avoid text copy pasting
-- Provide better code assistance using IDE 
+- Provide better code assistance using IDE
 - Allow customization for teams
 
 A chutney json scenario:
@@ -73,7 +73,7 @@ Scenario(title = "SWAPI GET people record") {
 }
 ```
 
-How (k)ool is Kotlin? super (k)ool! 
+How (k)ool is Kotlin? super (k)ool!
 
 # How to run Kotlin scenarios
 
@@ -140,7 +140,7 @@ val envB = ChutneyEnvironment(
 
 Alternatively, you can describe your environments with JSON files.
 
-They follow the model from Chutney [Environment module](https://github.com/chutney-testing/chutney/blob/master/environment/src/main/java/com/chutneytesting/environment/api/dto/EnvironmentDto.java).
+They follow the model from Chutney [Environment module](https://github.com/chutney-testing/chutney/blob/main/chutney/environment/src/main/java/com/chutneytesting/environment/api/dto/EnvironmentDto.java).
 
 In order to use environments from JSON files, you should store them in a folder named **environment** under some directory whose default path is ```./chutney```, but you can override it with a constructor parameter : ```Launcher(environmentJsonRootPath = "./chutney_env")```
 
@@ -163,7 +163,7 @@ val say_hi = Scenario(title = "Say hi!") {
 }
 ```
 
-## 4. Run your scenarios ! 
+## 4. Run your scenarios !
 
 ### Using the Launcher in JUnit test
 
@@ -184,7 +184,7 @@ By default, reports are in ".chutney/reports". But you can override it using ```
 
 #### Expecting a failure
 
-You can change the expecting status of your scenario. For example, the Chutney scenario will fail, 
+You can change the expecting status of your scenario. For example, the Chutney scenario will fail,
 but not the running JUnit test.
 
 ```kotlin
@@ -233,8 +233,8 @@ fun `is able to emulate a campaign on one environment`(scenario: ChutneyScenario
 
 #### Running a campaign, on different environment
 
-To keep it simple, we will combine the two previous snippets, 
-but this time we will parameterize the environment. 
+To keep it simple, we will combine the two previous snippets,
+but this time we will parameterize the environment.
 
 ```kotlin
 private companion object {
@@ -286,7 +286,7 @@ Two report entries could be listened to with following keys :
 * **chutney.report.step** : Report entry key for JSON scenario's step report
 
 #### Configuration
-As the Kotlin Chutney JUnit engine is packaged in ```chutney-koltin-dsl``` module, just adding it as a dependency will make 
+As the Kotlin Chutney JUnit engine is packaged in ```chutney-koltin-dsl``` module, just adding it as a dependency will make
 the engine active when executing tests with the JUnit platform.
 
 Chutney JUnit configuration parameters are :

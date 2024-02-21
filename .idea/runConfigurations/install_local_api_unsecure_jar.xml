@@ -1,0 +1,37 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="install-local-api-unsecure-jar" type="MavenRunConfiguration" factoryName="Maven">
+    <MavenSettings>
+      <option name="myGeneralSettings" />
+      <option name="myRunnerSettings" />
+      <option name="myRunnerParameters">
+        <MavenRunnerParameters>
+          <option name="cmdOptions" />
+          <option name="profiles">
+            <set />
+          </option>
+          <option name="goals">
+            <list>
+              <option value="org.apache.maven.plugins:maven-install-plugin:3.1.1:install-file" />
+              <option value="-Dfile=packaging/local-api-unsecure/target/chutney-local-api-unsecure-${project.version}.jar" />
+              <option value="-DgroupId=com.chutneytesting" />
+              <option value="-DartifactId=local-api-unsecure" />
+              <option value="-Dversion=${projec.version}" />
+              <option value="-Dpackaging=jar" />
+            </list>
+          </option>
+          <option name="multimoduleDir" />
+          <option name="pomFileName" />
+          <option name="profilesMap">
+            <map />
+          </option>
+          <option name="projectsCmdOptionValues">
+            <list />
+          </option>
+          <option name="resolveToWorkspace" value="false" />
+          <option name="workingDirPath" value="$ProjectFileDir$/chutney" />
+        </MavenRunnerParameters>
+      </option>
+    </MavenSettings>
+    <method v="2" />
+  </configuration>
+</component>

@@ -1,20 +1,20 @@
 ??? info "Browse implementations"
 
-    - [Click](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumClickAction.java){:target="_blank"}
-    - [Close](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumCloseAction.java){:target="_blank"}
-    - [Driver Init](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumDriverInitAction.java){:target="_blank"}
-    - [Get](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetAction.java){:target="_blank"}
-    - [Get Attribute](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetAttributeAction.java){:target="_blank"}
-    - [Get Text](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetTextAction.java){:target="_blank"}
-    - [Hover ThenClick](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumHoverThenClickAction.java){:target="_blank"}
-    - [Quit](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumQuitAction.java){:target="_blank"}
-    - [Remote Driver Init](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumRemoteDriverInitAction.java){:target="_blank"}
-    - [Screenshot](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumScreenShotAction.java){:target="_blank"}
-    - [Scroll To](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumScrollToAction.java){:target="_blank"}
-    - [Send Keys](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSendKeysAction.java){:target="_blank"}
-    - [Set Browser Size](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSetBrowserSizeAction.java){:target="_blank"}
-    - [Switch To](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSwitchToAction.java){:target="_blank"}
-    - [Wait](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumWaitAction.java){:target="_blank"}
+    - [Click](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumClickAction.java){:target="_blank"}
+    - [Close](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumCloseAction.java){:target="_blank"}
+    - [Driver Init](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumDriverInitAction.java){:target="_blank"}
+    - [Get](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetAction.java){:target="_blank"}
+    - [Get Attribute](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetAttributeAction.java){:target="_blank"}
+    - [Get Text](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetTextAction.java){:target="_blank"}
+    - [Hover ThenClick](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumHoverThenClickAction.java){:target="_blank"}
+    - [Quit](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumQuitAction.java){:target="_blank"}
+    - [Remote Driver Init](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumRemoteDriverInitAction.java){:target="_blank"}
+    - [Screenshot](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumScreenShotAction.java){:target="_blank"}
+    - [Scroll To](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumScrollToAction.java){:target="_blank"}
+    - [Send Keys](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSendKeysAction.java){:target="_blank"}
+    - [Set Browser Size](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSetBrowserSizeAction.java){:target="_blank"}
+    - [Switch To](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSwitchToAction.java){:target="_blank"}
+    - [Wait](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumWaitAction.java){:target="_blank"}
 
 !!! important "About `by` input"
 
@@ -46,7 +46,7 @@
 
 # Click
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumClickAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumClickAction.java){:target="_blank"}"
 
 Performs a click on an element. Element is expected to be clickable.  
 See [WebElement.click()](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/WebElement.html#click()){:target="_blank"}
@@ -76,7 +76,7 @@ It takes a screenshot in case of error.
 
 # Close
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumCloseAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumCloseAction.java){:target="_blank"}"
 
 This action close the current window, quitting the browser if it's the last window currently open.  
 See [WebDriver.close()](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/WebDriver.html#close()){:target="_blank"} for further details.
@@ -97,7 +97,7 @@ See [WebDriver.close()](https://www.selenium.dev/selenium/docs/api/java/org/open
 
 # DriverInit
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumDriverInitAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumDriverInitAction.java){:target="_blank"}"
 
 This action instantiate a webdriver
 
@@ -155,7 +155,7 @@ Performs the action [Quit](#quit) when the scenario ends.
 
 # Get
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetAction.java){:target="_blank"}"
 
 This action load a new web page in the current browser window.  
 See [WebDriver.get(String url)](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/WebDriver.html#get(java.lang.String)){:target="_blank"} for further details.
@@ -186,7 +186,7 @@ See [WebDriver.get(String url)](https://www.selenium.dev/selenium/docs/api/java/
 
 # GetAttribute
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetAttributeAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetAttributeAction.java){:target="_blank"}"
 
 Get the value of the given attribute of the element.  
 See [WebElement.getAttribute()](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/WebElement.html#getAttribute(java.lang.String)){:target="_blank"} for further details.
@@ -220,7 +220,7 @@ See [WebElement.getAttribute()](https://www.selenium.dev/selenium/docs/api/java/
 
 # GetText
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetTextAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumGetTextAction.java){:target="_blank"}"
 
 This action returns the visible (i.e. not hidden by CSS) text of an element, including sub-elements.  
 See [WebElement.getText()](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/WebElement.html#getText()){:target="_blank"} for further details.
@@ -252,7 +252,7 @@ See [WebElement.getText()](https://www.selenium.dev/selenium/docs/api/java/org/o
 
 # Hover and click
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumHoverThenClickAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumHoverThenClickAction.java){:target="_blank"}"
 
 Moves the mouse to the middle of the element then performs a click.  
 See [Actions.moveToElement()](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/interactions/Actions.html#moveToElement(org.openqa.selenium.WebElement)){:target="_blank"} and [Click](#click) for further details.
@@ -278,7 +278,7 @@ See [Actions.moveToElement()](https://www.selenium.dev/selenium/docs/api/java/or
 
 # Quit
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumQuitAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumQuitAction.java){:target="_blank"}"
 
 !!! important 
     This action is not available with the Kotlin DSL since it is performed by default when the scenario ends.
@@ -295,7 +295,7 @@ See [WebDriver.quit()](https://www.selenium.dev/selenium/docs/api/java/org/openq
 
 # Remote Driver Init
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumRemoteDriverInitAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumRemoteDriverInitAction.java){:target="_blank"}"
 
 !!! note
     `browser` input values :
@@ -359,7 +359,7 @@ Performs the action [Quit](#quit) when the scenario ends.
 
 # Screenshot
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumScreenShotAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumScreenShotAction.java){:target="_blank"}"
 
 Takes a screenshot, available in the execution report as a Base64 String.  
 See [TakesScreenshot.getScreenshotAs()](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/TakesScreenshot.html#getScreenshotAs(org.openqa.selenium.OutputType)){:target="_blank"}
@@ -381,7 +381,7 @@ and [OutputType.BASE64](https://www.selenium.dev/selenium/docs/api/java/org/open
 
 # Scroll to
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumScrollToAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumScrollToAction.java){:target="_blank"}"
 
 Scroll the page to make the element visible and align to the top.  
 See [Element.scrollIntoView()](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView){:target="_blank"} for further details.
@@ -407,7 +407,7 @@ See [Element.scrollIntoView()](https://developer.mozilla.org/en-US/docs/Web/API/
 
 # Send keys
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSendKeysAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSendKeysAction.java){:target="_blank"}"
 
 This action simulate typing into an element, which may set its value.  
 See [WebElement.sendKeys()](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/WebElement.html#sendKeys(java.lang.CharSequence...)){:target="_blank"}
@@ -435,7 +435,7 @@ See [WebElement.sendKeys()](https://www.selenium.dev/selenium/docs/api/java/org/
 
 # Set browser size
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSetBrowserSizeAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSetBrowserSizeAction.java){:target="_blank"}"
 
 This action set the size of the current window.  
 See [WebDriver.Window.setSize()](https://www.selenium.dev/selenium/docs/api/java/org/openqa/selenium/WebDriver.Window.html#setSize(org.openqa.selenium.Dimension)){:target="_blank"} for further details.
@@ -459,7 +459,7 @@ See [WebDriver.Window.setSize()](https://www.selenium.dev/selenium/docs/api/java
 
 # Switch to
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSwitchToAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumSwitchToAction.java){:target="_blank"}"
 
 !!! note
 
@@ -503,7 +503,7 @@ See [WebDriver.Window.setSize()](https://www.selenium.dev/selenium/docs/api/java
 
 # Wait
 
-!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumWaitAction.java){:target="_blank"}"
+!!! info "[Browse Implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/selenium/SeleniumWaitAction.java){:target="_blank"}"
 
 This action waits N seconds or until the expected conditions are met.
 

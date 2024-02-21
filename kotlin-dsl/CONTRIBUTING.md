@@ -26,7 +26,7 @@ To contribute to this documentation (README, CONTRIBUTING, etc.), we conforms to
 2. Create your working branches as you like
    * **WARNING** - Do not modify the master branch nor any of our branches since it will break the automatic sync
 3. When you are done, fetch all and rebase your branch onto our master or any other of ours
-   * ex. on your branch, do : 
+   * ex. on your branch, do :
      * `git fetch --all --prune`
      * `git rebase --no-ff origin/master`
 4. Test your changes and make sure everything is working
@@ -34,7 +34,7 @@ To contribute to this documentation (README, CONTRIBUTING, etc.), we conforms to
    * Do not forget to add reviewers ! Check out the last authors of the code you modified and add them.
    * In case of doubts, here are active contributors :
 
-     
+
 ## <a name="code"></a> Code convention
 
 Try to follow [Kotlin coding conventions](https://kotlinlang.org/docs/reference/coding-conventions.html).
@@ -46,7 +46,7 @@ Concerning tests mocking :
 * Use `org.springframework.test.web.servlet.MockMvc` to mock REST HTTP endpoints
 * **Do not use PowerMock**
   * We consider it to be sign of a code-smell
-  
+
 ## <a name="branch"></a> Branch convention
 
 * **wip/** unstable code, to share between developers working on the same task
@@ -83,21 +83,14 @@ We use github actions to build and releas this library.
 
 ### Update Changelog file
 
-Do it first, because changelog updates should be part of the release being made.  
+Do it first, because changelog updates should be part of the release being made.
 Check page:  [Automatically generated release notes](https://docs.github.com/en/repositories/releasing-projects-on-github/automatically-generated-release-notes)
 
 Do not hesitate to update the release note generated especially the titles of pull request :)
 Use it to update [CHANGELOG.md](https://github.com/chutney-testing/chutney-kotlin-dsl/blob/master/CHANGELOG.md)
 
 ### Releasing
-
-We use [Reckon gradle plugin](https://github.com/ajoberstar/reckon). 
-
-Release is just pushing a tag with version information :
-```shell
-  ./gradlew reckonTagCreate -Preckon.stage=<final|snapshot> -Preckon.scope=<major|minor|patch>
-  git push origin <TAG_VERSION> 
-```
+Update `chutneyVersion` in `gradle.properties` file.
 
 ### Update Github release
 
@@ -145,7 +138,7 @@ ALv2 license compatibility as defined by the ASF can be found here : [http://apa
 
 __As far as we understand :__
 
-If, by any mean, your contribution should rely on a Category X dependency, then you must provide a way to modularize it 
+If, by any mean, your contribution should rely on a Category X dependency, then you must provide a way to modularize it
 and make it's use optional to Chutney, as a plugin.
 
 You may distribute your plugin under the terms of the Category X license.
