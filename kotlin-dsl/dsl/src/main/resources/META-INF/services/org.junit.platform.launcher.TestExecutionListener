@@ -1,0 +1,4 @@
+com.chutneytesting.kotlin.junit.engine.execution.ConsoleLogScenarioReportExecutionListener
+com.chutneytesting.kotlin.junit.engine.execution.ConsoleLogStepReportExecutionListener
+com.chutneytesting.kotlin.junit.engine.execution.FileWriterScenarioReportExecutionListener
+com.chutneytesting.kotlin.junit.engine.execution.SiteGeneratorExecutionListener

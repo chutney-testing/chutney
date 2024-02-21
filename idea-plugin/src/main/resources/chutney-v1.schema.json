@@ -1,0 +1,767 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "urn:json-schema:Chutney:1.1.2",
+  "type": "object",
+  "title": "The Root Schema",
+  "additionalProperties": false,
+  "required": [
+    "scenario"
+  ],
+  "properties": {
+    "scenario": {
+      "$id": "#scenario",
+      "type": "object",
+      "title": "The Scenario",
+      "required": [
+        "name",
+        "steps"
+      ],
+      "properties": {
+        "gwtType": {
+          "$ref": "#/definitions/gwt_type"
+        },
+        "name": {
+          "$ref": "#/definitions/scenario_name"
+        },
+        "strategy": {
+          "$ref": "#/definitions/task_strategy"
+        },
+        "steps": {
+          "$ref": "#/definitions/scenario_task_steps"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "definitions": {
+    "gwt_type": {
+      "type": "string",
+      "enum": [
+        "ROOT_STEP",
+        "GIVEN",
+        "WHEN",
+        "THEN"
+      ],
+      "title": "The gwt type",
+      "default": "WHEN"
+    },
+    "scenario_substeps": {
+      "type": "object",
+      "default": "",
+      "properties": {
+        "gwtType": {
+          "$ref": "#/definitions/gwt_type"
+        },
+        "name": {
+          "$ref": "#/definitions/scenario_name"
+        },
+        "steps": {
+          "$ref": "#/definitions/scenario_task_steps"
+        }
+      },
+      "required": [
+        "steps"
+      ],
+      "additionalProperties": false
+    },
+    "scenario_name": {
+      "type": "string",
+      "title": "The Scenario Name",
+      "default": "",
+      "examples": [
+        "Téléopération de changement de tarif et puissance avec PM"
+      ],
+      "pattern": "^(.*)$"
+    },
+    "task_name": {
+      "type": "string",
+      "title": "The Task Name",
+      "default": ""
+    },
+    "task_strategy": {
+      "type": "object",
+      "title": "The Task Strategy",
+      "properties": {
+        "type": {
+          "type": "string",
+          "default": "retry-with-timeout"
+        },
+        "parameters": {
+          "type": "object",
+          "properties": {
+            "timeOut": {
+              "type": "string"
+            },
+            "retryDelay": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": false,
+          "required": [
+            "timeOut",
+            "retryDelay"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "parameters"
+      ]
+    },
+    "target": {
+      "type": "string",
+      "title": "The Task Target",
+      "default": ""
+    },
+    "debug_inputs": {
+      "type": "object"
+    },
+    "context_put_inputs": {
+      "type": "object",
+      "properties": {
+        "entries": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "entries"
+      ]
+    },
+    "http_get_inputs": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "object"
+        },
+        "timeout": {
+          "type": "string",
+          "default": "2 s"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "uri"
+      ]
+    },
+    "http_put_post_inputs": {
+      "type": "object",
+      "properties": {
+        "uri": {
+          "type": "string"
+        },
+        "headers": {
+          "type": "object"
+        },
+        "timeout": {
+          "type": "string",
+          "default": "2 s"
+        },
+        "body": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "uri"
+      ]
+    },
+    "json_validation_inputs": {
+      "type": "object",
+      "properties": {
+        "schema": {
+          "type": "string"
+        },
+        "json": {
+          "type": [
+            "string",
+            "object"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "schema",
+        "json"
+      ]
+    },
+    "json_assert_inputs": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "type": "string"
+        },
+        "expected": {
+          "type": [
+            "string",
+            "object"
+          ]
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "document",
+        "expected"
+      ]
+    },
+    "xml_assert_inputs": {
+      "type": "object",
+      "properties": {
+        "document": {
+          "type": "string"
+        },
+        "expected": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "document",
+        "expected"
+      ]
+    },
+    "assert_inputs": {
+      "type": "object",
+      "properties": {
+        "asserts": {
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "asserts"
+      ]
+    },
+    "json_compare_inputs": {
+      "type": "object",
+      "properties": {
+        "document1": {
+          "type": "string"
+        },
+        "document2": {
+          "type": "string"
+        },
+        "comparingPaths": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "document1",
+        "document2",
+        "comparingPaths"
+      ]
+    },
+    "amqp_basic_get_inputs": {
+      "type": "object",
+      "properties": {
+        "queue-name": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "queue-name"
+      ]
+    },
+    "amqp_clean_queues_inputs": {
+      "type": "object",
+      "properties": {
+        "queue-names": {
+          "type": [
+            "string",
+            "array"
+          ]
+        }
+      }
+    },
+    "amqp_basic_consume_inputs": {
+      "type": "object",
+      "properties": {
+        "queue-name": {
+          "type": "string"
+        },
+        "selector": {
+          "type": "string"
+        },
+        "nb-messages": {
+          "type": "number"
+        },
+        "timeout": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "queue-name"
+      ]
+    },
+    "kafka_basic_publish_inputs": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string"
+        },
+        "payload": {
+          "type": [
+            "string",
+            "object"
+          ]
+        },
+        "headers": {
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "topic",
+        "payload"
+      ]
+    },
+    "kafka_basic_consume_inputs": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string"
+        },
+        "group": {
+          "type": "string"
+        },
+        "properties": {
+          "type": "object"
+        },
+        "nb-messages": {
+          "type": "number"
+        },
+        "selector": {
+          "type": "string"
+        },
+        "timeout": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "required": [
+        "topic",
+        "group"
+      ]
+    },
+    "scenario_task_steps": {
+      "description": "The scenario/task steps",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "additionalItems": false,
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "$ref": {
+                "type": "string",
+                "format": "uri-reference"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "$ref"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "debug"
+                ]
+              },
+              "inputs": {
+                "$ref": "#/definitions/debug_inputs"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "type": {
+                "enum": [
+                  "context-put"
+                ]
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "inputs": {
+                "$ref": "#/definitions/context_put_inputs"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "strategy": {
+                "$ref": "#/definitions/task_strategy"
+              },
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "http-get",
+                  "http-delete"
+                ]
+              },
+              "target": {
+                "$ref": "#/definitions/target"
+              },
+              "inputs": {
+                "$ref": "#/definitions/http_get_inputs"
+              },
+              "outputs": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "strategy": {
+                "$ref": "#/definitions/task_strategy"
+              },
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "http-post",
+                  "http-put"
+                ]
+              },
+              "target": {
+                "$ref": "#/definitions/target"
+              },
+              "inputs": {
+                "$ref": "#/definitions/http_put_post_inputs"
+              },
+              "outputs": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "json-validation"
+                ]
+              },
+              "inputs": {
+                "$ref": "#/definitions/json_validation_inputs"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "json-assert"
+                ]
+              },
+              "inputs": {
+                "$ref": "#/definitions/json_assert_inputs"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "xml-assert"
+                ]
+              },
+              "inputs": {
+                "$ref": "#/definitions/xml_assert_inputs"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "assert"
+                ]
+              },
+              "inputs": {
+                "$ref": "#/definitions/assert_inputs"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "json-compare"
+                ]
+              },
+              "inputs": {
+                "$ref": "#/definitions/json_compare_inputs"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "strategy": {
+                "$ref": "#/definitions/task_strategy"
+              },
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "amqp-basic-get"
+                ]
+              },
+              "target": {
+                "$ref": "#/definitions/target"
+              },
+              "inputs": {
+                "$ref": "#/definitions/amqp_basic_get_inputs"
+              },
+              "outputs": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "strategy": {
+                "$ref": "#/definitions/task_strategy"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "amqp-clean-queues"
+                ]
+              },
+              "target": {
+                "$ref": "#/definitions/target"
+              },
+              "inputs": {
+                "$ref": "#/definitions/amqp_clean_queues_inputs"
+              },
+              "outputs": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "amqp-basic-consume"
+                ]
+              },
+              "target": {
+                "$ref": "#/definitions/target"
+              },
+              "inputs": {
+                "$ref": "#/definitions/amqp_basic_consume_inputs"
+              },
+              "outputs": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target",
+              "inputs"
+            ]
+          },
+          {
+            "type": "object",
+            "properties": {
+              "gwtType": {
+                "$ref": "#/definitions/gwt_type"
+              },
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "kafka-basic-publish"
+                ]
+              },
+              "target": {
+                "$ref": "#/definitions/target"
+              },
+              "inputs": {
+                "$ref": "#/definitions/kafka_basic_publish_inputs"
+              },
+              "outputs": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "name": {
+                "$ref": "#/definitions/task_name"
+              },
+              "type": {
+                "enum": [
+                  "kafka-basic-consume"
+                ]
+              },
+              "target": {
+                "$ref": "#/definitions/target"
+              },
+              "inputs": {
+                "$ref": "#/definitions/kafka_basic_consume_inputs"
+              },
+              "outputs": {
+                "type": "object"
+              }
+            },
+            "additionalProperties": false
+          },
+          {
+            "$ref": "#/definitions/scenario_substeps"
+          }
+        ]
+      },
+      "additionalProperties": false
+    }
+  }
+}

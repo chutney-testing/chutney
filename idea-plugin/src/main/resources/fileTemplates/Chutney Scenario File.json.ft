@@ -1,0 +1,24 @@
+#set($fileNameWithoutExtension = $NAME)
+#if ($NAME.indexOf(".")>0)
+    #set($fileNameWithoutExtension = $NAME.substring(0,$NAME.indexOf(".")))
+#end
+{
+  "scenario": {
+    "gwtType": "ROOT_STEP",
+    "name": "$fileNameWithoutExtension",
+    "steps": [
+      {
+        "gwtType": "GIVEN",
+        "name": ""
+      },
+      {
+        "gwtType": "WHEN",
+        "name": ""
+      },
+      {
+        "gwtType": "THEN",
+        "name": ""
+      }
+    ]
+  }
+}

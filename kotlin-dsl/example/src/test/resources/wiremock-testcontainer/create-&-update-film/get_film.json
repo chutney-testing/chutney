@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "GET",
+        "url": "/films/1"
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "content-type": "application/json"
+        },
+        "body": "{\"title\": \"Castle in the Sky\",\"director\": \"Hayao Miyazaki\",\"rating\": \"79\",\"category\": \"fiction\"}"
+    }
+}

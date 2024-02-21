@@ -1,0 +1,21 @@
+{
+    "name": "ALONE",
+    "description": "alone environment for test",
+    "targets": [
+        {
+            "name": "target",
+            "url": "url",
+            "properties": {
+                "key": "value",
+                "username": "username",
+                "password": "password",
+                "trustStore": "path",
+                "trustStorePassword": "password",
+                "keyStore": "path",
+                "keyStorePassword": "password",
+                "keyPassword": "password",
+                "privateKey": "path"
+            }
+        }
+    ]
+}

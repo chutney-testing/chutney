@@ -1,0 +1,18 @@
+<templateSet group="Chutney">
+    <template name="cht-context-put"
+              value="{&#10;        &quot;gwtType&quot;: &quot;$GWT_TYPE$&quot;,&#10;        &quot;type&quot;: &quot;context-put&quot;,&#10;        &quot;inputs&quot;: {&#10;          &quot;entries&quot;: {&#10;            &quot;$KEY$&quot;: &quot;$VALUE$&quot;,&#10;             }&#10;        }&#10;}"
+              description="Chutney ContextPutTask" toReformat="true" toShortenFQNames="false">
+        <variable name="GWT_TYPE" expression="complete()" defaultValue="GIVEN" alwaysStopAt="true"/>
+        <variable name="KEY" expression="" defaultValue="" alwaysStopAt="true"/>
+        <variable name="VALUE" expression="" defaultValue="" alwaysStopAt="true"/>
+        <context>
+            <option name="JSON" value="true"/>
+        </context>
+    </template>
+    <template name="cht-debug" value="{&#10;  &quot;type&quot;: &quot;debug&quot;&#10;}" description="Chutney DebugTask"
+              toReformat="false" toShortenFQNames="true">
+        <context>
+            <option name="JSON" value="true"/>
+        </context>
+    </template>
+</templateSet>

@@ -1,0 +1,23 @@
+name: 🐛 Bug Report
+description: File a bug report
+title: "🐛 |  "
+labels: ["bug", "triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+
+        🙌 Please, make sure your bug report is unique 🦄 !
+        Did you search issues labeled with Bug ? If you find anything relevant to you, up-vote 👍 or add a comment 💬 !
+
+        For more information, please visit our [contribute section](https://github.com/chutney-testing/chutney/blob/master/CONTRIBUTING.md)
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: Describe the bug - What is the current behavior?
+      placeholder: A clear and concise description of what actually happens
+    validations:
+      required: true
+

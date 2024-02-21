@@ -1,0 +1,12 @@
+{
+    "request": {
+        "method": "PATCH",
+        "url": "/films/1"
+    },
+    "response": {
+        "status": 200,
+        "headers": {
+            "content-type": "application/json"
+        }
+    }
+}

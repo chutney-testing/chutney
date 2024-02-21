@@ -1,0 +1,131 @@
+# yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
+site_name: ''
+site_url: https://www.chutney-testing.com/
+site_description: Opinionated test tool for Specification by Example
+site_author: Chutney Testing Team
+repo_name:
+repo_url: https://github.com/chutney-testing/chutney/
+edit_uri: https://github.com/chutney-testing/chutney-testing.github.io/docs
+copyright: © Chutney Testing 2017 | under the Apache License, Version 2.0
+
+nav:
+  - Overview: index.md
+  - Getting Started:
+      - Requirements: getting_started/requirements.md
+      - Write your first scenario: getting_started/write.md
+      - Run your scenario: getting_started/run.md
+  - Installation:
+      - Local Development: installation/local_dev.md
+      - On premise:
+          - Introduction: installation/on_premise/index.md
+          - Minimal configuration: installation/on_premise/minimal_conf.md
+          - Further details: installation/on_premise/details.md
+      - Advance topics: installation/advance_topics.md
+      - CI/CD integration:
+          - synchronize: installation/ci_cd/scenario_sync.md
+  - Documentation:
+      - Write a scenario: documentation/write.md
+      - Actions:
+          - documentation/actions/index.md
+          - AMQP: documentation/actions/amqp.md
+          - Groovy: documentation/actions/groovy.md
+          - HTTP: documentation/actions/http.md
+          - JMS: documentation/actions/jms.md
+          - Kafka: documentation/actions/kafka.md
+          - MongoDB: documentation/actions/mongo.md
+          - Radius: documentation/actions/radius.md
+          - Selenium: documentation/actions/selenium.md
+          - SOAP: documentation/actions/soap.md
+          - SQL: documentation/actions/sql.md
+          - SCP / FTP / SSH: documentation/actions/ssh.md
+          - Assertions: documentation/actions/assertions.md
+          - Micrometer: documentation/actions/micrometer.md
+          - Other: documentation/actions/other.md
+          - Extension: documentation/actions/extension.md
+      - Functions:
+          - Classpath: documentation/functions/classpath.md
+          - Dates & Time: documentation/functions/datetime.md
+          - Escape: documentation/functions/escape.md
+          - Handling null: documentation/functions/nullable.md
+          - JSON: documentation/functions/json.md
+          - Micrometer: documentation/functions/micrometer.md
+          - Network: documentation/functions/network.md
+          - Random values: documentation/functions/generate.md
+          - SOAP: documentation/functions/soap.md
+          - String: documentation/functions/string.md
+          - Wiremock: documentation/functions/wiremock.md
+          - XPath: documentation/functions/xpath.md
+          - Extension: documentation/functions/extension.md
+#  - Toolbox: toolbox.md # hidden page
+
+extra_css:
+  - stylesheets/extra.css
+
+theme:
+  name: material
+  favicon: img/favicon.ico
+  logo: img/logo.svg
+  language: en
+  font:
+    text: Ubuntu
+    #text: Montserrat
+    code: Source Code Pro
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/toggle-switch
+        # icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/toggle-switch-off-outline
+        # icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - content.code.annotate
+    - content.tabs.link
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.expand
+    - navigation.indexes
+#    - header.autohide
+
+# Material theme specific
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/chutney-testing
+
+markdown_extensions:
+  - toc:
+      permalink: "🔗"
+      baselevel: 2
+      toc_depth: 3
+  - footnotes
+  - admonition
+  - pymdownx.highlight:
+      linenums: true
+      anchor_linenums: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+
+plugins:
+  - search
+  - git-revision-date-localized
+  - redirects:
+        redirect_maps:
+          'install.md': 'index.md'   # to be removed after fixing in chutney

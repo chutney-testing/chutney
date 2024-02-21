@@ -1,0 +1,24 @@
+name: 🙋 Ask a Question
+description: Ask a question or suggest an idea for this documentation
+title: "🙋 | "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        🙌  Please, make sure your question is unique 🦄 !
+        Did you search issues labeled with Question ? If you find anything relevant to you, up-vote 👍 or add a comment 💬 !
+  - type: textarea
+    id: question
+    attributes:
+      label: Ask your question or suggest your idea !
+      placeholder: A clear and concise question ?
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Describe your use case
+      placeholder: Describes the context in which you asked yourself this question.
+    validations:
+      required: false

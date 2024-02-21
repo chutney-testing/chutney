@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>CHUTNEY REPORTS</title>
+    <link href="https://unpkg.com/tailwindcss@^1.0/dist/tailwind.min.css" rel="stylesheet">
+</head>
+<script type="text/javascript" src="chutney.js"></script>
+<body class="bg-gray-200">
+
+    <div id="report-list" class="grid grid-cols-1 gap-4 mt-5 mb-5">
+    </div>
+
+    <template id="report-success-template">
+        <div class="relative flex justify-center mr-5 ml-5 p-4 border-4 border-green-300 bg-green-100 rounded-lg shadow cursor-pointer"></div>
+    </template>
+    <template id="report-failure-template">
+        <div class="relative flex justify-center mr-5 ml-5 p-4 border-4 border-red-300 bg-red-100 rounded-lg shadow cursor-pointer"></div>
+    </template>
+    <template id="report-env-template">
+        <div class="absolute left-0 top-0 p-1 text-xs italic text-black"></div>
+    </template>
+
+</body>
+</html>

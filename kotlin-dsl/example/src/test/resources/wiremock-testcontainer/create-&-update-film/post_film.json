@@ -1,0 +1,13 @@
+{
+    "request": {
+        "method": "POST",
+        "url": "/films"
+    },
+    "response": {
+        "status": 201,
+        "headers": {
+            "content-type": "application/json"
+        },
+        "body": "1"
+    }
+}

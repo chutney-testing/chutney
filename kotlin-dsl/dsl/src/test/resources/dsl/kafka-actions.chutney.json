@@ -1,0 +1,38 @@
+{
+    "title": "Kafka actions",
+    "description": "Kafka actions",
+    "when": {
+        "description": "nothing"
+    },
+    "thens": [
+        {
+            "description": "Publish",
+            "implementation": {
+                "type": "kafka-basic-publish",
+                "target": "target",
+                "inputs": {
+                    "topic": "topic",
+                    "payload": "payload",
+                    "properties": {
+                        "bootstrap.servers": "a.host:666,b.host:999"
+                    }
+                }
+            }
+        },
+        {
+            "description": "Consume",
+            "implementation": {
+                "type": "kafka-basic-consume",
+                "target": "target",
+                "inputs": {
+                    "topic": "topic",
+                    "group": "group",
+                    "nb-messages": 2,
+                    "header-selector": "$[json/path]",
+                    "content-type": "application/json",
+                    "ackMode": "MANUAL"
+                }
+            }
+        }
+    ]
+}
