@@ -1,4 +1,4 @@
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/function/EscapeFunctions.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/function/EscapeFunctions.java){:target="_blank"}"
 
 Following functions help you escape and unescape strings from JSON, HTML, XML and SQL.
 

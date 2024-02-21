@@ -96,7 +96,7 @@ mvn jasypt:decrypt-value -Djasypt.encryptor.private-key-location="file:src/main/
 ```
 
 ## 3- Hashing
-When using in memory authentication ([`mem-auth`](https://github.com/chutney-testing/chutney/blob/master/packaging/local-dev/src/main/resources/application.yml#:~:text=%2D-,mem%2Dauth,-%2D%20dev%2Dauth)), we need to hide passwords by hashing them.
+When using in memory authentication ([`mem-auth`](https://github.com/chutney-testing/chutney/blob/main/chutney/packaging/local-dev/src/main/resources/application.yml#:~:text=%2D-,mem%2Dauth,-%2D%20dev%2Dauth)), we need to hide passwords by hashing them.
 
 Hash is calculated using [Bcrypt](https://en.wikipedia.org/wiki/Bcrypt).
 ### 3.a-  generate bcrypt hash using spring boot cli

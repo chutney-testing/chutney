@@ -1,0 +1,31 @@
+name: 'build all projects'
+description: 'build all projects sequentially'
+inputs:
+  goals:
+    default: "clean build :chutney-kotlin-dsl:publishToMavenLocal"
+    description: "Gradle goals to execute"
+  cache-artifacts:
+    default: ""
+    description: "path of artifacts to be cached"
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Build DSL
+      shell: bash
+      run: |
+        cd ./kotlin-dsl
+        echo "Running: ${{inputs.goals}}"
+        ./gradlew ${{inputs.goals}} :chutney-kotlin-dsl:publishToMavenLocal 
+        cd ..
+
+    - name: Temporarily cache jar artifacts
+      if: inputs.cache-artifacts != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: dsl-artifacts
+        path: ${{inputs.cache-artifacts}}
+        retention-days: 1
+        overwrite: true

@@ -76,16 +76,16 @@ Chutney uses Spring Security for :
 If you want to add another authentication mechanism, you should follow the [Spring security architecture](https://spring.io/guides/topicals/spring-security-architecture).
 
 !!! important "Authentication requirements"
-    The principal build by the authentication mechanism must be an instance of the Chutney [UserDto](https://github.com/chutney-testing/chutney/blob/master/server/src/main/java/com/chutneytesting/security/api/UserDto.java).
+    The principal build by the authentication mechanism must be an instance of the Chutney [UserDto](https://github.com/chutney-testing/chutney/blob/main/chutney/server/src/main/java/com/chutneytesting/security/api/UserDto.java).
 
 User roles and permissions are configured either with Web app form or by editing the file.
 
-One could use the existing [AuthenticationService](https://github.com/chutney-testing/chutney/blob/master/server/src/main/java/com/chutneytesting/security/domain/AuthenticationService.java) Chutney Spring Bean to retrieve Chutney roles by user id and grant associated authorities. <!-- TODO : I don't understand what you mean, is it useful ? provide a real use case for showing why and how it could be done -->
+One could use the existing [AuthenticationService](https://github.com/chutney-testing/chutney/blob/main/chutney/server/src/main/java/com/chutneytesting/security/domain/AuthenticationService.java) Chutney Spring Bean to retrieve Chutney roles by user id and grant associated authorities. <!-- TODO : I don't understand what you mean, is it useful ? provide a real use case for showing why and how it could be done -->
 
 !!! note "How to manage permissions"
     * A user can only have one role
-    * Chutney permissions are defined in the [Authorization](https://github.com/chutney-testing/chutney/blob/master/server-core/src/main/java/com/chutneytesting/server/core/domain/security/Authorization.java) class.
-    * The static `grantAuthoritiesFromUserRole` method of [UserDetailsServiceHelper](https://github.com/chutney-testing/chutney/blob/master/server/src/main/java/com/chutneytesting/security/infra/UserDetailsServiceHelper.java) class could be used to have the same authentication process than `mem-auth` profile,  
+    * Chutney permissions are defined in the [Authorization](https://github.com/chutney-testing/chutney/blob/main/chutney/server-core/src/main/java/com/chutneytesting/server/core/domain/security/Authorization.java) class.
+    * The static `grantAuthoritiesFromUserRole` method of [UserDetailsServiceHelper](https://github.com/chutney-testing/chutney/blob/main/chutney/server/src/main/java/com/chutneytesting/security/infra/UserDetailsServiceHelper.java) class could be used to have the same authentication process than `mem-auth` profile,  
     i.e. if the user has a role name containing the characters 'admin', ignoring case, user will be given all authorities available, else he will be given the authorities associated by the role retrieved by the AuthenticationService.
 
 # Compression

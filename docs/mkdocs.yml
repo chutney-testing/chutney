@@ -5,7 +5,7 @@ site_description: Opinionated test tool for Specification by Example
 site_author: Chutney Testing Team
 repo_name:
 repo_url: https://github.com/chutney-testing/chutney/
-edit_uri: https://github.com/chutney-testing/chutney-testing.github.io/docs
+edit_uri: https://github.com/chutney-testing/chutney/docs/docs/
 copyright: © Chutney Testing 2017 | under the Apache License, Version 2.0
 
 nav:

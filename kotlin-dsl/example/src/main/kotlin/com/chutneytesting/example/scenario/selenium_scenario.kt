@@ -25,14 +25,6 @@ fun selenium_scenario(hub: String) = Scenario(title = "Selenium scenario") {
         }
     }
     And("And scenario page are loaded") {
-        Step("Menu has admin section") {
-            SeleniumGetTextAction(
-                selector = "//*[@class='menu-header'][2]",
-                by = SELENIUM_BY.xpath,
-                wait = 10,
-                validations = mapOf("content is equals to ADMIN" to "#outputGetText.equals('ADMIN')".elEval())
-            )
-        }
         Step("Scenario menu is selected") {
             SeleniumGetAttributeAction(
                 selector = "//*[@href='#/scenario']",

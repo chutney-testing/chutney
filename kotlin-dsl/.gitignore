@@ -1,8 +1,3 @@
-# IntelliJ project files
-.idea
-*.iml
-out
-gen
 
 ### Gradle template
 ###############################################################################
@@ -13,7 +8,6 @@ DEVREP
 
 # Ignore Gradle GUI config
 gradle-app.setting
-gradle.properties
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
@@ -23,12 +17,6 @@ gradle.properties
 
 # # Work around https://youtrack.jetbrains.com/issue/IDEA-116898
 # gradle/wrapper/gradle-wrapper.properties
-
-# Maven
-###############################################################################
-/log/
-**/target/
-.mvn/maven.config
 
 
 # Chutney reports

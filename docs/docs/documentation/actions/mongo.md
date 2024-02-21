@@ -1,11 +1,11 @@
 ??? info "Browse implementations"
 
-    - [Count](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoCountAction.java){:target="_blank"}
-    - [Delete](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoDeleteAction.java){:target="_blank"}
-    - [Find](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoFindAction.java){:target="_blank"}
-    - [Insert](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoInsertAction.java){:target="_blank"}
-    - [List Collections](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoListAction.java){:target="_blank"}
-    - [Update](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoUpdateAction.java){:target="_blank"}
+    - [Count](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoCountAction.java){:target="_blank"}
+    - [Delete](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoDeleteAction.java){:target="_blank"}
+    - [Find](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoFindAction.java){:target="_blank"}
+    - [Insert](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoInsertAction.java){:target="_blank"}
+    - [List Collections](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoListAction.java){:target="_blank"}
+    - [Update](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoUpdateAction.java){:target="_blank"}
 
 !!! important "Target Configuration"
     For all actions, the target should have a property `databaseName`
@@ -45,7 +45,7 @@
     ```
 
 # Count
-!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoCountAction.java){:target="_blank"}
+!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoCountAction.java){:target="_blank"}
 
 === "Inputs"
 
@@ -73,7 +73,7 @@ MongoCountAction(
 ```
 
 # Delete
-!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoDeleteAction.java){:target="_blank"}
+!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoDeleteAction.java){:target="_blank"}
 
 === "Inputs"
 
@@ -101,7 +101,7 @@ MongoDeleteAction(
 ```
 
 # Find
-!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoFindAction.java){:target="_blank"}
+!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoFindAction.java){:target="_blank"}
 
 === "Inputs"
 
@@ -131,7 +131,7 @@ MongoFindAction(
 ```
 
 # Insert
-!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoInsertAction.java){:target="_blank"}
+!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoInsertAction.java){:target="_blank"}
 
 === "Inputs"
 
@@ -155,7 +155,7 @@ MongoInsertAction(
 ```
 
 # List Collections
-!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoListAction.java){:target="_blank"}
+!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoListAction.java){:target="_blank"}
 
 === "Inputs"
 
@@ -179,7 +179,7 @@ MongoListAction(
 ```
 
 # Update
-!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoUpdateAction.java){:target="_blank"}
+!!! info [Browse implementations](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/mongo/MongoUpdateAction.java){:target="_blank"}
 
 === "Inputs"
 

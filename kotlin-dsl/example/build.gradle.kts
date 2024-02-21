@@ -1,3 +1,5 @@
+fun properties(key: String) = project.findProperty(key).toString()
+version = properties("chutneyVersion")
 dependencies {
     implementation(project(":chutney-kotlin-dsl"))
     testImplementation("org.testcontainers:testcontainers")

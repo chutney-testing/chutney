@@ -1,12 +1,12 @@
 ??? info "Browse implementations"
 
-    - [GET](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpGetAction.java){:target="_blank"}
-    - [POST](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpPostAction.java){:target="_blank"}
-    - [PUT](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpPutAction.java){:target="_blank"}
-    - [DELETE](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpDeleteAction.java){:target="_blank"}
-    - [PATCH](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpPatchAction.java){:target="_blank"}
-    - [Start mock server](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpsServerStartAction.java){:target="_blank"}
-    - [Listened routes](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpsListenerAction.java){:target="_blank"}
+    - [GET](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpGetAction.java){:target="_blank"}
+    - [POST](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpPostAction.java){:target="_blank"}
+    - [PUT](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpPutAction.java){:target="_blank"}
+    - [DELETE](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpDeleteAction.java){:target="_blank"}
+    - [PATCH](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpPatchAction.java){:target="_blank"}
+    - [Start mock server](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpsServerStartAction.java){:target="_blank"}
+    - [Listened routes](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpsListenerAction.java){:target="_blank"}
 
 !!! note "How to request a secured service"
 
@@ -49,7 +49,7 @@
 2. `userPassword` or `password` to define password for basic authentification
 
 # Get
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpGetAction.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpGetAction.java){:target="_blank"}"
 
 === "Inputs"
 
@@ -83,7 +83,7 @@
     ```
 
 # Post
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpPostAction.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpPostAction.java){:target="_blank"}"
 
 === "Inputs"
 
@@ -118,7 +118,7 @@
     ```
 
 # Put
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpPutAction.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpPutAction.java){:target="_blank"}"
 
 === "Inputs"
 
@@ -153,7 +153,7 @@
     ```
 
 # Delete
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpDeleteAction.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpDeleteAction.java){:target="_blank"}"
 
 === "Inputs"
 
@@ -187,7 +187,7 @@
     ```
 
 # Patch
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpPatchAction.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpPatchAction.java){:target="_blank"}"
 
 === "Inputs"
 
@@ -223,7 +223,7 @@
 # Mocking an HTTP Server
 
 ## Start
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpsServerStartAction.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpsServerStartAction.java){:target="_blank"}"
 
 === "Inputs"
 
@@ -259,7 +259,7 @@
     This action automatically registers a teardown to stop the server at the end of the scenario.
 
 ## Listened routes
-!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/master/action-impl/src/main/java/com/chutneytesting/action/http/HttpsListenerAction.java){:target="_blank"}"
+!!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/http/HttpsListenerAction.java){:target="_blank"}"
 
 This actions allows you to check which requests have been received by a wiremock server.  
 Available verbs are : `GET`, `POST`, `PUT`, `DELETE`, `PATCH`, `OPTIONS`, `HEAD`, `TRACE`, `ANY`

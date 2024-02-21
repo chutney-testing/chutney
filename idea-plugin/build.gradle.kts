@@ -24,7 +24,7 @@ configurations.runtimeOnly {
 }
 
 group = properties("pluginGroup")
-version = properties("pluginVersion")
+version = properties("chutneyVersion")
 
 repositories {
     mavenLocal()
@@ -32,20 +32,11 @@ repositories {
     maven {
         url = uri("https://repo1.maven.org/maven2")
     }
-    ivy {
-        url = uri("https://github.com/")
-        patternLayout {
-            artifact("/[organisation]/[module]/releases/download/[revision]/[artifact]-[revision].[ext]")
-        }
-        // This is required in Gradle 6.0+ as metadata file (ivy.xml) is mandatory.
-        // Docs https://docs.gradle.org/6.2/userguide/declaring_repositories.html#sec:supported_metadata_sources
-        metadataSources { artifact() }
-    }
 }
 
 dependencies {
     implementation(enforcedPlatform("com.chutneytesting:chutney-parent:${properties["chutneyVersion"]}"))
-    implementation("com.chutneytesting", "chutney-kotlin-dsl", "2.0.1")
+    implementation("com.chutneytesting", "chutney-kotlin-dsl", properties("chutneyVersion"))
     implementation("com.google.guava", "guava")
     implementation("org.hjson", "hjson")
     implementation("org.apache.commons", "commons-text")
@@ -64,8 +55,7 @@ dependencies {
         // exclude("org.sl4j") does not exclude
         isTransitive = false // this exclude "org.sl4j"
     }
-    testImplementation("junit", "junit", "4.12")
-    runtimeOnly("chutney-testing", "chutney-idea-server", properties("chutneyIdeaServerVersion"), ext = "jar") {
+    runtimeOnly("com.chutneytesting", "local-api-unsecure", properties("chutneyVersion"), ext = "jar") {
         isTransitive = false
     }
 
@@ -92,13 +82,13 @@ intellij {
         }
     }
 }
-configure<JavaPluginConvention> {
+configure<JavaPluginExtension> {
     sourceCompatibility = JavaVersion.VERSION_17
 }
 
 // Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
 changelog {
-    version.set(properties("pluginVersion"))
+    version.set(properties("chutneyVersion"))
     groups.set(emptyList())
 }
 
@@ -115,7 +105,7 @@ tasks {
 
 
     patchPluginXml {
-        version.set(properties("pluginVersion"))
+        version.set(properties("chutneyVersion"))
         sinceBuild.set(properties("pluginSinceBuild"))
         untilBuild.set(properties("pluginUntilBuild"))
 
@@ -146,6 +136,6 @@ tasks {
         // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
         // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
         // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(listOf(properties("pluginVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+        channels.set(listOf(properties("chutneyVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
     }
 }

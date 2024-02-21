@@ -30,7 +30,7 @@ private class ChutneyTestEngineTest {
         fun emptySelectors(): Array<Any> {
             return arrayOf(
                 selectClass("UnknownClass"),
-                selectClasspathRoots(setOf(Path.of("../.github")))[0],
+                selectClasspathRoots(setOf(Path.of("./src/test/kotlin/com/chutneytesting/kotlin/junit/engine")))[0],
                 selectClasspathResource("unknownResource"),
                 selectMethod("com.chutneytesting.kotlin.junit.engine.ChutneyTest#unknownMethod()")
             )
