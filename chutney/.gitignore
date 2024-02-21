@@ -45,25 +45,6 @@ ui/documentation.json
 ######################
 .jqwik-database
 
-######################
-# Eclipse
-######################
-*.pydevproject
-.project
-.metadata
-tmp/
-tmp/**/*
-*.tmp
-*.bak
-*.swp
-*~.nib
-local.properties
-.classpath
-.settings/
-.loadpath
-.factorypath
-/src/main/resources/rebel.xml
-
 # External tool builders
 .externalToolBuilders/**
 
@@ -75,58 +56,24 @@ local.properties
 
 # PDT-specific
 .buildpath
-
-######################
-# Intellij
-######################
-**/.idea/*
-!.idea/codeStyleSettings.xml
-!.idea/codeStyles
-!.idea/runConfigurations
-!.idea/copyright
-!.idea/scopes
-*.iml
-*.iws
-*.ipr
-*.ids
-*.orig
 classes/
 /out
 /out-tsc/
 **/ui/out-tsc/
 
 ######################
-# Visual Studio Code
-######################
-.vscode/
-**/.sts4-cache
-
-######################
 # Maven
 ######################
 /log/
 **/target/
-# Except for the target folder inside src
-!**/src/**/target/
 .mvn/
+!/**/src/**/target/
 
 ######################
 # Maven Wrapper
 ######################
 !.mvn/wrapper/maven-wrapper.jar
 
-######################
-# Gradle
-######################
-.gradle/
-/build/
-classes/
-.gradletasknamecache
-
-######################
-# Gradle Wrapper
-######################
-!gradle/wrapper/gradle-wrapper.jar
 
 ######################
 # Package Files

@@ -318,9 +318,8 @@ Use it to update [CHANGELOG.md](https://github.com/chutney-testing/chutney/blob/
 In order to avoid committing unwanted files, we prefer to review changes with a pull request.
 
 ```shell
-mvn versions:set -pl '!packaging' -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
 mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false
-mvn versions:set-property -Dproperty=chutney.version -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
 git add .
 git diff --staged
 git commit -m "chore: Release <RELEASE_VERSION>"
@@ -361,9 +360,8 @@ In order to effectively release artifacts :
 ### Prepare next development
 
 ```shell
-mvn versions:set -pl '!packaging' -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false
 mvn versions:set-scm-tag -DnewTag=HEAD -DgenerateBackupPoms=false
-mvn versions:set-property -Dproperty=chutney.version -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false
 git diff HEAD
 git add . && git commit -m "chore: Prepare next development <NEXT_DEV_VERSION>"
 git push origin

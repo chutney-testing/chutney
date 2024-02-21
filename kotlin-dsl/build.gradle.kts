@@ -1,21 +1,10 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    id("org.ajoberstar.reckon") version "0.18.0"
-
-    kotlin("jvm") version "1.9.21" apply false
-}
-
-reckon {
-    setDefaultInferredScope("patch")
-    stages("rc", "final")
-    setScopeCalc(calcScopeFromProp().or(calcScopeFromCommitMessages()))
-    setStageCalc(calcStageFromProp())
+     kotlin("jvm") version "1.8.22" apply false
 }
 
 subprojects {
-    extra["chutneyTestingVersion"] = "2.7.0"
-
     repositories {
         mavenLocal()
         mavenCentral()
@@ -33,15 +22,15 @@ subprojects {
         testImplementation("org.junit.jupiter:junit-jupiter-params")
         testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 
-        implementation(enforcedPlatform("com.chutneytesting:chutney-parent:${project.extra["chutneyTestingVersion"]}"))
+        implementation(enforcedPlatform("com.chutneytesting:chutney-parent:${properties["chutneyVersion"]}"))
         // Resolve conflicts from chutney-parent for runtime classpath
-        runtimeOnly("com.fasterxml.jackson.module:jackson-module-scala_2.13") // :2.15.3
-        runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-csv") // :2.15.3
-        runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml") // :2.15.3
-        runtimeOnly("org.eclipse.jetty:jetty-client") // :12.0.5
-        runtimeOnly("org.eclipse.jetty:jetty-security") // :12.0.5
-        runtimeOnly("org.eclipse.jetty:jetty-xml") // :12.0.5
-        runtimeOnly("org.eclipse.jetty.http2:http2-common:11.0.19")
+        runtimeOnly("com.fasterxml.jackson.module:jackson-module-scala_2.13") // :2.15.2
+        runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-csv") // :2.15.2
+        runtimeOnly("com.fasterxml.jackson.dataformat:jackson-dataformat-yaml") // :2.15.2
+        runtimeOnly("org.eclipse.jetty:jetty-client:11.0.15") // :11.0.15
+        runtimeOnly("org.eclipse.jetty:jetty-security:11.0.15") // :11.0.15
+        runtimeOnly("org.eclipse.jetty:jetty-xml:11.0.15") // :11.0.15
+        runtimeOnly("org.eclipse.jetty.http2:http2-common:11.0.15") // :11.0.15
     }
 
     tasks.withType<KotlinCompile> {

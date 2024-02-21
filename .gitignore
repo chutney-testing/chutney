@@ -1,0 +1,22 @@
+######################
+# Intellij
+######################
+**/.idea/*
+!.idea/codeStyleSettings.xml
+!.idea/codeStyles
+!.idea/runConfigurations
+*.iml
+*.iws
+*.ipr
+*.ids
+*.orig
+
+
+######################
+# Visual Studio Code
+######################
+.vscode/
+**/.sts4-cache
+
+
+.env.chutney

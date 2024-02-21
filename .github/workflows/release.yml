@@ -1,0 +1,44 @@
+name: "Release all"
+
+on:
+  push:
+    tags:
+      - '*.*.*'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-all-template.yml
+    with:
+      skipTests: true
+      cache-artifacts: |
+        chutney/packaging/local-dev/target/chutney-local-dev-*.jar
+        idea-plugin/build/distributions/*.zip
+        chutney/ui/dist
+
+  release-github:
+    needs: [ build ]
+    if: ${{ contains(github.ref_name, 'RC') }}
+    uses: ./.github/workflows/release-github-template.yml
+
+  release-to-OSSRH:
+    if: ${{ ! contains(github.ref_name, 'RC') }}
+    needs: [ build ]
+    uses: ./.github/workflows/build-all-template.yml
+    with:
+      release: true
+      server-id: ossrh
+    secrets:
+      gpg-private-key: ${{secrets.CHUTNEY_GPG_PRIVATE_KEY}}
+      gpg-passphrase: ${{ secrets.CHUTNEY_GPG_PASSPHRASE }}
+      gpg-key-id: ${{ secrets.CHUTNEY_GPG_KEY_ID }}
+      maven-username: ${{ secrets.OSSRH_USERNAME }}
+      maven-password: ${{ secrets.OSSRH_PASSWORD }}
+
+  release-docker:
+    needs: [ build ]
+    uses: ./.github/workflows/release-docker-template.yml
+    with:
+      version: ${{needs.build.outputs.PROJECT_VERSION}}
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+

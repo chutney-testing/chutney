@@ -1,0 +1,53 @@
+name: 'build chutney'
+description: 'build chutney'
+inputs:
+  goals:
+    default: "clean install -V -B"
+    description: "Maven goals to execute"
+  cache-artifacts:
+    default: ""
+    description: "path of artifacts to be cached"
+runs:
+  using: "composite"
+  steps:
+    - name: Cache node
+      uses: actions/cache@v3
+      with:
+        path: '**/node'
+        key: node_cache
+
+    - name: Cache node_modules
+      uses: actions/cache@v3
+      with:
+        path: '**/node_modules'
+        key: node_module_cache
+
+    - uses: actions/checkout@v4
+
+    - name: Add the current IP address, long hostname and short hostname record to /etc/hosts file
+      if: ${{ ! contains(inputs.goals, '-DskipTests') }}
+      shell: bash
+      run: |
+        echo -e "$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)\t$(hostname -f) $(hostname -s)" | sudo tee -a /etc/hosts
+
+    - name: Build Chutney
+      shell: bash
+      run: |
+        cd ./chutney
+        echo "Running: ${{inputs.goals}}"
+        mvn ${{ inputs.goals }}
+        cd ..
+
+    - name: Codecov
+      if: ${{ ! contains(inputs.goals, '-DskipTests') }}
+      uses: codecov/codecov-action@v3
+
+    - name: Temporarily cache jar artifacts
+      if: inputs.cache-artifacts != ''
+      uses: actions/upload-artifact@v4
+      with:
+        name: chutney-artifacts
+        path: ${{inputs.cache-artifacts}}
+        retention-days: 1
+        overwrite: true
+

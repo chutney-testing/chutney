@@ -1,0 +1,55 @@
+name: "Release on Github"
+
+on:
+  workflow_call:
+
+jobs:
+  create-github-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create github release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          body: 'TODO'
+          draft: false
+          prerelease: false
+    outputs:
+      RELEASE_PATH: ${{ steps.create_release.outputs.upload_url }}
+
+  publish-to-github-maven-registry:
+    uses: ./.github/workflows/build-all-template.yml
+    with:
+      release: true
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+      maven-username: ${{ github.actor }}
+      maven-password: ${{ secrets.GITHUB_TOKEN }}
+
+
+  upload-plugin-to-release:
+    needs: [ create-github-release]
+    runs-on: ubuntu-latest
+    steps:
+      - name: get plugin artifacts from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: plugin-artifacts
+          path: artifacts
+
+      - name: Upload artifacts to github release
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create-github-release.outputs.RELEASE_PATH }}
+          asset_path: artifacts/idea-plugin/build/distributions/chutney-idea-plugin-${{ github.ref_name }}.zip
+          asset_name: chutney-idea-plugin-${{ github.ref_name }}.zip
+          asset_content_type: application/zip
+      
+
+

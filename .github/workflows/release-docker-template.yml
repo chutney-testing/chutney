@@ -1,0 +1,62 @@
+name: "Release docker images on ghcr"
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        type: string
+        description: "Project version"
+    secrets:
+      github-token:
+        description: "GITHUB_TOKEN secret"
+        required: true
+
+jobs:
+  publish-server-image:
+    name: Publish server docker image on ghcr
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download server artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: chutney-artifacts
+          path: artifacts
+
+      - name: Login to Github Packages
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.github-token }}
+
+      - name: Build and push server docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ github.workspace }}
+          file: ${{ github.workspace }}/chutney/.docker/server/Dockerfile
+          tags: |
+            ghcr.io/chutney-testing/chutney-suite/server:latest
+            ghcr.io/chutney-testing/chutney-suite/server:${{ inputs.version }}
+          push: true
+          build-args: |
+            JAR_PATH=artifacts/chutney/packaging/local-dev/target
+
+      - name: Build and push ui docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ github.workspace }}
+          file: ${{ github.workspace }}/chutney/.docker/ui/Dockerfile
+          tags: |
+            ghcr.io/chutney-testing/chutney-suite/ui:latest
+            ghcr.io/chutney-testing/chutney-suite/ui:${{ inputs.version }}
+          push: true
+          build-args: |
+            WEBSITE=artifacts/chutney/ui/dist
+            CONF=chutney/.docker/ui
+
+

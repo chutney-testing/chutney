@@ -25,7 +25,7 @@ To launch Chutney in _local-dev_ mode, use
 * [Npm] (https://www.npmjs.com/) - version 6.14.4 or higher - JavaScript package manager
 
 
-If you use **direnv** and **nix** packages manager, we provide 2 files for the ui module : [.env.nix](.env.nix) and [.envrc](.envrc).
+If you use **direnv** and **nix** packages manager, we provide 2 files for the ui module : [.env.nix](../.env.nix) and [.envrc](../.envrc).
 
 Upon running **direnv allow** inside ui module folder, it will install node, npm, and some usefull symlinks you can use for configuring IDE or other tools.
 
@@ -56,4 +56,4 @@ Main class : com.chutneytesting.ServerBootstrap
 - Run Unit Test: `mvn test`
     - Chutney now eats its own dog food,
     - [Glacio features](https://github.com/chutney-testing/glacio) in [server/src/test/resources/blackbox](server/src/test/resources/blackbox) are run by JUnit using [chutney-junit](https://github.com/chutney-testing/chutney-junit) and [glacio-adapter](glacio-adapter)
-- [run configuration for Intellij IDEA](.idea/runConfigurations)
+- [run configuration for Intellij IDEA](../.idea/runConfigurations)

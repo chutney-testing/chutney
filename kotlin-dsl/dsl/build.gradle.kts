@@ -1,6 +1,8 @@
 import java.time.Instant
 import java.time.format.DateTimeFormatter
 
+fun properties(key: String) = project.findProperty(key).toString()
+
 plugins {
     java
     `maven-publish`
@@ -8,6 +10,7 @@ plugins {
 }
 
 val group = "com.chutneytesting"
+version = properties("chutneyVersion")
 val timestamp: String = DateTimeFormatter.ISO_INSTANT.format(Instant.now())
 val githubUrl = "https://github.com/chutney-testing/${project.name}"
 val publicationName = "chutneyKotlinDSL"
@@ -22,9 +25,9 @@ configurations {
 
 dependencies {
 
-    api("com.chutneytesting:engine:${project.extra["chutneyTestingVersion"]}")
-    implementation("com.chutneytesting:environment:${project.extra["chutneyTestingVersion"]}")
-    runtimeOnly("com.chutneytesting:action-impl:${project.extra["chutneyTestingVersion"]}")
+    api("com.chutneytesting:engine:${properties["chutneyVersion"]}")
+    implementation("com.chutneytesting:environment:${properties["chutneyVersion"]}")
+    runtimeOnly("com.chutneytesting:action-impl:${properties["chutneyVersion"]}")
 
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.slf4j:slf4j-api")
@@ -70,17 +73,28 @@ tasks.withType<GenerateModuleMetadata> {
     suppressedValidationErrors.add("enforced-platform")
 }
 
+tasks.withType<PublishToMavenRepository>().configureEach {
+    val predicate = provider {
+        val publishToOssrh = repository == publishing.repositories["ossrh"] && project.findProperty("server-id") == "ossrh"
+        val publishToGithub = repository == publishing.repositories["github"] && project.findProperty("server-id") == "github"
+        publishToOssrh || publishToGithub
+    }
+    onlyIf("publish to ossrh or github") {
+        predicate.get()
+    }
+}
+
 publishing {
     publications {
         create<MavenPublication>(publicationName) {
             groupId = group
             artifactId = project.name
-            version = project.version.toString()
+            version = properties("chutneyVersion")
             from(components["java"])
             pom {
                 name.set("Chutney Kotlin DSL")
                 description.set("Generates Chutney scenarios using Kotlin.")
-                inceptionYear.set("2020")
+                inceptionYear.set("2017")
                 url.set(githubUrl)
                 licenses {
                     license {
@@ -124,39 +138,45 @@ publishing {
                         id.set("KarimGl")
                         name.set("Karim Goubbaa")
                     }
+                    developer {
+                        id.set("DelaunayAlex")
+                        name.set("Alexandre Delaunay")
+                    }
                 }
             }
         }
     }
     repositories {
         maven {
-            name = "OSSRH"
-
-            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots"
-
-            val ossrhUsername =
-                System.getenv("OSSRH_USERNAME") // Use token ; https://s01.oss.sonatype.org/#profile;User%20Token
-            val ossrhPassword = System.getenv("OSSRH_PASSWORD") // Use token
-
-            url = uri(releasesRepoUrl)
+            name = "ossrh"
+            url = uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/")
             credentials {
-                username = ossrhUsername
-                password = ossrhPassword
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
+            }
+        }
+        maven {
+            name = "github"
+            url = uri("https://maven.pkg.github.com/chutney-testing/chutney-suite")
+            credentials {
+                username = System.getenv("MAVEN_USERNAME")
+                password = System.getenv("MAVEN_PASSWORD")
             }
         }
     }
 }
 
 signing {
-    //useGpgCmd()
-
-    // Format: "0x12345678" ; gpg --list-keys --keyid-format 0xSHORT
-    val signingKeyId: String? = System.getenv("CHUTNEY_GPG_KEY_ID")
-
-    // gpg -a --export-secret-subkeys KEY_ID
-    val signingKey: String? = System.getenv("CHUTNEY_GPG_KEY")
-    val signingPassword: String? = System.getenv("CHUTNEY_GPG_PASSPHRASE")
-    useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
-    sign(publishing.publications[publicationName])
+    setRequired(  false )
+    if (project.findProperty("server-id") == "ossrh") {
+        //useGpgCmd()
+        // Format: "0x12345678" ; gpg --list-keys --keyid-format 0xSHORT
+        val signingKeyId: String? = System.getenv("CHUTNEY_GPG_KEY_ID")
+        // gpg -a --export-secret-subkeys KEY_ID
+        val signingKey: String? = System.getenv("CHUTNEY_GPG_KEY")
+        val signingPassword: String? = System.getenv("CHUTNEY_GPG_PASSPHRASE")
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+        sign(publishing.publications[publicationName])
+    }
 }
+
