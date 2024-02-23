@@ -124,8 +124,8 @@ class ChutneyServer(settings: ChutneyServerSettings) {
 
         private fun createCommandLine(settings: ChutneyServerSettings): GeneralCommandLine {
             val libFolder = File(PathUtil.toSystemIndependentName(PathManager.getPluginsPath() + "/chutney-idea-plugin/lib"))
-            val ideaServerJarFile = libFolder.walk().find { it.name.startsWith("chutney-idea-server-") && it.name.endsWith(".jar") }
-                ?: throw RuntimeException("chutney-idea-server jar file not found in " + libFolder.absolutePath)
+          val ideaServerJarFile = libFolder.walk().find { it.name.startsWith("local-api-unsecure-") && it.name.endsWith(".jar") }
+                  ?: throw RuntimeException("local-api-unsecure jar file not found in " + libFolder.absolutePath)
 
             val commandLine = GeneralCommandLine()
             val javaHomePath = System.getenv("JAVA_HOME") ?: System.getProperty("java.home")

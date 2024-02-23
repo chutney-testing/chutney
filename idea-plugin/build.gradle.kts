@@ -37,6 +37,17 @@ repositories {
 dependencies {
     implementation(enforcedPlatform("com.chutneytesting:chutney-parent:${properties["chutneyVersion"]}"))
     implementation("com.chutneytesting", "chutney-kotlin-dsl", properties("chutneyVersion"))
+    implementation("com.chutneytesting", "chutney-kotlin-dsl", properties("chutneyVersion")) {
+      isTransitive = false
+    }
+    // Runtime for kotlin-dsl dependency (server info && Http client)
+    runtimeOnly("com.fasterxml.jackson.module", "jackson-module-kotlin")
+    runtimeOnly("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310")
+    runtimeOnly("com.fasterxml.jackson.module", "jackson-module-paranamer")
+    runtimeOnly("org.apache.httpcomponents.client5", "httpclient5") {
+      exclude("org.slf4j")
+    }
+    runtimeOnly("org.apache.httpcomponents.core5", "httpcore5")
     implementation("com.google.guava", "guava")
     implementation("org.hjson", "hjson")
     implementation("org.apache.commons", "commons-text")
