@@ -25,7 +25,9 @@
         <li *ngFor="let exec of tabs" [ngbNavItem]="exec.executionId.toString()" [destroyOnHide]="false">
             <a ngbNavLink>
                 <small><strong>#{{exec.executionId}} </strong> <small>({{ exec.time | amCalendar}})</small></small>
-                <i class="fa-regular fa-x fa-xs ms-2 fw-light" (click)="closeReport($event, exec.executionId)"></i>
+                <button type="button" class="btn btn-sm ms-1 close-tab" (click)="closeReport($event, exec.executionId)">
+                    <i class="fa-regular fa-x fa-xs fw-light" ></i>
+                </button>
             </a>
             <ng-template ngbNavContent>
                 <chutney-scenario-execution [scenario]="scenario"
