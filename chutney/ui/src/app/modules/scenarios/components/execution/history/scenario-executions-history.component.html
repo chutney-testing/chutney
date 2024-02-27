@@ -1,3 +1,4 @@
+<chutney-scenario-execution-menu></chutney-scenario-execution-menu>
 <div *ngIf="error" class="alert alert-dismissible alert-danger mt-4">
     <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="error = null"></button>
     {{ error }}
@@ -32,7 +33,7 @@
             <ng-template ngbNavContent>
                 <chutney-scenario-execution [scenario]="scenario"
                                             [execution]="exec"
-                                            [stickyTop]="'-1.5rem'"
+                                            [stickyTop]="'0.9rem'"
                                             [stickyTopElementSelector]="'.executions-tabs'"
                                             (onExecutionStatusUpdate)="updateExecutionStatus(exec.executionId, $event)">
 

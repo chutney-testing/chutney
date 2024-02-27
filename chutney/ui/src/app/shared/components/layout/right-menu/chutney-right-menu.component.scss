@@ -1,7 +1,15 @@
+@import "~bootswatch/dist/flatly/variables";
+
 .nav-item {
     white-space: nowrap;
 }
 
 .nav-link:hover {
     color: var(--bs-primary)!important;
+}
+
+.chutney-nav-menu {
+    margin: -1.5rem -0.7rem 0rem -1.5rem;
+    top: -1.5rem;
+    z-index: 2000;
 }

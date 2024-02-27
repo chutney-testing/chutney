@@ -7,9 +7,14 @@ $info:#3190d0;
 @import "~bootstrap/scss/bootstrap";
 @import "~bootswatch/dist/flatly/bootswatch";
 
-.app-sidebar{
+.app-sidebar {
     background-color: $light;
 }
+
+.middle-sidebar {
+    background-color: $light;
+}
+
 
 :root {
     --chutney-report-bg-color: #{$gray-100};
