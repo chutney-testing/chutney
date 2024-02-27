@@ -17,7 +17,7 @@
 package com.chutneytesting.jira.api;
 
 import com.chutneytesting.jira.domain.JiraRepository;
-import com.chutneytesting.jira.domain.JiraTargetConfiguration;
+import com.chutneytesting.jira.domain.JiraServerConfiguration;
 import com.chutneytesting.jira.domain.JiraXrayService;
 import com.chutneytesting.jira.xrayapi.XrayTestExecTest;
 import java.util.ArrayList;
@@ -167,22 +167,22 @@ public class JiraModuleController {
     @PreAuthorize("hasAuthority('ADMIN_ACCESS')")
     @GetMapping(path = BASE_CONFIGURATION_URL, produces = MediaType.APPLICATION_JSON_VALUE)
     public JiraConfigurationDto getConfiguration() {
-        JiraTargetConfiguration jiraTargetConfiguration = jiraRepository.loadServerConfiguration();
+        JiraServerConfiguration jiraServerConfiguration = jiraRepository.loadServerConfiguration();
         return ImmutableJiraConfigurationDto.builder()
-            .url(jiraTargetConfiguration.url())
-            .username(jiraTargetConfiguration.username())
-            .password(jiraTargetConfiguration.password())
-            .urlProxy(jiraTargetConfiguration.urlProxy())
-            .userProxy(jiraTargetConfiguration.userProxy())
-            .passwordProxy(jiraTargetConfiguration.passwordProxy())
+            .url(jiraServerConfiguration.url())
+            .username(jiraServerConfiguration.username())
+            .password(jiraServerConfiguration.password())
+            .urlProxy(jiraServerConfiguration.urlProxy())
+            .userProxy(jiraServerConfiguration.userProxy())
+            .passwordProxy(jiraServerConfiguration.passwordProxy())
             .build();
     }
 
     @PreAuthorize("hasAuthority('SCENARIO_READ') or hasAuthority('CAMPAIGN_READ')")
     @GetMapping(path = BASE_CONFIGURATION_URL + "/url", produces = MediaType.TEXT_PLAIN_VALUE)
     public String getConfigurationUrl() {
-        JiraTargetConfiguration jiraTargetConfiguration = jiraRepository.loadServerConfiguration();
-        return jiraTargetConfiguration.url();
+        JiraServerConfiguration jiraServerConfiguration = jiraRepository.loadServerConfiguration();
+        return jiraServerConfiguration.url();
     }
 
     @PreAuthorize("hasAuthority('ADMIN_ACCESS')")
@@ -191,7 +191,7 @@ public class JiraModuleController {
         produces = MediaType.APPLICATION_JSON_VALUE)
     public void saveConfiguration(@RequestBody JiraConfigurationDto jiraConfigurationDto) {
         jiraRepository.saveServerConfiguration(
-            new JiraTargetConfiguration(
+            new JiraServerConfiguration(
                 jiraConfigurationDto.url(),
                 jiraConfigurationDto.username(),
                 jiraConfigurationDto.password(),

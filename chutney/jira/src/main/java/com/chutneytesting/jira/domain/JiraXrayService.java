@@ -44,10 +44,12 @@ public class JiraXrayService {
 
     private final JiraRepository jiraRepository;
     private final JiraXrayClientFactory jiraXrayImplFactory;
+    private JiraServerConfiguration jiraServerConfiguration;
 
     public JiraXrayService(JiraRepository jiraRepository, JiraXrayClientFactory jiraXrayImplFactory) {
         this.jiraRepository = jiraRepository;
         this.jiraXrayImplFactory = jiraXrayImplFactory;
+        loadJiraServerConfiguration();
     }
 
     public void updateTestExecution(Long campaignId, Long campaignExecutionId, String scenarioId, ReportForJira report) {
@@ -95,17 +97,17 @@ public class JiraXrayService {
 
         List<XrayTestExecTest> testExecutionScenarios = getTestExecutionScenarios(testExecId);
         Optional<XrayTestExecTest> foundTest = testExecutionScenarios.stream().filter(test -> scenarioJiraId.equals(test.getKey())).findFirst();
-        foundTest.ifPresent(xrayTestExecTest -> jiraXrayApi.updateStatusByTestRunId(xrayTestExecTest.getId(), executionStatus));
+        foundTest.ifPresent(xrayTestExecTest -> {
+            LOGGER.info("Update xray test execution {} status to {}", testExecId, executionStatus);
+            jiraXrayApi.updateStatusByTestRunId(xrayTestExecTest.getId(), executionStatus);
+        });
     }
 
     private JiraXrayApi createHttpJiraXrayImpl() {
-        JiraTargetConfiguration jiraTargetConfiguration = jiraRepository.loadServerConfiguration();
-        if (!jiraTargetConfiguration.isValid()) {
-            LOGGER.error("Unable to create xray http service, jira url is undefined");
+        if (!loadJiraServerConfiguration()) {
             throw new NoJiraConfigurationException();
-        } else {
-            return jiraXrayImplFactory.create(jiraTargetConfiguration);
         }
+        return jiraXrayImplFactory.create(jiraServerConfiguration);
     }
 
     private List<String> getErrors(ReportForJira report) {
@@ -149,5 +151,19 @@ public class JiraXrayService {
         return parentStep.trim().replace(" ", "-")
             + (parentStep.trim().isEmpty() ? "" : "_")
             + stepName.trim().replace(" ", "-");
+    }
+
+    private boolean loadJiraServerConfiguration() {
+        JiraServerConfiguration currentConfiguration = jiraRepository.loadServerConfiguration();
+        boolean hasConfigurationChanged = !currentConfiguration.equals(this.jiraServerConfiguration);
+        if (hasConfigurationChanged) {
+            LOGGER.info("Jira server configuration has changed");
+            this.jiraServerConfiguration = currentConfiguration;
+        }
+        boolean isConfigurationValid = this.jiraServerConfiguration.isValid();
+        if (hasConfigurationChanged && !isConfigurationValid) {
+            LOGGER.warn("Jira server configuration is not valid");
+        }
+        return isConfigurationValid;
     }
 }

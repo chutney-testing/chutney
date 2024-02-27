@@ -26,7 +26,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.chutneytesting.jira.domain.JiraTargetConfiguration;
+import com.chutneytesting.jira.domain.JiraServerConfiguration;
 import com.chutneytesting.jira.xrayapi.Xray;
 import com.chutneytesting.jira.xrayapi.XrayInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
@@ -55,7 +55,7 @@ public class HttpJiraXrayImplTest {
         @Test
         void update_xray_execution() {
             // Given
-            JiraTargetConfiguration config = new JiraTargetConfiguration(
+            JiraServerConfiguration config = new JiraServerConfiguration(
                 "http://fake-server-jira",
                 "user",
                 "password",
@@ -86,7 +86,7 @@ public class HttpJiraXrayImplTest {
             // Given
             String issueId = "PRJ-666";
 
-            var config = new JiraTargetConfiguration(
+            var config = new JiraServerConfiguration(
                 "http://fake-server-jira",
                 "user",
                 "password",
@@ -174,7 +174,7 @@ public class HttpJiraXrayImplTest {
         @Test
         void update_xray_execution() {
             // Given
-            JiraTargetConfiguration config = new JiraTargetConfiguration(
+            JiraServerConfiguration config = new JiraServerConfiguration(
                 "http://fake-server-jira",
                 "user",
                 "password",
@@ -205,7 +205,7 @@ public class HttpJiraXrayImplTest {
             // Given
             String issueId = "PRJ-666";
 
-            var config = new JiraTargetConfiguration(
+            var config = new JiraServerConfiguration(
                 "http://fake-server-jira",
                 "user",
                 "password",
@@ -287,12 +287,12 @@ public class HttpJiraXrayImplTest {
         }
     }
 
-    private static String expectedProxyAuthorization(JiraTargetConfiguration config) {
+    private static String expectedProxyAuthorization(JiraServerConfiguration config) {
         return "Basic " + Base64.getEncoder()
             .encodeToString((config.userProxy() + ":" + config.passwordProxy()).getBytes());
     }
 
-    private static String expectedAuthorization(JiraTargetConfiguration config) {
+    private static String expectedAuthorization(JiraServerConfiguration config) {
         return "Basic " + Base64.getEncoder()
             .encodeToString((config.username() + ":" + config.password()).getBytes());
     }

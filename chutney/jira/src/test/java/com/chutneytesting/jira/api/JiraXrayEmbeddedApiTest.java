@@ -28,7 +28,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.chutneytesting.jira.domain.JiraRepository;
-import com.chutneytesting.jira.domain.JiraTargetConfiguration;
+import com.chutneytesting.jira.domain.JiraServerConfiguration;
 import com.chutneytesting.jira.domain.JiraXrayApi;
 import com.chutneytesting.jira.domain.JiraXrayClientFactory;
 import com.chutneytesting.jira.domain.JiraXrayService;
@@ -53,7 +53,7 @@ class JiraXrayEmbeddedApiTest {
     private final JiraXrayApi jiraXrayApiMock = mock(JiraXrayApi.class);
     private final JiraXrayClientFactory jiraXrayFactory = mock(JiraXrayClientFactory.class);
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZZZZZ");
-    private final JiraTargetConfiguration jiraTargetConfiguration = new JiraTargetConfiguration("an url", "a username", "a password", null, null, null);
+    private final JiraServerConfiguration jiraServerConfiguration = new JiraServerConfiguration("an url", "a username", "a password", null, null, null);
 
     private JiraXrayEmbeddedApi jiraXrayEmbeddedApi;
     private JiraRepository jiraRepository;
@@ -61,7 +61,7 @@ class JiraXrayEmbeddedApiTest {
     @BeforeEach
     public void setUp() throws IOException {
         jiraRepository = new JiraFileRepository(Files.createTempDirectory("jira").toString());
-        jiraRepository.saveServerConfiguration(jiraTargetConfiguration);
+        jiraRepository.saveServerConfiguration(jiraServerConfiguration);
 
         JiraXrayService jiraXrayService = new JiraXrayService(jiraRepository, jiraXrayFactory);
 

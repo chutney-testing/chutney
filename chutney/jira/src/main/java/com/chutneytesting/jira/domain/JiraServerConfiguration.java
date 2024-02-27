@@ -18,12 +18,11 @@ package com.chutneytesting.jira.domain;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 
-import org.apache.commons.lang3.StringUtils;
-
-public record JiraTargetConfiguration(
+public record JiraServerConfiguration(
     String url, String username, String password,
     String urlProxy, String userProxy, String passwordProxy
 ) {
+
     public boolean isValid() {
         return isNotBlank(url);
     }

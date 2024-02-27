@@ -19,7 +19,7 @@ package com.chutneytesting.jira.infra;
 import static com.chutneytesting.tools.file.FileUtils.initFolder;
 
 import com.chutneytesting.jira.domain.JiraRepository;
-import com.chutneytesting.jira.domain.JiraTargetConfiguration;
+import com.chutneytesting.jira.domain.JiraServerConfiguration;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -117,20 +117,20 @@ public class JiraFileRepository implements JiraRepository {
     }
 
     @Override
-    public JiraTargetConfiguration loadServerConfiguration() {
+    public JiraServerConfiguration loadServerConfiguration() {
         JiraTargetConfigurationDto dto = doLoadServerConfiguration();
-        return new JiraTargetConfiguration(dto.url, dto.username, dto.password, dto.urlProxy, dto.userProxy, dto.passwordProxy);
+        return new JiraServerConfiguration(dto.url, dto.username, dto.password, dto.urlProxy, dto.userProxy, dto.passwordProxy);
     }
 
     @Override
-    public void saveServerConfiguration(JiraTargetConfiguration jiraTargetConfiguration) {
+    public void saveServerConfiguration(JiraServerConfiguration jiraServerConfiguration) {
         JiraTargetConfigurationDto jiraTargetConfigurationDto = new JiraTargetConfigurationDto(
-            jiraTargetConfiguration.url(),
-            jiraTargetConfiguration.username(),
-            jiraTargetConfiguration.password(),
-            jiraTargetConfiguration.urlProxy(),
-            jiraTargetConfiguration.userProxy(),
-            jiraTargetConfiguration.passwordProxy()
+            jiraServerConfiguration.url(),
+            jiraServerConfiguration.username(),
+            jiraServerConfiguration.password(),
+            jiraServerConfiguration.urlProxy(),
+            jiraServerConfiguration.userProxy(),
+            jiraServerConfiguration.passwordProxy()
         );
         Path resolvedFilePath = storeFolderPath.resolve(CONFIGURATION_FILE);
         doSave(resolvedFilePath, jiraTargetConfigurationDto);

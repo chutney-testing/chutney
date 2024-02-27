@@ -26,7 +26,7 @@ import com.atlassian.jira.rest.client.api.domain.input.IssueInput;
 import com.atlassian.jira.rest.client.api.domain.input.IssueInputBuilder;
 import com.atlassian.jira.rest.client.internal.async.AsynchronousJiraRestClient;
 import com.atlassian.jira.rest.client.internal.async.DisposableHttpClient;
-import com.chutneytesting.jira.domain.JiraTargetConfiguration;
+import com.chutneytesting.jira.domain.JiraServerConfiguration;
 import com.chutneytesting.jira.domain.JiraXrayApi;
 import com.chutneytesting.jira.domain.exception.NoJiraConfigurationException;
 import com.chutneytesting.jira.infra.atlassian.httpclient.api.factory.HttpClientOptions;
@@ -75,18 +75,18 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
 
     private static final int MS_TIMEOUT = 10 * 1000; // 10 s
 
-    private final JiraTargetConfiguration jiraTargetConfiguration;
+    private final JiraServerConfiguration jiraServerConfiguration;
 
-    public HttpJiraXrayImpl(JiraTargetConfiguration jiraTargetConfiguration) {
-        this.jiraTargetConfiguration = jiraTargetConfiguration;
-        if (!jiraTargetConfiguration.isValid()) {
+    public HttpJiraXrayImpl(JiraServerConfiguration jiraServerConfiguration) {
+        this.jiraServerConfiguration = jiraServerConfiguration;
+        if (!jiraServerConfiguration.isValid()) {
             throw new NoJiraConfigurationException();
         }
     }
 
     @Override
     public void updateRequest(Xray xray) {
-        String updateUri = jiraTargetConfiguration.url() + "/rest/raven/1.0/import/execution";
+        String updateUri = jiraServerConfiguration.url() + "/rest/raven/1.0/import/execution";
 
         RestTemplate restTemplate = buildRestTemplate();
 
@@ -107,7 +107,7 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
     public List<XrayTestExecTest> getTestExecutionScenarios(String xrayId) {
         List<XrayTestExecTest> tests = new ArrayList<>();
 
-        String uriTemplate = jiraTargetConfiguration.url() + "/rest/raven/1.0/api/%s/%s/test";
+        String uriTemplate = jiraServerConfiguration.url() + "/rest/raven/1.0/api/%s/%s/test";
         String uri = String.format(uriTemplate, isTestPlan(xrayId) ? "testplan" : "testexec", xrayId);
 
         RestTemplate restTemplate = buildRestTemplate();
@@ -127,7 +127,7 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
 
     @Override
     public void updateStatusByTestRunId(String testRuntId, String executionStatus) {
-        String uriTemplate = jiraTargetConfiguration.url() + "/rest/raven/1.0/api/testrun/%s/status?status=%s";
+        String uriTemplate = jiraServerConfiguration.url() + "/rest/raven/1.0/api/testrun/%s/status?status=%s";
         String uri = String.format(uriTemplate, testRuntId, executionStatus);
 
         RestTemplate restTemplate = buildRestTemplate();
@@ -140,7 +140,7 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
 
     @Override
     public void associateTestExecutionFromTestPlan(String testPlanId, String testExecutionId) {
-        String uriTemplate = jiraTargetConfiguration.url() + "/rest/raven/1.0/api/testplan/%s/testexecution";
+        String uriTemplate = jiraServerConfiguration.url() + "/rest/raven/1.0/api/testplan/%s/testexecution";
         String uri = String.format(uriTemplate, testPlanId);
 
         RestTemplate restTemplate = buildRestTemplate();
@@ -192,7 +192,7 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
     }
 
     private JiraIssueType getIssueTypeByName(String issueTypeName) {
-        String uri = jiraTargetConfiguration.url() + "/rest/api/latest/issuetype";
+        String uri = jiraServerConfiguration.url() + "/rest/api/latest/issuetype";
         Optional<JiraIssueType> issueTypeOptional = Optional.empty();
 
         RestTemplate restTemplate = buildRestTemplate();
@@ -222,21 +222,21 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
     }
 
     private HttpClient buildHttpClient() throws URISyntaxException {
-        HttpHost httpHost = HttpHost.create(new URI(jiraTargetConfiguration.url()));
-        HttpHost proxyHttpHost = HttpHost.create(new URI(jiraTargetConfiguration.urlProxy()));
+        HttpHost httpHost = HttpHost.create(new URI(jiraServerConfiguration.url()));
+        HttpHost proxyHttpHost = HttpHost.create(new URI(jiraServerConfiguration.urlProxy()));
 
         HttpClientBuilder httpClientBuilder = HttpClients.custom()
             .setConnectionManager(buildConnectionManager())
             .setDefaultCredentialsProvider(getBasicCredentialsProvider(httpHost, proxyHttpHost));
 
         var defaultHeaders = new ArrayList<BasicHeader>();
-        String authorization = basicAuthHeaderEncodedValue(jiraTargetConfiguration.username(), jiraTargetConfiguration.password());
+        String authorization = basicAuthHeaderEncodedValue(jiraServerConfiguration.username(), jiraServerConfiguration.password());
         defaultHeaders.add(new BasicHeader(HttpHeaders.AUTHORIZATION, authorization));
 
-        if (jiraTargetConfiguration.hasProxy()) {
+        if (jiraServerConfiguration.hasProxy()) {
             httpClientBuilder.setProxy(proxyHttpHost);
-            if (jiraTargetConfiguration.hasProxyWithAuth()) {
-                String proxyAuthorization = basicAuthHeaderEncodedValue(jiraTargetConfiguration.userProxy(), jiraTargetConfiguration.passwordProxy());
+            if (jiraServerConfiguration.hasProxyWithAuth()) {
+                String proxyAuthorization = basicAuthHeaderEncodedValue(jiraServerConfiguration.userProxy(), jiraServerConfiguration.passwordProxy());
                 defaultHeaders.add(new BasicHeader(HttpHeaders.PROXY_AUTHORIZATION, proxyAuthorization));
             }
         }
@@ -273,26 +273,26 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
         BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
         credentialsProvider.setCredentials(
             new AuthScope(httpHost),
-            new UsernamePasswordCredentials(jiraTargetConfiguration.username(), jiraTargetConfiguration.password().toCharArray())
+            new UsernamePasswordCredentials(jiraServerConfiguration.username(), jiraServerConfiguration.password().toCharArray())
         );
-        if (jiraTargetConfiguration.hasProxyWithAuth()) {
+        if (jiraServerConfiguration.hasProxyWithAuth()) {
             credentialsProvider.setCredentials(
                 new AuthScope(proxyHttpHost),
-                new UsernamePasswordCredentials(jiraTargetConfiguration.userProxy(), jiraTargetConfiguration.passwordProxy().toCharArray())
+                new UsernamePasswordCredentials(jiraServerConfiguration.userProxy(), jiraServerConfiguration.passwordProxy().toCharArray())
             );
         }
         return credentialsProvider;
     }
 
     private JiraRestClient getJiraRestClient() throws URISyntaxException {
-        URI serverUri = URI.create(jiraTargetConfiguration.url());
+        URI serverUri = URI.create(jiraServerConfiguration.url());
         return new AsynchronousJiraRestClient(
             serverUri,
             buildJiraHttpClient(
                 serverUri,
                 new BasicHttpAuthenticationHandler(
-                    jiraTargetConfiguration.username(), jiraTargetConfiguration.password(),
-                    jiraTargetConfiguration.userProxy(), jiraTargetConfiguration.passwordProxy()
+                    jiraServerConfiguration.username(), jiraServerConfiguration.password(),
+                    jiraServerConfiguration.userProxy(), jiraServerConfiguration.passwordProxy()
                 )
             )
         );
@@ -305,8 +305,8 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
         final HttpClientOptions options = new HttpClientOptions();
         options.setTrustSelfSignedCertificates(true);
 
-        if (jiraTargetConfiguration.hasProxy()) {
-            HttpHost proxyHttpHost = HttpHost.create(new URI(jiraTargetConfiguration.urlProxy()));
+        if (jiraServerConfiguration.hasProxy()) {
+            HttpHost proxyHttpHost = HttpHost.create(new URI(jiraServerConfiguration.urlProxy()));
             options.setProxyOptions(
                 ProxyOptions.ProxyOptionsBuilder.create()
                     .withProxy(Scheme.valueOf(serverUri.getScheme().toUpperCase()), proxyHttpHost)
