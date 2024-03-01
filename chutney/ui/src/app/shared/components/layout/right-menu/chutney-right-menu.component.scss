@@ -9,7 +9,10 @@
 }
 
 .chutney-nav-menu {
-    margin: -1.5rem -0.7rem 0rem -1.5rem;
+    margin-left: calc(var(--bs-gutter-x)* -0.5);
+    margin-right: calc(var(--bs-gutter-x)* -0.5);
+    margin-top: -1.5rem;
+
     top: -1.5rem;
     z-index: 2000;
 }

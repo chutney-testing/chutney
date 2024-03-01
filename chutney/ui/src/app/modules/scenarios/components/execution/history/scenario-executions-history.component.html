@@ -31,9 +31,10 @@
                 </button>
             </a>
             <ng-template ngbNavContent>
+                <!-- 40px - 1.5rem explanation : calculation between execution header and app_main_inner heights -->
                 <chutney-scenario-execution [scenario]="scenario"
                                             [execution]="exec"
-                                            [stickyTop]="'0.9rem'"
+                                            [stickyTop]="'40px - 1.5rem'"
                                             [stickyTopElementSelector]="'.executions-tabs'"
                                             (onExecutionStatusUpdate)="updateExecutionStatus(exec.executionId, $event)">
 

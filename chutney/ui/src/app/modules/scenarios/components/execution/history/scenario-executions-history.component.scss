@@ -1,5 +1,5 @@
 .executions-tabs {
-    top: 1rem;
+    top: calc(40px - 1.5rem); // calculation between execution header and app_main_inner heights
     z-index: 1021;
     background-color: var(--bs-body-bg) !important;
 }
