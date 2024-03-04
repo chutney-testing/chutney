@@ -25,6 +25,7 @@ import com.chutneytesting.campaign.domain.CampaignNotFoundException;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.jira.api.JiraXrayEmbeddedApi;
+import com.chutneytesting.jira.domain.exception.NoJiraConfigurationException;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.dataset.DataSetHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.ExecutionRequest;
@@ -235,15 +236,24 @@ public class CampaignExecutionEngine {
             } else {
                 scenarioExecution = generateNotExecutedScenarioExecutionAndReport(campaign, testCase, campaignExecution);
             }
-                // Add scenario report to campaign's one
+            // Add scenario report to campaign's one
             ofNullable(scenarioExecution)
                 .ifPresent(serc -> {
                     campaignExecution.endScenarioExecution(serc);
                     // update xray test
                     ExecutionHistory.Execution execution = executionHistoryRepository.getExecution(serc.scenarioId, serc.execution.executionId());
-                    jiraXrayEmbeddedApi.updateTestExecution(campaign.id, campaignExecution.executionId, serc.scenarioId, JiraReportMapper.from(execution.report(), objectMapper));
+                    updateJira(campaign, campaignExecution, serc, execution);
                 });
         };
+    }
+
+    private void updateJira(Campaign campaign, CampaignExecution campaignExecution, ScenarioExecutionCampaign serc, ExecutionHistory.Execution execution) {
+        try {
+            jiraXrayEmbeddedApi.updateTestExecution(campaign.id, campaignExecution.executionId, serc.scenarioId, JiraReportMapper.from(execution.report(), objectMapper));
+        } catch (NoJiraConfigurationException e) { // Silent
+        } catch (Exception e) {
+            LOGGER.warn("Update JIRA failed", e);
+        }
     }
 
     private ScenarioExecutionCampaign generateNotExecutedScenarioExecutionAndReport(Campaign campaign, TestCase testCase, CampaignExecution campaignExecution) {
