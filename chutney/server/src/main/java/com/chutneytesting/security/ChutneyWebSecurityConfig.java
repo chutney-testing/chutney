@@ -23,6 +23,7 @@ import com.chutneytesting.security.domain.AuthenticationService;
 import com.chutneytesting.security.domain.Authorizations;
 import com.chutneytesting.security.infra.handlers.Http401FailureHandler;
 import com.chutneytesting.security.infra.handlers.HttpEmptyLogoutSuccessHandler;
+import com.chutneytesting.security.infra.handlers.HttpLoginSuccessHandler;
 import com.chutneytesting.server.core.domain.security.Authorization;
 import com.chutneytesting.server.core.domain.security.User;
 import java.util.ArrayList;
@@ -87,7 +88,7 @@ public class ChutneyWebSecurityConfig {
             .requiresChannel(channelRequestMatcherRegistry -> channelRequestMatcherRegistry.anyRequest().requiresSecure())
             .formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer
                 .loginProcessingUrl(LOGIN_URL)
-                .successForwardUrl(UserController.BASE_URL)
+                .successHandler(new HttpLoginSuccessHandler())
                 .failureHandler(new Http401FailureHandler()))
             .logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer
                 .logoutUrl(LOGOUT_URL)
