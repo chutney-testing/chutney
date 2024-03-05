@@ -86,7 +86,7 @@ public class CampaignControllerTest {
         resultExtractor = new ResultExtractor();
 
         repositoryAggregator = mock(TestCaseRepositoryAggregator.class);
-        CampaignController campaignController = new CampaignController(repositoryAggregator, repository, repository, campaignExecutionEngine, new CampaignService(repository));
+        CampaignController campaignController = new CampaignController(repositoryAggregator, repository, repository, new CampaignService(repository));
         mockMvc = MockMvcBuilders.standaloneSetup(campaignController)
             .setControllerAdvice(new RestExceptionHandler(Mockito.mock(ChutneyMetrics.class)))
             .build();
@@ -262,9 +262,6 @@ public class CampaignControllerTest {
     @Test
     public void should_retrieve_executions_and_current_execution_when_found_campaign() throws Exception {
         // Given
-        CampaignExecution currentExecution = new CampaignExecution(42L, existingCampaign.getTitle(), false, "", null, null, "");
-        when(campaignExecutionEngine.currentExecution(existingCampaign.getId()))
-            .thenReturn(Optional.of(currentExecution));
 
         CampaignExecution report1 = new CampaignExecution(1L, existingCampaign.getId(), emptyList(), "...", false, "", null, null, "");
         CampaignExecution report2 = new CampaignExecution(2L, existingCampaign.getId(), emptyList(), "...", false, "", null, null, "");
@@ -283,18 +280,16 @@ public class CampaignControllerTest {
 
         // Then
         // get campaign with all executions
-        verify(campaignExecutionEngine).currentExecution(existingCampaign.getId());
-        assertThat(receivedCampaign.getCampaignExecutionReports()).hasSize(5);
-        assertThat(receivedCampaign.getCampaignExecutionReports().get(0).getExecutionId()).isEqualTo(42L);
+        assertThat(receivedCampaign.getCampaignExecutionReports()).hasSize(4);
+        assertThat(receivedCampaign.getCampaignExecutionReports().get(0).getExecutionId()).isEqualTo(1L);
+        assertThat(receivedCampaign.getCampaignExecutionReports().get(1).getExecutionId()).isEqualTo(2L);
+        assertThat(receivedCampaign.getCampaignExecutionReports().get(2).getExecutionId()).isEqualTo(3L);
+        assertThat(receivedCampaign.getCampaignExecutionReports().get(3).getExecutionId()).isEqualTo(4L);
     }
 
     @Test
-    public void should_retrieve_user_execution_when_found_campaign() throws Exception {
+    public void should_retrieve_execution_when_found_campaign() throws Exception {
         // Given
-        CampaignExecution currentExecution = new CampaignExecution(42L, existingCampaign.getTitle(), false, "", null, null, "user_1");
-        when(campaignExecutionEngine.currentExecution(existingCampaign.getId()))
-            .thenReturn(Optional.of(currentExecution));
-
         CampaignExecution report1 = new CampaignExecution(1L, existingCampaign.getId(), emptyList(), existingCampaign.getTitle(), false, "", null, null, "user_2");
 
         repository.saveCampaignExecution(existingCampaign.getId(), report1);
@@ -306,12 +301,10 @@ public class CampaignControllerTest {
 
         // Then
         // get campaign with all executions
-        verify(campaignExecutionEngine).currentExecution(existingCampaign.getId());
-        assertThat(receivedCampaign.getCampaignExecutionReports()).hasSize(2);
-        assertThat(receivedCampaign.getCampaignExecutionReports().get(0).getExecutionId()).isEqualTo(42L);
+        assertThat(receivedCampaign.getCampaignExecutionReports()).hasSize(1);
+        assertThat(receivedCampaign.getCampaignExecutionReports().get(0).getExecutionId()).isEqualTo(1L);
 
-        assertThat(receivedCampaign.getCampaignExecutionReports().get(0).getUserId()).isEqualTo("user_1");
-        assertThat(receivedCampaign.getCampaignExecutionReports().get(1).getUserId()).isEqualTo("user_2");
+        assertThat(receivedCampaign.getCampaignExecutionReports().get(0).getUserId()).isEqualTo("user_2");
     }
 
     @Test
@@ -330,8 +323,8 @@ public class CampaignControllerTest {
         awaitDuring(100, MILLISECONDS); // Avoid reports with same startDate...
         CampaignExecution campaignExecution2 = new CampaignExecution(5L, 2L, emptyList(), anotherExistingCampaign.getTitle(), false, "", null, null, "");
 
-        when(campaignExecutionEngine.currentExecutions())
-            .thenReturn(Lists.list(campaignExecution1, campaignExecution2));
+        repository.saveCampaignExecution(campaignExecution1.executionId, campaignExecution1);
+        repository.saveCampaignExecution(campaignExecution2.executionId, campaignExecution2);
 
         // When
         // last executions asked for
