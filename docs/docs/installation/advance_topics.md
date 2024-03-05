@@ -29,7 +29,7 @@ Moreover, Chutney provides following metrics and corresponding Micrometer tags :
 # Authentication
 
 !!! important
-    Maven module [local-dev](https://github.com/chutney-testing/chutney/tree/master/packaging/local-dev) shows :
+    Maven module [local-dev](https://github.com/chutney-testing/chutney/tree/main/chutney/packaging/local-dev) shows :
 
     * How to use in memory authentication and roles, see the `mem-auth` profile.
     * How to use a custom LDAP authentication (for example purpose, it uses an embedded LDAP server).

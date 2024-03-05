@@ -15,7 +15,7 @@ To configure your datasource, use the property `spring.datasource`
             url: jdbc:h2:mem:dbName
     ```
     !!! note
-        You can find an example in maven module [local-dev](https://github.com/chutney-testing/chutney/tree/master/packaging/local-dev){:target="_blank"}, which uses an embedded H2 with filesystem persistence.
+        You can find an example in maven module [local-dev](https://github.com/chutney-testing/chutney/tree/main/chutney/packaging/local-dev){:target="_blank"}, which uses an embedded H2 with filesystem persistence.
 
 === "PostgreSQL (SSL two way)"
     ``` yaml

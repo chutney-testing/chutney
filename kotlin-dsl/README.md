@@ -77,7 +77,7 @@ How (k)ool is Kotlin? super (k)ool!
 
 # How to run Kotlin scenarios
 
-> Some examples are available in [example module](https://github.com/chutney-testing/chutney-kotlin-dsl/tree/master/src)
+> Some examples are available in [example module](https://github.com/chutney-testing/chutney/tree/main/kotlin-dsl/example/src/main/kotlin/com/chutneytesting/example)
 
 You want to run Chutney scenarios from your local environment or on your CI/CD ?
 
