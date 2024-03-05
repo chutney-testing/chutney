@@ -130,7 +130,7 @@
                                     <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>install --verbose</arguments>
+                                    <arguments>install</arguments>
                                 </configuration>
                             </execution>
                             <execution>
@@ -139,7 +139,7 @@
                                     <goal>npm</goal>
                                 </goals>
                                 <configuration>
-                                    <arguments>run-script build</arguments>
+                                    <arguments>run-script build --silent</arguments>
                                 </configuration>
                             </execution>
                             <execution>
