@@ -192,6 +192,20 @@ public class DatabaseExecutionHistoryRepositoryTest {
             assertThat(lastExecutions.get(scenarioIdOne).status()).isEqualTo(SUCCESS);
         }
 
+
+        @Test
+        public void last_execution_return_last_running_even_if_it_is_not_the_last_exec() {
+            String scenarioIdOne = givenScenarioId();
+            sut.store(scenarioIdOne, buildDetachedExecution(RUNNING, "exec1", ""));
+            sut.store(scenarioIdOne, buildDetachedExecution(RUNNING, "exec2", ""));
+            sut.store(scenarioIdOne, buildDetachedExecution(SUCCESS, "exec3", ""));
+
+            Map<String, ExecutionSummary> lastExecutions = sut.getLastExecutions(List.of(scenarioIdOne));
+            assertThat(lastExecutions).containsOnlyKeys(scenarioIdOne);
+            assertThat(lastExecutions.get(scenarioIdOne).info()).hasValue("exec2");
+            assertThat(lastExecutions.get(scenarioIdOne).status()).isEqualTo(RUNNING);
+        }
+
         @Test
         public void storage_keeps_all_items() {
             String scenarioId = givenScenarioId();
