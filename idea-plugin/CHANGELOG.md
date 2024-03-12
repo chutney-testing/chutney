@@ -2,6 +2,9 @@
 
 # Chutney Idea Plugin Changelog
 
-## [Unreleased]
-## [0.10.1]
-### Added
+## New releases starting from 2.7.1 : https://github.com/chutney-testing/chutney/releases)
+## [2.7.0]
+
+## [Before Release 2.7.1]
+## [2.7.0]
+### Old releases : https://github.com/chutney-testing/chutney-idea-plugin-legacy/releases)

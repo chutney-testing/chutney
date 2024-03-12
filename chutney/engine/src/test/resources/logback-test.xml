@@ -24,7 +24,7 @@
     <logger name="net.schmizz" level="WARN" />
     <logger name="wiremock" level="WARN" />
 
-    <root level="INFO">
+    <root level="WARN">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>

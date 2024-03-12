@@ -23,7 +23,7 @@ jobs:
 
   publish-to-github-maven-registry:
     uses: ./.github/workflows/build-all-template.yml
-    if: ${{ contains(github.ref_name, 'RC') }}
+    if: ${{ github.ref_name =~ ^\d+\.\d+\.\d+\.\d+$ }}
     with:
       release: true
     secrets:

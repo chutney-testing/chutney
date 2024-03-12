@@ -4,8 +4,7 @@ on:
   push:
     tags:
       - '*.*.*'
-      - '*.*.*-RC'
-      - '*.*.*-RC*'
+      - '*.*.*.*'
 
 jobs:
   build:
@@ -22,7 +21,7 @@ jobs:
     uses: ./.github/workflows/release-github-template.yml
 
   release-to-OSSRH:
-    if: ${{ ! contains(github.ref_name, 'RC') }}
+    if: ${{ github.ref_name =~ ^\d+\.\d+\.\d+$) }}
     needs: [ build ]
     uses: ./.github/workflows/build-all-template.yml
     with:

@@ -32,7 +32,7 @@
     <logger name="wiremock" level="WARN" />
     <logger name="wiremock.org.eclipse.jetty.util.thread.QueuedThreadPool" level="ERROR" />
 
-    <root level="DEBUG">
+    <root level="WARN">
         <appender-ref ref="STDOUT" />
     </root>
 </configuration>
