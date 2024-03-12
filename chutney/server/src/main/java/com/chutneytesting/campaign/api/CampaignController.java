@@ -58,19 +58,16 @@ public class CampaignController {
     private final CampaignRepository campaignRepository;
 
     private final CampaignExecutionRepository campaignExecutionRepository;
-    private final CampaignExecutionEngine campaignExecutionEngine;
     private final CampaignService campaignService;
 
     public CampaignController(TestCaseRepositoryAggregator repositoryAggregator,
                               CampaignRepository campaignRepository,
                               CampaignExecutionRepository campaignExecutionRepository,
-                              CampaignExecutionEngine campaignExecutionEngine,
                               CampaignService campaignService) {
 
         this.repositoryAggregator = repositoryAggregator;
         this.campaignRepository = campaignRepository;
         this.campaignExecutionRepository = campaignExecutionRepository;
-        this.campaignExecutionEngine = campaignExecutionEngine;
         this.campaignService = campaignService;
     }
 
@@ -97,8 +94,6 @@ public class CampaignController {
     public CampaignDto getCampaignById(@PathVariable("campaignId") Long campaignId) {
         Campaign campaign = campaignRepository.findById(campaignId);
         List<CampaignExecution> reports = campaignService.findExecutionsById(campaignId);
-        campaignExecutionEngine.currentExecution(campaignId)
-            .ifPresent(report -> addCurrentExecution(reports, report));
         return toDto(campaign, reports);
     }
 
@@ -122,12 +117,7 @@ public class CampaignController {
     @PreAuthorize("hasAuthority('CAMPAIGN_READ')")
     @GetMapping(path = "/lastexecutions/{limit}", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CampaignExecutionReportDto> getLastExecutions(@PathVariable("limit") Long limit) {
-        List<CampaignExecution> lastExecutions = campaignExecutionEngine.currentExecutions();
-
-        // Complete current executions with finished ones up to the limit
-        if (lastExecutions.size() < limit) {
-            lastExecutions.addAll(campaignExecutionRepository.getLastExecutions(limit - lastExecutions.size()));
-        }
+        List<CampaignExecution> lastExecutions = campaignExecutionRepository.getLastExecutions(limit);
 
         return lastExecutions.stream()
             .map(CampaignExecutionReportMapper::toDto)
@@ -143,10 +133,4 @@ public class CampaignController {
             .collect(Collectors.toList());
     }
 
-    private void addCurrentExecution(List<CampaignExecution> currentCampaignExecutions, CampaignExecution campaignExecution) {
-        if (currentCampaignExecutions == null) {
-            currentCampaignExecutions = new ArrayList<>();
-        }
-        currentCampaignExecutions.add(0, campaignExecution);
-    }
 }

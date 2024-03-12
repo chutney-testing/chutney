@@ -29,10 +29,13 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.OptionalInt;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -241,9 +244,14 @@ public class CampaignExecution {
     private List<ScenarioExecutionCampaign> filterRetry(List<ScenarioExecutionCampaign> scenarioExecutionReports) {
         return scenarioExecutionReports.stream()
             .filter(Objects::nonNull)
-            .collect(Collectors.groupingBy(s -> s.scenarioId))
-            .values().stream()
-            .map(list -> list.size() == 1 ? list.get(0) : list.stream().max(Comparator.comparing(objet -> objet.execution.time())).get())
+            .collect(Collectors.toMap(
+                s -> s.scenarioId,
+                Function.identity(),
+                BinaryOperator.maxBy(Comparator.comparing(s -> s.execution.time())),
+                    LinkedHashMap::new // Keep the insertion order
+                ))
+            .values()
+            .stream()
             .toList();
     }
 

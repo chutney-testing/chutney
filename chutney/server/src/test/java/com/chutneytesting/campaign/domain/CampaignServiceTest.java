@@ -18,6 +18,7 @@ package com.chutneytesting.campaign.domain;
 
 
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.FAILURE;
+import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.RUNNING;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -84,6 +85,69 @@ class CampaignServiceTest {
         assertThat(report.status()).isEqualTo(SUCCESS);
         assertThat(report).usingRecursiveComparison()
             .isEqualTo(campaignReport);
+
+    }
+
+    @Test
+    void should_keep_scenarios_executions_order_on_running_campaign_report() {
+        // Given
+        Long campaignId = 1L;
+        CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
+        ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
+            .executionId(1L)
+            .testCaseTitle("")
+            .time(LocalDateTime.now())
+            .duration(0L)
+            .environment("")
+            .user("")
+            .scenarioId("")
+            .status(FAILURE)
+            .build();
+
+        ScenarioExecutionCampaign scenarioExecutionReport1 = new ScenarioExecutionCampaign("scenario 1", "", execution1);
+        ExecutionHistory.ExecutionSummary execution2 = ImmutableExecutionHistory.ExecutionSummary.builder()
+            .executionId(2L)
+            .testCaseTitle("")
+            .time(LocalDateTime.now())
+            .duration(0L)
+            .environment("")
+            .user("")
+            .scenarioId("")
+            .status(SUCCESS)
+            .build();
+
+        ScenarioExecutionCampaign scenarioExecutionReport2 = new ScenarioExecutionCampaign("scenario 1", "", execution2);
+        ExecutionHistory.ExecutionSummary execution3 = ImmutableExecutionHistory.ExecutionSummary.builder()
+            .executionId(2L)
+            .testCaseTitle("")
+            .time(LocalDateTime.now())
+            .duration(0L)
+            .environment("")
+            .user("")
+            .status(RUNNING)
+            .scenarioId("")
+            .build();
+        ScenarioExecutionCampaign scenarioExecutionReport3 = new ScenarioExecutionCampaign("scenario 2", "", execution3);
+        List<CampaignExecution> allExecutions = List.of(
+            CampaignExecutionReportBuilder.builder()
+                // scenario exec report order is important for this test
+                .addScenarioExecutionReport(scenarioExecutionReport1)
+                .addScenarioExecutionReport(scenarioExecutionReport2)
+                .addScenarioExecutionReport(scenarioExecutionReport3)
+                .build()
+        );
+        when(campaignExecutionRepository.getExecutionHistory(anyLong())).thenReturn(allExecutions);
+        CampaignService sut = new CampaignService(campaignExecutionRepository);
+
+        // When
+        List<CampaignExecution> executionsReports = sut.findExecutionsById(campaignId);
+
+        // Then
+        assertThat(executionsReports).hasSize(1);
+        assertThat(executionsReports.get(0).status()).isEqualTo(RUNNING);
+        assertThat(executionsReports.get(0).scenarioExecutionReports()).hasSize(2);
+        assertThat(executionsReports.get(0).scenarioExecutionReports().get(0).scenarioId).isEqualTo("scenario 1");
+        assertThat(executionsReports.get(0).scenarioExecutionReports().get(1).scenarioId).isEqualTo("scenario 2");
 
     }
 
