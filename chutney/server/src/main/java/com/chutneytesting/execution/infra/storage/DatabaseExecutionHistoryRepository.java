@@ -83,7 +83,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     @Transactional(readOnly = true)
     public Map<String, ExecutionSummary> getLastExecutions(List<String> scenariosIds) {
         List<String> validScenariosIds = scenariosIds.stream().filter(id -> !invalidScenarioId(id)).toList();
-        List<Long> executionsIds = scenarioExecutionsJpaRepository.findLastExecutionsByScenarioId(validScenariosIds)
+        List<Long> executionsIds = scenarioExecutionsJpaRepository.findLastByStatusAndScenariosIds(validScenariosIds, ServerReportStatus.RUNNING)
             .stream().map(t -> t.get(0, Long.class)).toList();
         Iterable<ScenarioExecutionEntity> lastExecutions = scenarioExecutionsJpaRepository.findAllById(executionsIds );
         return StreamSupport.stream(lastExecutions.spliterator(), true)
