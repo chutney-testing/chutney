@@ -44,6 +44,7 @@ import com.chutneytesting.action.spi.time.Duration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,10 +53,14 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import org.apache.commons.exec.util.MapUtils;
+import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
+import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.header.Header;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
+import org.springframework.kafka.listener.ConsumerAwareRebalanceListener;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.MessageListener;
 import org.springframework.util.MimeType;
@@ -87,6 +92,7 @@ public class KafkaBasicConsumeAction implements Action {
     private final List<Map<String, Object>> consumedMessages = new ArrayList<>();
     private final String group;
     private final String ackMode;
+    private final Boolean resetOffset;
     private MimeType recordContentType;
 
     public KafkaBasicConsumeAction(Target target,
@@ -99,6 +105,7 @@ public class KafkaBasicConsumeAction implements Action {
                                    @Input("content-type") String contentType,
                                    @Input("timeout") String timeout,
                                    @Input("ackMode") String ackMode,
+                                   @Input("reset-offset") Boolean resetOffset,
                                    Logger logger) {
         this.topic = topic;
         this.nbMessages = defaultIfNull(nbMessages, 1);
@@ -116,6 +123,7 @@ public class KafkaBasicConsumeAction implements Action {
         this.ackMode = ofNullable(ackMode)
             .or(() -> ofNullable(target).flatMap(t -> t.property("ackMode")))
             .orElse(ContainerProperties.AckMode.BATCH.name());
+        this.resetOffset = ofNullable(resetOffset).orElse(false);
     }
 
     @Override
@@ -131,7 +139,7 @@ public class KafkaBasicConsumeAction implements Action {
 
     @Override
     public ActionExecutionResult execute() {
-        ConcurrentMessageListenerContainer<String, String> messageListenerContainer = createMessageListenerContainer(createMessageListener());
+        ConcurrentMessageListenerContainer<String, String> messageListenerContainer = createMessageListenerContainer();
         try {
             logger.info("Consuming message from topic " + topic);
             messageListenerContainer.start();
@@ -233,9 +241,12 @@ public class KafkaBasicConsumeAction implements Action {
         return Stream.of(record.headers().toArray()).distinct().collect(toMap(Header::key, header -> new String(header.value(), UTF_8)));
     }
 
-    private ConcurrentMessageListenerContainer<String, String> createMessageListenerContainer(MessageListener<String, String> messageListener) {
+    private ConcurrentMessageListenerContainer<String, String> createMessageListenerContainer() {
         ContainerProperties containerProperties = new ContainerProperties(topic);
-        containerProperties.setMessageListener(messageListener);
+        containerProperties.setMessageListener(createMessageListener());
+        if (resetOffset) {
+            containerProperties.setConsumerRebalanceListener(creatConsumerRebalanceListener());
+        }
         containerProperties.setAckMode(ContainerProperties.AckMode.valueOf(this.ackMode));
         ofNullable(properties.get(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG))
             .ifPresent(acims -> containerProperties.setAckTime(Long.parseLong(acims)));
@@ -245,6 +256,17 @@ public class KafkaBasicConsumeAction implements Action {
             kafkaConsumerFactoryFactory.create(target, group, properties),
             containerProperties);
     }
+
+    private ConsumerRebalanceListener creatConsumerRebalanceListener() {
+        return new ConsumerAwareRebalanceListener() {
+            @Override
+            public void onPartitionsAssigned(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
+                ConsumerAwareRebalanceListener.super.onPartitionsAssigned(consumer, partitions);
+                consumer.seekToBeginning(partitions);
+            }
+        };
+    }
+
 
     private Map<String, Object> toOutputs() {
         Map<String, Object> results = new HashMap<>();
