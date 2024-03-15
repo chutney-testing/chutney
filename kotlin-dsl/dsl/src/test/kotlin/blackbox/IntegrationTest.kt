@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test
 import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Testcontainers
+import util.WSLUtil
 import java.io.File
 import java.nio.file.Files
 
@@ -16,14 +17,14 @@ import java.nio.file.Files
 class IntegrationTest {
 
     companion object {
-        var chutneyServer: GenericContainer<Nothing>? = null
+        private var chutneyServer: GenericContainer<Nothing>? = null
         var adminServerInfo: ChutneyServerInfo? = null
         var userServerInfo: ChutneyServerInfo? = null
 
         @JvmStatic
         @BeforeAll
         fun setUp() {
-            val tempDirectory = Files.createTempDirectory("chutney-kotlin-blackbox")
+            val tempDirectory = Files.createTempDirectory("chutney-kotlin-blackbox-")
             val memAuthConfigFile = File(
                 IntegrationTest::class.java.getResource("/blackbox/application-mem-auth.yml")!!.path
             )
@@ -36,13 +37,13 @@ class IntegrationTest {
                 .apply {
                     //withStartupTimeout(Duration.ofSeconds(30))
                     withExposedPorts(8443)
-                    withFileSystemBind(tempDirectory.toString(), "/config", BindMode.READ_WRITE)
+                    withFileSystemBind(WSLUtil.wslPath(tempDirectory), "/config", BindMode.READ_WRITE)
                 }
             chutneyServer!!.start()
             adminServerInfo =
-                ChutneyServerInfo("https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}", "admin", "admin")
+                ChutneyServerInfo("https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}", "admin", "admin", null, null, null)
             userServerInfo =
-                ChutneyServerInfo("https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}", "user", "user")
+                ChutneyServerInfo("https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}", "user", "user", null, null, null)
 
             // Set authorizations
             val roles = IntegrationTest::class.java.getResource("/blackbox/roles.json")!!.path
