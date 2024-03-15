@@ -56,7 +56,7 @@ class SeleniumTest {
             ActionExecutionResult firefoxActionResult = remoteFirefoxAction.execute();
             assertThat(firefoxActionResult.status).isEqualTo(Success);
 
-            SeleniumQuitAction quitAction = new SeleniumQuitAction(logger, (WebDriver) firefoxActionResult.outputs.get(WEBDRIVER));
+            SeleniumQuitAction quitAction = new SeleniumQuitAction(logger, (WebDriver) firefoxActionResult.outputs.get("webDriver"));
             quitAction.execute();
         }
     }
@@ -77,7 +77,7 @@ class SeleniumTest {
             ActionExecutionResult chromeActionResult = remoteChromeAction.execute();
             assertThat(chromeActionResult.status).isEqualTo(Success);
 
-            SeleniumQuitAction quitAction = new SeleniumQuitAction(logger, (WebDriver) chromeActionResult.outputs.get(WEBDRIVER));
+            SeleniumQuitAction quitAction = new SeleniumQuitAction(logger, (WebDriver) chromeActionResult.outputs.get("webDriver"));
             quitAction.execute();
         }
     }
