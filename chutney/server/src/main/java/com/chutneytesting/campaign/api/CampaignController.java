@@ -21,6 +21,7 @@ import static com.chutneytesting.campaign.api.dto.CampaignMapper.toDto;
 import static com.chutneytesting.campaign.api.dto.CampaignMapper.toDtoWithoutReport;
 
 import com.chutneytesting.campaign.api.dto.CampaignDto;
+import com.chutneytesting.campaign.api.dto.CampaignExecutionFullReportDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper;
 import com.chutneytesting.campaign.api.dto.CampaignMapper;
@@ -30,6 +31,8 @@ import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.execution.domain.campaign.CampaignExecutionEngine;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
+import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
+import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
@@ -58,16 +61,19 @@ public class CampaignController {
     private final CampaignRepository campaignRepository;
 
     private final CampaignExecutionRepository campaignExecutionRepository;
+    private final ExecutionHistoryRepository executionHistoryRepository;
     private final CampaignService campaignService;
 
     public CampaignController(TestCaseRepositoryAggregator repositoryAggregator,
                               CampaignRepository campaignRepository,
                               CampaignExecutionRepository campaignExecutionRepository,
+                              ExecutionHistoryRepository executionHistoryRepository,
                               CampaignService campaignService) {
 
         this.repositoryAggregator = repositoryAggregator;
         this.campaignRepository = campaignRepository;
         this.campaignExecutionRepository = campaignExecutionRepository;
+        this.executionHistoryRepository = executionHistoryRepository;
         this.campaignService = campaignService;
     }
 
@@ -95,6 +101,20 @@ public class CampaignController {
         Campaign campaign = campaignRepository.findById(campaignId);
         List<CampaignExecution> reports = campaignService.findExecutionsById(campaignId);
         return toDto(campaign, reports);
+    }
+
+    @PreAuthorize("hasAuthority('CAMPAIGN_READ')")
+    @GetMapping(path = "/execution/{campaignExecutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public CampaignExecutionFullReportDto getCampaignExecutionReportById(@PathVariable("campaignExecutionId") Long campaignExecutionId) {
+        List<ExecutionHistory.Execution> executions = new ArrayList<>();
+
+        CampaignExecution campaignExecution = campaignExecutionRepository.getCampaignExecutionById(campaignExecutionId);
+
+        campaignExecution.scenarioExecutionReports().forEach(scenarioExecutionCampaign -> {
+            executions.add(executionHistoryRepository.getExecution(scenarioExecutionCampaign.scenarioId, scenarioExecutionCampaign.execution.executionId()));
+        });
+
+        return CampaignExecutionReportMapper.fullExecutionToDto(campaignExecution, executions);
     }
 
     @PreAuthorize("hasAuthority('CAMPAIGN_READ')")

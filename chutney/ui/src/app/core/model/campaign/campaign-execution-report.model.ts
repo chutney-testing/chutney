@@ -15,11 +15,25 @@
  */
 
 import { ScenarioExecutionReportOutline } from '.';
+import { Execution, ScenarioExecutionReport } from '../scenario';
 import { ExecutionStatus } from '../scenario/execution-status';
 
 export interface CampaignExecutionReport {
     executionId?: number,
     scenarioExecutionReports: Array<ScenarioExecutionReportOutline>,
+    status?: string,
+    duration?: string,
+    startDate?: string,
+    campaignName?: string,
+    partialExecution?: boolean,
+    executionEnvironment?: string,
+    campaignId?: string,
+    user: string
+}
+
+export interface CampaignExecutionFullReport {
+    executionId?: number,
+    scenarioExecutionReports: Array<Execution>,
     status?: string,
     duration?: string,
     startDate?: string,

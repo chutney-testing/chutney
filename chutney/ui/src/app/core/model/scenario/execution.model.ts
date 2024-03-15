@@ -33,6 +33,7 @@ export class Execution {
     public error?: string,
     public scenarioId?: string,
     public campaignReport?: CampaignExecutionReport,
+    public testCaseTitle?: string
   ) { }
 
   static deserializeExecutions(jsonObject: any): Execution[] {

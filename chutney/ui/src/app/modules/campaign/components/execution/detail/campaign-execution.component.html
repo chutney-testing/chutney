@@ -41,13 +41,23 @@
                 </small>
             </span>
             <ng-container *hasAuthorization="[Authorization.CAMPAIGN_EXECUTE]">
-                <div class="text-center" *ngIf="!report.isRunning() && (report.hasFailed() || report.hasStopped())">
-                    <button id="replay-btn" type="button" class="btn btn-sm btn-outline-primary"
-                        title="{{ 'campaigns.execution.replay' | translate }}"
-                        (click)="replay()">
-                        <span class="fa-solid fa-play me-2" aria-hidden="true"></span>
-                        <span class="btn-label">{{ 'global.actions.replay' | translate }}</span>
-                    </button>
+                <div class="text-center" *ngIf="!report.isRunning()">
+                    <ng-container *ngIf="report.hasFailed() || report.hasStopped()">
+                        <button id="replay-btn" type="button" class="btn btn-sm btn-outline-primary"
+                            title="{{ 'campaigns.execution.replay' | translate }}"
+                            (click)="replay()">
+                            <span class="fa-solid fa-play me-2" aria-hidden="true"></span>
+                            <span class="btn-label">{{ 'global.actions.replay' | translate }}</span>
+                        </button>
+                    </ng-container>
+                    <ng-container>
+                        <button id="export-btn" type="button" class="btn btn-sm btn-outline-primary ms-1"
+                            title="{{ 'scenarios.execution.step.actions.export' | translate }}"
+                            (click)="exportReport()">
+                            <span class="fa-solid fa-download me-2" aria-hidden="true"></span>
+                            <span class="btn-label">{{'scenarios.execution.step.actions.export' | translate}}</span>
+                        </button>
+                    </ng-container>
                 </div>
                 <div class="text-center" *ngIf="report.isRunning()">
                     <button id="stop-btn" type="button" class="btn btn-sm btn-outline-primary"
