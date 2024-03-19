@@ -2,10 +2,16 @@ name: "Release on Github"
 
 on:
   workflow_call:
-
+    inputs:
+      publish-to-github-maven-registry:
+        default: true
+        type: boolean
+        description: "Skip publish-to-github-maven-registry if false"
 jobs:
   create-github-release:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     steps:
       - name: Create github release
         id: create_release
@@ -23,7 +29,7 @@ jobs:
 
   publish-to-github-maven-registry:
     uses: ./.github/workflows/build-all-template.yml
-    if: ${{ github.ref_name =~ ^\d+\.\d+\.\d+\.\d+$ }}
+    if: ${{inputs.publish-to-github-maven-registry}}
     with:
       release: true
     secrets:
@@ -33,6 +39,8 @@ jobs:
 
 
   upload-plugin-to-release:
+    permissions:
+      contents: write
     needs: [ create-github-release]
     runs-on: ubuntu-latest
     steps:

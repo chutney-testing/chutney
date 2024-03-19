@@ -1,0 +1,29 @@
+name: "Release to github registry"
+
+on:
+  push:
+    tags:
+      - '[1-9]+.[0-9]+.[0-9]+.[0-9]+'
+
+jobs:
+  build:
+    uses: ./.github/workflows/build-all-template.yml
+    with:
+      skipTests: true
+      cache-artifacts: |
+        chutney/packaging/local-dev/target/chutney-local-dev-*.jar
+        idea-plugin/build/distributions/*.zip
+        chutney/ui/dist
+
+  release-github:
+    needs: [ build ]
+    uses: ./.github/workflows/release-github-template.yml
+
+  release-docker:
+    needs: [ build ]
+    uses: ./.github/workflows/release-docker-template.yml
+    with:
+      version: ${{needs.build.outputs.PROJECT_VERSION}}
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
+
