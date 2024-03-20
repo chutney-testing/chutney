@@ -49,19 +49,17 @@
             <ng-container *hasAuthorization="[Authorization.CAMPAIGN_EXECUTE]">
                 <div class="text-center" *ngIf="!report.isRunning()">
                     <ng-container *ngIf="report.hasFailed() || report.hasStopped()">
-                        <button id="replay-btn" type="button" class="btn btn-sm btn-outline-primary"
+                        <button id="replay-btn" type="button" class="btn btn-sm btn-outline-primary w10"
                             title="{{ 'campaigns.execution.replay' | translate }}"
                             (click)="replay()">
-                            <span class="fa-solid fa-play me-2" aria-hidden="true"></span>
-                            <span class="btn-label">{{ 'global.actions.replay' | translate }}</span>
+                            <span class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></span>
                         </button>
                     </ng-container>
                     <ng-container>
-                        <button id="export-btn" type="button" class="btn btn-sm btn-outline-primary ms-1"
+                        <button id="export-btn" type="button" class="btn btn-sm btn-outline-primary ms-1 w10"
                             title="{{ 'scenarios.execution.step.actions.export' | translate }}"
                             (click)="exportReport()">
-                            <span class="fa-solid fa-download me-2" aria-hidden="true"></span>
-                            <span class="btn-label">{{'scenarios.execution.step.actions.export' | translate}}</span>
+                            <span class="fa-solid fa-file-pdf" aria-hidden="true"></span>
                         </button>
                     </ng-container>
                 </div>

@@ -84,7 +84,10 @@ export class CampaignReportService {
 
         report.scenarioExecutionReports
             .map(s => this.buildExecutionReport(s))
-            .forEach(r => {
+            .forEach((r, index) => {
+                if (index){
+                    pdf.addPage();
+                }
                 pdf.text(r.scenarioName, 15, 25);
                 const scenarioReportBody = r.report.steps.map(step => [step.name, step.status, this.buildErrorMessage(step)]);
                 autoTable(pdf, {
@@ -97,10 +100,7 @@ export class CampaignReportService {
                         CampaignReportService.setStatusStyle(data);
                     }
                 });
-                pdf.addPage();
             });
-
-        pdf.deletePage(pdf.internal.pages.length - 1);
     }
 
     private buildErrorMessage(step: StepExecutionReport): string {
