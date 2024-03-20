@@ -15,7 +15,7 @@
  */
 
 import { ScenarioExecutionReportOutline } from '.';
-import { Execution, ScenarioExecutionReport } from '../scenario';
+import { Execution } from '../scenario';
 import { ExecutionStatus } from '../scenario/execution-status';
 
 export interface CampaignExecutionReport {
@@ -76,7 +76,7 @@ export class CampaignReport {
         var notExecuted = 0;
         var pauses = 0;
         report.scenarioExecutionReports.forEach(r => {
-            switch(r.status) {
+            switch (r.status) {
                 case ExecutionStatus.NOT_EXECUTED:
                     notExecuted++;
                     break;
@@ -141,7 +141,7 @@ export class CampaignReport {
     }
 
     refresh(campaignReport: CampaignReport) {
-        if(campaignReport.report.campaignId === this.report.campaignId && campaignReport.report.executionId === this.report.executionId){
+        if (campaignReport.report.campaignId === this.report.campaignId && campaignReport.report.executionId === this.report.executionId) {
             this.report = campaignReport.report;
             this.notexecuted = campaignReport.notexecuted;
             this.running = campaignReport.running;

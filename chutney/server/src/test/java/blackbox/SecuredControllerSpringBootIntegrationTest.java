@@ -131,6 +131,7 @@ public class SecuredControllerSpringBootIntegrationTest {
             {POST, "/api/ui/campaign/execution/v1/666/stop", "CAMPAIGN_EXECUTE", "{}", NOT_FOUND},
             {GET, "/api/ui/campaign/execution/v1/byID/666", "CAMPAIGN_EXECUTE", null, NOT_FOUND},
             {GET, "/api/ui/campaign/execution/v1/byID/666/DEFAULT", "CAMPAIGN_EXECUTE", null, NOT_FOUND},
+            {GET, "/api/ui/campaign/v1/execution/1", "CAMPAIGN_READ", null, NOT_FOUND},
 
             {GET, "/api/v1/editions/testcases/testcaseId", "SCENARIO_READ", null, OK},
             {POST, "/api/v1/editions/testcases/testcaseId", "SCENARIO_WRITE", "{}", NOT_FOUND},

@@ -17,16 +17,13 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { forkJoin, Observable, of, switchMap, timer } from "rxjs";
 
-import { Authorization, CampaignExecutionFullReport, CampaignReport, JiraScenario, JiraTestExecutionScenarios, ScenarioExecutionReport, ScenarioExecutionReportOutline, StepExecutionReport, XrayStatus } from "@core/model";
+import { Authorization, CampaignExecutionFullReport, CampaignReport, JiraScenario, JiraTestExecutionScenarios, ScenarioExecutionReportOutline, XrayStatus } from "@core/model";
 import { CampaignService, JiraPluginService } from "@core/services";
-import { Params, Router } from "@angular/router";
+import { Params } from "@angular/router";
 import { ExecutionStatus } from "@core/model/scenario/execution-status";
 import { EventManagerService } from "@shared";
 import { sortByAndOrder } from '@shared/tools';
-import jsPDF from "jspdf";
-import autoTable, { CellHookData } from 'jspdf-autotable';
-import { DurationPipe } from "@shared/pipes";
-import { TranslateService } from "@ngx-translate/core";
+import { CampaignReportService } from "@core/services/campaign-report.service";
 
 @Component({
     selector: 'chutney-campaign-execution',
@@ -42,6 +39,7 @@ export class CampaignExecutionComponent implements OnInit {
     Authorization = Authorization;
     ExecutionStatus = ExecutionStatus;
 
+    errors: string[] = [];
     jiraTestExecutionId: string;
     private jiraScenarios: JiraScenario[] = [];
     UNSUPPORTED = 'UNSUPPORTED';
@@ -55,8 +53,7 @@ export class CampaignExecutionComponent implements OnInit {
         private jiraLinkService: JiraPluginService,
         private campaignService: CampaignService,
         private eventManagerService: EventManagerService,
-        private router: Router,
-        private translate: TranslateService
+        private campaignReportService: CampaignReportService
     ) { }
 
     ngOnInit(): void {
@@ -188,116 +185,11 @@ export class CampaignExecutionComponent implements OnInit {
         this.campaignService.findExecution(this.report.report.executionId)
             .subscribe({
                 next: (report: CampaignExecutionFullReport) => {
-                    const url = location.origin + '/#' + this.router.serializeUrl(this.router.createUrlTree(['/scenario', ':id', 'executions']));
-                    const pdf = new jsPDF('l', 'mm', 'a4');
-                    const pdfFontSize = pdf.getFontSize();
-                    const duration = new DurationPipe();
-
-
-                    const docTitle = report.campaignName;
-                    pdf.text(docTitle, 148, 20, { align: 'center' });
-
-                    const docRecap = duration.transform(Number.parseInt(this.report.report.duration)) + ' - ' + this.report.passed + ' OK / ' + this.report.total;
-                    pdf.setFontSize(pdfFontSize - 4);
-                    pdf.text(docRecap, 148, 30, { align: 'center' });
-
-                    const dataHeader = [["id", "Scenario", "Status", "error"]];
-                    const dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.error.toString()]);
-                    pdf.setFontSize(pdfFontSize - 2);
-                    autoTable(pdf, {
-                        body: dataBody,
-                        head: dataHeader,
-                        startY: 40,
-                        theme: 'striped',
-                        useCss: true,
-                        didParseCell(data) {
-                            setStatusStyle(data);
-                        },
-                        didDrawCell(data) {
-                            if (data.cell.section === 'body' && data.column.index === 1) {
-                                let scenarioId = data.row.cells[0].raw.toString();
-                                pdf.link(data.cell.x, data.cell.y, data.cell.width, data.cell.height, { url: url.replace(':id', scenarioId) });
-                            }
-                        }
-                    });
-
-                    pdf.addPage();
-                    this.translate.get('campaigns.execution.scenarios.title').subscribe((res: string) => {
-                        pdf.text(res, 148, 15, { align: "center" });
-                    });
-
-                    const scenarioReportHeader = [["step", "Status", "error"]];
-
-                    report.scenarioExecutionReports
-                        .map(s => this.buildExecutionReport(s))
-                        .forEach(r => {
-                            pdf.text(r.scenarioName, 15, 25);
-                            const scenarioReportBody = r.report.steps.map(step => [step.name, step.status, this.buildErrorMessage(step)]);
-                            autoTable(pdf, {
-                                body: scenarioReportBody,
-                                head: scenarioReportHeader,
-                                startY: 30,
-                                theme: 'striped',
-                                useCss: true,
-                                didParseCell(data) {
-                                    setStatusStyle(data);
-                                }
-                            });
-                            pdf.addPage();
-                        });
-
-                    pdf.deletePage(pdf.internal.pages.length - 1);
-                    pdf.save('campaignExecutionReport.pdf');
+                    this.campaignReportService.toPDF(report).save('campaignExecutionReport.pdf');
                 },
                 error: error => {
-                    console.error(error.message);
+                    this.errors.push(error.message);
                 }
             });
     }
-
-    private buildErrorMessage(step: StepExecutionReport): string {
-        if (step.status === 'FAILURE') {
-            const s = this.getFailedStep(step);
-            return '[ ' + s.name + ' ] ' + s.errors.toString();
-        }
-        return '';
-    }
-
-    private getFailedStep(step: StepExecutionReport): StepExecutionReport {
-        return (step.steps && step.steps.length) ? this.getFailedStep(step.steps.filter(s => s.status === 'FAILURE')[0]) : step;
-    }
-
-    private buildExecutionReport(jsonResponse: any): ScenarioExecutionReport {
-        let report: StepExecutionReport;
-        let contextVariables: Map<string, Object>;
-        if (jsonResponse?.report) {
-            report = JSON.parse(jsonResponse.report).report;
-            contextVariables = JSON.parse(jsonResponse.report).contextVariables;
-        }
-        return new ScenarioExecutionReport(
-            jsonResponse.executionId,
-            jsonResponse.status ? jsonResponse.status : report?.status,
-            jsonResponse.duration ? jsonResponse.duration : report?.duration,
-            new Date(jsonResponse.time ? jsonResponse.time : report?.startDate),
-            report,
-            jsonResponse.environment,
-            jsonResponse.user,
-            jsonResponse.testCaseTitle,
-            jsonResponse.error,
-            contextVariables
-        );
-    }
 }
-function setStatusStyle(data: CellHookData) {
-    if (data.cell.section === 'body') {
-        if (data.cell.raw === "FAILURE") {
-            data.cell.styles.textColor = [255, 255, 255];
-            data.cell.styles.fillColor = '#e74c3c';
-        }
-        if (data.cell.raw === "SUCCESS") {
-            data.cell.styles.textColor = [255, 255, 255];
-            data.cell.styles.fillColor = '#18bc9c';
-        }
-    }
-}
-

@@ -28,7 +28,6 @@ import com.chutneytesting.campaign.api.dto.CampaignMapper;
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.campaign.domain.CampaignService;
-import com.chutneytesting.execution.domain.campaign.CampaignExecutionEngine;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
@@ -36,7 +35,6 @@ import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryR
 import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -106,13 +104,11 @@ public class CampaignController {
     @PreAuthorize("hasAuthority('CAMPAIGN_READ')")
     @GetMapping(path = "/execution/{campaignExecutionId}", produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignExecutionFullReportDto getCampaignExecutionReportById(@PathVariable("campaignExecutionId") Long campaignExecutionId) {
-        List<ExecutionHistory.Execution> executions = new ArrayList<>();
-
         CampaignExecution campaignExecution = campaignExecutionRepository.getCampaignExecutionById(campaignExecutionId);
 
-        campaignExecution.scenarioExecutionReports().forEach(scenarioExecutionCampaign -> {
-            executions.add(executionHistoryRepository.getExecution(scenarioExecutionCampaign.scenarioId, scenarioExecutionCampaign.execution.executionId()));
-        });
+        List<ExecutionHistory.Execution> executions = campaignExecution.scenarioExecutionReports().stream()
+            .map(ser -> executionHistoryRepository.getExecution(ser.scenarioId, ser.execution.executionId()))
+            .toList();
 
         return CampaignExecutionReportMapper.fullExecutionToDto(campaignExecution, executions);
     }
