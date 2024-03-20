@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.SQLException;
+import java.util.HashMap;
 import javax.sql.DataSource;
 import org.h2.tools.Server;
 import org.slf4j.Logger;
@@ -46,6 +47,83 @@ public class DBConfiguration {
     private static final String DBSERVER_PORT_SPRING_VALUE = "${chutney.db-server.port}";
     private static final String DBSERVER_BASEDIR_SPRING_VALUE = "${chutney.db-server.base-dir:~/.chutney/data}";
     private static final String DBSERVER_TMPDIR_SPRING_VALUE = "${chutney.db-server.base-dir:}";
+
+    @Configuration
+    @Profile("db-sqlite-rw")
+    static class SqliteRWConfiguration {
+
+        @Value(DBSERVER_BASEDIR_SPRING_VALUE)
+        private String baseDir;
+
+        @PostConstruct
+        public void initBaseDir() throws IOException {
+            Files.createDirectories(Path.of(baseDir));
+        }
+
+        private DataSource readWriteDataSource(
+            DataSourceProperties internalDataSourceProperties,
+            @Value(DBSERVER_TMPDIR_SPRING_VALUE) String tmpDirectory
+        ) {
+            HikariConfig hikariConfig = new HikariConfig();
+            hikariConfig.setAutoCommit(false);
+            hikariConfig.setJdbcUrl(internalDataSourceProperties.determineUrl());
+            hikariConfig.setDriverClassName(DatabaseDriver.fromJdbcUrl(internalDataSourceProperties.determineUrl()).getDriverClassName());
+            hikariConfig.setMaximumPoolSize(1); // fix for sqlite
+
+            SQLiteConfig config = new SQLiteConfig();
+            // see https://www.sqlite.org/pragma.html
+            config.setLockingMode(SQLiteConfig.LockingMode.NORMAL);
+            config.setTransactionMode(SQLiteConfig.TransactionMode.IMMEDIATE);
+            config.setDefaultCacheSize(-20000); // ~20Mb
+            config.setPageSize(4096); // 4Kb
+            config.setJournalMode(SQLiteConfig.JournalMode.WAL);
+            config.setSynchronous(SQLiteConfig.SynchronousMode.NORMAL);
+            config.setBusyTimeout(10000);
+            if (!tmpDirectory.isBlank()) {
+                config.setTempStoreDirectory(tmpDirectory);
+            }
+            hikariConfig.setDataSourceProperties(config.toProperties());
+
+            return new HikariDataSource(hikariConfig);
+        }
+
+        private DataSource readOnlyDataSource(
+            DataSourceProperties internalDataSourceProperties
+        ) {
+            HikariConfig hikariConfig = new HikariConfig();
+            hikariConfig.setAutoCommit(false);
+            hikariConfig.setReadOnly(true);
+            hikariConfig.setJdbcUrl(internalDataSourceProperties.determineUrl());
+            hikariConfig.setDriverClassName(DatabaseDriver.fromJdbcUrl(internalDataSourceProperties.determineUrl()).getDriverClassName());
+
+            SQLiteConfig config = new SQLiteConfig();
+            // see https://www.sqlite.org/pragma.html
+            config.setReadOnly(true);
+            hikariConfig.setDataSourceProperties(config.toProperties());
+
+            return new HikariDataSource(hikariConfig);
+        }
+
+        @Bean
+        public TransactionRoutingDataSource dataSource(
+            DataSourceProperties internalDataSourceProperties,
+            @Value(DBSERVER_TMPDIR_SPRING_VALUE) String tmpDirectory
+        ) {
+            var dataSourceMap = new HashMap<>();
+            dataSourceMap.put(
+                DataSourceType.READ_WRITE,
+                readWriteDataSource(internalDataSourceProperties, tmpDirectory)
+            );
+            dataSourceMap.put(
+                DataSourceType.READ_ONLY,
+                readOnlyDataSource(internalDataSourceProperties)
+            );
+
+            var routingDataSource = new TransactionRoutingDataSource();
+            routingDataSource.setTargetDataSources(dataSourceMap);
+            return routingDataSource;
+        }
+    }
 
     @Configuration
     @Profile("db-sqlite")

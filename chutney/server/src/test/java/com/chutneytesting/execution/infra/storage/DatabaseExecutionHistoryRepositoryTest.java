@@ -61,6 +61,7 @@ import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.stream.IntStream;
 import org.hibernate.exception.LockAcquisitionException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -108,6 +109,11 @@ public class DatabaseExecutionHistoryRepositoryTest {
         @Autowired
         private DatabaseTestCaseRepository databaseTestCaseRepository;
 
+        @AfterEach
+        void afterEach() {
+            clearTables();
+        }
+
         @Test
         public void parallel_execution_does_not_lock_database() throws InterruptedException {
             int numThreads = 10;
@@ -153,7 +159,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
 
         @Test
         public void execution_summary_is_available_after_storing_sorted_newest_first() {
-            String scenarioId = givenScenarioId(true);
+            String scenarioId = givenScenarioId();
             sut.store(scenarioId, buildDetachedExecution(SUCCESS, "exec1", ""));
             sut.store(scenarioId, buildDetachedExecution(SUCCESS, "exec2", ""));
             sut.store(scenarioId, buildDetachedExecution(FAILURE, "exec3", ""));
@@ -169,7 +175,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
             sut.store(scenarioIdOne, buildDetachedExecution(SUCCESS, "exec2", ""));
             sut.store(scenarioIdOne, buildDetachedExecution(FAILURE, "exec3", ""));
 
-            String scenarioIdTwo = givenScenarioId(true);
+            String scenarioIdTwo = givenScenarioId();
             sut.store(scenarioIdTwo, buildDetachedExecution(SUCCESS, "exec6", ""));
             sut.store(scenarioIdTwo, buildDetachedExecution(SUCCESS, "exec5", ""));
             sut.store(scenarioIdTwo, buildDetachedExecution(FAILURE, "exec4", ""));
@@ -272,8 +278,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
         @Test
         public void all_running_executions_are_set_to_KO_on_startup() {
             // Given running executions
-            clearTables();
-            String scenarioIdOne = givenScenarioId(true);
+            String scenarioIdOne = givenScenarioId();
             String scenarioIdTwo = givenScenarioId();
             sut.store(scenarioIdOne, buildDetachedExecution(RUNNING, "exec1", ""));
             sut.store(scenarioIdTwo, buildDetachedExecution(RUNNING, "exec2", ""));
@@ -293,7 +298,6 @@ public class DatabaseExecutionHistoryRepositoryTest {
         @Test
         public void all_running_executions_are_set_to_KO_on_startup_check_report_status_update() throws JsonProcessingException {
             // Given running executions
-            clearTables();
             String scenarioIdOne = "123";
             Long scenarioId = sut.store(scenarioIdOne, buildDetachedExecution(RUNNING, "exec1", "")).summary().executionId();
 
@@ -318,7 +322,6 @@ public class DatabaseExecutionHistoryRepositoryTest {
         @Test
         public void all_paused_executions_are_set_to_KO_on_startup_check_report_status_update() throws JsonProcessingException {
             // Given running executions
-            clearTables();
             String scenarioIdOne = "123";
             Long scenarioId = sut.store(scenarioIdOne, buildDetachedExecution(PAUSED, "exec1", "")).summary().executionId();
 
@@ -361,7 +364,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
 
         @Test
         public void should_truncate_report_info_and_error_on_save_or_update() {
-            String scenarioId = givenScenarioId(true);
+            String scenarioId = givenScenarioId();
             final String tooLongString = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non risus. Suspendisse lectus tortor, dignissim sit amet, adipiscing nec, ultricies sed, dolor. Cras elementum ultrices diam. Maecenas ligula massa, varius a, semper congue, euismod non, mi. Proin porttitor, orci nec nonummy molestie, enim est eleifend mi, non fermentum diam nisl sit amet erat. Duis semper. Duis arcu massa, scelerisque vitae, consequat in, pretium a, enim. Pellentesque congue. Ut in risus volutpat libero pharetra tempor. Cras vestibulum bibendum augue. Praesent egestas leo in pede.";
 
             Execution last = sut.store(scenarioId, buildDetachedExecution(SUCCESS, tooLongString, tooLongString));
@@ -452,9 +455,13 @@ public class DatabaseExecutionHistoryRepositoryTest {
         @NestedTestConfiguration(NestedTestConfiguration.EnclosingConfiguration.OVERRIDE)
         @DisplayName("Find scenario execution with report match")
         class ScenarioExecutionReportMatch {
+            @AfterEach
+            void afterEach() {
+                clearTables();
+            }
+
             @Test
             void simple_case() {
-                clearTables();
                 var scenarioId1 = givenScenario().getId().toString();
                 var scenarioId2 = givenScenario().getId().toString();
                 var exec1 = sut.store(scenarioId1, buildDetachedExecution("toto"));
@@ -469,7 +476,6 @@ public class DatabaseExecutionHistoryRepositoryTest {
 
             @Test
             void filter_unactivated_scenario_execution() {
-                clearTables();
                 var scenarioId1 = givenScenario().getId().toString();
                 var scenarioId2 = givenScenario().getId().toString();
                 var exec1 = sut.store(scenarioId1, buildDetachedExecution("toto"));
@@ -485,7 +491,6 @@ public class DatabaseExecutionHistoryRepositoryTest {
 
             @Test
             void limit_results_to_100() {
-                clearTables();
                 IntStream.range(0, 110).forEach(i -> {
                     String scenarioId = givenScenario().getId().toString();
                     sut.store(scenarioId, buildDetachedExecution("report"));
@@ -498,7 +503,6 @@ public class DatabaseExecutionHistoryRepositoryTest {
 
             @Test
             void order_by_id_descending() {
-                clearTables();
                 List<Long> executionsIds = new ArrayList<>();
                 IntStream.range(0, 10).forEach(i -> {
                     var scenarioId = givenScenario().getId();

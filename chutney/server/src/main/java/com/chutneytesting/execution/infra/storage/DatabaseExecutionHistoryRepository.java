@@ -25,7 +25,6 @@ import com.chutneytesting.campaign.infra.CampaignJpaRepository;
 import com.chutneytesting.campaign.infra.jpa.CampaignExecutionEntity;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionReportEntity;
-import com.chutneytesting.scenario.infra.raw.ScenarioJpaRepository;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.DetachedExecution;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.Execution;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.ExecutionSummary;
@@ -52,7 +51,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 @Component
-@Transactional
+@Transactional(readOnly = true)
 class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
 
     private final DatabaseExecutionJpaRepository scenarioExecutionsJpaRepository;
@@ -67,7 +66,6 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     DatabaseExecutionHistoryRepository(
         DatabaseExecutionJpaRepository scenarioExecutionsJpaRepository,
         ScenarioExecutionReportJpaRepository scenarioExecutionReportJpaRepository,
-        ScenarioJpaRepository scenarioJpaRepository,
         CampaignJpaRepository campaignJpaRepository, TestCaseRepository testCaseRepository,
         CampaignExecutionJpaRepository campaignExecutionJpaRepository,
         @Qualifier("reportObjectMapper") ObjectMapper objectMapper) {
@@ -80,7 +78,6 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Map<String, ExecutionSummary> getLastExecutions(List<String> scenariosIds) {
         List<String> validScenariosIds = scenariosIds.stream().filter(id -> !invalidScenarioId(id)).toList();
         List<Long> executionsIds = scenarioExecutionsJpaRepository.findLastByStatusAndScenariosIds(validScenariosIds, ServerReportStatus.RUNNING)
@@ -91,7 +88,6 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ExecutionSummary> getExecutions(String scenarioId) {
         if (invalidScenarioId(scenarioId)) {
             return emptyList();
@@ -103,7 +99,6 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ExecutionSummary> getExecutions() {
         return scenarioExecutionsJpaRepository.findAll().stream()
             .map(this::scenarioExecutionToExecutionSummary)
@@ -111,7 +106,6 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public ExecutionSummary getExecutionSummary(Long executionId) {
         return scenarioExecutionsJpaRepository.findById(executionId)
             .map(this::scenarioExecutionToExecutionSummary)
@@ -128,6 +122,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     }
 
     @Override
+    @Transactional
     public Execution store(String scenarioId, DetachedExecution detachedExecution) throws IllegalStateException {
         if (invalidScenarioId(scenarioId)) {
             throw new IllegalStateException("Scenario id is null or empty");
@@ -144,7 +139,6 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     // TODO remove scenarioId params
     public Execution getExecution(String scenarioId, Long reportId) throws ReportNotFoundException {
         if (invalidScenarioId(scenarioId) || testCaseRepository.findById(scenarioId).isEmpty()) {
@@ -166,6 +160,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     }
 
     @Override
+    @Transactional
     public void update(String scenarioId, Execution updatedExecution) throws ReportNotFoundException {
         if (!scenarioExecutionsJpaRepository.existsById(updatedExecution.executionId())) {
             throw new ReportNotFoundException(scenarioId, updatedExecution.executionId());
@@ -192,6 +187,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     }
 
     @Override
+    @Transactional
     public int setAllRunningExecutionsToKO() {
         List<ExecutionSummary> runningExecutions = getExecutionsWithStatus(ServerReportStatus.RUNNING);
         updateExecutionsToKO(runningExecutions);
@@ -203,12 +199,12 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<ExecutionSummary> getExecutionsWithStatus(ServerReportStatus status) {
         return scenarioExecutionsJpaRepository.findByStatus(status).stream().map(ScenarioExecutionEntity::toDomain).toList();
     }
 
     @Override
+    @Transactional
     public void deleteExecutions(Set<Long> executionsIds) {
         scenarioExecutionsJpaRepository.deleteAllByIdInBatch(executionsIds);
         scenarioExecutionReportJpaRepository.deleteAllById(executionsIds);

@@ -1,0 +1,13 @@
+chutney:
+  db-server:
+    base-dir: ./.chutney/data
+
+spring:
+  jpa:
+    properties:
+      hibernate.dialect: org.hibernate.community.dialect.SQLiteDialect
+      hibernate.id.new_generator_mappings: false
+      hibernate.connection.provider_disables_autocommit: true
+      hibernate.connection.handling_mode: DELAYED_ACQUISITION_AND_RELEASE_AFTER_TRANSACTION
+  datasource:
+    url: jdbc:sqlite:${chutney.db-server.base-dir}/sqlitesample.db
