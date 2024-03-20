@@ -153,7 +153,7 @@ public class ScenarioExecutionEngineAsync {
         Observable<StepExecutionReportCore> replayer = engineExecution.getLeft().observeOn(io());
         // Debounce configuration
         if (debounceMilliSeconds > 0) {
-            replayer = replayer.debounce(debounceMilliSeconds, TimeUnit.MILLISECONDS);
+            replayer = replayer.throttleLatest(debounceMilliSeconds, TimeUnit.MILLISECONDS, true);
         }
         return replayer
             .doOnSubscribe(disposable -> notifyExecutionStart(executionId, executionRequest.testCase))
