@@ -43,7 +43,7 @@ class ChutneyJsonToTestEventConverter(
         ApplicationManager.getApplication().executeOnPooledThread {
             val server = ChutneyServerRegistry.instance.myServer
             WaitUntilUtils.waitUntil({ getServerUrl(server) != null }, 60000)
-            processHandler.startNotify()
+            //processHandler.startNotify()
             val cacheEvaluation = mutableMapOf<Int, Any>()
             jsonFiles.filterNotNull().forEachIndexed { index, virtualFile ->
                 if (ChutneyUtil.isChutneyDsl(virtualFile)) {
