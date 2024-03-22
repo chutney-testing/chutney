@@ -1,10 +1,9 @@
-name: "Release all"
+name: "Release to OSSRH"
 
 on:
   push:
     tags:
-      - '*.*.*'
-      - '*.*.*.*'
+      - '[1-9]+.[0-9]+.[0-9]+'
 
 jobs:
   build:
@@ -19,9 +18,10 @@ jobs:
   release-github:
     needs: [ build ]
     uses: ./.github/workflows/release-github-template.yml
+    with:
+      publish-to-github-maven-registry: false
 
   release-to-OSSRH:
-    if: ${{ github.ref_name =~ ^\d+\.\d+\.\d+$) }}
     needs: [ build ]
     uses: ./.github/workflows/build-all-template.yml
     with:
@@ -41,4 +41,3 @@ jobs:
       version: ${{needs.build.outputs.PROJECT_VERSION}}
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
-
