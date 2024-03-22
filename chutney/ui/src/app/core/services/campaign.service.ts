@@ -18,7 +18,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import { Campaign, CampaignExecutionReport, ScenarioIndex } from '@model';
+import { Campaign, CampaignExecutionFullReport, CampaignExecutionReport, ScenarioIndex } from '@model';
 import { HttpClient } from '@angular/common/http';
 import { distinct } from '@shared/tools';
 
@@ -71,6 +71,11 @@ export class CampaignService {
 
     find(id: number): Observable<Campaign> {
         return this.http.get<Campaign>(environment.backend + `${this.resourceUrl}/${id}`);
+    }
+
+    findExecution(id: number): Observable<CampaignExecutionFullReport> {
+        return this.http.get<CampaignExecutionFullReport>(environment.backend + `${this.resourceUrl}/execution/${id}`)
+        ;
     }
 
     create(campaign: Campaign): Observable<Campaign> {

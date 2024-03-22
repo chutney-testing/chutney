@@ -15,11 +15,25 @@
  */
 
 import { ScenarioExecutionReportOutline } from '.';
+import { Execution } from '../scenario';
 import { ExecutionStatus } from '../scenario/execution-status';
 
 export interface CampaignExecutionReport {
     executionId?: number,
     scenarioExecutionReports: Array<ScenarioExecutionReportOutline>,
+    status?: string,
+    duration?: string,
+    startDate?: string,
+    campaignName?: string,
+    partialExecution?: boolean,
+    executionEnvironment?: string,
+    campaignId?: string,
+    user: string
+}
+
+export interface CampaignExecutionFullReport {
+    executionId?: number,
+    scenarioExecutionReports: Array<Execution>,
     status?: string,
     duration?: string,
     startDate?: string,
@@ -62,7 +76,7 @@ export class CampaignReport {
         var notExecuted = 0;
         var pauses = 0;
         report.scenarioExecutionReports.forEach(r => {
-            switch(r.status) {
+            switch (r.status) {
                 case ExecutionStatus.NOT_EXECUTED:
                     notExecuted++;
                     break;
@@ -127,7 +141,7 @@ export class CampaignReport {
     }
 
     refresh(campaignReport: CampaignReport) {
-        if(campaignReport.report.campaignId === this.report.campaignId && campaignReport.report.executionId === this.report.executionId){
+        if (campaignReport.report.campaignId === this.report.campaignId && campaignReport.report.executionId === this.report.executionId) {
             this.report = campaignReport.report;
             this.notexecuted = campaignReport.notexecuted;
             this.running = campaignReport.running;

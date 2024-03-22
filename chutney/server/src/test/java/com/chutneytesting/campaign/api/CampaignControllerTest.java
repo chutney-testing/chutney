@@ -40,6 +40,7 @@ import com.chutneytesting.scenario.api.raw.dto.ImmutableTestCaseIndexDto;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
+import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
@@ -76,6 +77,7 @@ public class CampaignControllerTest {
     private TestCaseRepositoryAggregator repositoryAggregator;
 
     private final CampaignExecutionEngine campaignExecutionEngine = mock(CampaignExecutionEngine.class);
+    private final ExecutionHistoryRepository executionHistoryRepository = mock(ExecutionHistoryRepository.class);
     private MockMvc mockMvc;
     private ResultExtractor resultExtractor;
     private CampaignDto existingCampaign;
@@ -86,7 +88,7 @@ public class CampaignControllerTest {
         resultExtractor = new ResultExtractor();
 
         repositoryAggregator = mock(TestCaseRepositoryAggregator.class);
-        CampaignController campaignController = new CampaignController(repositoryAggregator, repository, repository, new CampaignService(repository));
+        CampaignController campaignController = new CampaignController(repositoryAggregator, repository, repository, executionHistoryRepository, new CampaignService(repository));
         mockMvc = MockMvcBuilders.standaloneSetup(campaignController)
             .setControllerAdvice(new RestExceptionHandler(Mockito.mock(ChutneyMetrics.class)))
             .build();

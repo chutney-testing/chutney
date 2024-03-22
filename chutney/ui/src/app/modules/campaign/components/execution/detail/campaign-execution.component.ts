@@ -17,12 +17,13 @@
 import { Component, Input, OnInit } from "@angular/core";
 import { forkJoin, Observable, of, switchMap, timer } from "rxjs";
 
-import { Authorization, CampaignReport, JiraScenario, JiraTestExecutionScenarios, ScenarioExecutionReportOutline, XrayStatus } from "@core/model";
+import { Authorization, CampaignExecutionFullReport, CampaignReport, JiraScenario, JiraTestExecutionScenarios, ScenarioExecutionReportOutline, XrayStatus } from "@core/model";
 import { CampaignService, JiraPluginService } from "@core/services";
 import { Params } from "@angular/router";
 import { ExecutionStatus } from "@core/model/scenario/execution-status";
 import { EventManagerService } from "@shared";
 import { sortByAndOrder } from '@shared/tools';
+import { CampaignReportService } from "@core/services/campaign-report.service";
 
 @Component({
     selector: 'chutney-campaign-execution',
@@ -38,6 +39,7 @@ export class CampaignExecutionComponent implements OnInit {
     Authorization = Authorization;
     ExecutionStatus = ExecutionStatus;
 
+    errors: string[] = [];
     jiraTestExecutionId: string;
     private jiraScenarios: JiraScenario[] = [];
     UNSUPPORTED = 'UNSUPPORTED';
@@ -50,7 +52,8 @@ export class CampaignExecutionComponent implements OnInit {
     constructor(
         private jiraLinkService: JiraPluginService,
         private campaignService: CampaignService,
-        private eventManagerService: EventManagerService
+        private eventManagerService: EventManagerService,
+        private campaignReportService: CampaignReportService
     ) { }
 
     ngOnInit(): void {
@@ -61,7 +64,7 @@ export class CampaignExecutionComponent implements OnInit {
             this.jiraScenarios = result.jirjiraTestExecutionScenarios.jiraScenarios;
             this.jiraTestExecutionId = result.jirjiraTestExecutionScenarios.id;
         });
-        this.report.report.scenarioExecutionReports.forEach((_report,index) => this.showMore[index]=false);
+        this.report.report.scenarioExecutionReports.forEach((_report, index) => this.showMore[index] = false);
     }
 
     private cleanJiraUrl() {
@@ -95,7 +98,7 @@ export class CampaignExecutionComponent implements OnInit {
         const newStatus = this.selectedStatusByScenarioId.get(scenarioId);
         if (newStatus === XrayStatus.PASS || newStatus === XrayStatus.FAIL) {
             this.jiraLinkService.updateScenarioStatus(this.jiraTestExecutionId, scenarioId, newStatus).subscribe(
-                () => {},
+                () => { },
                 (error) => {
                     console.log(error);
                 }
@@ -122,7 +125,7 @@ export class CampaignExecutionComponent implements OnInit {
         }
     }
 
-    toQueryParams (scenarioExecutionReportOutline: ScenarioExecutionReportOutline): Params {
+    toQueryParams(scenarioExecutionReportOutline: ScenarioExecutionReportOutline): Params {
         let execId = scenarioExecutionReportOutline.executionId !== -1 ? scenarioExecutionReportOutline.executionId : 'last';
         return {
             active: execId,
@@ -176,5 +179,17 @@ export class CampaignExecutionComponent implements OnInit {
             (i) => i[property] == null ? '' : i[property],
             this.reverseOrder
         );
+    }
+
+    exportReport() {
+        this.campaignService.findExecution(this.report.report.executionId)
+            .subscribe({
+                next: (report: CampaignExecutionFullReport) => {
+                    this.campaignReportService.toPDF(report).save('campaignExecutionReport.pdf');
+                },
+                error: error => {
+                    this.errors.push(error.message);
+                }
+            });
     }
 }

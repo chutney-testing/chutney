@@ -16,7 +16,9 @@
 
 package com.chutneytesting.campaign.api.dto;
 
+import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class CampaignExecutionReportMapper {
@@ -27,6 +29,19 @@ public class CampaignExecutionReportMapper {
             campaignReport.scenarioExecutionReports().stream()
                 .map(ScenarioExecutionReportCampaignMapper::toDto)
                 .collect(Collectors.toList()),
+            campaignReport.campaignName,
+            campaignReport.startDate,
+            campaignReport.status(),
+            campaignReport.partialExecution,
+            campaignReport.executionEnvironment,
+            campaignReport.userId,
+            campaignReport.getDuration());
+    }
+
+    public static CampaignExecutionFullReportDto fullExecutionToDto(CampaignExecution campaignReport, List<ExecutionHistory.Execution> executions) {
+        return new CampaignExecutionFullReportDto(
+            campaignReport.executionId,
+            executions,
             campaignReport.campaignName,
             campaignReport.startDate,
             campaignReport.status(),

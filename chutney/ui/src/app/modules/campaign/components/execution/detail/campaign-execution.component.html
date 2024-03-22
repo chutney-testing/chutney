@@ -1,3 +1,9 @@
+<div *ngIf="errors.length > 0" class="alert alert-dismissible alert-danger mt-4">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errors = []"></button>
+    <ng-container *ngFor="let err of errors">
+        {{ err }}<br />
+    </ng-container>
+</div>
 <div *ngIf="report">
 
     <div class="row">
@@ -41,13 +47,21 @@
                 </small>
             </span>
             <ng-container *hasAuthorization="[Authorization.CAMPAIGN_EXECUTE]">
-                <div class="text-center" *ngIf="!report.isRunning() && (report.hasFailed() || report.hasStopped())">
-                    <button id="replay-btn" type="button" class="btn btn-sm btn-outline-primary"
-                        title="{{ 'campaigns.execution.replay' | translate }}"
-                        (click)="replay()">
-                        <span class="fa-solid fa-play me-2" aria-hidden="true"></span>
-                        <span class="btn-label">{{ 'global.actions.replay' | translate }}</span>
-                    </button>
+                <div class="text-center" *ngIf="!report.isRunning()">
+                    <ng-container *ngIf="report.hasFailed() || report.hasStopped()">
+                        <button id="replay-btn" type="button" class="btn btn-sm btn-outline-primary w10"
+                            title="{{ 'campaigns.execution.replay' | translate }}"
+                            (click)="replay()">
+                            <span class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></span>
+                        </button>
+                    </ng-container>
+                    <ng-container>
+                        <button id="export-btn" type="button" class="btn btn-sm btn-outline-primary ms-1 w10"
+                            title="{{ 'scenarios.execution.step.actions.export' | translate }}"
+                            (click)="exportReport()">
+                            <span class="fa-solid fa-file-pdf" aria-hidden="true"></span>
+                        </button>
+                    </ng-container>
                 </div>
                 <div class="text-center" *ngIf="report.isRunning()">
                     <button id="stop-btn" type="button" class="btn btn-sm btn-outline-primary"
