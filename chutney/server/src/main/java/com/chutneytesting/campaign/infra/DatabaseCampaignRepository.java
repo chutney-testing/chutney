@@ -36,7 +36,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Campaign persistence management.
  */
 @Repository
-@Transactional
+@Transactional(readOnly = true)
 public class DatabaseCampaignRepository implements CampaignRepository {
 
     private final CampaignJpaRepository campaignJpaRepository;
@@ -54,6 +54,7 @@ public class DatabaseCampaignRepository implements CampaignRepository {
     }
 
     @Override
+    @Transactional
     public Campaign createOrUpdate(Campaign campaign) {
         if (campaign.id != null && !campaignExists(campaign.id)) {
             CampaignEntity campaignEntity = CampaignEntity.fromDomain(campaign, 1);
@@ -78,6 +79,7 @@ public class DatabaseCampaignRepository implements CampaignRepository {
     }
 
     @Override
+    @Transactional
     public boolean removeById(Long id) {
         if (campaignJpaRepository.existsById(id)) {
             campaignExecutionRepository.clearAllExecutionHistory(id);
@@ -89,7 +91,6 @@ public class DatabaseCampaignRepository implements CampaignRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Campaign findById(Long campaignId) throws CampaignNotFoundException {
         return campaignJpaRepository.findById(campaignId)
             .map(CampaignEntity::toDomain)
@@ -97,7 +98,6 @@ public class DatabaseCampaignRepository implements CampaignRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Campaign> findByName(String campaignName) {
         return campaignJpaRepository.findAll((root, query, criteriaBuilder) ->
                 criteriaBuilder.like(criteriaBuilder.lower(root.get("title")), campaignName.toLowerCase()))
@@ -107,7 +107,6 @@ public class DatabaseCampaignRepository implements CampaignRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<String> findScenariosIds(Long campaignId) {
         return campaignJpaRepository.findById(campaignId)
             .map(c -> c.campaignScenarios().stream()
@@ -118,7 +117,6 @@ public class DatabaseCampaignRepository implements CampaignRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Campaign> findAll() {
         return StreamSupport.stream(campaignJpaRepository.findAll().spliterator(), false)
             .map(CampaignEntity::toDomain)
@@ -126,7 +124,6 @@ public class DatabaseCampaignRepository implements CampaignRepository {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<Campaign> findCampaignsByScenarioId(String scenarioId) {
         if (isNullOrEmpty(scenarioId)) {
             return emptyList();

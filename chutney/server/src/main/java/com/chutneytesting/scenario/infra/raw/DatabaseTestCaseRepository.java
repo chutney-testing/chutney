@@ -50,7 +50,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-@Transactional
+@Transactional(readOnly = true)
 public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestCase> {
 
     private final ScenarioJpaRepository scenarioJpaRepository;
@@ -72,6 +72,7 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     }
 
     @Override
+    @Transactional
     public String save(GwtTestCase testCase) {
         if (testCaseDoesNotExist(testCase.id())) {
           saveScenarioWithExplicitId(testCase);
@@ -85,7 +86,6 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<GwtTestCase> findById(String scenarioId) {
         if (checkIdInput(scenarioId)) {
             return empty();
@@ -96,13 +96,11 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<TestCase> findExecutableById(String id) {
         return findById(id).map(TestCase.class::cast);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<TestCaseMetadata> findMetadataById(String testCaseId) {
         if (checkIdInput(testCaseId)) {
             return empty();
@@ -111,7 +109,6 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<TestCaseMetadata> findAll() {
         return scenarioJpaRepository.findMetaDataByActivatedTrue().stream()
             .map(ScenarioEntity::toTestCaseMetadata)
@@ -119,6 +116,7 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     }
 
     @Override
+    @Transactional
     public void removeById(String scenarioId) {
         if (checkIdInput(scenarioId)) {
             return;
@@ -140,7 +138,6 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     }
 
     @Override
-    @Transactional(readOnly = true)
     public Optional<Integer> lastVersion(String scenarioId) {
         if (checkIdInput(scenarioId)) {
             return empty();
@@ -153,7 +150,6 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<TestCaseMetadata> search(String textFilter) {
         if (!textFilter.isEmpty()) {
             List<String> words = getWordsToSearchWithQuotes(escapeSql(textFilter));

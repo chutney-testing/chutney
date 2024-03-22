@@ -19,7 +19,9 @@ package com.chutneytesting.admin.infra;
 import static java.util.Collections.emptyMap;
 
 import com.chutneytesting.admin.domain.DBVacuum;
+import java.sql.Connection;
 import java.util.Map;
+import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
@@ -45,12 +47,18 @@ public class DefaultDBVacuum implements DBVacuum {
     }
 
     @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public VacuumReport vacuum() {
         var dbBeforeSize = size();
         LOGGER.info("Vacuum start [{}]", dbBeforeSize);
         switch (JDBCDriver.valueFromJDBCUrl(dsProperties.determineUrl())) {
-            case SQLITE -> jdbcTemplate.update("VACUUM", emptyMap());
+            case SQLITE -> {
+                try (Connection conn = Objects.requireNonNull(jdbcTemplate.getJdbcTemplate().getDataSource()).getConnection()) {
+                    conn.setAutoCommit(true);
+                    conn.createStatement().execute("VACUUM");
+                } catch (Exception e) {
+                    LOGGER.error("Error vacuuming", e);
+                }
+            }
             case POSTGRES, H2 ->
                 throw new UnsupportedOperationException("Database Vacuum is only supported for SQLite database");
         }

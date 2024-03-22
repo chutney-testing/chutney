@@ -43,7 +43,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository
-@Transactional
+@Transactional(readOnly = true)
 public class CampaignExecutionDBRepository implements CampaignExecutionRepository {
 
     private final CampaignExecutionJpaRepository campaignExecutionJpaRepository;
@@ -93,6 +93,7 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     }
 
     @Override
+    @Transactional
     public void deleteExecutions(Set<Long> executionsIds) {
         List<CampaignExecutionEntity> executions = campaignExecutionJpaRepository.findAllById(executionsIds);
         List<ScenarioExecutionEntity> scenarioExecutions = executions.stream().flatMap(cer -> cer.scenarioExecutions().stream()).toList();
@@ -102,7 +103,6 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CampaignExecution> getExecutionHistory(Long campaignId) {
         CampaignEntity campaign = campaignJpaRepository.findById(campaignId).orElseThrow(() -> new CampaignNotFoundException(campaignId));
         return campaignExecutionJpaRepository.findByCampaignIdOrderByIdDesc(campaignId).stream()
@@ -112,6 +112,7 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     }
 
     @Override
+    @Transactional
     public void saveCampaignExecution(Long campaignId, CampaignExecution campaignExecution) {
         CampaignExecutionEntity execution = campaignExecutionJpaRepository.findById(campaignExecution.executionId).orElseThrow(
             () -> new CampaignExecutionNotFoundException(campaignId, campaignExecution.executionId)
@@ -125,7 +126,6 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<CampaignExecution> getLastExecutions(Long numberOfExecution) {
         return campaignExecutionJpaRepository.findAll(
                 PageRequest.of(0, numberOfExecution.intValue(), Sort.by(Sort.Direction.DESC, "id"))).stream()
@@ -135,7 +135,6 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     }
 
     @Override
-    @Transactional(readOnly = true)
     public CampaignExecution getCampaignExecutionById(Long campaignExecId) {
         return campaignExecutionJpaRepository.findById(campaignExecId)
             .map(this::toDomain)
@@ -143,6 +142,7 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     }
 
     @Override
+    @Transactional
     public void clearAllExecutionHistory(Long campaignId) {
         List<CampaignExecutionEntity> campaignExecutionEntities = campaignExecutionJpaRepository.findAllByCampaignId(campaignId);
         List<ScenarioExecutionEntity> scenarioExecutions = campaignExecutionEntities.stream().flatMap(ce -> ce.scenarioExecutions().stream()).toList();
@@ -152,6 +152,7 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     }
 
     @Override
+    @Transactional
     public Long generateCampaignExecutionId(Long campaignId, String environment) {
         notNull(campaignId, "Campaign ID cannot be null");
         notBlank(environment, "Environment cannot be null or empty");

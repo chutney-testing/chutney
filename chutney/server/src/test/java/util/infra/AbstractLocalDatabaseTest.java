@@ -94,13 +94,8 @@ public abstract class AbstractLocalDatabaseTest {
     }
 
     protected String givenScenarioId() {
-        return givenScenarioId(false);
-    }
-
-    protected String givenScenarioId(boolean componentId) {
-        int clusterId = rand.nextInt(100);
-        int objectId = rand.nextInt(100);
-        return componentId ? clusterId + "-" + objectId : String.valueOf(objectId);
+        int objectId = rand.nextInt(500);
+        return String.valueOf(objectId);
     }
 
     protected CampaignEntity givenCampaign(ScenarioEntity... scenarioEntities) {
