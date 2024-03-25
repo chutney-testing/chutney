@@ -44,7 +44,6 @@ import com.chutneytesting.action.spi.time.Duration;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,14 +52,10 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 import org.apache.commons.exec.util.MapUtils;
-import org.apache.kafka.clients.consumer.Consumer;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
-import org.apache.kafka.clients.consumer.ConsumerRebalanceListener;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.header.Header;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
-import org.springframework.kafka.listener.ConsumerAwareRebalanceListener;
 import org.springframework.kafka.listener.ContainerProperties;
 import org.springframework.kafka.listener.MessageListener;
 import org.springframework.util.MimeType;
@@ -245,28 +240,18 @@ public class KafkaBasicConsumeAction implements Action {
         ContainerProperties containerProperties = new ContainerProperties(topic);
         containerProperties.setMessageListener(createMessageListener());
         if (resetOffset) {
-            containerProperties.setConsumerRebalanceListener(creatConsumerRebalanceListener());
+            containerProperties.setConsumerRebalanceListener(new CustomConsumerRebalanceListener());
         }
         containerProperties.setAckMode(ContainerProperties.AckMode.valueOf(this.ackMode));
         ofNullable(properties.get(ConsumerConfig.AUTO_COMMIT_INTERVAL_MS_CONFIG))
             .ifPresent(acims -> containerProperties.setAckTime(Long.parseLong(acims)));
         target.property(AUTO_COMMIT_COUNT_CONFIG)
             .ifPresent(acc -> containerProperties.setAckCount(Integer.parseInt(acc)));
-        return new ConcurrentMessageListenerContainer<>(
+
+      return new ConcurrentMessageListenerContainer<>(
             kafkaConsumerFactoryFactory.create(target, group, properties),
             containerProperties);
     }
-
-    private ConsumerRebalanceListener creatConsumerRebalanceListener() {
-        return new ConsumerAwareRebalanceListener() {
-            @Override
-            public void onPartitionsAssigned(Consumer<?, ?> consumer, Collection<TopicPartition> partitions) {
-                ConsumerAwareRebalanceListener.super.onPartitionsAssigned(consumer, partitions);
-                consumer.seekToBeginning(partitions);
-            }
-        };
-    }
-
 
     private Map<String, Object> toOutputs() {
         Map<String, Object> results = new HashMap<>();

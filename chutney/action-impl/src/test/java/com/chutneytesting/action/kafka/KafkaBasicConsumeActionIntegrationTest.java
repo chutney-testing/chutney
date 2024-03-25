@@ -46,7 +46,6 @@ import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.IntegerSerializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
@@ -159,7 +158,7 @@ public abstract class KafkaBasicConsumeActionIntegrationTest {
     }
 
     private KafkaBasicConsumeAction getKafkaBasicConsumeAction(Target target, Map<String, String> props, boolean resetOffset) {
-        return new KafkaBasicConsumeAction(target, uniqueTopic, GROUP, props, 1, null, null, TEXT_PLAIN_VALUE, "3000 ms", null, resetOffset, logger);
+        return new KafkaBasicConsumeAction(target, uniqueTopic, GROUP, props, 1, null, null, TEXT_PLAIN_VALUE, "10 s", null, resetOffset, logger);
     }
 
     private List<Map<String, Object>> assertActionOutputsSize(ActionExecutionResult actionExecutionResult, int size) {
