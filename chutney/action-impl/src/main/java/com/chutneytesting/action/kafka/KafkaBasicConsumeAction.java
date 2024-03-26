@@ -241,9 +241,12 @@ public class KafkaBasicConsumeAction implements Action {
             .ifPresent(acims -> containerProperties.setAckTime(Long.parseLong(acims)));
         target.property(AUTO_COMMIT_COUNT_CONFIG)
             .ifPresent(acc -> containerProperties.setAckCount(Integer.parseInt(acc)));
-        return new ConcurrentMessageListenerContainer<>(
+
+        ConcurrentMessageListenerContainer<String, String> listenerContainer = new ConcurrentMessageListenerContainer<>(
             kafkaConsumerFactoryFactory.create(target, group, properties),
             containerProperties);
+        listenerContainer.setCommonErrorHandler(new ListenerContainerErrorHandler(logger));
+        return listenerContainer;
     }
 
     private Map<String, Object> toOutputs() {
