@@ -20,6 +20,14 @@
             </th>
             <th scope="col">{{'scenarios.execution.history.error' | translate}}</th>
             <th scope="col">{{'scenarios.execution.history.info' | translate}}</th>
+            <th scope="col">
+                <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(tagsDropdown, $event)">
+                    <span>{{ 'scenarios.execution.history.tags'  | translate  }}</span>
+                        <i class="ms-2 fa" [ngClass]="{
+                            'fa-chevron-up': tagsDropdown.isActive,
+                            'fa-chevron-down': !tagsDropdown.isActive}"></i>
+                </div>
+            </th>
             <th scope="col">{{'scenarios.execution.history.scenarioId' | translate}}</th>
             <th scope="col">
                 <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(envsDropdown, $event)">
@@ -28,7 +36,6 @@
                     'fa-chevron-up': envsDropdown.isActive,
                     'fa-chevron-down': !envsDropdown.isActive}"></i>
                 </div>
-
             </th>
             <th scope="col">
                 <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(campsDropdown, $event)">
@@ -51,7 +58,7 @@
             <th></th>
             <th>
                 <div *ngIf="filtersForm.controls['date'].value" (click)="filtersForm.get('date').reset()"
-                     class="chutney-tag chutney-tag-selected">
+                     class="cursor-pointer chutney-tag chutney-tag-selected">
                     {{ getDateFilterValue() | amDateFormat:'LL'}}
                     <i class="fa-regular fa-x fa-xs ms-2"></i>
                 </div>
@@ -65,6 +72,13 @@
             </th>
             <th class="w20"></th>
             <th></th>
+            <th>
+                <angular2-multiselect #tagsDropdown
+                        [data]="tags"
+                        [settings]="selectSettings"
+                        formControlName="tags">
+                </angular2-multiselect>
+            </th>
             <th></th>
             <th>
                 <angular2-multiselect [data]="environments"
@@ -127,6 +141,21 @@
             <td>
                 <ngb-highlight [result]="execution.info"
                                [term]="filtersForm.get('keyword').value"></ngb-highlight>
+            </td>
+            <td class="text-center">
+                <span *ngIf="execution.tags && execution.tags.length <= 3">
+                    <span *ngFor="let tag of execution.tags"
+                          class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                </span>
+                <span *ngIf="execution.tags && execution.tags.length > 3">
+                    <span *ngFor="let tag of execution.tags | slice:0:2"
+                          class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                    <button type="button" class="chutney-tag chutney-tag-selected"
+                            ngbPopover="{{execution.tags}}" placement="left"
+                            triggers="mouseenter:mouseleave">
+                        ...
+                    </button>
+                </span>
             </td>
             <td>
                 <ngb-highlight [result]="execution.scenarioId"

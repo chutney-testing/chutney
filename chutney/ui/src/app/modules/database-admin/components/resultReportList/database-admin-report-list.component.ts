@@ -38,6 +38,7 @@ import { debounceTime, map, tap } from 'rxjs/operators';
 @Component({
     selector: 'database-admin-report-list',
     templateUrl: './database-admin-report-list.component.html',
+    styleUrls: ['./database-admin-report-list.component.scss']
 })
 export class DatabaseAdminExecutionReportListComponent
     implements OnChanges, OnDestroy
@@ -50,6 +51,7 @@ export class DatabaseAdminExecutionReportListComponent
     environments: { id: string; itemName: string }[] = [];
     executors: { id: string; itemName: string }[] = [];
     campaigns: { id: string; itemName: string }[] = [];
+    tags: { id: string; itemName: string }[] = [];
     selectSettings = {
         text: '',
         enableCheckAll: false,
@@ -70,6 +72,8 @@ export class DatabaseAdminExecutionReportListComponent
     executorsDropdown: AngularMultiSelect;
     @ViewChild('campsDropdown', { static: false })
     campsDropdown: AngularMultiSelect;
+    @ViewChild('tagsDropdown', { static: false })
+    tagsDropdown: AngularMultiSelect;
 
     @Input() executions: Execution[] = [];
     @Output() onExecutionSelect = new EventEmitter<{
@@ -139,6 +143,7 @@ export class DatabaseAdminExecutionReportListComponent
                     .map((exec) => exec.campaignReport.campaignName)
             ),
         ].map((camp) => this.toSelectOption(camp));
+        this.tags = [...new Set(this.executions.flatMap(exec => exec.tags))].map(tag => this.toSelectOption(tag));
     }
 
     private applyFilters() {
@@ -167,6 +172,9 @@ export class DatabaseAdminExecutionReportListComponent
             ),
             campaigns: this.formBuilder.control(
                 this.selectedOptionsFromUri(this.filters['camp'])
+            ),
+            tags: this.formBuilder.control(
+                this.selectedOptionsFromUri(this.filters['tags'])
             ),
         });
     }
@@ -232,6 +240,9 @@ export class DatabaseAdminExecutionReportListComponent
         if (filters.executors && filters.executors.length) {
             params['exec'] = filters.executors.map((env) => env.id).toString();
         }
+        if (filters.tags && filters.tags.length) {
+            params['tags'] = filters.campaigns.map(tag => tag.id).toString();
+        }
         return params;
     }
 
@@ -264,6 +275,8 @@ export class DatabaseAdminExecutionReportListComponent
                 exec.environment +
                 space +
                 this.datePipe.transform(exec.time, 'DD MMM. YYYY HH:mm') +
+                space +
+                exec.tags.join(space) +
                 space +
                 exec.executionId +
                 space +
@@ -323,13 +336,19 @@ export class DatabaseAdminExecutionReportListComponent
             );
         }
 
+        let tagMatch = true;
+        if (filters.tags && filters.tags.length) {
+            tagMatch = !!filters.tags.find(tag => exec.tags && exec.tags.includes(tag.id));
+        }
+
         return (
             keywordMatch &&
             statusMatch &&
             dateMatch &&
             userMatch &&
             envMatch &&
-            campaignMatch
+            campaignMatch &&
+            tagMatch
         );
     }
 
