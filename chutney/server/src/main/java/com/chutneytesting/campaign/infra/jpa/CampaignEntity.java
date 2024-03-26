@@ -89,7 +89,7 @@ public class CampaignEntity implements Serializable {
         this.parallelRun = parallelRun;
         this.retryAuto = retryAuto;
         this.datasetId = datasetId;
-        this.tags = TagListMapper.tagsListToString(tags);
+        this.tags = TagListMapper.tagsToString(tags);
         this.version = ofNullable(version).orElse(1);
         fromCampaignScenarios(campaignScenarios);
     }

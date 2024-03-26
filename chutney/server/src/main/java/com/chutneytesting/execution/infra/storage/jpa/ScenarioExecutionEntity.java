@@ -19,6 +19,7 @@ package com.chutneytesting.execution.infra.storage.jpa;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.infra.jpa.CampaignExecutionEntity;
+import com.chutneytesting.scenario.infra.raw.TagListMapper;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
@@ -77,6 +78,9 @@ public class ScenarioExecutionEntity {
     @Column(name = "USER_ID")
     private String userId;
 
+    @Column(name = "TAGS")
+    private String tags;
+
     @Column(name = "DATASET_ID")
     private String datasetId;
 
@@ -90,7 +94,23 @@ public class ScenarioExecutionEntity {
     public ScenarioExecutionEntity() {
     }
 
-    public ScenarioExecutionEntity(Long id, String scenarioId, CampaignExecutionEntity campaignExecution, Long executionTime, Long duration, ServerReportStatus status, String information, String error, String scenarioTitle, String environment, String userId, String datasetId, Integer datasetVersion, Integer version) {
+    public ScenarioExecutionEntity(
+        Long id,
+        String scenarioId,
+        CampaignExecutionEntity campaignExecution,
+        Long executionTime,
+        Long duration,
+        ServerReportStatus status,
+        String information,
+        String error,
+        String scenarioTitle,
+        String environment,
+        String userId,
+        String datasetId,
+        Integer datasetVersion,
+        String tags,
+        Integer version
+    ) {
         this.id = id;
         this.scenarioId = scenarioId;
         this.campaignExecution = campaignExecution;
@@ -104,6 +124,7 @@ public class ScenarioExecutionEntity {
         this.userId = userId;
         this.datasetId = datasetId;
         this.datasetVersion = datasetVersion;
+        this.tags = tags;
         this.version = version;
     }
 
@@ -171,6 +192,10 @@ public class ScenarioExecutionEntity {
         return datasetVersion;
     }
 
+    public String tags() {
+        return tags;
+    }
+
     public static ScenarioExecutionEntity fromDomain(String scenarioId, ExecutionHistory.ExecutionProperties execution) {
         return fromDomain(scenarioId, null, null, execution);
     }
@@ -190,6 +215,7 @@ public class ScenarioExecutionEntity {
             execution.user(),
             execution.datasetId().orElse(null),
             execution.datasetVersion().orElse(null),
+            TagListMapper.tagsToString(execution.tags().orElse(null)),
             version
         );
     }
@@ -213,6 +239,7 @@ public class ScenarioExecutionEntity {
             .user(userId)
             .campaignReport(ofNullable(campaignReport))
             .scenarioId(scenarioId)
+            .tags(TagListMapper.tagsStringToSet(tags))
             .build();
     }
 

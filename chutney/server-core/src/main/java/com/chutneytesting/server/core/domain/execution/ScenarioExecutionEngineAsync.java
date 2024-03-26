@@ -124,13 +124,12 @@ public class ScenarioExecutionEngineAsync {
             .time(LocalDateTime.now())
             .duration(0L)
             .status(ServerReportStatus.RUNNING)
-            .info("")
-            .error("")
             .report("")
             .testCaseTitle(executionRequest.testCase.metadata().title())
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
             .campaignReport(ofNullable(executionRequest.campaignExecution))
+            .tags(executionRequest.tags)
             .build();
 
         return executionHistoryRepository.store(executionRequest.testCase.id(), detachedExecution);
@@ -161,7 +160,14 @@ public class ScenarioExecutionEngineAsync {
             // Create report
             .map(report -> {
                 LOGGER.trace("Map report for execution {}", executionId);
-                return new ScenarioExecutionReport(executionId, executionRequest.testCase.metadata().title(), executionRequest.environment, executionRequest.userId, report);
+                return new ScenarioExecutionReport(
+                    executionId,
+                    executionRequest.testCase.metadata().title(),
+                    executionRequest.environment,
+                    executionRequest.userId,
+                    executionRequest.tags,
+                    report
+                );
             })
 
             .doOnNext(report -> updateHistory(executionId, executionRequest, report))
@@ -233,6 +239,7 @@ public class ScenarioExecutionEngineAsync {
             .testCaseTitle(executionRequest.testCase.metadata().title())
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
+            .tags(executionRequest.tags)
             .build();
 
         ExecutionHistory.Execution execution = executionHistoryRepository.store(executionRequest.testCase.id(), detachedExecution);
@@ -259,6 +266,7 @@ public class ScenarioExecutionEngineAsync {
             execution.executionId(),
             executionRequest.testCase.metadata().title(),
             executionRequest.environment, executionRequest.userId,
+            executionRequest.tags,
             report
         );
         updateHistory(execution.executionId(), executionRequest, scenarioExecutionReport);

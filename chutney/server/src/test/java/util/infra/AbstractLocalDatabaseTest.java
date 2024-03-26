@@ -22,6 +22,7 @@ import com.chutneytesting.campaign.infra.jpa.CampaignEntity;
 import com.chutneytesting.campaign.infra.jpa.CampaignScenarioEntity;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
 import com.chutneytesting.scenario.infra.jpa.ScenarioEntity;
+import com.chutneytesting.scenario.infra.raw.TagListMapper;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import jakarta.persistence.EntityManager;
 import java.sql.Connection;
@@ -30,6 +31,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 import javax.sql.DataSource;
 import liquibase.Liquibase;
 import liquibase.database.jvm.JdbcConnection;
@@ -86,7 +88,7 @@ public abstract class AbstractLocalDatabaseTest {
     }
 
     protected ScenarioEntity givenScenario() {
-        ScenarioEntity scenarioEntity = new ScenarioEntity(null, "", null, "{\"when\":{}}", null, now(), true, null, now(), null, null);
+        ScenarioEntity scenarioEntity = new ScenarioEntity(null, "", null, "{\"when\":{}}", TagListMapper.tagsToString(defaultScenarioTags()), now(), true, null, now(), null, null);
         return transactionTemplate.execute(ts -> {
             entityManager.persist(scenarioEntity);
             return scenarioEntity;
@@ -113,7 +115,7 @@ public abstract class AbstractLocalDatabaseTest {
     }
 
     protected ScenarioExecutionEntity givenScenarioExecution(Long scenarioId, ServerReportStatus status) {
-        ScenarioExecutionEntity execution = new ScenarioExecutionEntity(null, scenarioId.toString(), null, now().toEpochMilli(), 0L, status, null, null, "", "", "", null, null, null);
+        ScenarioExecutionEntity execution = new ScenarioExecutionEntity(null, scenarioId.toString(), null, now().toEpochMilli(), 0L, status, null, null, "", "", "", null, null, TagListMapper.tagsToString(defaultScenarioTags()), null);
         return transactionTemplate.execute(ts -> {
             entityManager.persist(execution);
             return execution;
@@ -122,5 +124,9 @@ public abstract class AbstractLocalDatabaseTest {
 
     protected List<String> scenariosIds(ScenarioEntity... scenarioEntities) {
         return Arrays.stream(scenarioEntities).map(ScenarioEntity::getId).map(String::valueOf).toList();
+    }
+
+    protected Set<String> defaultScenarioTags() {
+        return Set.of("SIMPLE", "COM_PLEX");
     }
 }

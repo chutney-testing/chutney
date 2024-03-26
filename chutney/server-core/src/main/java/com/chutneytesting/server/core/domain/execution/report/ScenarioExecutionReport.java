@@ -16,15 +16,21 @@
 
 package com.chutneytesting.server.core.domain.execution.report;
 
+import static java.util.Collections.emptySet;
+
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public class ScenarioExecutionReport {
     public final long executionId;
     public final String scenarioName;
     public final String environment;
     public final String user;
+    public final Set<String> tags;
     public final Map<String, Object> contextVariables;
     public final StepExecutionReportCore report;
 
@@ -32,11 +38,13 @@ public class ScenarioExecutionReport {
                                    String scenarioName,
                                    String environment,
                                    String user,
+                                   Collection<String> tags,
                                    StepExecutionReportCore report) {
         this.executionId = executionId;
         this.scenarioName = scenarioName;
         this.environment = environment;
         this.user = user;
+        this.tags = Optional.ofNullable(tags).map(Set::copyOf).orElse(emptySet());
         this.contextVariables = searchContextVariables(report);
         this.report = report;
     }
