@@ -1815,7 +1815,7 @@ fun ChutneyStepBuilder.KafkaBasicConsumeAction(
     headerSelector: String? = null,
     contentType: String? = null,
     ackMode: KafkaSpringOffsetCommitBehavior? = null,
-    resetOffset: Boolean? = false,
+    resetOffset: Boolean = false,
     outputs: Map<String, Any> = mapOf(),
     validations: Map<String, Any> = mapOf(),
     strategy: Strategy? = null
