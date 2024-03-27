@@ -151,7 +151,7 @@
                     <span *ngFor="let tag of execution.tags | slice:0:2"
                           class="chutney-tag chutney-tag-selected">{{tag}}</span>
                     <button type="button" class="chutney-tag chutney-tag-selected"
-                            ngbPopover="{{execution.tags}}" placement="left"
+                            ngbPopover="{{execution.tags.join(' | ')}}" placement="left"
                             triggers="mouseenter:mouseleave">
                         ...
                     </button>

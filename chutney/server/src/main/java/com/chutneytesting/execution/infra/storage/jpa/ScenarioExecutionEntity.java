@@ -215,7 +215,7 @@ public class ScenarioExecutionEntity {
             execution.user(),
             execution.datasetId().orElse(null),
             execution.datasetVersion().orElse(null),
-            TagListMapper.tagsToString(execution.tags().orElse(null)),
+            truncateExecutionTags(TagListMapper.tagsToString(execution.tags().orElse(null))),
             version
         );
     }
@@ -252,5 +252,9 @@ public class ScenarioExecutionEntity {
 
     private static String truncateExecutionTrace(String trace) {
         return StringUtils.substring(trace, 0, 512);
+    }
+
+    private static String truncateExecutionTags(String tags) {
+        return tags != null ? StringUtils.substring(tags, 0, 500) : null;
     }
 }

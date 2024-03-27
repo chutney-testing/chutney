@@ -241,7 +241,7 @@ export class DatabaseAdminExecutionReportListComponent
             params['exec'] = filters.executors.map((env) => env.id).toString();
         }
         if (filters.tags && filters.tags.length) {
-            params['tags'] = filters.campaigns.map(tag => tag.id).toString();
+            params['tags'] = filters.tags.map(tag => tag.id).toString();
         }
         return params;
     }
