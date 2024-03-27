@@ -8,7 +8,7 @@ Follow [this](/getting_started/write/#write-a-scenario) documentation to write y
 To create your scenario on a Chutney server from your IDE,
 
 1. Annotate with @Scenario
-    In order to be included in the synchronization, a scenario must be annotated with [@Scenario](https://github.com/chutney-testing/chutney-kotlin-dsl/blob/master/dsl/src/main/kotlin/com/chutneytesting/kotlin/annotations/Scenario.kt){:target=_blank}.
+    In order to be included in the synchronization, a scenario must be annotated with [@Scenario](https://github.com/chutney-testing/chutney/blob/main/kotlin-dsl/dsl/src/main/kotlin/com/chutneytesting/kotlin/annotations/Scenario.kt){:target=_blank}.
 2. Configure your server info
     ``` kotlin 
     import com.chutneytesting.kotlin.synchronize.synchronise
