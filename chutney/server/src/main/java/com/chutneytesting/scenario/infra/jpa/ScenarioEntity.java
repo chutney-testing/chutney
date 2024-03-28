@@ -162,7 +162,7 @@ public class ScenarioEntity {
             testCase.metadata().title(),
             testCase.metadata().description(),
             ofNullable(testCase.scenario).map(marshaller::serialize).orElse(null),
-            TagListMapper.tagsListToString(testCase.metadata().tags()),
+            TagListMapper.tagsToString(testCase.metadata().tags()),
             testCase.metadata().creationDate(),
             true,
             User.isAnonymous(testCase.metadata().author()) ? null : testCase.metadata().author(),

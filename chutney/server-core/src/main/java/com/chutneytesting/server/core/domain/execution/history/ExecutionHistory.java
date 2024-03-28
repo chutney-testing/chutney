@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -57,6 +58,8 @@ public interface ExecutionHistory {
         String user();
 
         Optional<CampaignExecution> campaignReport();
+
+        Optional<Set<String>> tags();
     }
 
     interface Attached {

@@ -54,7 +54,7 @@ public class SurefireScenarioExecutionReportBuilderTest {
                 stepReport("step 1", 24L, ServerReportStatus.SUCCESS,
                     stepReport("step1.1", 23L, ServerReportStatus.SUCCESS)));
 
-        ScenarioExecutionReport report = new ScenarioExecutionReport(1L, "scenario name", "", "", successStepReport);
+        ScenarioExecutionReport report = new ScenarioExecutionReport(1L, "scenario name", "", "", null, successStepReport);
         ExecutionHistory.Execution execution = ImmutableExecutionHistory.Execution
             .builder()
             .executionId(report.executionId)
@@ -108,7 +108,7 @@ public class SurefireScenarioExecutionReportBuilderTest {
                 stepReport("step2", 420L, ServerReportStatus.FAILURE),
                 stepReport("step3", 0L, ServerReportStatus.NOT_EXECUTED));
 
-        ScenarioExecutionReport report = new ScenarioExecutionReport(1L, "scenario name", "", "", failureStepReport);
+        ScenarioExecutionReport report = new ScenarioExecutionReport(1L, "scenario name", "", "", null, failureStepReport);
         ExecutionHistory.Execution execution = ImmutableExecutionHistory.Execution
             .builder()
             .executionId(report.executionId)

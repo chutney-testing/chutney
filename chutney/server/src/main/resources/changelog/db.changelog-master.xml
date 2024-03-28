@@ -1019,4 +1019,11 @@
         <comment>Drop Campaign Parameters table</comment>
         <dropTable tableName="CAMPAIGN_PARAMETERS"/>
     </changeSet>
+
+    <changeSet id="add-executions-tags" author="ICG">
+        <comment>Add Scenario executions tags</comment>
+        <addColumn tableName="SCENARIO_EXECUTIONS">
+            <column name="TAGS" type="VARCHAR(500)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

@@ -95,6 +95,7 @@ export class DatabaseAdminComponent {
         this.databaseAdminService.getExecutionReportMatchQuery(this.query)
             .subscribe({
                 next: (res: Execution[]) => {
+                    res?.forEach(e => e.tags.sort());
                     this.executions = res;
                 },
                 error: (error) => {

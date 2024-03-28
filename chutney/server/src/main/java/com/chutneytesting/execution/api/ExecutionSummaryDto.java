@@ -16,10 +16,10 @@
 
 package com.chutneytesting.execution.api;
 
-import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.WithScenario;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.Attached;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.ExecutionProperties;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.ExecutionSummary;
+import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.WithScenario;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -50,6 +50,7 @@ public interface ExecutionSummaryDto extends ExecutionProperties, Attached, With
             .user(executionSummary.user())
             .campaignReport(executionSummary.campaignReport())
             .scenarioId(executionSummary.scenarioId())
+            .tags(executionSummary.tags())
             .build();
     }
 
@@ -69,6 +70,7 @@ public interface ExecutionSummaryDto extends ExecutionProperties, Attached, With
             .environment(dto.environment())
             .user(dto.user())
             .scenarioId(dto.scenarioId())
+            .tags(dto.tags())
             .build();
     }
 }

@@ -75,6 +75,7 @@
                 "env": "Environment",
                 "executor": "User",
                 "campaign": "Campaign",
+                "tags": "Tags",
                 "report": "Report",
                 "error": "Error",
                 "info": "Info",

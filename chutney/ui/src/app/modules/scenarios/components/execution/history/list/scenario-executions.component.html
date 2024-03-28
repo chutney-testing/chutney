@@ -30,6 +30,14 @@
                 </th>
                 <th scope="col">{{'scenarios.execution.history.report' | translate}}</th>
                 <th scope="col">
+                    <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(tagsDropdown, $event)">
+                        <span>{{ 'scenarios.execution.history.tags'  | translate  }}</span>
+                            <i class="ms-2 fa" [ngClass]="{
+                                'fa-chevron-up': tagsDropdown.isActive,
+                                'fa-chevron-down': !tagsDropdown.isActive}"></i>
+                    </div>
+                </th>
+                <th scope="col">
                     <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(envsDropdown, $event)">
                         <span>{{'scenarios.execution.history.env' | translate}}</span>
                         <i class="ms-2 fa" [ngClass]="{
@@ -72,6 +80,13 @@
                     </angular2-multiselect>
                 </th>
                 <th class="w40"></th>
+                <th>
+                    <angular2-multiselect #tagsDropdown
+                            [data]="tags"
+                            [settings]="selectSettings"
+                            formControlName="tags">
+                    </angular2-multiselect>
+                </th>
                 <th>
                     <angular2-multiselect [data]="environments"
                                           [settings]="selectSettings"
@@ -129,6 +144,21 @@
                 <td>
                     <ngb-highlight [result]="execution.error"
                                    [term]="filtersForm.get('keyword').value"></ngb-highlight>
+                </td>
+                <td class="text-center">
+                    <span *ngIf="execution.tags && execution.tags.length <= 3">
+                        <span *ngFor="let tag of execution.tags"
+                              class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                    </span>
+                    <span *ngIf="execution.tags && execution.tags.length > 3">
+                        <span *ngFor="let tag of execution.tags | slice:0:2"
+                              class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                        <button type="button" class="chutney-tag chutney-tag-selected"
+                                ngbPopover="{{execution.tags.join(' | ')}}" placement="left"
+                                triggers="mouseenter:mouseleave">
+                            ...
+                        </button>
+                    </span>
                 </td>
                 <td>
                     <ngb-highlight [result]="execution.environment"

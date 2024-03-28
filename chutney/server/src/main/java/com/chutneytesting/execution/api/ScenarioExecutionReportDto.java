@@ -17,7 +17,15 @@
 package com.chutneytesting.execution.api;
 
 import java.util.Map;
+import java.util.Set;
 
-public record ScenarioExecutionReportDto(long executionId, String scenarioName, String environment, String user,
-                                         Map<String, Object> contextVariables, StepExecutionReportCoreDto report) {
+public record ScenarioExecutionReportDto(
+    long executionId,
+    String scenarioName,
+    String environment,
+    String user,
+    Set<String> tags,
+    Map<String, Object> contextVariables,
+    StepExecutionReportCoreDto report
+) {
 }

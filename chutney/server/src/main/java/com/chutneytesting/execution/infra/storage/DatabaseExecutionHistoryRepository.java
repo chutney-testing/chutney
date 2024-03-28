@@ -129,7 +129,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
         }
         ScenarioExecutionEntity scenarioExecution = ScenarioExecutionEntity.fromDomain(scenarioId, detachedExecution);
         if (detachedExecution.campaignReport().isPresent()) {
-            Optional<CampaignExecutionEntity> campaignExecution = campaignExecutionJpaRepository.findById(detachedExecution.campaignReport().get().executionId.longValue());
+            Optional<CampaignExecutionEntity> campaignExecution = campaignExecutionJpaRepository.findById(detachedExecution.campaignReport().get().executionId);
             scenarioExecution.forCampaignExecution(campaignExecution.get());
         }
         scenarioExecution = scenarioExecutionsJpaRepository.save(scenarioExecution);
@@ -230,6 +230,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
             .environment(executionSummary.environment())
             .user(executionSummary.user())
             .scenarioId(executionSummary.scenarioId())
+            .tags(executionSummary.tags())
             .build();
     }
 
@@ -260,6 +261,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
             scenarioExecutionReport.scenarioName,
             scenarioExecutionReport.environment,
             scenarioExecutionReport.user,
+            scenarioExecutionReport.tags,
             report);
     }
 

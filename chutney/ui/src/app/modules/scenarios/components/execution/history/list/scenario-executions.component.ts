@@ -41,6 +41,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     environments: { id: string, itemName: string }[] = [];
     executors: { id: string, itemName: string }[] = [];
     campaigns: { id: string, itemName: string }[] = [];
+    tags: { id: string, itemName: string }[] = [];
     selectSettings = {
         text: '',
         enableCheckAll: false,
@@ -57,6 +58,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     @ViewChild('envsDropdown', {static: false}) envsDropdown: AngularMultiSelect;
     @ViewChild('executorsDropdown', {static: false}) executorsDropdown: AngularMultiSelect;
     @ViewChild('campsDropdown', {static: false}) campsDropdown: AngularMultiSelect;
+    @ViewChild('tagsDropdown', {static: false}) tagsDropdown: AngularMultiSelect;
 
     @Input() executions: Execution[] = [];
     @Output() onExecutionSelect = new EventEmitter<{ execution: Execution, focus: boolean }>();
@@ -101,10 +103,11 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
 
 
     private initFiltersOptions() {
-        this.status = [...new Set(this.executions.map(exec => exec.status))].map(status => this.toSelectOption(status,  this.translateService.instant(ExecutionStatus.toString(status))));
+        this.status = [...new Set(this.executions.map(exec => exec.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
         this.environments = [...new Set(this.executions.map(exec => exec.environment))].map(env => this.toSelectOption(env));
         this.executors = [...new Set(this.executions.map(exec => exec.user))].map(user => this.toSelectOption(user));
         this.campaigns = [...new Set(this.executions.filter(exec => !!exec.campaignReport).map(exec => exec.campaignReport.campaignName))].map(camp => this.toSelectOption(camp));
+        this.tags = [...new Set(this.executions.flatMap(exec => exec.tags))].map(tag => this.toSelectOption(tag));
     }
 
     private applyFilters() {
@@ -120,6 +123,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
             environments: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['env'])),
             executors: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['exec'])),
             campaigns: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['camp'])),
+            tags: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['tags'])),
         });
     }
 
@@ -172,6 +176,9 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
         if (filters.executors && filters.executors.length) {
             params['exec'] = filters.executors.map(env => env.id).toString();
         }
+        if (filters.tags && filters.tags.length) {
+            params['tags'] = filters.tags.map(tag => tag.id).toString();
+        }
         return params;
     }
 
@@ -207,6 +214,8 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
                 + exec.executionId
                 + space
                 + this.translateService.instant(ExecutionStatus.toString(exec.status))
+                + space
+                + exec.tags.join(space)
                 + space;
             if (exec.campaignReport) {
                 searchScope += space + exec.campaignReport.campaignName;
@@ -242,7 +251,12 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
             campaignMatch = !!filters.campaigns.find(camp => exec.campaignReport && camp.id === exec.campaignReport.campaignName);
         }
 
-        return keywordMatch && statusMatch && dateMatch && userMatch && envMatch && campaignMatch;
+        let tagMatch = true;
+        if (filters.tags && filters.tags.length) {
+            tagMatch = !!filters.tags.find(tag => exec.tags && exec.tags.includes(tag.id));
+        }
+
+        return keywordMatch && statusMatch && dateMatch && userMatch && envMatch && campaignMatch && tagMatch;
     }
 
     openCampaignExecution(execution: Execution, event: MouseEvent) {
@@ -250,6 +264,5 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
             event.stopPropagation();
             this.router.navigate(['/campaign', execution.campaignReport.campaignId, 'executions'], {queryParams: {open: execution.campaignReport.executionId, active: execution.campaignReport.executionId}});
         }
-
     }
 }

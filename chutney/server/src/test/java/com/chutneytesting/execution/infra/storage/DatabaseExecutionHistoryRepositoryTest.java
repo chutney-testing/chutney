@@ -330,7 +330,9 @@ public class DatabaseExecutionHistoryRepositoryTest {
 
             // Then, these executions are KO
             assertThat(nbOfAffectedExecutions).isEqualTo(1);
-            assertThat(sut.getExecutions(scenarioIdOne).get(0).status()).isEqualTo(FAILURE);
+            ExecutionSummary execution = sut.getExecutions(scenarioIdOne).get(0);
+            assertThat(execution.status()).isEqualTo(FAILURE);
+            assertThat(execution.tags()).hasValue(defaultScenarioTags());
             ScenarioExecutionReportEntity scenarioExecutionReport = scenarioExecutionReportJpaRepository.findById(scenarioId).orElseThrow();
             ScenarioExecutionReport report = objectMapper.readValue(scenarioExecutionReport.getReport(), ScenarioExecutionReport.class);
             assertThat(report.report.status).isEqualTo(SUCCESS);
@@ -431,6 +433,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
 
             // Then
             assertThat(executionSummary.executionId()).isEqualTo(scenarioExecutionOne.id());
+            assertThat(executionSummary.tags()).hasValue(defaultScenarioTags());
             assertThat(executionSummary.campaignReport()).isPresent();
             assertThat(executionSummary.campaignReport()).hasValueSatisfying(cr -> {
                 assertThat(cr.campaignId).isEqualTo(campaign.id());
@@ -544,6 +547,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .environment("")
                 .datasetId("fake dataset id")
                 .user("")
+                .tags(defaultScenarioTags())
                 .build();
         }
 
@@ -553,7 +557,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                     stepReport("step 1", 24L, PAUSED,
                         stepReport("step1.1", 23L, RUNNING)));
             try {
-                return objectMapper.writeValueAsString(new ScenarioExecutionReport(1L, "scenario name", "", "", successStepReport));
+                return objectMapper.writeValueAsString(new ScenarioExecutionReport(1L, "scenario name", "", "", null, successStepReport));
             } catch (JsonProcessingException exception) {
                 return "";
             }

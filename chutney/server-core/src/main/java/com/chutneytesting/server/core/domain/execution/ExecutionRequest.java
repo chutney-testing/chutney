@@ -16,9 +16,16 @@
 
 package com.chutneytesting.server.core.domain.execution;
 
+import static java.util.Optional.ofNullable;
+import static java.util.stream.Collectors.toUnmodifiableSet;
+
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.google.common.collect.Streams;
+import java.util.Collection;
+import java.util.Set;
+import java.util.stream.Stream;
 
 public class ExecutionRequest {
 
@@ -27,6 +34,7 @@ public class ExecutionRequest {
     public final String userId;
     public final DataSet dataset;
     public final CampaignExecution campaignExecution;
+    public final Set<String> tags;
 
     public ExecutionRequest(TestCase testCase, String environment, String userId, DataSet dataset, CampaignExecution campaignExecution) {
         this.testCase = testCase;
@@ -34,6 +42,7 @@ public class ExecutionRequest {
         this.userId = userId;
         this.dataset = dataset;
         this.campaignExecution = campaignExecution;
+        this.tags = tags();
     }
 
     public ExecutionRequest(TestCase testCase, String environment, String userId, DataSet dataset) {
@@ -44,4 +53,11 @@ public class ExecutionRequest {
         this(testCase, environment, userId, DataSet.NO_DATASET, null);
     }
 
+    private Set<String> tags() {
+        return Streams.concat(
+                ofNullable(testCase).map(tc -> tc.metadata().tags().stream()).orElse(Stream.empty()),
+                ofNullable(dataset).stream().flatMap(ds -> ofNullable(ds.tags).stream().flatMap(Collection::stream))
+            )
+            .collect(toUnmodifiableSet());
+    }
 }

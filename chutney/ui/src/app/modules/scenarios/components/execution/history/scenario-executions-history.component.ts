@@ -78,7 +78,10 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
     private getScenarioExecutions() {
         return this.scenarioExecutionService.findScenarioExecutions(this.scenarioId)
             .pipe(
-                tap(executions => this.executions = executions)
+                tap(executions => {
+                    executions?.forEach(e => e.tags.sort());
+                    this.executions = executions;
+                })
             );
     }
 
