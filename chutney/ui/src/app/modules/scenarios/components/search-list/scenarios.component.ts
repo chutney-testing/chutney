@@ -16,7 +16,7 @@
 
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Subscription } from 'rxjs';
+import { Subject, Subscription, interval } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
 
 import {
@@ -66,6 +66,9 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     Authorization = Authorization;
 
+    private scenarioUpdatesubscription: Subscription;
+
+
     constructor(
         private router: Router,
         private scenarioService: ScenarioService,
@@ -94,6 +97,19 @@ export class ScenariosComponent implements OnInit, OnDestroy {
             );
         });
 
+        this.fetchAndUpdateScenario()
+        this.scenarioUpdatesubscription = interval(3000).subscribe(() => {
+            this.fetchAndUpdateScenario()
+        });
+    }
+
+    ngOnDestroy(): void {
+        if (this.urlParams) {
+            this.urlParams.unsubscribe();
+        }
+    }
+
+    private fetchAndUpdateScenario(): void {
         this.getScenarios()
             .then(r => {
                 this.scenarios = r || [];
@@ -101,14 +117,11 @@ export class ScenariosComponent implements OnInit, OnDestroy {
                 this.applySavedState();
                 this.applyUriState();
                 this.applyFilters();
+                if (r.filter(scenario => scenario.status == "RUNNING").length == 0) {
+                    this.scenarioUpdatesubscription.unsubscribe()
+                }
             })
             .catch(err => console.log(err));
-    }
-
-    ngOnDestroy(): void {
-        if (this.urlParams) {
-            this.urlParams.unsubscribe();
-        }
     }
 
     private initFilters() {
