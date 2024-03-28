@@ -197,7 +197,8 @@ class ChutneyScenarioDslTest {
                     nbMessages = 2,
                     headerSelector = "$[json/path]",
                     contentType = "application/json",
-                    ackMode = KafkaSpringOffsetCommitBehavior.MANUAL
+                    ackMode = KafkaSpringOffsetCommitBehavior.MANUAL,
+                    resetOffset = true
                 )
             }
         }

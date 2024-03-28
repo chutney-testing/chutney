@@ -24,6 +24,7 @@ import static org.apache.kafka.clients.consumer.ConsumerConfig.GROUP_ID_CONFIG;
 import com.chutneytesting.action.spi.injectable.Target;
 import java.util.HashMap;
 import java.util.Map;
+import org.apache.kafka.common.config.SslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.kafka.core.ConsumerFactory;
 import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
@@ -36,8 +37,8 @@ public class KafkaConsumerFactoryFactory {
         consumerConfig.put(BOOTSTRAP_SERVERS_CONFIG, resolveBootStrapServerConfig(target));
         consumerConfig.put(GROUP_ID_CONFIG, group);
         target.trustStore().ifPresent(trustStore -> {
-          consumerConfig.put("ssl.truststore.location", trustStore);
-          consumerConfig.put("ssl.truststore.password", target.trustStorePassword().orElseThrow(IllegalArgumentException::new));
+            consumerConfig.put(SslConfigs.SSL_TRUSTSTORE_LOCATION_CONFIG, trustStore);
+            consumerConfig.put(SslConfigs.SSL_TRUSTSTORE_PASSWORD_CONFIG, target.trustStorePassword().orElseThrow(IllegalArgumentException::new));
         });
 
         consumerConfig.putAll(config);

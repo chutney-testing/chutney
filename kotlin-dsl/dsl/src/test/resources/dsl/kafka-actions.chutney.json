@@ -30,7 +30,8 @@
                     "nb-messages": 2,
                     "header-selector": "$[json/path]",
                     "content-type": "application/json",
-                    "ackMode": "MANUAL"
+                    "ackMode": "MANUAL",
+                    "resetOffset": true
                 }
             }
         }
