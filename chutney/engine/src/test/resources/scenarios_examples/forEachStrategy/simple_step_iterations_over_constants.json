@@ -1,0 +1,38 @@
+{
+    "dataset": {
+        "constants": {
+            "env": "A",
+            "user": "Tata",
+            "pwd": "B"
+        },
+        "datatable": []
+    },
+    "scenario": {
+        "name": "Test iterations",
+        "steps": [
+            {
+                "name": "<idx> - Hello website on ${#env} with user ${#user}",
+                "type": "complex",
+                "inputs": {
+                    "stringParam": "/${#env}/${#user}/${#pwd}"
+                },
+                "outputs": {
+                    "check_<idx>": "${\"/\" + #env + \"/\" + #user + \"/<idx>\"}"
+                },
+                "validations" : {
+                    "check_<idx>_ok": "${#check_<idx> == \"/\" + #env + \"/\" + #user + \"/<idx>\"}"
+                },
+                "strategy": {
+                    "type": "for",
+                    "parameters": {
+                        "index": "idx",
+                        "dataset": "${#dataset}"
+                    }
+                }
+            }
+        ]
+    },
+    "environment": {
+        "name": "env"
+    }
+}
