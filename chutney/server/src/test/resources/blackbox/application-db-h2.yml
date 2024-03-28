@@ -1,7 +1,7 @@
 spring:
   jpa:
     open-in-view: false
-    show_sql: true
+    show_sql: false
     generate-ddl: false
     hibernate:
       ddl-auto: none

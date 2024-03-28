@@ -17,26 +17,43 @@
         border: none;
         padding: 0;
     }
-
-    .chutney-tag {
-        padding: .5rem;
-        font-size: 1rem;
-    }
-
 }
 
-:host ::ng-deep
-.cuppa-dropdown {
-    border: none;
-    .selected-list {
-        .c-angle-up {
-            display: none!important;
-        }
-        .c-angle-down {
-            display: none!important;
+:host ::ng-deep {
+
+    .popover {
+        max-width: 30vw; /* optional max width */
+        width: intrinsic; /* Safari/WebKit uses a non-standard name */
+        width: -moz-max-content; /* Firefox/Gecko */
+        width: -webkit-max-content; /* Chrome */
+        border: 0;
+        border-radius: 0.5rem;
+
+        .popover-arrow {
+            &::after {
+                border-left-color: var(--bs-primary);
+            }
         }
     }
-    .dropdown-list {
-        width: max-content!important;
+
+    .popover-body {
+        background-color: var(--bs-primary);
+        color: var(--bs-white);
+        border-radius: 0.5rem;
+    }
+
+    .cuppa-dropdown {
+        border: none;
+        .selected-list {
+            .c-angle-up {
+                display: none!important;
+            }
+            .c-angle-down {
+                display: none!important;
+            }
+        }
+        .dropdown-list {
+            width: max-content!important;
+        }
     }
 }

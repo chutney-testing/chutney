@@ -18,6 +18,7 @@ package com.chutneytesting.execution.infra.storage.jpa;
 
 import static java.util.Optional.ofNullable;
 
+import com.chutneytesting.scenario.infra.raw.TagListMapper;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import jakarta.persistence.Basic;
@@ -82,6 +83,7 @@ public class ScenarioExecutionReportEntity {
             .datasetId(ofNullable(scenarioExecution.datasetId()))
             .datasetVersion(ofNullable(scenarioExecution.datasetVersion()))
             .scenarioId(scenarioExecution.scenarioId())
+            .tags(TagListMapper.tagsStringToSet(scenarioExecution.tags()))
             .build();
     }
 }
