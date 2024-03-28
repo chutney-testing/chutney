@@ -1,6 +1,6 @@
 # Actions
 
-[^1]: [Here, you can see the code for all actions.](https://github.com/chutney-testing/chutney/tree/master/action-impl/src/main/java/com/chutneytesting/action)
+[^1]: [Here, you can see the code for all actions.](https://github.com/chutney-testing/chutney/tree/main/chutney/action-impl/src/main/java/com/chutneytesting/action)
 
 
 Chutney provides a set of capabilities, or `Actions`, you can use in your scenarios.
