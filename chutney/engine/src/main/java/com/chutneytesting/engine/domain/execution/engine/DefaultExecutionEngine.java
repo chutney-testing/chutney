@@ -86,7 +86,7 @@ public class DefaultExecutionEngine implements ExecutionEngine {
                 try {
                     scenarioContext.put("environment", environment.name());
                     scenarioContext.putAll(ofNullable(environment.variables()).orElse(emptyMap()));
-                    scenarioContext.put("dataset", dataset.datatable);
+                    scenarioContext.put("dataset", getDataSet(dataset));
                     scenarioContext.putAll(evaluateDatasetConstants(dataset, scenarioContext));
 
                     rootStep.set(buildStep(stepDefinition));
@@ -111,6 +111,13 @@ public class DefaultExecutionEngine implements ExecutionEngine {
         });
 
         return execution.executionId;
+    }
+
+    private List<Map<String, String>> getDataSet(Dataset dataset) {
+        if (dataset.datatable.isEmpty() && !dataset.constants.isEmpty()) {
+            return List.of(dataset.constants);
+        }
+        return dataset.datatable;
     }
 
     @Override

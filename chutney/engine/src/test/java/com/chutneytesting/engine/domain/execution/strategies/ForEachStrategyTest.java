@@ -168,6 +168,20 @@ class ForEachStrategyTest {
     }
 
     @Test
+    public void should_iterate_once_over_dataset_constant_if_datatable_is_empty() {
+        // G
+        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/simple_step_iterations_over_constants.json", ExecutionRequestDto.class);
+
+        // W
+        StepExecutionReportDto result = testEngine.execute(requestDto);
+
+        // T
+        assertThat(result.steps.get(0).steps).hasSize(1);
+        assertThat(result.status).isEqualTo(SUCCESS);
+    }
+
+    @Test
     public void should_evaluate_dataset_before_iterations() {
         // G
         final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
