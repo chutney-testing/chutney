@@ -7,3 +7,4 @@ vendor
 bin
 .idea
 *.iml
+/.venv/
