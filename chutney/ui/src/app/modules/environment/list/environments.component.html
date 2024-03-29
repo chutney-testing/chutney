@@ -71,12 +71,12 @@
                     ngbTooltip="{{'global.actions.export' | translate}}"
                     (click)="export(env)"><i class="bi bi-download"> </i>
             </button>
-            <chutney-delete-confirm-dialog [dialogMessage]="('global.confirm.question' | translate) + ' ' + ('global.actions.delete' | translate) + '\n' + env.name"
+            <chutney-confirm-dialog [dialogMessage]="('global.confirm.question' | translate) + ' ' + ('global.actions.delete' | translate) + '\n' + env.name"
                                            [label]="'Delete Environment'"
                                            [btnSizeClass]="'sm'"
-                                           (deleteEvent)="delete(env.name, i)"
+                                           (callbackEvent)="delete(env.name, i)"
                                            class="ms-2">
-            </chutney-delete-confirm-dialog>
+            </chutney-confirm-dialog>
 
 
         </td>

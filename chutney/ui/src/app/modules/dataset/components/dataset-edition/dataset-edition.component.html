@@ -1,6 +1,6 @@
 <div *ngIf="message || backendError" class="notification text-center text-white rounded" [ngClass]="backendError ? 'bg-danger' : 'bg-info'">
     <strong *ngIf="message">{{ message }} <br></strong>
-    
+
     <strong *ngIf="backendError">{{ backendError }}</strong>
 </div>
 <div class="p-3">
@@ -27,12 +27,12 @@
         </div>
 
         <div *ngIf="dataset.name" class="box2 float-end">
-            <chutney-delete-confirm-dialog
+            <chutney-confirm-dialog
                 [dialogMessage]="('global.confirm.question' | translate) + ' ' + ('global.actions.delete' | translate) + '\n' + dataset.name"
                 [label]="'Delete dataset'"
                 [disabled]="null"
-                (deleteEvent)="deleteDataset()">
-            </chutney-delete-confirm-dialog>
+                (callbackEvent)="deleteDataset()">
+            </chutney-confirm-dialog>
              <span class="ms-4">{{ dataset.lastUpdated.toString() | amLocale:'fr' | amTimeAgo }}</span>
         </div>
 

@@ -13,13 +13,13 @@
                 (click)="save()">{{'global.actions.save' | translate}}</button>
         <button type="button" class="btn btn-outline-info rounded" routerLink="/targets">{{'global.actions.cancel' | translate}}</button>
 
-        <chutney-delete-confirm-dialog *ngIf="existingEnvs.length"
+        <chutney-confirm-dialog *ngIf="existingEnvs.length"
                                        [dialogMessage]="('global.confirm.question' | translate) + ' ' + ('global.actions.delete' | translate) + '\n' + name"
                                        [label]="'Delete Target'"
                                        [disabled]="null"
-                                       (deleteEvent)="deleteAll()"
+                                       (callbackEvent)="deleteAll()"
                                        class="ms-2">
-        </chutney-delete-confirm-dialog>
+        </chutney-confirm-dialog>
     </div>
 </div>
 <div class="row">
@@ -48,13 +48,13 @@
                     [btnSizeClass]="'sm'"
                     [btnColor]="'primary'"
                     (submitEvent)="import($event, index)"></chutney-import-button>
-                <chutney-delete-confirm-dialog *ngIf="existOn(item.environment)"
+                <chutney-confirm-dialog *ngIf="existOn(item.environment)"
                                                [dialogMessage]="('global.confirm.question' | translate) + ' ' + ('global.actions.delete' | translate) + '\n'
                                             + name + ' ' + ('global.smallword.On' | translate | lowercase) + ' ' + item.environment"
                                                [label]="'Delete Target'"
                                                [btnSizeClass]="'sm'"
-                                               (deleteEvent)="delete(index)" class="ms-2">
-                </chutney-delete-confirm-dialog>
+                                               (callbackEvent)="delete(index)" class="ms-2">
+                </chutney-confirm-dialog>
             </div>
         </div>
         <div class="card-body">

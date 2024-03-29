@@ -27,7 +27,7 @@ import { NgClickOutsideModule } from 'ng-click-outside2';
 import { AtomsModule } from '../atoms/atoms.module';
 import { SharedModule } from '@shared/shared.module';
 
-import { DeleteConfirmDialogComponent } from './dialog/delete-confirm-dialog/delete-confirm-dialog.component';
+import { ConfirmDialogComponent } from './dialog/delete-confirm-dialog/confirm-dialog.component';
 import { CollapsiblePanelComponent } from './panel/collapsible-panel/collapsible-panel.component';
 import { ErrorPanelComponent } from './panel/error-panel/error-panel.component';
 import { PropertyTablePanelComponent } from './panel/property-table-panel/property-table-panel.component';
@@ -63,7 +63,7 @@ import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
     exports: [
         AsciiDoctorComponent,
         CollapsiblePanelComponent,
-        DeleteConfirmDialogComponent,
+        ConfirmDialogComponent,
         EditableBadgeComponent,
         EditableLabelComponent,
         EditableTextAreaComponent,
@@ -80,7 +80,7 @@ import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
     declarations: [
         AsciiDoctorComponent,
         CollapsiblePanelComponent,
-        DeleteConfirmDialogComponent,
+        ConfirmDialogComponent,
         EditableBadgeComponent,
         EditableLabelComponent,
         EditableTextAreaComponent,

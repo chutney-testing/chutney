@@ -18,12 +18,12 @@
             placeholder="Add a new file" [(ngModel)]="currentFileName"/>
     </div>
     <div class="box2">
-        <chutney-delete-confirm-dialog *hasAuthorization="[Authorization.GLOBAL_VAR_WRITE]"
+        <chutney-confirm-dialog *hasAuthorization="[Authorization.GLOBAL_VAR_WRITE]"
             [dialogMessage]="('global.confirm.question' | translate) + ' ' + ('global.actions.delete' | translate) + '\n' + currentFileName"
             [label]="'Delete file'"
             [disabled]="null"
-            (deleteEvent)="deleteFile()">
-        </chutney-delete-confirm-dialog>
+            (callbackEvent)="deleteFile()">
+        </chutney-confirm-dialog>
     </div>
     <div class="box2">
         <button type="button" class="btn btn-primary m-2 box2" (click)="help = !help">

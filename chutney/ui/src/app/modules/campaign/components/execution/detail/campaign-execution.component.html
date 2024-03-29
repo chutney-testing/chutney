@@ -147,13 +147,13 @@
                     </td>
                     <td *ngIf="jiraTestExecutionId">
                         <ng-container *ngIf="jiraLinkFrom(scenarioReportOutline.scenarioId) !== null">
-                            <chutney-delete-confirm-dialog class="me-2 mt-1"
+                            <chutney-confirm-dialog class="me-2 mt-1"
                                 [dialogMessage]="('campaigns.execution.update.jira' | translate)" [label]=null
-                                [title]="('global.actions.update' | translate)"
+                                [title]="'global.actions.update'"
                                 [disabled]="selectedStatusByScenarioId.get(scenarioReportOutline.scenarioId) !=='PASS' && selectedStatusByScenarioId.get(scenarioReportOutline.scenarioId) !=='FAIL'"
                                 [btnSizeClass]="'sm'" [btnClassIcon]="'fa-pencil-alt'" [btnColor]="'primary'"
-                                (deleteEvent)="updateStatus(scenarioReportOutline.scenarioId)">
-                            </chutney-delete-confirm-dialog>
+                                (callbackEvent)="updateStatus(scenarioReportOutline.scenarioId)">
+                            </chutney-confirm-dialog>
                             <select class="custom-select mt-1"
                                 (change)="selectedUpdateStatus(scenarioReportOutline.scenarioId, $event)"
                                 style="width: 120px">
