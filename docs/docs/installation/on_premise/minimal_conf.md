@@ -1,5 +1,5 @@
 !!! note "Packaging example"
-    Maven module [local-dev](https://github.com/chutney-testing/chutney/tree/master/packaging/local-dev){:target="_blank"} shows one way of packaging Chutney.  
+    Maven module [local-dev](https://github.com/chutney-testing/chutney/tree/main/chutney/packaging/local-dev){:target="_blank"} shows one way of packaging Chutney.  
     Use it as an example to make your own package, custom to your needs.
 
 

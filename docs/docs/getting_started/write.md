@@ -134,11 +134,11 @@ In this example the "withData" will be useful to declare the template of the dat
 
 Now you can declare constants like this in the dataset panel of the IHM
 
-![constant_dataset.png](constant_dataset.png)
+![constant_dataset.png](../getting_started/constant_dataset.png)
 
 The last step is to link the dataset and execute the scenario with your values
 
-![report_constant.png](report_constant.png)
+![report_constant.png](../getting_started/report_constant.png)
 
 ## Array dataset
 
@@ -185,7 +185,7 @@ Now let's create an array dataset in your IHM Chutney and link it with the scena
 ```
 If we start the execution
 
-![report_exec_strategy_for.png](report_exec_strategy_for.png)
+![report_exec_strategy_for.png](../getting_started/report_exec_strategy_for.png)
 
 Warning - only one strategy can be applied per action. If needed, you can add intermediate steps with a strategy
 
