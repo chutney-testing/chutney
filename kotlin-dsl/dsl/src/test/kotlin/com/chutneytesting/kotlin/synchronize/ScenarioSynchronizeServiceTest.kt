@@ -59,7 +59,7 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
         // Given
         assertScenarioSynchronization(tempDir = tempDir, scenario = localScenario)
 
-        val modifiedScenario = Scenario(title = "A scenario") {
+        val modifiedScenario = Scenario(title = "A scenario", tags = listOf("TAG1", "TAG_2")) {
             When("Something happens with success") {
                 SuccessAction()
             }
@@ -87,9 +87,11 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
             it.request.url == "/api/scenario/v2/raw" && it.request.method.value() == "POST"
         }.map { it.request.bodyAsString }
         assertThat(requestJson.size).isEqualTo(1)
-        assertThat(requestJson.first()).contains(localScenario.title)
-        assertThat(requestJson.first()).contains("Something happens with success")
-        assertThat(requestJson.first()).contains("KOTLIN")
+        assertThat(requestJson.first())
+            .contains(localScenario.title)
+            .contains("Something happens with success")
+            .contains("TAG1")
+            .contains("TAG_2")
     }
 
     @Test
@@ -141,11 +143,11 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
             it.request.url == "/api/scenario/v2/raw" && it.request.method.value() == "POST"
         }.map { it.request.bodyAsString }
         assertThat(requestJson.size).isEqualTo(1)
-        assertThat(requestJson.first()).contains(existingScenario.title)
-        assertThat(requestJson.first()).contains(existingScenario.id.toString())
-        assertThat(requestJson.first()).contains("Something happens with success")
-        assertThat(requestJson.first()).contains("TEST")
-        assertThat(requestJson.first()).contains("KOTLIN")
+        assertThat(requestJson.first())
+            .contains(existingScenario.title)
+            .contains(existingScenario.id.toString())
+            .contains("Something happens with success")
+            .contains("TEST")
     }
 
     @Test
@@ -181,7 +183,7 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
         ChutneyServerServiceImpl.createOrUpdateJsonScenario(chutneyServerInfo, scenario)
 
         // Then
-        Assertions.assertThat(wireMockServer.allServeEvents.filter {
+        assertThat(wireMockServer.allServeEvents.filter {
             it.request.url == "/api/scenario/v2/raw" && it.request.method.value() == "POST"
         }.toList().size).isEqualTo(1)
     }

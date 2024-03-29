@@ -22,7 +22,8 @@ class SynchronizeScenariosBuilder {
             (this.call()?.let {
                 when (it) {
                     is ChutneyScenario -> listOf(it)
-                    else -> it as List<ChutneyScenario>
+                    is List<*> -> it.filterIsInstance<ChutneyScenario>()
+                    else -> throw UnsupportedOperationException()
                 }
             })!!
     }

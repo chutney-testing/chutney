@@ -49,10 +49,10 @@ object ChutneyServerServiceImpl : ChutneyServerService {
         scenario: ChutneyScenario,
         remoteScenario: LinkedHashMap<String, Any>
     ): Int {
-        val generatedTag = "KOTLIN"
-        var tags = remoteScenario["tags"] as List<String>
-        if (!tags.contains(generatedTag)) {
-            tags = tags.plus(generatedTag)
+        var tags = emptyList<String>()
+        val remoteTags = remoteScenario["tags"]
+        if (remoteTags is List<*>) {
+            tags = (scenario.tags + remoteTags.filterIsInstance<String>()).distinct()
         }
         val body = """
             {
@@ -83,14 +83,13 @@ object ChutneyServerServiceImpl : ChutneyServerService {
     }
 
     private fun createJsonScenario(serverInfo: ChutneyServerInfo, scenario: ChutneyScenario): Int {
-        val generatedTag = "KOTLIN"
         val body = """
             {
                 ${buildIdJson(scenario)}
                 "content": "${escapeJson(scenario.toString())}",
                 "title": "${scenario.title}",
                 "description": "${scenario.description}",
-                "tags": ["$generatedTag"],
+                "tags": ${Mapper.toJson(scenario.tags)},
                 ${buildDefaultDatasetJson(scenario)}
             }
         """.trimIndent()

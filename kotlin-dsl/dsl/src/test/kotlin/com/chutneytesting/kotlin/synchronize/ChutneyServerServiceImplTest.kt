@@ -110,14 +110,14 @@ class ChutneyServerServiceImplTest {
                 assertThat(createRequestReceived.get("title").textValue()).isEqualTo(scenario.title)
                 assertThat(createRequestReceived.get("description").textValue()).isEqualTo(scenario.description)
                 assertThat(createRequestReceived.get("content").textValue()).isNotBlank()
-                assertThat(createRequestReceived.get("tags")[0].textValue()).isEqualTo("KOTLIN")
+                assertThat(createRequestReceived.get("tags")).isEmpty()
                 assertThat(createRequestReceived.get("defaultDataset").isNull).isTrue()
             }
 
             @Test
             fun id_from_code() {
                 // Given
-                val scenario = Scenario(id = 666, title = "A scenario") {
+                val scenario = Scenario(id = 666, title = "A scenario", tags = listOf("TAG")) {
                     When("Something happens") {
                         SuccessAction()
                     }
@@ -156,7 +156,7 @@ class ChutneyServerServiceImplTest {
                 assertThat(createRequestReceived.get("title").textValue()).isEqualTo(scenario.title)
                 assertThat(createRequestReceived.get("description").textValue()).isEqualTo(scenario.description)
                 assertThat(createRequestReceived.get("content").textValue()).isNotBlank()
-                assertThat(createRequestReceived.get("tags")[0].textValue()).isEqualTo("KOTLIN")
+                assertThat(createRequestReceived.get("tags")[0].textValue()).isEqualTo("TAG")
                 assertThat(createRequestReceived.get("defaultDataset").isNull).isTrue()
             }
         }
@@ -166,7 +166,7 @@ class ChutneyServerServiceImplTest {
             @Test
             fun update_from_code() {
                 // Given
-                val scenario = Scenario(id = 666, title = "A new scenario", defaultDataset = "NEW_DATASET") {
+                val scenario = Scenario(id = 666, title = "A new scenario", defaultDataset = "NEW_DATASET", tags = listOf("STAG_1", "STAG_2")) {
                     description = "MyDescription"
                     When("Something happens update") {
                         SuccessAction()
@@ -217,7 +217,7 @@ class ChutneyServerServiceImplTest {
                 assertThat(createRequestReceived.get("content").textValue()).isNotBlank()
                 assertThat(createRequestReceived.get("tags"))
                     .extracting(JsonNode::textValue)
-                    .containsExactlyInAnyOrder(tuple("TAG1"), tuple("TAG2"), tuple("KOTLIN"))
+                    .containsExactlyInAnyOrder(tuple("STAG_1"), tuple("STAG_2"), tuple("TAG1"), tuple("TAG2"))
                 assertThat(createRequestReceived.get("defaultDataset").textValue()).isEqualTo(scenario.defaultDataset)
             }
         }
