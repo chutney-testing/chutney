@@ -38,7 +38,11 @@ import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
+import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -87,6 +91,37 @@ public class PurgeServiceTest {
                 }
 
                 @Test
+                void no_purge_when_only_today_executions_even_if_limit_exceeded() {
+                    // Given
+                    // Two scenario's executions independents of any campaigns' execution
+                    // And a configuration limit set to 2 for scenarios' executions
+                    Integer maxScenarioExecutionsConfiguration = 2;
+                    String scenarioId = "1";
+                    LocalDateTime now = now();
+
+                    TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
+                    when(testCaseRepository.findAll()).thenReturn(List.of(
+                        TestCaseMetadataImpl.builder().withId(scenarioId).build()
+                    ));
+                    ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
+                    when(executionsRepository.getExecutions(scenarioId)).thenReturn(List.of(
+                        scenarioExecutionBuilder().executionId(1L).time(now.minusHours(23)).build(),
+                        scenarioExecutionBuilder().executionId(2L).time(now.minusMinutes(50)).build(),
+                        scenarioExecutionBuilder().executionId(3L).time(now.minusSeconds(10)).build(),
+                        scenarioExecutionBuilder().executionId(4L).time(now).build()
+                    ));
+
+                    // When
+                    PurgeServiceImpl sut = new PurgeServiceImpl(testCaseRepository, executionsRepository, mock(CampaignRepository.class), mock(CampaignExecutionRepository.class), maxScenarioExecutionsConfiguration, 100);
+                    PurgeReport report = sut.purge();
+
+                    // Then
+                    verify(executionsRepository, times(0)).deleteExecutions(anySet());
+                    // The four scenario's executions are not deleted
+                    assertThat(report.scenariosExecutionsIds()).isEmpty();
+                }
+
+                @Test
                 void purge_oldest_when_limit_exceeded() {
                     // Given
                     // Three scenario's executions independents of any campaigns' execution
@@ -100,11 +135,11 @@ public class PurgeServiceTest {
                         TestCaseMetadataImpl.builder().withId(scenarioId).build()
                     ));
                     ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
-                    LocalDateTime now = now();
+                    LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
                     when(executionsRepository.getExecutions(scenarioId)).thenReturn(List.of(
-                        scenarioExecutionBuilder().executionId(3L).time(now).build(),
-                        scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(10)).build(),
-                        scenarioExecutionBuilder().executionId(oldestScenarioExecutionId).time(now.minusSeconds(20)).build()
+                        scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier).build(),
+                        scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(10)).build(),
+                        scenarioExecutionBuilder().executionId(oldestScenarioExecutionId).time(twentyFiveHoursEarlier.minusSeconds(20)).build()
                     ));
 
                     // When
@@ -115,6 +150,38 @@ public class PurgeServiceTest {
                     // The oldest scenario's execution is deleted
                     verify(executionsRepository).deleteExecutions(Set.of(oldestScenarioExecutionId));
                     assertThat(report.scenariosExecutionsIds()).containsExactly(oldestScenarioExecutionId);
+                }
+
+                @Test
+                void purge_only_oldest_than_one_day_when_limit_exceeded() {
+                    // Given
+                    // Three scenario's executions independents of any campaigns' execution
+                    // And a configuration limit set to 1 for scenarios' executions
+                    Integer maxScenarioExecutionsConfiguration = 1;
+                    String scenarioId = "1";
+
+                    TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
+                    when(testCaseRepository.findAll()).thenReturn(List.of(
+                        TestCaseMetadataImpl.builder().withId(scenarioId).build()
+                    ));
+                    ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
+                    LocalDateTime now = now();
+                    LocalDateTime twoDaysEarlier = now.minusDays(2);
+                    when(executionsRepository.getExecutions(scenarioId)).thenReturn(List.of(
+                        scenarioExecutionBuilder().executionId(4L).time(now).build(),
+                        scenarioExecutionBuilder().executionId(3L).time(now.minusSeconds(10)).build(),
+                        scenarioExecutionBuilder().executionId(2L).time(twoDaysEarlier).build(),
+                        scenarioExecutionBuilder().executionId(1L).time(twoDaysEarlier.minusSeconds(30)).build()
+                    ));
+
+                    // When
+                    PurgeServiceImpl sut = new PurgeServiceImpl(testCaseRepository, executionsRepository, mock(CampaignRepository.class), mock(CampaignExecutionRepository.class), maxScenarioExecutionsConfiguration, 100);
+                    PurgeReport report = sut.purge();
+
+                    // Then
+                    // The oldest scenario's execution is deleted
+                    verify(executionsRepository).deleteExecutions(Set.of(1L));
+                    assertThat(report.scenariosExecutionsIds()).containsExactly(1L);
                 }
             }
 
@@ -154,7 +221,7 @@ public class PurgeServiceTest {
                     // Three scenario's executions independents of any campaigns' execution on two different environments
                     // And a configuration limit set to 1 for scenarios' executions
                     Integer maxScenarioExecutionsConfiguration = 1;
-                    LocalDateTime now = now();
+                    LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
                     String scenarioId = "1";
                     Long oldestScenarioExecutionId = 1L;
 
@@ -164,9 +231,9 @@ public class PurgeServiceTest {
                     ));
                     ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
                     when(executionsRepository.getExecutions(scenarioId)).thenReturn(List.of(
-                        scenarioExecutionBuilder().executionId(3L).time(now).environment("env1").build(),
-                        scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(10)).environment("env2").build(),
-                        scenarioExecutionBuilder().executionId(oldestScenarioExecutionId).time(now.minusSeconds(20)).environment("env1").build()
+                        scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier).environment("env1").build(),
+                        scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(10)).environment("env2").build(),
+                        scenarioExecutionBuilder().executionId(oldestScenarioExecutionId).time(twentyFiveHoursEarlier.minusSeconds(20)).environment("env1").build()
                     ));
 
                     // When
@@ -190,7 +257,7 @@ public class PurgeServiceTest {
                 // Two scenarios and three scenario's executions independents of any campaigns' execution
                 // And a configuration limit set to 1 for scenarios' executions
                 Integer maxScenarioExecutionsConfiguration = 1;
-                LocalDateTime now = now();
+                LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
                 String scenarioId1 = "1";
                 String scenarioId2 = "2";
 
@@ -201,11 +268,11 @@ public class PurgeServiceTest {
                 ));
                 ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
                 when(executionsRepository.getExecutions(scenarioId1)).thenReturn(List.of(
-                    scenarioExecutionBuilder().executionId(1L).time(now).build(),
-                    scenarioExecutionBuilder().executionId(3L).time(now.minusSeconds(10)).build()
+                    scenarioExecutionBuilder().executionId(1L).time(twentyFiveHoursEarlier).build(),
+                    scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier.minusSeconds(10)).build()
                 ));
                 when(executionsRepository.getExecutions(scenarioId2)).thenReturn(List.of(
-                    scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(20)).build()
+                    scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(20)).build()
                 ));
 
                 // When
@@ -230,7 +297,7 @@ public class PurgeServiceTest {
             @DisplayName("for one environment")
             class OneEnvironment {
                 @Test
-                void purge_oldest_when_limit_exceeded() {
+                void purge_only_oldest_when_limit_exceeded() {
                     // Given
                     // Three campaign's executions with only one scenario's execution each
                     // And a configuration limit set to 10 for scenarios' executions
@@ -239,28 +306,31 @@ public class PurgeServiceTest {
                     Integer maxCampaignExecutionsConfiguration = 2;
                     String scenarioId = "1";
                     Long campaignId = 1L;
-                    Long oldestCampaignExecutionId = 1L;
-                    LocalDateTime now = now();
+                    LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
 
                     TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
                     when(testCaseRepository.findAll()).thenReturn(List.of(
                         TestCaseMetadataImpl.builder().withId(scenarioId).build()
                     ));
 
-                    ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(3L).time(now).build();
-                    CampaignExecution campaignExecution1 = buildCampaignExecution(3L, campaignId, tuple(scenarioId, scenarioExecution1));
+                    ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(1L).time(twentyFiveHoursEarlier.minusSeconds(20)).build();
+                    CampaignExecution campaignExecution1 = buildCampaignExecution(1L, campaignId, tuple(scenarioId, scenarioExecution1));
 
-                    ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(10)).build();
+                    ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(10)).build();
                     CampaignExecution campaignExecution2 = buildCampaignExecution(2L, campaignId, tuple(scenarioId, scenarioExecution2));
 
-                    ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(1L).time(now.minusSeconds(20)).build();
-                    CampaignExecution campaignExecution3 = buildCampaignExecution(oldestCampaignExecutionId, campaignId, tuple(scenarioId, scenarioExecution3));
+                    ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier).build();
+                    CampaignExecution campaignExecution3 = buildCampaignExecution(3L, campaignId, tuple(scenarioId, scenarioExecution3));
+
+                    ExecutionSummary scenarioExecution4 = scenarioExecutionBuilder().executionId(4L).time(now().minusSeconds(20)).build();
+                    CampaignExecution campaignExecution4 = buildCampaignExecution(4L, campaignId, tuple(scenarioId, scenarioExecution4));
 
                     ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
                     when(executionsRepository.getExecutions(scenarioId)).thenReturn(List.of(
                         scenarioExecution1.withCampaignReport(campaignExecution1),
                         scenarioExecution2.withCampaignReport(campaignExecution2),
-                        scenarioExecution3.withCampaignReport(campaignExecution3)
+                        scenarioExecution3.withCampaignReport(campaignExecution3),
+                        scenarioExecution4.withCampaignReport(campaignExecution4)
                     ));
 
                     CampaignRepository campaignRepository = mock(CampaignRepository.class);
@@ -269,7 +339,7 @@ public class PurgeServiceTest {
                     ));
                     CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
                     when(campaignExecutionRepository.getExecutionHistory(campaignId)).thenReturn(List.of(
-                        campaignExecution1, campaignExecution2, campaignExecution3
+                        campaignExecution4, campaignExecution3, campaignExecution3, campaignExecution1
                     ));
 
                     // When
@@ -281,9 +351,9 @@ public class PurgeServiceTest {
                     // The associated scenario's execution is kept
                     verify(executionsRepository, times(0)).deleteExecutions(anySet());
                     verify(campaignExecutionRepository).deleteExecutions(anySet());
-                    verify(campaignExecutionRepository).deleteExecutions(Set.of(oldestCampaignExecutionId));
+                    verify(campaignExecutionRepository).deleteExecutions(Set.of(1L));
                     assertThat(report.scenariosExecutionsIds()).isEmpty();
-                    assertThat(report.campaignsExecutionsIds()).containsExactly(oldestCampaignExecutionId);
+                    assertThat(report.campaignsExecutionsIds()).containsExactly(1L);
                 }
 
                 @Test
@@ -297,20 +367,20 @@ public class PurgeServiceTest {
                     String scenarioId = "1";
                     Long campaignId = 1L;
                     Long oldestCampaignExecutionId = 1L;
-                    LocalDateTime now = now();
+                    LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
 
                     TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
                     when(testCaseRepository.findAll()).thenReturn(List.of(
                         TestCaseMetadataImpl.builder().withId(scenarioId).build()
                     ));
 
-                    ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(3L).time(now).build();
+                    ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier).build();
                     CampaignExecution campaignExecution1 = buildCampaignExecution(3L, campaignId, tuple(scenarioId, scenarioExecution1));
 
-                    ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(10)).build();
+                    ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(10)).build();
                     CampaignExecution campaignExecution2 = buildCampaignExecutionWithNullEnv(2L, campaignId, tuple(scenarioId, scenarioExecution2));
 
-                    ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(1L).time(now.minusSeconds(20)).build();
+                    ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(1L).time(twentyFiveHoursEarlier.minusSeconds(20)).build();
                     CampaignExecution campaignExecution3 = buildCampaignExecution(oldestCampaignExecutionId, campaignId, tuple(scenarioId, scenarioExecution3));
 
                     ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
@@ -358,20 +428,20 @@ public class PurgeServiceTest {
                     String scenarioId = "1";
                     Long campaignId = 1L;
                     Long oldestCampaignExecutionId = 1L;
-                    LocalDateTime now = now();
+                    LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
 
                     TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
                     when(testCaseRepository.findAll()).thenReturn(List.of(
                         TestCaseMetadataImpl.builder().withId(scenarioId).build()
                     ));
 
-                    ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(3L).time(now).environment("env1").build();
+                    ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier).environment("env1").build();
                     CampaignExecution campaignExecution1 = buildCampaignExecution(3L, campaignId, tuple(scenarioId, scenarioExecution1));
 
-                    ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(10)).environment("env2").build();
+                    ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(10)).environment("env2").build();
                     CampaignExecution campaignExecution2 = buildCampaignExecution(2L, campaignId, tuple(scenarioId, scenarioExecution2));
 
-                    ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(1L).time(now.minusSeconds(20)).environment("env1").build();
+                    ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(1L).time(twentyFiveHoursEarlier.minusSeconds(20)).environment("env1").build();
                     CampaignExecution campaignExecution3 = buildCampaignExecution(oldestCampaignExecutionId, campaignId, tuple(scenarioId, scenarioExecution3));
 
                     ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
@@ -422,7 +492,7 @@ public class PurgeServiceTest {
                 Long campaignId2 = 2L;
                 Long oldestCampaignExecutionId1 = 2L;
                 Long oldestCampaignExecutionId2 = 1L;
-                LocalDateTime now = now();
+                LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
 
                 TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
                 when(testCaseRepository.findAll()).thenReturn(List.of(
@@ -430,12 +500,12 @@ public class PurgeServiceTest {
                 ));
 
                 // Scenario executions
-                ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(6L).time(now).build();
-                ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(5L).time(now.minusSeconds(10)).build();
-                ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(4L).time(now.minusSeconds(20)).build();
-                ExecutionSummary scenarioExecution4 = scenarioExecutionBuilder().executionId(3L).time(now.minusSeconds(30)).build();
-                ExecutionSummary scenarioExecution5 = scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(40)).build();
-                ExecutionSummary scenarioExecution6 = scenarioExecutionBuilder().executionId(1L).time(now.minusSeconds(50)).build();
+                ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(6L).time(twentyFiveHoursEarlier).build();
+                ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(5L).time(twentyFiveHoursEarlier.minusSeconds(10)).build();
+                ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(4L).time(twentyFiveHoursEarlier.minusSeconds(20)).build();
+                ExecutionSummary scenarioExecution4 = scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier.minusSeconds(30)).build();
+                ExecutionSummary scenarioExecution5 = scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(40)).build();
+                ExecutionSummary scenarioExecution6 = scenarioExecutionBuilder().executionId(1L).time(twentyFiveHoursEarlier.minusSeconds(50)).build();
 
                 // First campaign executions
                 CampaignExecution campaignExecution1 = buildCampaignExecution(6L, campaignId1, tuple(scenarioId, scenarioExecution1));
@@ -507,12 +577,12 @@ public class PurgeServiceTest {
                     TestCaseMetadataImpl.builder().withId(scenarioId).build()
                 ));
                 ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
-                LocalDateTime now = now();
+                LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
                 when(executionsRepository.getExecutions(scenarioId)).thenReturn(List.of(
-                    scenarioExecutionBuilder().executionId(4L).status(FAILURE).time(now).build(),
-                    scenarioExecutionBuilder().executionId(3L).status(FAILURE).time(now.minusSeconds(10)).build(),
-                    scenarioExecutionBuilder().executionId(lastSuccessScenarioExecutionId).time(now.minusSeconds(20)).build(),
-                    scenarioExecutionBuilder().executionId(1L).time(now.minusSeconds(30)).build()
+                    scenarioExecutionBuilder().executionId(4L).status(FAILURE).time(twentyFiveHoursEarlier).build(),
+                    scenarioExecutionBuilder().executionId(3L).status(FAILURE).time(twentyFiveHoursEarlier.minusSeconds(10)).build(),
+                    scenarioExecutionBuilder().executionId(lastSuccessScenarioExecutionId).time(twentyFiveHoursEarlier.minusSeconds(20)).build(),
+                    scenarioExecutionBuilder().executionId(1L).time(twentyFiveHoursEarlier.minusSeconds(30)).build()
                 ));
 
                 // When
@@ -542,23 +612,23 @@ public class PurgeServiceTest {
                 String scenarioId = "1";
                 Long campaignId = 1L;
                 Long lastSuccessCampaignExecutionId = 2L;
-                LocalDateTime now = now();
+                LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
 
                 TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
                 when(testCaseRepository.findAll()).thenReturn(List.of(
                     TestCaseMetadataImpl.builder().withId(scenarioId).build()
                 ));
 
-                ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(4L).status(FAILURE).time(now).build();
+                ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(4L).status(FAILURE).time(twentyFiveHoursEarlier).build();
                 CampaignExecution campaignExecution1 = buildCampaignExecution(4L, campaignId, tuple(scenarioId, scenarioExecution1));
 
-                ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(3L).status(FAILURE).time(now.minusSeconds(10)).build();
+                ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(3L).status(FAILURE).time(twentyFiveHoursEarlier.minusSeconds(10)).build();
                 CampaignExecution campaignExecution2 = buildCampaignExecution(3L, campaignId, tuple(scenarioId, scenarioExecution2));
 
-                ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(20)).build();
+                ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(20)).build();
                 CampaignExecution campaignExecution3 = buildCampaignExecution(lastSuccessCampaignExecutionId, campaignId, tuple(scenarioId, scenarioExecution3));
 
-                ExecutionSummary scenarioExecution4 = scenarioExecutionBuilder().executionId(1L).time(now.minusSeconds(30)).build();
+                ExecutionSummary scenarioExecution4 = scenarioExecutionBuilder().executionId(1L).time(twentyFiveHoursEarlier.minusSeconds(30)).build();
                 CampaignExecution campaignExecution4 = buildCampaignExecution(1L, campaignId, tuple(scenarioId, scenarioExecution4));
 
                 ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
@@ -610,17 +680,17 @@ public class PurgeServiceTest {
             String scenarioId = "1";
             Long campaignId = 1L;
             Long oldestScenarioExecutionId = 1L;
-            LocalDateTime now = now();
+            LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
 
             TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
             when(testCaseRepository.findAll()).thenReturn(List.of(
                 TestCaseMetadataImpl.builder().withId(scenarioId).build()
             ));
 
-            ExecutionSummary autoRetryScenarioExecution2 = scenarioExecutionBuilder().executionId(4L).time(now).build();
-            ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(3L).time(now.minusSeconds(10)).status(FAILURE).build();
-            ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(20)).build();
-            ExecutionSummary scenarioExecution4 = scenarioExecutionBuilder().executionId(oldestScenarioExecutionId).time(now.minusSeconds(30)).build();
+            ExecutionSummary autoRetryScenarioExecution2 = scenarioExecutionBuilder().executionId(4L).time(twentyFiveHoursEarlier).build();
+            ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier.minusSeconds(10)).status(FAILURE).build();
+            ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(20)).build();
+            ExecutionSummary scenarioExecution4 = scenarioExecutionBuilder().executionId(oldestScenarioExecutionId).time(twentyFiveHoursEarlier.minusSeconds(30)).build();
 
             CampaignExecution campaignExecution1 = buildCampaignExecution(1L, campaignId, tuple(scenarioId, autoRetryScenarioExecution2), tuple(scenarioId, scenarioExecution2));
 
@@ -672,7 +742,7 @@ public class PurgeServiceTest {
             String scenarioId = "1";
             Long campaignWithManualReplaysId = 1L;
             Long campaignId = 2L;
-            LocalDateTime now = now();
+            LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
 
             TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
             when(testCaseRepository.findAll()).thenReturn(List.of(
@@ -680,12 +750,12 @@ public class PurgeServiceTest {
             ));
 
             // Scenario executions
-            ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(6L).time(now).build();
-            ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(5L).time(now).build();
-            ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(4L).time(now.minusSeconds(10)).build();
-            ExecutionSummary scenarioExecution4 = scenarioExecutionBuilder().executionId(3L).time(now.minusSeconds(20)).status(FAILURE).build();
-            ExecutionSummary scenarioExecution5 = scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(30)).build();
-            ExecutionSummary scenarioExecution6 = scenarioExecutionBuilder().executionId(1L).time(now.minusSeconds(40)).status(FAILURE).build();
+            ExecutionSummary scenarioExecution1 = scenarioExecutionBuilder().executionId(6L).time(twentyFiveHoursEarlier).build();
+            ExecutionSummary scenarioExecution2 = scenarioExecutionBuilder().executionId(5L).time(twentyFiveHoursEarlier).build();
+            ExecutionSummary scenarioExecution3 = scenarioExecutionBuilder().executionId(4L).time(twentyFiveHoursEarlier.minusSeconds(10)).build();
+            ExecutionSummary scenarioExecution4 = scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier.minusSeconds(20)).status(FAILURE).build();
+            ExecutionSummary scenarioExecution5 = scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(30)).build();
+            ExecutionSummary scenarioExecution6 = scenarioExecutionBuilder().executionId(1L).time(twentyFiveHoursEarlier.minusSeconds(40)).status(FAILURE).build();
 
             // First campaign executions
             CampaignExecution campaignExecution1 = buildCampaignExecution(6L, campaignWithManualReplaysId, tuple(scenarioId, scenarioExecution1));
@@ -751,7 +821,7 @@ public class PurgeServiceTest {
             String env3 = "qa";
             Long campaignId1 = 1L;
             Long campaignId2 = 2L;
-            LocalDateTime now = now();
+            LocalDateTime twentyFiveHoursEarlier = now().minusHours(25);
 
             // Two scenarios
             TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
@@ -767,69 +837,69 @@ public class PurgeServiceTest {
             ));
 
             // First scenario executions
-            ExecutionSummary se1_ce1 = scenarioExecutionBuilder().executionId(29L).time(now).environment(env1).build();
-            ExecutionSummary se2_ce10 = scenarioExecutionBuilder().executionId(28L).time(now.minusSeconds(10)).environment(env1).build();
-            ExecutionSummary se3_ce5 = scenarioExecutionBuilder().executionId(27L).time(now.minusSeconds(20)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se4_ce6 = scenarioExecutionBuilder().executionId(26L).time(now.minusSeconds(30)).environment(env2).build();
-            ExecutionSummary se5 = scenarioExecutionBuilder().executionId(25L).time(now.minusSeconds(30)).environment(env3).build();
-            ExecutionSummary se6_ce2 = scenarioExecutionBuilder().executionId(24L).time(now.minusSeconds(40)).environment(env1).build();
-            ExecutionSummary se7_ce2 = scenarioExecutionBuilder().executionId(23L).time(now.minusSeconds(50)).environment(env1).status(FAILURE).build();
-            ExecutionSummary se8_ce11 = scenarioExecutionBuilder().executionId(22L).time(now.minusSeconds(60)).environment(env1).build();
-            ExecutionSummary se9_ce15 = scenarioExecutionBuilder().executionId(21L).time(now.minusSeconds(70)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se10_ce7 = scenarioExecutionBuilder().executionId(20L).time(now.minusSeconds(80)).environment(env2).build();
-            ExecutionSummary se11_ce16 = scenarioExecutionBuilder().executionId(19L).time(now.minusSeconds(90)).environment(env2).build();
-            ExecutionSummary se12 = scenarioExecutionBuilder().executionId(18L).time(now.minusSeconds(100)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se13 = scenarioExecutionBuilder().executionId(17L).time(now.minusSeconds(110)).environment(env2).build();
-            ExecutionSummary se14 = scenarioExecutionBuilder().executionId(16L).time(now.minusSeconds(120)).environment(env2).build();
-            ExecutionSummary se15 = scenarioExecutionBuilder().executionId(15L).time(now.minusSeconds(120)).environment(env3).build();
-            ExecutionSummary se16_ce12 = scenarioExecutionBuilder().executionId(14L).time(now.minusSeconds(130)).environment(env1).build();
-            ExecutionSummary se17_ce13 = scenarioExecutionBuilder().executionId(13L).time(now.minusSeconds(140)).environment(env1).status(FAILURE).build();
-            ExecutionSummary se18_ce3 = scenarioExecutionBuilder().executionId(12L).time(now.minusSeconds(150)).environment(env1).build();
-            ExecutionSummary se19_ce17 = scenarioExecutionBuilder().executionId(11L).time(now.minusSeconds(160)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se20 = scenarioExecutionBuilder().executionId(10L).time(now.minusSeconds(170)).environment(env1).status(FAILURE).build();
-            ExecutionSummary se21 = scenarioExecutionBuilder().executionId(9L).time(now.minusSeconds(180)).environment(env2).build();
-            ExecutionSummary se22 = scenarioExecutionBuilder().executionId(8L).time(now.minusSeconds(190)).environment(env3).build();
-            ExecutionSummary se23_ce18 = scenarioExecutionBuilder().executionId(7L).time(now.minusSeconds(190)).environment(env2).build();
-            ExecutionSummary se24 = scenarioExecutionBuilder().executionId(6L).time(now.minusSeconds(200)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se25 = scenarioExecutionBuilder().executionId(5L).time(now.minusSeconds(210)).environment(env1).status(FAILURE).build();
-            ExecutionSummary se26_ce14 = scenarioExecutionBuilder().executionId(4L).time(now.minusSeconds(220)).environment(env1).build();
-            ExecutionSummary se27 = scenarioExecutionBuilder().executionId(3L).time(now.minusSeconds(230)).environment(env1).status(FAILURE).build();
-            ExecutionSummary se28_ce9 = scenarioExecutionBuilder().executionId(2L).time(now.minusSeconds(240)).environment(env2).build();
-            ExecutionSummary se29_ce4 = scenarioExecutionBuilder().executionId(1L).time(now.minusSeconds(250)).environment(env1).build();
+            ExecutionSummary se1_ce1 = scenarioExecutionBuilder().executionId(29L).time(twentyFiveHoursEarlier).environment(env1).build();
+            ExecutionSummary se2_ce10 = scenarioExecutionBuilder().executionId(28L).time(twentyFiveHoursEarlier.minusSeconds(10)).environment(env1).build();
+            ExecutionSummary se3_ce5 = scenarioExecutionBuilder().executionId(27L).time(twentyFiveHoursEarlier.minusSeconds(20)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se4_ce6 = scenarioExecutionBuilder().executionId(26L).time(twentyFiveHoursEarlier.minusSeconds(30)).environment(env2).build();
+            ExecutionSummary se5 = scenarioExecutionBuilder().executionId(25L).time(twentyFiveHoursEarlier.minusSeconds(30)).environment(env3).build();
+            ExecutionSummary se6_ce2 = scenarioExecutionBuilder().executionId(24L).time(twentyFiveHoursEarlier.minusSeconds(40)).environment(env1).build();
+            ExecutionSummary se7_ce2 = scenarioExecutionBuilder().executionId(23L).time(twentyFiveHoursEarlier.minusSeconds(50)).environment(env1).status(FAILURE).build();
+            ExecutionSummary se8_ce11 = scenarioExecutionBuilder().executionId(22L).time(twentyFiveHoursEarlier.minusSeconds(60)).environment(env1).build();
+            ExecutionSummary se9_ce15 = scenarioExecutionBuilder().executionId(21L).time(twentyFiveHoursEarlier.minusSeconds(70)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se10_ce7 = scenarioExecutionBuilder().executionId(20L).time(twentyFiveHoursEarlier.minusSeconds(80)).environment(env2).build();
+            ExecutionSummary se11_ce16 = scenarioExecutionBuilder().executionId(19L).time(twentyFiveHoursEarlier.minusSeconds(90)).environment(env2).build();
+            ExecutionSummary se12 = scenarioExecutionBuilder().executionId(18L).time(twentyFiveHoursEarlier.minusSeconds(100)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se13 = scenarioExecutionBuilder().executionId(17L).time(twentyFiveHoursEarlier.minusSeconds(110)).environment(env2).build();
+            ExecutionSummary se14 = scenarioExecutionBuilder().executionId(16L).time(twentyFiveHoursEarlier.minusSeconds(120)).environment(env2).build();
+            ExecutionSummary se15 = scenarioExecutionBuilder().executionId(15L).time(twentyFiveHoursEarlier.minusSeconds(120)).environment(env3).build();
+            ExecutionSummary se16_ce12 = scenarioExecutionBuilder().executionId(14L).time(twentyFiveHoursEarlier.minusSeconds(130)).environment(env1).build();
+            ExecutionSummary se17_ce13 = scenarioExecutionBuilder().executionId(13L).time(twentyFiveHoursEarlier.minusSeconds(140)).environment(env1).status(FAILURE).build();
+            ExecutionSummary se18_ce3 = scenarioExecutionBuilder().executionId(12L).time(twentyFiveHoursEarlier.minusSeconds(150)).environment(env1).build();
+            ExecutionSummary se19_ce17 = scenarioExecutionBuilder().executionId(11L).time(twentyFiveHoursEarlier.minusSeconds(160)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se20 = scenarioExecutionBuilder().executionId(10L).time(twentyFiveHoursEarlier.minusSeconds(170)).environment(env1).status(FAILURE).build();
+            ExecutionSummary se21 = scenarioExecutionBuilder().executionId(9L).time(twentyFiveHoursEarlier.minusSeconds(180)).environment(env2).build();
+            ExecutionSummary se22 = scenarioExecutionBuilder().executionId(8L).time(twentyFiveHoursEarlier.minusSeconds(190)).environment(env3).build();
+            ExecutionSummary se23_ce18 = scenarioExecutionBuilder().executionId(7L).time(twentyFiveHoursEarlier.minusSeconds(190)).environment(env2).build();
+            ExecutionSummary se24 = scenarioExecutionBuilder().executionId(6L).time(twentyFiveHoursEarlier.minusSeconds(200)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se25 = scenarioExecutionBuilder().executionId(5L).time(twentyFiveHoursEarlier.minusSeconds(210)).environment(env1).status(FAILURE).build();
+            ExecutionSummary se26_ce14 = scenarioExecutionBuilder().executionId(4L).time(twentyFiveHoursEarlier.minusSeconds(220)).environment(env1).build();
+            ExecutionSummary se27 = scenarioExecutionBuilder().executionId(3L).time(twentyFiveHoursEarlier.minusSeconds(230)).environment(env1).status(FAILURE).build();
+            ExecutionSummary se28_ce9 = scenarioExecutionBuilder().executionId(2L).time(twentyFiveHoursEarlier.minusSeconds(240)).environment(env2).build();
+            ExecutionSummary se29_ce4 = scenarioExecutionBuilder().executionId(1L).time(twentyFiveHoursEarlier.minusSeconds(250)).environment(env1).build();
 
             // Second scenario executions
-            ExecutionSummary se30_ce1 = scenarioExecutionBuilder().executionId(61L).time(now.minusSeconds(5)).environment(env1).build();
-            ExecutionSummary se31_ce10 = scenarioExecutionBuilder().executionId(60L).time(now.minusSeconds(15)).environment(env1).build();
-            ExecutionSummary se32_ce5 = scenarioExecutionBuilder().executionId(59L).time(now.minusSeconds(25)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se33_ce6 = scenarioExecutionBuilder().executionId(58L).time(now.minusSeconds(35)).environment(env2).build();
-            ExecutionSummary se34 = scenarioExecutionBuilder().executionId(57L).time(now.minusSeconds(45)).environment(env3).build();
-            ExecutionSummary se35_ce11 = scenarioExecutionBuilder().executionId(56L).time(now.minusSeconds(45)).environment(env1).build();
-            ExecutionSummary se36_ce2 = scenarioExecutionBuilder().executionId(55L).time(now.minusSeconds(55)).environment(env1).build();
-            ExecutionSummary se37_ce13 = scenarioExecutionBuilder().executionId(54L).time(now.minusSeconds(65)).environment(env1).build();
-            ExecutionSummary se38_ce7 = scenarioExecutionBuilder().executionId(53L).time(now.minusSeconds(75)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se39_ce15 = scenarioExecutionBuilder().executionId(52L).time(now.minusSeconds(85)).environment(env2).build();
-            ExecutionSummary se40 = scenarioExecutionBuilder().executionId(51L).time(now.minusSeconds(95)).environment(env3).build();
-            ExecutionSummary se41 = scenarioExecutionBuilder().executionId(50L).time(now.minusSeconds(95)).environment(env3).build();
-            ExecutionSummary se42 = scenarioExecutionBuilder().executionId(49L).time(now.minusSeconds(95)).environment(env2).build();
-            ExecutionSummary se43_ce16 = scenarioExecutionBuilder().executionId(48L).time(now.minusSeconds(105)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se44 = scenarioExecutionBuilder().executionId(47L).time(now.minusSeconds(115)).environment(env2).build();
-            ExecutionSummary se45 = scenarioExecutionBuilder().executionId(46L).time(now.minusSeconds(125)).environment(env3).build();
-            ExecutionSummary se46 = scenarioExecutionBuilder().executionId(45L).time(now.minusSeconds(125)).environment(env2).build();
-            ExecutionSummary se47 = scenarioExecutionBuilder().executionId(44L).time(now.minusSeconds(135)).environment(env1).build();
-            ExecutionSummary se48 = scenarioExecutionBuilder().executionId(43L).time(now.minusSeconds(145)).environment(env1).status(FAILURE).build();
-            ExecutionSummary se49 = scenarioExecutionBuilder().executionId(42L).time(now.minusSeconds(155)).environment(env1).build();
-            ExecutionSummary se50_ce3 = scenarioExecutionBuilder().executionId(41L).time(now.minusSeconds(165)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se51 = scenarioExecutionBuilder().executionId(40L).time(now.minusSeconds(175)).environment(env1).status(FAILURE).build();
-            ExecutionSummary se52_ce17 = scenarioExecutionBuilder().executionId(39L).time(now.minusSeconds(185)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se53 = scenarioExecutionBuilder().executionId(38L).time(now.minusSeconds(195)).environment(env3).build();
-            ExecutionSummary se54_ce8 = scenarioExecutionBuilder().executionId(37L).time(now.minusSeconds(195)).environment(env2).build();
-            ExecutionSummary se55_ce9 = scenarioExecutionBuilder().executionId(36L).time(now.minusSeconds(205)).environment(env2).status(FAILURE).build();
-            ExecutionSummary se56 = scenarioExecutionBuilder().executionId(35L).time(now.minusSeconds(215)).environment(env1).status(FAILURE).build();
-            ExecutionSummary se57_ce14 = scenarioExecutionBuilder().executionId(34L).time(now.minusSeconds(225)).environment(env1).build();
-            ExecutionSummary se58_ce14 = scenarioExecutionBuilder().executionId(33L).time(now.minusSeconds(235)).environment(env1).status(FAILURE).build();
-            ExecutionSummary se59_ce18 = scenarioExecutionBuilder().executionId(32L).time(now.minusSeconds(245)).environment(env2).build();
-            ExecutionSummary se60 = scenarioExecutionBuilder().executionId(31L).time(now.minusSeconds(255)).environment(env3).build();
-            ExecutionSummary se61_ce4 = scenarioExecutionBuilder().executionId(30L).time(now.minusSeconds(265)).environment(env1).build();
+            ExecutionSummary se30_ce1 = scenarioExecutionBuilder().executionId(61L).time(twentyFiveHoursEarlier.minusSeconds(5)).environment(env1).build();
+            ExecutionSummary se31_ce10 = scenarioExecutionBuilder().executionId(60L).time(twentyFiveHoursEarlier.minusSeconds(15)).environment(env1).build();
+            ExecutionSummary se32_ce5 = scenarioExecutionBuilder().executionId(59L).time(twentyFiveHoursEarlier.minusSeconds(25)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se33_ce6 = scenarioExecutionBuilder().executionId(58L).time(twentyFiveHoursEarlier.minusSeconds(35)).environment(env2).build();
+            ExecutionSummary se34 = scenarioExecutionBuilder().executionId(57L).time(twentyFiveHoursEarlier.minusSeconds(45)).environment(env3).build();
+            ExecutionSummary se35_ce11 = scenarioExecutionBuilder().executionId(56L).time(twentyFiveHoursEarlier.minusSeconds(45)).environment(env1).build();
+            ExecutionSummary se36_ce2 = scenarioExecutionBuilder().executionId(55L).time(twentyFiveHoursEarlier.minusSeconds(55)).environment(env1).build();
+            ExecutionSummary se37_ce13 = scenarioExecutionBuilder().executionId(54L).time(twentyFiveHoursEarlier.minusSeconds(65)).environment(env1).build();
+            ExecutionSummary se38_ce7 = scenarioExecutionBuilder().executionId(53L).time(twentyFiveHoursEarlier.minusSeconds(75)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se39_ce15 = scenarioExecutionBuilder().executionId(52L).time(twentyFiveHoursEarlier.minusSeconds(85)).environment(env2).build();
+            ExecutionSummary se40 = scenarioExecutionBuilder().executionId(51L).time(twentyFiveHoursEarlier.minusSeconds(95)).environment(env3).build();
+            ExecutionSummary se41 = scenarioExecutionBuilder().executionId(50L).time(twentyFiveHoursEarlier.minusSeconds(95)).environment(env3).build();
+            ExecutionSummary se42 = scenarioExecutionBuilder().executionId(49L).time(twentyFiveHoursEarlier.minusSeconds(95)).environment(env2).build();
+            ExecutionSummary se43_ce16 = scenarioExecutionBuilder().executionId(48L).time(twentyFiveHoursEarlier.minusSeconds(105)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se44 = scenarioExecutionBuilder().executionId(47L).time(twentyFiveHoursEarlier.minusSeconds(115)).environment(env2).build();
+            ExecutionSummary se45 = scenarioExecutionBuilder().executionId(46L).time(twentyFiveHoursEarlier.minusSeconds(125)).environment(env3).build();
+            ExecutionSummary se46 = scenarioExecutionBuilder().executionId(45L).time(twentyFiveHoursEarlier.minusSeconds(125)).environment(env2).build();
+            ExecutionSummary se47 = scenarioExecutionBuilder().executionId(44L).time(twentyFiveHoursEarlier.minusSeconds(135)).environment(env1).build();
+            ExecutionSummary se48 = scenarioExecutionBuilder().executionId(43L).time(twentyFiveHoursEarlier.minusSeconds(145)).environment(env1).status(FAILURE).build();
+            ExecutionSummary se49 = scenarioExecutionBuilder().executionId(42L).time(twentyFiveHoursEarlier.minusSeconds(155)).environment(env1).build();
+            ExecutionSummary se50_ce3 = scenarioExecutionBuilder().executionId(41L).time(twentyFiveHoursEarlier.minusSeconds(165)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se51 = scenarioExecutionBuilder().executionId(40L).time(twentyFiveHoursEarlier.minusSeconds(175)).environment(env1).status(FAILURE).build();
+            ExecutionSummary se52_ce17 = scenarioExecutionBuilder().executionId(39L).time(twentyFiveHoursEarlier.minusSeconds(185)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se53 = scenarioExecutionBuilder().executionId(38L).time(twentyFiveHoursEarlier.minusSeconds(195)).environment(env3).build();
+            ExecutionSummary se54_ce8 = scenarioExecutionBuilder().executionId(37L).time(twentyFiveHoursEarlier.minusSeconds(195)).environment(env2).build();
+            ExecutionSummary se55_ce9 = scenarioExecutionBuilder().executionId(36L).time(twentyFiveHoursEarlier.minusSeconds(205)).environment(env2).status(FAILURE).build();
+            ExecutionSummary se56 = scenarioExecutionBuilder().executionId(35L).time(twentyFiveHoursEarlier.minusSeconds(215)).environment(env1).status(FAILURE).build();
+            ExecutionSummary se57_ce14 = scenarioExecutionBuilder().executionId(34L).time(twentyFiveHoursEarlier.minusSeconds(225)).environment(env1).build();
+            ExecutionSummary se58_ce14 = scenarioExecutionBuilder().executionId(33L).time(twentyFiveHoursEarlier.minusSeconds(235)).environment(env1).status(FAILURE).build();
+            ExecutionSummary se59_ce18 = scenarioExecutionBuilder().executionId(32L).time(twentyFiveHoursEarlier.minusSeconds(245)).environment(env2).build();
+            ExecutionSummary se60 = scenarioExecutionBuilder().executionId(31L).time(twentyFiveHoursEarlier.minusSeconds(255)).environment(env3).build();
+            ExecutionSummary se61_ce4 = scenarioExecutionBuilder().executionId(30L).time(twentyFiveHoursEarlier.minusSeconds(265)).environment(env1).build();
 
             // First campaign executions - env1
             CampaignExecution ce1 = buildCampaignExecution(18L, campaignId1, tuple(scenarioId1, se1_ce1), tuple(scenarioId2, se30_ce1));

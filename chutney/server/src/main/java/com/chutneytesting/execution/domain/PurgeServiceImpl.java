@@ -219,6 +219,7 @@ public class PurgeServiceImpl implements PurgeService {
         /**
          * Purge executions.
          * <p> Find all base objects ids and map them to executions.</p>
+         * <p> Keep only executions before last 24 hours.</p>
          * <p>For each group of executions, filter then group them by environment.</p>
          * <p>For each group of executions by environment,</p>
          * <p>permits a specific handle via {@link #handleExecutionsForOneEnvironment(List)}</p>
@@ -228,11 +229,13 @@ public class PurgeServiceImpl implements PurgeService {
          */
         Set<Long> purgeExecutions() {
             Set<Long> deletedExecutionsIds = new HashSet<>();
+            LocalDateTime twentyFourHoursEarlier = LocalDateTime.now().minusHours(24);
             baseObject.get().stream()
                 .map(idFunction)
                 .map(executionsFunction)
                 .forEach(executionsReports -> {
                     var executionsByEnvironment = executionsReports.stream()
+                        .filter(execution -> executionDateFunction.apply(execution).isBefore(twentyFourHoursEarlier))
                         .filter(executionsFilter)
                         .collect(groupingBy(t -> {
                             var env = environmentFunction.apply(t);
