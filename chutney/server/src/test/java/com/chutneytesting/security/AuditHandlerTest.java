@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
-import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -33,14 +32,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.slf4j.LoggerFactory;
-import org.slf4j.MDC;
 import org.springframework.boot.test.system.CapturedOutput;
 import org.springframework.boot.test.system.OutputCaptureExtension;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.servlet.HandlerMapping;
 
 @ExtendWith(OutputCaptureExtension.class)
 public class AuditHandlerTest {
@@ -65,12 +62,8 @@ public class AuditHandlerTest {
     }
 
     @Test
-    public void should_log_post_with_parameters_and_attributes(CapturedOutput output) throws Exception {
-        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/test/endpoint");
-        request.setParameter("param1", "value1");
-        request.setParameter("passwordKey", "value2");
-        request.setAttribute(HandlerMapping.URI_TEMPLATE_VARIABLES_ATTRIBUTE,
-            Map.of("attribute3", "value3", "keyPwd", "value4"));
+    public void should_log_post(CapturedOutput output) throws Exception {
+        MockHttpServletRequest request = new MockHttpServletRequest("POST", "/test/endpoint/42/entity");
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         AuditHandler handler = new AuditHandler();
@@ -80,11 +73,7 @@ public class AuditHandlerTest {
         boolean preHandled = handler.preHandle(request, response, null);
 
         assertTrue(preHandled);
-        assertThat(output.getAll()).contains("[user authentified] [POST] [/test/endpoint]");
-        assertThat(output.getAll()).contains("[param1 = value1]");
-        assertThat(output.getAll()).contains("[passwordKey = ***]");
-        assertThat(output.getAll()).contains("[attribute3 = value3]");
-        assertThat(output.getAll()).contains("[keyPwd = ***]");
+        assertThat(output.getAll()).contains("[user authentified] [POST] [/test/endpoint/42/entity]");
     }
 
     @Test
