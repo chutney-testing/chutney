@@ -26,7 +26,7 @@ class ChutneyEnvironmentDslTest {
 
     }
     @Test
-    fun `Test duplicate taget name in environment`() {
+    fun `Test duplicate target name in environment`() {
         val targets: List<ChutneyTarget> = listOf(
             ChutneyTarget("toto", "url1"),
             ChutneyTarget("toto","url2"),

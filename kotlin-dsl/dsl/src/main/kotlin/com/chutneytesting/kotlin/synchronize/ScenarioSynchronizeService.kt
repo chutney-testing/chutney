@@ -92,7 +92,7 @@ private fun createJsonFile(pathCreated: String, id: Int?, scenario: ChutneyScena
 }
 
 private fun getFileName(id: Int?, title: String) =
-    (id?.let { id.toString() + "-" } ?: "") + title + ".chutney.json"
+    (id?.let { "$id-" } ?: "") + title + ".chutney.json"
 
 private fun getJsonFile(path: String, scenario: ChutneyScenario): File? {
     return File(path).walkTopDown().filter { it.isFile }

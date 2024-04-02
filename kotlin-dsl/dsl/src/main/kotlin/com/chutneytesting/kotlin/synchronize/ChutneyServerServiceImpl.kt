@@ -2,16 +2,20 @@ package com.chutneytesting.kotlin.synchronize
 
 import com.chutneytesting.environment.api.environment.dto.EnvironmentDto
 import com.chutneytesting.kotlin.dsl.ChutneyScenario
+import com.chutneytesting.kotlin.dsl.Dataset
 import com.chutneytesting.kotlin.dsl.Mapper
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
 import com.chutneytesting.kotlin.util.HttpClient
 import com.chutneytesting.kotlin.util.HttpClientException
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.commons.text.StringEscapeUtils.escapeJson
+import java.util.*
 
 interface ChutneyServerService {
     fun getAllScenarios(serverInfo: ChutneyServerInfo): List<LinkedHashMap<String, Any>>
     fun createOrUpdateJsonScenario(serverInfo: ChutneyServerInfo, scenario: ChutneyScenario): Int
     fun getEnvironments(serverInfo: ChutneyServerInfo): Set<EnvironmentDto>
+    fun createOrUpdateDataset(serverInfo: ChutneyServerInfo, dataset: Dataset)
 }
 
 object ChutneyServerServiceImpl : ChutneyServerService {
@@ -44,7 +48,7 @@ object ChutneyServerServiceImpl : ChutneyServerService {
         }
     }
 
-    fun updateJsonScenario(
+    private fun updateJsonScenario(
         serverInfo: ChutneyServerInfo,
         scenario: ChutneyScenario,
         remoteScenario: LinkedHashMap<String, Any>
@@ -123,5 +127,37 @@ object ChutneyServerServiceImpl : ChutneyServerService {
 
     override fun getEnvironments(serverInfo: ChutneyServerInfo): Set<EnvironmentDto> {
         return HttpClient.get(serverInfo, "/api/v2/environment")
+    }
+
+    private const val chutneyDatasetEndpoint = "/api/v1/datasets"
+    private fun Dataset.payload(): String {
+        val om = ObjectMapper()
+        return """
+        {
+          "id": "$id",
+          "name": "$name",
+          "description": "$description",
+          "uniqueValues": ${om.writeValueAsString(uniqueValues)},
+          "multipleValues": ${om.writeValueAsString(multipleValues)},
+          "tags": ${om.writeValueAsString(tags)}
+        }
+    """.trimIndent()
+    }
+
+    override fun createOrUpdateDataset(serverInfo: ChutneyServerInfo, dataset: Dataset) {
+        findDatasetById(serverInfo, dataset.id).ifPresentOrElse(
+            { _ -> HttpClient.put<Dataset>(serverInfo, chutneyDatasetEndpoint, dataset.payload()) },
+            { HttpClient.post<Dataset>(serverInfo, chutneyDatasetEndpoint, dataset.payload()) }
+        )
+    }
+
+    private fun findDatasetById(serverInfo: ChutneyServerInfo, id: String): Optional<Dataset> {
+        return try {
+            Optional.of(
+                HttpClient.get<Dataset>(serverInfo, "${chutneyDatasetEndpoint}/${id}")
+            )
+        } catch (e: Exception) {
+            Optional.empty()
+        }
     }
 }
