@@ -60,13 +60,13 @@
                                 ngbTooltip="{{'global.actions.edit' | translate}}">
                             <i class="bi bi-pen-fill"></i>
                         </button>
-                        <chutney-delete-confirm-dialog
+                        <chutney-confirm-dialog
                             [dialogMessage]="('global.confirm.question' | translate) + ' ' + ('global.actions.delete' | translate) + '\n' + variableKey"
                             [label]="'Delete Environment'"
                             [btnSizeClass]="'sm'"
-                            (deleteEvent)="delete(variableKey)"
+                            (callbackEvent)="delete(variableKey)"
                             class="ms-2">
-                        </chutney-delete-confirm-dialog>
+                        </chutney-confirm-dialog>
                     </div>
                 </td>
             </ng-container>

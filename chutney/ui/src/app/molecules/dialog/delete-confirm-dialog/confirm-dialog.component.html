@@ -1,15 +1,15 @@
 <button *ngIf="type === 'trash-button'" type="button" class="btn {{btnSizeClass ? 'btn-' + btnSizeClass : ''}} btn-{{btnColor ? btnColor : 'danger'}} trash-btn"
         (click)="openModal(template)"
         [attr.disabled]="disabledBoolean(disabled)"
-        ngbTooltip="{{'global.actions.delete' | translate}}"
+        ngbTooltip="{{title | translate}}"
         placement="top" container="body">
-    <span class="fa {{btnClassIcon ? btnClassIcon : 'fa-trash'}}"></span>
+    <span class="fa {{btnClassIcon}}"></span>
 </button>
 <chutney-link *ngIf="type === 'link'" [model]="label" (click)="openModal(template)">
 </chutney-link>
 <ng-template #template>
     <div class="modal-body text-center">
-        <p>{{dialogMessage ? dialogMessage : ('global.confirm.delete' | translate)}}</p>
+        <p>{{dialogMessage  | translate }}</p>
         <button type="button" class="btn btn-default" (click)="confirm()">{{'global.confirm.yes' | translate}}</button>
         <button id="no-btn" type="button" class="btn btn-primary" (click)="decline()">{{'global.confirm.no' | translate}}</button>
     </div>

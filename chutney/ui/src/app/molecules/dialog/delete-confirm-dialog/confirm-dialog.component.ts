@@ -21,23 +21,22 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { disabledBoolean } from '@shared/tools/bool-utils';
 
 @Component({
-    selector: 'chutney-delete-confirm-dialog',
-    templateUrl: './delete-confirm-dialog.component.html',
-    styleUrls: ['./delete-confirm-dialog.component.scss']
+    selector: 'chutney-confirm-dialog',
+    templateUrl: './confirm-dialog.component.html',
+    styleUrls: ['./confirm-dialog.component.scss']
 })
-export class DeleteConfirmDialogComponent {
+export class ConfirmDialogComponent {
 
     modalRef: BsModalRef;
-    @Input() dialogMessage: string;
+    @Input() dialogMessage: string= "global.confirm.delete";
     @Input() type = 'trash-button';
     @Input() label: string;
-    @Input() title: string;
+    @Input() title: string = "global.actions.delete";
     @Input() disabled = false;
     @Input() btnSizeClass: 'lg' | 'sm';
-    @Input() btnClassIcon: string;
+    @Input() btnClassIcon: string= "fa-trash";
     @Input() btnColor: string;
-    @Output() deleteEvent = new EventEmitter();
-
+    @Output() callbackEvent = new EventEmitter();
     disabledBoolean = disabledBoolean;
 
     constructor(private modalService: BsModalService) {
@@ -50,7 +49,7 @@ export class DeleteConfirmDialogComponent {
 
     confirm(): void {
         this.modalRef.hide();
-        this.deleteEvent.emit();
+        this.callbackEvent.emit();
     }
 
     decline(): void {
