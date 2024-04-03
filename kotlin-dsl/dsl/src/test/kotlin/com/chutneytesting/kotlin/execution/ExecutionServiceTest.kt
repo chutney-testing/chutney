@@ -115,4 +115,24 @@ class ExecutionServiceTest {
         assertThat(report.steps[0].steps[1].name).isEqualTo("1 step description - A - B") // Second Iteration
     }
 
+    @Test
+    fun `should iterate once over dataset constants`() {
+        val constants = mapOf(
+            "key1" to "X",
+            "key2" to "Y"
+        )
+        val scenario = Scenario(title = "scenario with for") {
+            When("<i> step description - \${#key1} - \${#key2}", strategy = ForStrategy()) {
+                SuccessAction(
+                )
+            }
+        }
+        val sut = ExecutionService()
+        val report = sut.waitLastReport(sut.execute(scenario, constants = constants))
+
+        assertThat(report.status).isEqualTo(StatusDto.SUCCESS)
+        assertThat(report.steps[0].steps).hasSize(1)
+        assertThat(report.steps[0].steps[0].name).isEqualTo("0 step description - X - Y") // First Iteration
+    }
+
 }

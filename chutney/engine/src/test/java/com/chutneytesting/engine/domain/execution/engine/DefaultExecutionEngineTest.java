@@ -197,7 +197,7 @@ class DefaultExecutionEngineTest {
     }
 
     @Test
-    void should_set_dataset_and_constants_in_scenario_context() {
+    void should_set_dataset_datatable_and_constants_in_scenario_context() {
         // Given
         when(stepExecutionStrategies.buildStrategyFrom(any())).thenReturn(DefaultStepExecutionStrategy.instance);
 
@@ -223,6 +223,34 @@ class DefaultExecutionEngineTest {
         assertThat(report.scenarioContext).contains(entry("keyA", "A"));
         assertThat(report.scenarioContext).contains(entry("keyB", "B"));
         assertThat(report.scenarioContext).contains(entry("dataset", datatable));
+    }
+
+    @Test
+    void should_set_dataset_constants_as_dataset_in_scenario_context_when_datatable_is_empty() {
+        // Given
+        when(stepExecutionStrategies.buildStrategyFrom(any())).thenReturn(DefaultStepExecutionStrategy.instance);
+
+        ActionTemplateRegistry actionTemplateRegistry = mock(ActionTemplateRegistry.class);
+        when(actionTemplateRegistry.getByIdentifier(any())).thenReturn(Optional.empty());
+        when(delegationService.findExecutor(any())).thenReturn(new DefaultStepExecutor(actionTemplateRegistry));
+
+        StepDefinition stepDefinition = new StepDefinition("fakeScenario", null, "", null, emptyMap(), emptyList(), emptyMap(), emptyMap());
+
+        Map<String, String> constants = Map.of("keyA", "A", "keyB", "B");
+        Dataset dataset = new Dataset(constants, emptyList());
+
+        Reporter reporter = new Reporter();
+
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor);
+
+        // When
+        Long executionId = sut.execute(stepDefinition, dataset, createScenarioExecution(null), fakeEnvironment);
+        StepExecutionReport report = reporter.subscribeOnExecution(executionId).blockingLast();
+
+        // Then
+        assertThat(report.scenarioContext).contains(entry("keyA", "A"));
+        assertThat(report.scenarioContext).contains(entry("keyB", "B"));
+        assertThat(report.scenarioContext).contains(entry("dataset", List.of(constants)));
     }
 
     @Test
