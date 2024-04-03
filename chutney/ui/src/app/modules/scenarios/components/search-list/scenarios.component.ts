@@ -97,31 +97,42 @@ export class ScenariosComponent implements OnInit, OnDestroy {
             );
         });
 
-        this.fetchAndUpdateScenario()
-        this.scenarioUpdatesubscription = interval(3000).subscribe(() => {
-            this.fetchAndUpdateScenario()
-        });
+        this.fetchAndUpdateScenario().then(scenarios => {
+            if (!this.noScenarioIsRunning(scenarios)) {
+                this.scenarioUpdatesubscription = interval(3000).subscribe(() => {
+                    this.fetchAndUpdateScenario().then(scenariosSubcription => {
+                        if (this.noScenarioIsRunning(scenariosSubcription)) {
+                            this.scenarioUpdatesubscription.unsubscribe();
+                        }
+                    })
+                })
+            };
+        })
     }
 
     ngOnDestroy(): void {
-        if (this.urlParams) {
-            this.urlParams.unsubscribe();
-        }
+        this.urlParams?.unsubscribe();
+        this.scenarioUpdatesubscription?.unsubscribe();
     }
 
-    private fetchAndUpdateScenario(): void {
-        this.getScenarios()
-            .then(r => {
+    private fetchAndUpdateScenario(): Promise<Array<ScenarioIndex>> {
+        return this.getScenarios()
+            .then<Array<ScenarioIndex>>(r => {
                 this.scenarios = r || [];
                 this.applyDefaultState();
                 this.applySavedState();
                 this.applyUriState();
                 this.applyFilters();
-                if (r.filter(scenario => scenario.status == "RUNNING").length == 0) {
-                    this.scenarioUpdatesubscription.unsubscribe()
-                }
+                return r
             })
-            .catch(err => console.log(err));
+            .catch(err => {
+                console.log(err);
+                return [];
+            });
+    }
+
+    private noScenarioIsRunning(scenarios: Array<ScenarioIndex>) : boolean {
+        return scenarios.filter(scenario => scenario.status == "RUNNING").length == 0
     }
 
     private initFilters() {
@@ -182,7 +193,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
                         }
                     }
                     this.applyFilters();
-                    this.ngOnDestroy();
+                    this.urlParams?.unsubscribe()
                 },
                 (error) => console.log(error)))
             .subscribe();
