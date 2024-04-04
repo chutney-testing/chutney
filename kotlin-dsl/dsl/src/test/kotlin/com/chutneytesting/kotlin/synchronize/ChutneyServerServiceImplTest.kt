@@ -1,6 +1,7 @@
 package com.chutneytesting.kotlin.synchronize
 
 import com.chutneytesting.kolin.util.ChutneyServerInfoClearProperties
+import com.chutneytesting.kotlin.dsl.Campaign
 import com.chutneytesting.kotlin.dsl.Dataset
 import com.chutneytesting.kotlin.dsl.Dataset.KeyValue
 import com.chutneytesting.kotlin.dsl.Scenario
@@ -400,6 +401,129 @@ class ChutneyServerServiceImplTest {
             assertThat(createRequestReceived.get("tags")).hasSize(2)
                 .map<String> { jsonNode -> jsonNode.textValue() }
                 .containsExactly("TAG_1", "TAG_2")
+        }
+    }
+
+    @Nested
+    inner class Campaigns {
+
+        @Nested
+        inner class NewRemoteCampaign {
+            @Test
+            fun new_id_from_remote() {
+                // Given
+                val campaign = Campaign(title = "Campaign title", tags = setOf("TAG_1", "TAG_2"))
+                val newIdFromRemote = 666
+
+                val createStub = wireMockServer.stubFor(
+                    post(urlPathMatching("/api/ui/campaign/v1"))
+                        .willReturn(
+                            okJson(
+                                """
+                                {
+                                  "id": $newIdFromRemote,
+                                  "title": "${campaign.title}",
+                                  "description": "",
+                                  "scenarioIds": [],
+                                  "campaignExecutionReports": [],
+                                  "environment": "DEFAULT",
+                                  "parallelRun": false,
+                                  "retryAuto": false,
+                                  "tags": ["TAG_1", "TAG_2"]
+                                }
+                            """.trimIndent()
+                            )
+                        )
+                )
+
+                // When
+                val id = ChutneyServerServiceImpl.createOrUpdateCampaign(
+                    buildServerInfo(),
+                    campaign
+                )
+
+                // Then
+                assertThat(wireMockServer.allServeEvents).hasSize(1)
+                wireMockServer.verify(1, postRequestedFor(createStub.request.urlMatcher))
+                assertThat(id).isEqualTo(newIdFromRemote)
+
+                val createRequestReceived = serverEventRequestBodyAsJson(
+                    wireMockServer.getServeEvents(forStubMapping(createStub.id)).requests[0]
+                )
+                assertThat(createRequestReceived.get("id")).isNull()
+                assertThat(createRequestReceived.get("title").textValue()).isEqualTo(campaign.title)
+                assertThat(createRequestReceived.get("environment").textValue()).isEqualTo(campaign.environment)
+                assertThat(createRequestReceived.get("parallelRun").booleanValue()).isEqualTo(campaign.parallelRun)
+                assertThat(createRequestReceived.get("retryAuto").booleanValue()).isEqualTo(campaign.retryAuto)
+                assertThat(createRequestReceived.get("scenarioIds")).isEmpty()
+                assertThat(createRequestReceived.get("tags")).hasSize(2)
+                    .map<String> { jsonNode -> jsonNode.textValue() }
+                    .containsExactly("TAG_1", "TAG_2")
+            }
+
+            @Test
+            fun id_from_code() {
+                // Given
+                val campaign = Campaign(
+                    id = 666,
+                    title = "Campaign title",
+                    description = "Campaign description",
+                    scenarioIds = listOf(111, 666, 8888),
+                    environment = "STAGING",
+                    parallelRun = true,
+                    retryAuto = true,
+                    datasetId = "DATASET",
+                    tags = setOf("TAG_1", "TAG_2")
+                )
+
+                val createStub = wireMockServer.stubFor(
+                    post(urlPathMatching("/api/ui/campaign/v1"))
+                        .willReturn(
+                            okJson(
+                                """
+                                {
+                                  "id": ${campaign.id},
+                                  "title": "${campaign.title}",
+                                  "description": "",
+                                  "scenarioIds": ["111", "666", "8888"],
+                                  "campaignExecutionReports": [],
+                                  "datasetId": "${campaign.datasetId}",
+                                  "environment": "${campaign.environment}",
+                                  "parallelRun": ${campaign.parallelRun},
+                                  "retryAuto": ${campaign.retryAuto},
+                                  "tags": ["TAG_1", "TAG_2"]
+                                }
+                            """.trimIndent()
+                            )
+                        )
+                )
+
+                // When
+                val id = ChutneyServerServiceImpl.createOrUpdateCampaign(
+                    buildServerInfo(),
+                    campaign
+                )
+
+                // Then
+                assertThat(wireMockServer.allServeEvents).hasSize(1)
+                wireMockServer.verify(1, postRequestedFor(createStub.request.urlMatcher))
+                assertThat(id).isEqualTo(campaign.id)
+
+                val createRequestReceived = serverEventRequestBodyAsJson(
+                    wireMockServer.getServeEvents(forStubMapping(createStub.id)).requests[0]
+                )
+                assertThat(createRequestReceived.get("id").intValue()).isEqualTo(campaign.id)
+                assertThat(createRequestReceived.get("title").textValue()).isEqualTo(campaign.title)
+                assertThat(createRequestReceived.get("environment").textValue()).isEqualTo(campaign.environment)
+                assertThat(createRequestReceived.get("parallelRun").booleanValue()).isEqualTo(campaign.parallelRun)
+                assertThat(createRequestReceived.get("retryAuto").booleanValue()).isEqualTo(campaign.retryAuto)
+                assertThat(createRequestReceived.get("scenarioIds")).hasSize(3)
+                    .map<String> { jsonNode -> jsonNode.textValue() }
+                    .containsExactlyElementsOf(campaign.scenarioIds.map(Int::toString))
+                assertThat(createRequestReceived.get("tags")).hasSize(2)
+                    .map<String> { jsonNode -> jsonNode.textValue() }
+                    .containsExactlyInAnyOrderElementsOf(campaign.tags)
+            }
         }
     }
 

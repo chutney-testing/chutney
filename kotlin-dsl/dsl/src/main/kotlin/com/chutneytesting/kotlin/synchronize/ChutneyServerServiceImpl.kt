@@ -1,6 +1,7 @@
 package com.chutneytesting.kotlin.synchronize
 
 import com.chutneytesting.environment.api.environment.dto.EnvironmentDto
+import com.chutneytesting.kotlin.dsl.Campaign
 import com.chutneytesting.kotlin.dsl.ChutneyScenario
 import com.chutneytesting.kotlin.dsl.Dataset
 import com.chutneytesting.kotlin.dsl.Mapper
@@ -16,6 +17,7 @@ interface ChutneyServerService {
     fun createOrUpdateJsonScenario(serverInfo: ChutneyServerInfo, scenario: ChutneyScenario): Int
     fun getEnvironments(serverInfo: ChutneyServerInfo): Set<EnvironmentDto>
     fun createOrUpdateDataset(serverInfo: ChutneyServerInfo, dataset: Dataset)
+    fun createOrUpdateCampaign(serverInfo: ChutneyServerInfo, campaign: Campaign): Int
 }
 
 object ChutneyServerServiceImpl : ChutneyServerService {
@@ -159,5 +161,28 @@ object ChutneyServerServiceImpl : ChutneyServerService {
         } catch (e: Exception) {
             Optional.empty()
         }
+    }
+
+    private const val chutneyCampaignEndpoint = "/api/ui/campaign/v1"
+    private fun Campaign.payload(): String {
+        val om = ObjectMapper()
+        return """
+        {
+          ${Optional.ofNullable(id).map { l -> "\"id\": $l," }.orElseGet { "" }}
+          "title": "$title",
+          "description": "$description",
+          "scenarioIds": ${om.writeValueAsString(scenarioIds.map(Int::toString))},
+          "environment": "$environment",
+          "parallelRun": $parallelRun,
+          "retryAuto": $retryAuto,
+          ${Optional.ofNullable(datasetId).map { d -> "\"datasetId\": \"$d\"," }.orElseGet { "" }}
+          "tags": ${om.writeValueAsString(tags)}
+        }
+    """.trimIndent()
+    }
+
+    override fun createOrUpdateCampaign(serverInfo: ChutneyServerInfo, campaign: Campaign): Int {
+        val result = HttpClient.post<HashMap<String, Any>>(serverInfo, chutneyCampaignEndpoint, campaign.payload())
+        return result["id"] as Int
     }
 }
