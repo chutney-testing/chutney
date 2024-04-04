@@ -16,6 +16,7 @@
 
 package com.chutneytesting.campaign.infra;
 
+import static java.util.Collections.emptyList;
 import static org.apache.commons.lang3.Validate.notBlank;
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -33,7 +34,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -50,7 +50,7 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     private final CampaignJpaRepository campaignJpaRepository;
     private final DatabaseExecutionJpaRepository scenarioExecutionJpaRepository;
     private final TestCaseRepository testCaseRepository;
-    private final Map<Long, CampaignExecution> currentCampaignExecutions = new ConcurrentHashMap<>();
+    private final Map<Long, List<CampaignExecution>> currentCampaignExecutions = new ConcurrentHashMap<>();
 
     public CampaignExecutionDBRepository(
         CampaignExecutionJpaRepository campaignExecutionJpaRepository,
@@ -64,24 +64,27 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     }
 
     @Override
-    public Optional<CampaignExecution> currentExecution(Long campaignId) {
-        return Optional.ofNullable(campaignId)
-            .map(id -> currentCampaignExecutions.get(campaignId));
-    }
-
-    @Override
-    public List<CampaignExecution> currentExecutions() {
-        return new ArrayList<>(currentCampaignExecutions.values());
+    public List<CampaignExecution> currentExecutions(Long campaignId) {
+        return currentCampaignExecutions.getOrDefault(campaignId, emptyList());
     }
 
     @Override
     public void startExecution(Long campaignId, CampaignExecution campaignExecution) {
-        currentCampaignExecutions.put(campaignId, campaignExecution);
+        List<CampaignExecution> campaignExecutions = new ArrayList<>();
+        if (currentCampaignExecutions.containsKey(campaignId)) {
+            campaignExecutions = currentCampaignExecutions.get(campaignId);
+        }
+        campaignExecutions.add(campaignExecution);
+        currentCampaignExecutions.put(campaignId, campaignExecutions);
     }
 
     @Override
-    public void stopExecution(Long campaignId) {
-        currentCampaignExecutions.remove(campaignId);
+    public void stopExecution(Long campaignId, String environment) {
+        currentCampaignExecutions.get(campaignId)
+            .removeIf(exec -> exec.executionEnvironment.equals(environment));
+        if (currentCampaignExecutions.get(campaignId).isEmpty()) {
+            currentCampaignExecutions.remove(campaignId);
+        }
     }
 
     @Override
@@ -176,8 +179,8 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     }
 
     private boolean isCampaignExecutionRunning(CampaignExecutionEntity campaignExecutionEntity) {
-        return currentExecution(campaignExecutionEntity.campaignId())
-            .map(cer -> cer.executionId.equals(campaignExecutionEntity.id()))
-            .orElse(false);
+        return currentExecutions(campaignExecutionEntity.campaignId())
+            .stream()
+            .anyMatch(exec -> exec.executionId.equals(campaignExecutionEntity.id()));
     }
 }
