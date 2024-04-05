@@ -147,19 +147,20 @@ object ChutneyServerServiceImpl : ChutneyServerService {
     }
 
     override fun createOrUpdateDataset(serverInfo: ChutneyServerInfo, dataset: Dataset) {
-        findDatasetById(serverInfo, dataset.id).ifPresentOrElse(
-            { _ -> HttpClient.put<Dataset>(serverInfo, chutneyDatasetEndpoint, dataset.payload()) },
-            { HttpClient.post<Dataset>(serverInfo, chutneyDatasetEndpoint, dataset.payload()) }
-        )
+        if (findDatasetById(serverInfo, dataset.id)) {
+            HttpClient.put<HashMap<String, Any>>(serverInfo, chutneyDatasetEndpoint, dataset.payload())
+        } else {
+            HttpClient.post<HashMap<String, Any>>(serverInfo, chutneyDatasetEndpoint, dataset.payload())
+        }
     }
 
-    private fun findDatasetById(serverInfo: ChutneyServerInfo, id: String): Optional<Dataset> {
+    private fun findDatasetById(serverInfo: ChutneyServerInfo, id: String): Boolean {
         return try {
-            Optional.of(
-                HttpClient.get<Dataset>(serverInfo, "${chutneyDatasetEndpoint}/${id}")
-            )
+            Optional.ofNullable(
+                HttpClient.get<HashMap<String, Any>>(serverInfo, "${chutneyDatasetEndpoint}/${id}")["id"]
+            ).map { true }.orElseGet { false }
         } catch (e: Exception) {
-            Optional.empty()
+            false
         }
     }
 

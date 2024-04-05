@@ -17,19 +17,14 @@
 
 package com.chutneytesting.kotlin.dsl
 
-import java.time.Instant
-
 data class Dataset(
-    val name: String = "",
+    val name: String,
     val description: String = "",
     val uniqueValues: Set<KeyValue> = emptySet(),
     val multipleValues: List<List<KeyValue>> = emptyList(),
     val tags: Set<String> = emptySet()
 ) {
     val id: String = name
-    // Keep it for jackson deserialization
-    val version: Int = 0
-    val lastUpdated: Instant = Instant.now()
 
     data class KeyValue(val key: String, val value: String)
 }
