@@ -102,23 +102,24 @@ private object ChutneyScenarioJSONSerializer {
     private fun getJsonFile(path: String, scenario: ChutneyScenario): File? {
         return File(path).walkTopDown().filter { it.isFile }
             .firstOrNull {
-                val chutneyScenarioIdFromFileName = getChutneyScenarioIdFromFileName(it.name)
-                val sameId = scenario.id != null && scenario.id == chutneyScenarioIdFromFileName
-                val sameName = it.name.equals(scenario.fileName(), ignoreCase = true)
+                val idAndNameFromFileName = getChutneyScenarioIdFromFileName(it.name)
+                val sameId = scenario.id != null && scenario.id == idAndNameFromFileName.first
+                val sameName = idAndNameFromFileName.second.equals(scenario.noIdFileName(), ignoreCase = true)
                 sameId || sameName
             }
     }
 
-    private fun getChutneyScenarioIdFromFileName(fileName: String): Int? {
-        val dashIndex = fileName.indexOf("-")
+    private fun getChutneyScenarioIdFromFileName(fileName: String): Pair<Int?, String> {
+        val idAndName = fileName.split("-")
         return try {
-            if (dashIndex > 0) Integer.valueOf(fileName.substring(0, dashIndex)) else null
+            if (idAndName.size > 1) (Integer.valueOf(idAndName[0]) to idAndName[1]) else (null to idAndName[0])
         } catch (e: Exception) {
-            null
+            null to ""
         }
     }
 
-    private fun ChutneyScenario.fileName() = (id?.let { "$id-" } ?: "") + title + ".chutney.json"
+    private fun ChutneyScenario.fileName() = (id?.let { "$id-" } ?: "") + this.noIdFileName()
+    private fun ChutneyScenario.noIdFileName() = "$title.chutney.json"
 
     private fun updateJsonFile(file: File, scenario: ChutneyScenario) {
         file.writeText(scenario.toString())
