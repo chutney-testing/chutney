@@ -114,6 +114,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <jmxPort>54321</jmxPort>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>com.github.ulisesbocchio</groupId>
