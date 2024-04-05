@@ -16,8 +16,8 @@
 
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Subscription, interval } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
+import { Observable, Subject, Subscription, interval } from 'rxjs';
+import { catchError, debounceTime, map, mergeMap, takeWhile } from 'rxjs/operators';
 
 import {
     distinct,
@@ -97,17 +97,19 @@ export class ScenariosComponent implements OnInit, OnDestroy {
             );
         });
 
-        this.fetchAndUpdateScenario().then(scenarios => {
+        this.fetchAndUpdateScenario().pipe(map(scenarios => {
             if (!this.noScenarioIsRunning(scenarios)) {
-                this.scenarioUpdatesubscription = interval(3000).subscribe(() => {
-                    this.fetchAndUpdateScenario().then(scenariosSubcription => {
-                        if (this.noScenarioIsRunning(scenariosSubcription)) {
-                            this.scenarioUpdatesubscription.unsubscribe();
-                        }
-                    })
-                })
+                this.subscribeForScenarios()
             };
-        })
+        })).subscribe()
+    }
+
+    private subscribeForScenarios() {
+        interval(3000)
+        .pipe(
+            mergeMap(() => this.fetchAndUpdateScenario()),
+            takeWhile(t => !this.noScenarioIsRunning(t)))
+        .subscribe()
     }
 
     ngOnDestroy(): void {
@@ -115,24 +117,24 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         this.scenarioUpdatesubscription?.unsubscribe();
     }
 
-    private fetchAndUpdateScenario(): Promise<Array<ScenarioIndex>> {
+    private fetchAndUpdateScenario(): Observable<Array<ScenarioIndex>> {
         return this.getScenarios()
-            .then<Array<ScenarioIndex>>(r => {
+        .pipe(
+            map(r => {
                 this.scenarios = r || [];
                 this.applyDefaultState();
                 this.applySavedState();
                 this.applyUriState();
                 this.applyFilters();
                 return r
-            })
-            .catch(err => {
-                console.log(err);
+            }),
+            catchError(err => {
                 return [];
-            });
+            }));
     }
 
     private noScenarioIsRunning(scenarios: Array<ScenarioIndex>) : boolean {
-        return scenarios.filter(scenario => scenario.status == "RUNNING").length == 0
+        return scenarios.filter(scenario => scenario.status === ExecutionStatus.RUNNING).length == 0
     }
 
     private initFilters() {
@@ -145,8 +147,8 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         return {id: id, text: label };
     }
 
-    private async getScenarios() {
-        return this.scenarioService.findScenarios().toPromise();
+    private getScenarios(): Observable<Array<ScenarioIndex>> {
+        return this.scenarioService.findScenarios();
     }
 
     private applyDefaultState() {
