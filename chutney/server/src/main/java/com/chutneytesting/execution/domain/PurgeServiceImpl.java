@@ -40,6 +40,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -61,11 +62,31 @@ public class PurgeServiceImpl implements PurgeService {
         Integer maxScenarioExecutionsConfiguration,
         Integer maxCampaignExecutionsConfiguration
     ) {
+        this(testCaseRepository,
+            executionsRepository,
+            campaignRepository,
+            campaignExecutionRepository,
+            maxScenarioExecutionsConfiguration,
+            null,
+            maxCampaignExecutionsConfiguration,
+            null);
+    }
+
+    public PurgeServiceImpl(
+        TestCaseRepository testCaseRepository,
+        ExecutionHistoryRepository executionsRepository,
+        CampaignRepository campaignRepository,
+        CampaignExecutionRepository campaignExecutionRepository,
+        Integer maxScenarioExecutionsConfiguration,
+        LocalDateTime maxScenarioExecutionsDateConfiguration,
+        Integer maxCampaignExecutionsConfiguration,
+        LocalDateTime maxCampaignExecutionsDateConfiguration
+        ) {
         Integer maxScenarioExecutions = validateConfigurationLimit(maxScenarioExecutionsConfiguration, "maxScenarioExecutions");
         Integer maxCampaignExecutions = validateConfigurationLimit(maxCampaignExecutionsConfiguration, "maxCampaignExecutions");
 
-        this.scenarioPurgeService = buildScenarioService(testCaseRepository, executionsRepository, maxScenarioExecutions);
-        this.campaignPurgeService = buildCampaignService(campaignRepository, campaignExecutionRepository, maxCampaignExecutions);
+        this.scenarioPurgeService = buildScenarioService(testCaseRepository, executionsRepository, maxScenarioExecutions, maxScenarioExecutionsDateConfiguration);
+        this.campaignPurgeService = buildCampaignService(campaignRepository, campaignExecutionRepository, maxCampaignExecutions, maxCampaignExecutionsDateConfiguration);
     }
 
     private static Integer validateConfigurationLimit(Integer configurationLimit, String configName) {
@@ -79,14 +100,14 @@ public class PurgeServiceImpl implements PurgeService {
     private static PurgeExecutionService<TestCaseMetadata, String, ExecutionSummary> buildScenarioService(
         TestCaseRepository testCaseRepository,
         ExecutionHistoryRepository executionsRepository,
-        Integer maxScenarioExecutions
-    ) {
+        Integer maxScenarioExecutions,
+        LocalDateTime maxScenarioExecutionsDateConfiguration) {
         return new PurgeExecutionService<>(
             maxScenarioExecutions,
             testCaseRepository::findAll,
             TestCaseMetadata::id,
             executionsRepository::getExecutions,
-            es -> es.campaignReport().isEmpty(),
+            es -> es.campaignReport().isEmpty() && Optional.ofNullable(maxScenarioExecutionsDateConfiguration).map(es.time()::isBefore).orElse(true),
             ExecutionSummary::executionId,
             ExecutionSummary::time,
             ExecutionSummary::status,
@@ -95,13 +116,13 @@ public class PurgeServiceImpl implements PurgeService {
         );
     }
 
-    private PurgeExecutionService<Campaign, Long, CampaignExecution> buildCampaignService(CampaignRepository campaignRepository, CampaignExecutionRepository campaignExecutionRepository, Integer maxCampaignExecutions) {
+    private PurgeExecutionService<Campaign, Long, CampaignExecution> buildCampaignService(CampaignRepository campaignRepository, CampaignExecutionRepository campaignExecutionRepository, Integer maxCampaignExecutions, LocalDateTime maxCampaignExecutionsDateConfiguration) {
         return new PurgeExecutionService<>(
             maxCampaignExecutions,
             campaignRepository::findAll,
             campaign -> campaign.id,
             campaignExecutionRepository::getExecutionHistory,
-            cer -> true,
+            cer ->  Optional.ofNullable(maxCampaignExecutionsDateConfiguration).map(cer.startDate::isBefore).orElse(true),
             cer -> cer.executionId,
             cer -> cer.startDate,
             CampaignExecution::getStatus,
@@ -229,13 +250,11 @@ public class PurgeServiceImpl implements PurgeService {
          */
         Set<Long> purgeExecutions() {
             Set<Long> deletedExecutionsIds = new HashSet<>();
-            LocalDateTime twentyFourHoursEarlier = LocalDateTime.now().minusHours(24);
             baseObject.get().stream()
                 .map(idFunction)
                 .map(executionsFunction)
                 .forEach(executionsReports -> {
                     var executionsByEnvironment = executionsReports.stream()
-                        .filter(execution -> executionDateFunction.apply(execution).isBefore(twentyFourHoursEarlier))
                         .filter(executionsFilter)
                         .collect(groupingBy(t -> {
                             var env = environmentFunction.apply(t);

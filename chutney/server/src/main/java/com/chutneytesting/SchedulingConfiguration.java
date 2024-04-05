@@ -19,6 +19,7 @@ package com.chutneytesting;
 import static com.chutneytesting.ServerConfigurationValues.SCHEDULED_CAMPAIGNS_EXECUTOR_POOL_SIZE_SPRING_VALUE;
 import static com.chutneytesting.ServerConfigurationValues.SCHEDULED_PURGE_MAX_CAMPAIGN_EXECUTIONS_SPRING_VALUE;
 import static com.chutneytesting.ServerConfigurationValues.SCHEDULED_PURGE_MAX_SCENARIO_EXECUTIONS_SPRING_VALUE;
+import static java.time.LocalDateTime.now;
 
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
@@ -29,6 +30,7 @@ import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryR
 import com.chutneytesting.server.core.domain.execution.history.PurgeService;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
 import java.lang.reflect.Method;
+import java.time.LocalDateTime;
 import java.util.concurrent.ExecutorService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,13 +117,16 @@ public class SchedulingConfiguration implements AsyncConfigurer {
         @Value(SCHEDULED_PURGE_MAX_SCENARIO_EXECUTIONS_SPRING_VALUE) Integer maxScenarioExecutionsConfig,
         @Value(SCHEDULED_PURGE_MAX_CAMPAIGN_EXECUTIONS_SPRING_VALUE) Integer maxCampaignExecutionsConfig
     ) {
+        LocalDateTime oneDayEarlier = now().minusDays(1);
         return new PurgeServiceImpl(
             testCaseRepository,
             executionRepository,
             campaignRepository,
             campaignExecutionRepository,
             maxScenarioExecutionsConfig,
-            maxCampaignExecutionsConfig
+            oneDayEarlier,
+            maxCampaignExecutionsConfig,
+            oneDayEarlier
         );
     }
 }
