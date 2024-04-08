@@ -25,6 +25,7 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
@@ -60,6 +61,7 @@ import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -266,15 +268,29 @@ public class CampaignExecutionEngineTest {
     }
 
     @Test
-    public void should_throw_when_campaign_already_running() {
-        Campaign campaign = createCampaign(1L);
+    public void should_throw_when_campaign_already_running_on_the_same_env() {
+        String env = "env";
+        Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L, "", false, "", null, null, "");
-        when(campaignExecutionRepository.currentExecution(1L)).thenReturn(Optional.of(mockReport));
+        CampaignExecution mockReport = new CampaignExecution(1L,"", false, env, null, null, "");
+        when(campaignExecutionRepository.currentExecutions(1L)).thenReturn(List.of(mockReport));
 
         // When
-        assertThatThrownBy(() -> sut.executeScenarioInCampaign(null, campaign, "user"))
+        assertThatThrownBy(() -> sut.executeScenarioInCampaign(emptyList(), campaign, "user"))
             .isInstanceOf(CampaignAlreadyRunningException.class);
+    }
+
+    @Test
+    public void should_execute_campaign_in_parallel_on_two_different_envs() {
+        String env = "env";
+        String otherEnv = "otherEnv";
+        Campaign campaign = createCampaign(1L, env);
+
+        CampaignExecution mockReport = new CampaignExecution(1L,"", false, otherEnv, null, null, "");
+        when(campaignExecutionRepository.currentExecutions(anyLong())).thenReturn(List.of(mockReport));
+
+        // When
+        assertDoesNotThrow(()-> sut.executeScenarioInCampaign(emptyList(), campaign, "user"));
     }
 
     @Test
@@ -364,16 +380,20 @@ public class CampaignExecutionEngineTest {
     }
 
     @Test
-    public void should_retrieve_current_campaign_executions() {
-        CampaignExecution report = new CampaignExecution(1L, 33L, emptyList(), "", false, "", null, null, "");
-        CampaignExecution report2 = new CampaignExecution(2L, 42L, emptyList(), "", false, "", null, null, "");
-        when(campaignExecutionRepository.currentExecution(1L)).thenReturn(Optional.of(report));
-        when(campaignExecutionRepository.currentExecution(2L)).thenReturn(Optional.of(report2));
+    public void should_retrieve_current_campaign_execution_on_a_given_env() {
+        String env = "env";
+        CampaignExecution report = new CampaignExecution(1L, 33L, emptyList(), "", false, env, null, null, "");
+        String otherEnv = "otherEnv";
+        CampaignExecution report2 = new CampaignExecution(2L, 33L, emptyList(), "", false, otherEnv, null, null, "");
+        CampaignExecution report3 = new CampaignExecution(3L, 42L, emptyList(), "", false, otherEnv, null, null, "");
+        when(campaignExecutionRepository.currentExecutions(33L)).thenReturn(List.of(report, report2));
+        when(campaignExecutionRepository.currentExecutions(42L)).thenReturn(List.of(report3));
 
-        Optional<CampaignExecution> campaignExecutionReport = sut.currentExecution(1L);
+        Optional<CampaignExecution> campaignExecutionReport = sut.currentExecution(33L, env);
 
         assertThat(campaignExecutionReport).isNotEmpty();
-        assertThat(campaignExecutionReport.get().campaignId).isEqualTo(33L);
+        assertThat(campaignExecutionReport.get().executionId).isEqualTo(1L);
+        assertThat(campaignExecutionReport.get().executionEnvironment).isEqualTo(env);
     }
 
     @Test
@@ -463,8 +483,8 @@ public class CampaignExecutionEngineTest {
         return new Campaign(generateId(), "...", null, null, "campaignEnv", false, false, null, null);
     }
 
-    private Campaign createCampaign(Long idCampaign) {
-        return new Campaign(idCampaign, "campaign1", null, emptyList(), "env", false, false, null, null);
+    private Campaign createCampaign(Long idCampaign, String env) {
+        return new Campaign(idCampaign, "campaign1", null, emptyList(), env, false, false, null, null);
     }
 
     private Campaign createCampaign(TestCase firstTestCase, TestCase secondtTestCase) {

@@ -16,6 +16,7 @@
 
 package com.chutneytesting.campaign.infra;
 
+import static java.util.Collections.*;
 import static java.util.Optional.ofNullable;
 import static org.assertj.core.util.Lists.newArrayList;
 
@@ -30,7 +31,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -139,15 +139,9 @@ public class FakeCampaignRepository implements CampaignRepository, CampaignExecu
     }
 
     @Override
-    public Optional<CampaignExecution> currentExecution(Long campaignId) {
+    public List<CampaignExecution> currentExecutions(Long campaignId) {
         // not needed in tests
-        return Optional.empty();
-    }
-
-    @Override
-    public List<CampaignExecution> currentExecutions() {
-        // not needed in tests
-        return null;
+        return emptyList();
     }
 
     @Override
@@ -156,7 +150,7 @@ public class FakeCampaignRepository implements CampaignRepository, CampaignExecu
     }
 
     @Override
-    public void stopExecution(Long campaignId) {
+    public void stopExecution(Long campaignId, String environment) {
         // not needed in tests
     }
 

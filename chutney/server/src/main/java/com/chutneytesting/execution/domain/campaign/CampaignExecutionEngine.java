@@ -134,13 +134,13 @@ public class CampaignExecutionEngine {
             .orElseThrow(() -> new CampaignNotFoundException(campaignId));
     }
 
-    public Optional<CampaignExecution> currentExecution(Long campaignId) {
-        return campaignExecutionRepository.currentExecution(campaignId);
+    public Optional<CampaignExecution> currentExecution(Long campaignId, String environment) {
+        return campaignExecutionRepository.currentExecutions(campaignId)
+            .stream()
+            .filter(exec -> exec.executionEnvironment.equals(environment))
+            .findAny();
     }
 
-    public List<CampaignExecution> currentExecutions() {
-        return campaignExecutionRepository.currentExecutions();
-    }
 
     public void stopExecution(Long executionId) {
         LOGGER.trace("Stop requested for " + executionId);
@@ -177,7 +177,7 @@ public class CampaignExecutionEngine {
             campaignExecution.endCampaignExecution();
             LOGGER.info("Save campaign {} execution {} with status {}", campaign.id, campaignExecution.executionId, campaignExecution.status());
             currentCampaignExecutionsStopRequests.remove(executionId);
-            campaignExecutionRepository.stopExecution(campaign.id);
+            campaignExecutionRepository.stopExecution(campaign.id, campaign.executionEnvironment());
 
             Try.exec(() -> {
                 campaignExecutionRepository.saveCampaignExecution(campaign.id, campaignExecution);
@@ -303,7 +303,7 @@ public class CampaignExecutionEngine {
     }
 
     private void verifyNotAlreadyRunning(Campaign campaign) {
-        Optional<CampaignExecution> currentReport = currentExecution(campaign.id);
+        Optional<CampaignExecution> currentReport = currentExecution(campaign.id, campaign.executionEnvironment());
         if (currentReport.isPresent() && !currentReport.get().status().isFinal()) {
             throw new CampaignAlreadyRunningException(currentReport.get());
         }

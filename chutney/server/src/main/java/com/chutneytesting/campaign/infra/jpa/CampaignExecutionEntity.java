@@ -101,6 +101,8 @@ public class CampaignExecutionEntity {
         return scenarioExecutions;
     }
 
+    public String environment() { return environment;}
+
     public void updateFromDomain(CampaignExecution report, Iterable<ScenarioExecutionEntity> scenarioExecutions) {
         //id = report.executionId;
         //campaignId = report.campaignId;

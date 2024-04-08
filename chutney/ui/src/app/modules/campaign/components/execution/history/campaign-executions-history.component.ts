@@ -125,11 +125,9 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
     }
 
     private refreshCampaign() {
-        if (!this.isRefreshActive()) {
-            this.campaign$().subscribe(c => {
-                this.openReport({ execution: this.campaignReports[0], focus: true });
-            });
-        }
+        this.campaign$().subscribe(c => {
+            this.openReport({ execution: this.campaignReports[0], focus: true });
+        });
     }
 
     private onMenuError(menuErrorEvent: any) {
