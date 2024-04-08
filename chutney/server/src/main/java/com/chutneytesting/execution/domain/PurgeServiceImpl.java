@@ -40,7 +40,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -54,7 +53,7 @@ public class PurgeServiceImpl implements PurgeService {
     private final PurgeExecutionService<Campaign, Long, CampaignExecution> campaignPurgeService;
     private final PurgeExecutionService<TestCaseMetadata, String, ExecutionSummary> scenarioPurgeService;
 
-    public PurgeServiceImpl(
+    PurgeServiceImpl(
         TestCaseRepository testCaseRepository,
         ExecutionHistoryRepository executionsRepository,
         CampaignRepository campaignRepository,
@@ -67,9 +66,9 @@ public class PurgeServiceImpl implements PurgeService {
             campaignRepository,
             campaignExecutionRepository,
             maxScenarioExecutionsConfiguration,
-            null,
+            0,
             maxCampaignExecutionsConfiguration,
-            null);
+            0);
     }
 
     public PurgeServiceImpl(
@@ -78,36 +77,53 @@ public class PurgeServiceImpl implements PurgeService {
         CampaignRepository campaignRepository,
         CampaignExecutionRepository campaignExecutionRepository,
         Integer maxScenarioExecutionsConfiguration,
-        LocalDateTime maxScenarioExecutionsDateConfiguration,
+        Integer scenarioBeforeHoursTimeExecutionsConfiguration,
         Integer maxCampaignExecutionsConfiguration,
-        LocalDateTime maxCampaignExecutionsDateConfiguration
+        Integer campaignsBeforeHoursTimeExecutionsConfiguration
         ) {
-        Integer maxScenarioExecutions = validateConfigurationLimit(maxScenarioExecutionsConfiguration, "maxScenarioExecutions");
-        Integer maxCampaignExecutions = validateConfigurationLimit(maxCampaignExecutionsConfiguration, "maxCampaignExecutions");
+        Integer maxScenarioExecutions = validateConfigurationLimit(true, maxScenarioExecutionsConfiguration, "maxScenarioExecutions", 10);
+        Integer maxCampaignExecutions = validateConfigurationLimit(true, maxCampaignExecutionsConfiguration, "maxCampaignExecutions", 10);
+        Integer scenarioBeforeHoursTimeExecutions = validateConfigurationLimit(false, scenarioBeforeHoursTimeExecutionsConfiguration, "scenarioBeforeHoursTimeExecutions", 24);
+        Integer campaignsBeforeHoursTimeExecutions = validateConfigurationLimit(false, campaignsBeforeHoursTimeExecutionsConfiguration, "campaignsBeforeHoursTimeExecutionsConfiguration", 24);
 
-        this.scenarioPurgeService = buildScenarioService(testCaseRepository, executionsRepository, maxScenarioExecutions, maxScenarioExecutionsDateConfiguration);
-        this.campaignPurgeService = buildCampaignService(campaignRepository, campaignExecutionRepository, maxCampaignExecutions, maxCampaignExecutionsDateConfiguration);
+        this.scenarioPurgeService = buildScenarioService(testCaseRepository, executionsRepository, maxScenarioExecutions, scenarioBeforeHoursTimeExecutions);
+        this.campaignPurgeService = buildCampaignService(campaignRepository, campaignExecutionRepository, maxCampaignExecutions, campaignsBeforeHoursTimeExecutions);
     }
 
-    private static Integer validateConfigurationLimit(Integer configurationLimit, String configName) {
-        if (configurationLimit <= 0) {
-            LOGGER.warn("Purge configuration limit must be positive. Defaulting {} to {}", configName, 10);
-            return 10;
+    private static Integer validateConfigurationLimit(
+        Boolean strictlyPositive,
+        Integer configurationLimit,
+        String configName,
+        Integer defaultValue
+    ) {
+        if (strictlyPositive) {
+            if (configurationLimit <= 0) {
+                LOGGER.warn("Purge configuration limit must be strictly positive. Defaulting {} to {}", configName, defaultValue);
+                return defaultValue;
+            }
+        } else {
+            if (configurationLimit < 0) {
+                LOGGER.warn("Purge configuration limit must be positive. Defaulting {} to {}", configName, defaultValue);
+                return defaultValue;
+            }
         }
         return configurationLimit;
     }
+
+    private static final Predicate<ExecutionSummary> emptyCampaignReport = es -> es.campaignReport().isEmpty();
 
     private static PurgeExecutionService<TestCaseMetadata, String, ExecutionSummary> buildScenarioService(
         TestCaseRepository testCaseRepository,
         ExecutionHistoryRepository executionsRepository,
         Integer maxScenarioExecutions,
-        LocalDateTime maxScenarioExecutionsDateConfiguration) {
+        Integer beforeHoursTimeExecutions
+    ) {
         return new PurgeExecutionService<>(
             maxScenarioExecutions,
             testCaseRepository::findAll,
             TestCaseMetadata::id,
             executionsRepository::getExecutions,
-            es -> es.campaignReport().isEmpty() && Optional.ofNullable(maxScenarioExecutionsDateConfiguration).map(es.time()::isBefore).orElse(true),
+            emptyCampaignReport.and(timeBefore(ExecutionSummary::time, beforeHoursTimeExecutions)),
             ExecutionSummary::executionId,
             ExecutionSummary::time,
             ExecutionSummary::status,
@@ -116,13 +132,18 @@ public class PurgeServiceImpl implements PurgeService {
         );
     }
 
-    private PurgeExecutionService<Campaign, Long, CampaignExecution> buildCampaignService(CampaignRepository campaignRepository, CampaignExecutionRepository campaignExecutionRepository, Integer maxCampaignExecutions, LocalDateTime maxCampaignExecutionsDateConfiguration) {
+    private PurgeExecutionService<Campaign, Long, CampaignExecution> buildCampaignService(
+        CampaignRepository campaignRepository,
+        CampaignExecutionRepository campaignExecutionRepository,
+        Integer maxCampaignExecutions,
+        Integer beforeHoursTimeExecutions
+    ) {
         return new PurgeExecutionService<>(
             maxCampaignExecutions,
             campaignRepository::findAll,
             campaign -> campaign.id,
             campaignExecutionRepository::getExecutionHistory,
-            cer ->  Optional.ofNullable(maxCampaignExecutionsDateConfiguration).map(cer.startDate::isBefore).orElse(true),
+            timeBefore(cer -> cer.startDate, beforeHoursTimeExecutions),
             cer -> cer.executionId,
             cer -> cer.startDate,
             CampaignExecution::getStatus,
@@ -161,6 +182,20 @@ public class PurgeServiceImpl implements PurgeService {
         Set<Long> purgedScenariosExecutionsIds = scenarioPurgeService.purgeExecutions();
         LOGGER.info("Purge report : {} scenarios' executions deleted - {} campaigns' executions deleted", purgedScenariosExecutionsIds.size(), purgedCampaignsExecutionsIds.size());
         return new PurgeReport(purgedScenariosExecutionsIds, purgedCampaignsExecutionsIds);
+    }
+
+    private static <Execution> Predicate<Execution> timeBefore(
+        Function<Execution, LocalDateTime> executionDateFunction,
+        int hours
+    ) {
+        if (hours <= 0) {
+            return e -> true;
+        } else {
+            return exec -> {
+                LocalDateTime now = LocalDateTime.now().minusHours(hours);
+                return executionDateFunction.apply(exec).isBefore(now);
+            };
+        }
     }
 
     /**

@@ -749,9 +749,9 @@ public class PurgeServiceTest {
                 //  a configuration limit set to 2 for scenarios' executions
                 // And a configuration max date set to yesterday
                 Integer maxScenarioExecutionsConfiguration = 2;
+                Integer scenarioBeforeHoursTimeExecutionsConfiguration = 24;
                 String scenarioId = "1";
                 LocalDateTime now = now();
-                LocalDateTime onDayEarlier = now.minusDays(1);
 
                 TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
                 when(testCaseRepository.findAll()).thenReturn(List.of(
@@ -771,9 +771,9 @@ public class PurgeServiceTest {
                     mock(CampaignRepository.class),
                     mock(CampaignExecutionRepository.class),
                     maxScenarioExecutionsConfiguration,
-                    onDayEarlier,
+                    scenarioBeforeHoursTimeExecutionsConfiguration,
                     100,
-                    null);
+                    0);
                 PurgeReport report = sut.purge();
 
                 // Then
@@ -787,8 +787,8 @@ public class PurgeServiceTest {
                 // Three scenario's executions independents of any campaigns' execution
                 // And a configuration limit set to 1 for scenarios' executions
                 Integer maxScenarioExecutionsConfiguration = 1;
+                Integer scenarioBeforeHoursTimeExecutionsConfiguration = 24;
                 String scenarioId = "1";
-
 
                 TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
                 when(testCaseRepository.findAll()).thenReturn(List.of(
@@ -796,7 +796,6 @@ public class PurgeServiceTest {
                 ));
                 ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
                 LocalDateTime now = now();
-                LocalDateTime onDayEarlier = now.minusDays(1);
                 LocalDateTime twoDaysEarlier = now.minusDays(2);
                 when(executionsRepository.getExecutions(scenarioId)).thenReturn(List.of(
                     scenarioExecutionBuilder().executionId(4L).time(now).build(),
@@ -811,9 +810,9 @@ public class PurgeServiceTest {
                     mock(CampaignRepository.class),
                     mock(CampaignExecutionRepository.class),
                     maxScenarioExecutionsConfiguration,
-                    onDayEarlier,
+                    scenarioBeforeHoursTimeExecutionsConfiguration,
                     100,
-                    null);
+                    0);
                 PurgeReport report = sut.purge();
 
                 // Then
@@ -836,6 +835,7 @@ public class PurgeServiceTest {
                 // And a configuration max date set to one day
                 Integer maxScenarioExecutionsConfiguration = 10;
                 Integer maxCampaignExecutionsConfiguration = 1;
+                Integer campaignsBeforeHoursTimeExecutionsConfiguration = 24;
                 String scenarioId = "1";
                 Long campaignId = 1L;
                 LocalDateTime now = now();
@@ -878,9 +878,9 @@ public class PurgeServiceTest {
                     campaignRepository,
                     campaignExecutionRepository,
                     maxScenarioExecutionsConfiguration,
-                    null,
+                    0,
                     maxCampaignExecutionsConfiguration,
-                    onDayEarlier);
+                    campaignsBeforeHoursTimeExecutionsConfiguration);
                 PurgeReport report = sut.purge();
 
                 // Then
@@ -901,10 +901,10 @@ public class PurgeServiceTest {
                 // And a configuration max date set to one day
                 Integer maxScenarioExecutionsConfiguration = 10;
                 Integer maxCampaignExecutionsConfiguration = 1;
+                Integer campaignsBeforeHoursTimeExecutionsConfiguration = 24;
                 String scenarioId = "1";
                 Long campaignId = 1L;
                 LocalDateTime now = now();
-                LocalDateTime onDayEarlier = now.minusDays(1);
                 LocalDateTime twoDaysEarlier = now().minusDays(2);
 
 
@@ -944,9 +944,9 @@ public class PurgeServiceTest {
                     campaignRepository,
                     campaignExecutionRepository,
                     maxScenarioExecutionsConfiguration,
-                    null,
+                    0,
                     maxCampaignExecutionsConfiguration,
-                    onDayEarlier);
+                    campaignsBeforeHoursTimeExecutionsConfiguration);
                 PurgeReport report = sut.purge();
 
                 // Then
