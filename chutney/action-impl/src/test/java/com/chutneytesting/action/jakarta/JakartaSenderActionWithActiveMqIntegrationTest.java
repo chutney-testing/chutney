@@ -30,14 +30,13 @@ import org.junit.jupiter.api.Test;
 public class JakartaSenderActionWithActiveMqIntegrationTest extends ActiveMQTestSupport {
     @Test
     public void failedSSL2WayAskWithOneWayProvided() {
-
         String body = "messageBody";
         String destination = "dynamicQueues/testD";
         Map<String, String> headers = new HashMap<>();
 
         TestTarget target = TestTarget.TestTargetBuilder.builder()
             .withTargetId("id")
-            .withUrl("tcp://localhost:61617?" +
+            .withUrl(serverUri() + "?" +
                 "sslEnabled=true" +
                 "&keyStorePath=" + keyStorePath +
                 "&keyStorePassword=" + keyStorePassword +
@@ -60,5 +59,4 @@ public class JakartaSenderActionWithActiveMqIntegrationTest extends ActiveMQTest
         assertThat(result.status).isEqualTo(Success);
         assertThat(result.outputs.get("textMessage")).isEqualTo("messageBody");
     }
-
 }
