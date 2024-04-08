@@ -37,4 +37,9 @@ class NetworkFunctionsTest {
         final String ip = NetworkFunctions.hostIpReaching("127.0.0.2");
         assertThat(ip).isEqualTo("127.0.0.1");
     }
+
+    @Test
+    void freeSystemPort() {
+        assertThat(NetworkFunctions.freeSystemPort()).isGreaterThan(0);
+    }
 }

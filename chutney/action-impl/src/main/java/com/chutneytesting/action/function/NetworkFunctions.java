@@ -39,6 +39,11 @@ import java.util.stream.Stream;
 public class NetworkFunctions {
 
     @SpelFunction
+    public static int freeSystemPort() {
+        return SocketUtils.freePortFromSystem();
+    }
+
+    @SpelFunction
     public static int tcpPort() {
         return findAvailableTcpPort();
     }
