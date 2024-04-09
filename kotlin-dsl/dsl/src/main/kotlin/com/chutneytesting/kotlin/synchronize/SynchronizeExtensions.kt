@@ -71,10 +71,10 @@ fun ChutneyScenario.jsonSerialize(path: String = "src/main/chutney/generated") =
  */
 fun Dataset.synchronise(serverInfo: ChutneyServerInfo) {
     try {
-        ChutneyServerServiceImpl.createOrUpdateDataset(serverInfo, this)
-        println("| Dataset <$id> synchronized:: ${serverInfo.url}/#/dataset/$id/edition")
+        val remoteId = ChutneyServerServiceImpl.createOrUpdateDataset(serverInfo, this)
+        println("| Dataset <$name> synchronized:: ${serverInfo.url}/#/dataset/$remoteId/edition")
     } catch (e: Exception) {
-        println("| Dataset <$id> cannot be synchronized:: ${e.message}")
+        println("| Dataset <$name> cannot be synchronized:: ${e.message}")
         throw e
     }
 }

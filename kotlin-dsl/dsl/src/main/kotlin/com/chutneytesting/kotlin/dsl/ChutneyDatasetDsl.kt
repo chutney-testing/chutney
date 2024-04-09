@@ -24,7 +24,7 @@ data class Dataset(
     val multipleValues: List<List<KeyValue>> = emptyList(),
     val tags: Set<String> = emptySet()
 ) {
-    val id: String = name
+    val id: String = name.replace(" ", "_")
 
     data class KeyValue(val key: String, val value: String)
 }

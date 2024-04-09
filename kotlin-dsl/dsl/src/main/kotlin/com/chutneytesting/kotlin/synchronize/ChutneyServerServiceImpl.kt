@@ -16,7 +16,7 @@ interface ChutneyServerService {
     fun getAllScenarios(serverInfo: ChutneyServerInfo): List<LinkedHashMap<String, Any>>
     fun createOrUpdateJsonScenario(serverInfo: ChutneyServerInfo, scenario: ChutneyScenario): Int
     fun getEnvironments(serverInfo: ChutneyServerInfo): Set<EnvironmentDto>
-    fun createOrUpdateDataset(serverInfo: ChutneyServerInfo, dataset: Dataset)
+    fun createOrUpdateDataset(serverInfo: ChutneyServerInfo, dataset: Dataset): String
     fun createOrUpdateCampaign(serverInfo: ChutneyServerInfo, campaign: Campaign): Int
 }
 
@@ -146,15 +146,16 @@ object ChutneyServerServiceImpl : ChutneyServerService {
     """.trimIndent()
     }
 
-    override fun createOrUpdateDataset(serverInfo: ChutneyServerInfo, dataset: Dataset) {
-        if (findDatasetById(serverInfo, dataset.id)) {
+    override fun createOrUpdateDataset(serverInfo: ChutneyServerInfo, dataset: Dataset): String {
+        val result = if (datasetIdExists(serverInfo, dataset.id)) {
             HttpClient.put<HashMap<String, Any>>(serverInfo, chutneyDatasetEndpoint, dataset.payload())
         } else {
             HttpClient.post<HashMap<String, Any>>(serverInfo, chutneyDatasetEndpoint, dataset.payload())
         }
+        return result["id"] as String
     }
 
-    private fun findDatasetById(serverInfo: ChutneyServerInfo, id: String): Boolean {
+    private fun datasetIdExists(serverInfo: ChutneyServerInfo, id: String): Boolean {
         return try {
             Optional.ofNullable(
                 HttpClient.get<HashMap<String, Any>>(serverInfo, "${chutneyDatasetEndpoint}/${id}")["id"]

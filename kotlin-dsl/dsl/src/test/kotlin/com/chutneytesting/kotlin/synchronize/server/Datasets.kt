@@ -34,7 +34,7 @@ class Datasets : ChutneyServerServiceImplTest() {
     fun create_dataset(readStubStatus: Int) {
         // Given
         val dataset = Dataset(
-            name = "MY_DATASET",
+            name = "MY DATASET",
             description = "A description",
             uniqueValues = setOf(KeyValue("u1", "vu1"), KeyValue("u2", "vu2")),
             multipleValues = listOf(
@@ -85,10 +85,12 @@ class Datasets : ChutneyServerServiceImplTest() {
         )
 
         // When
-        ChutneyServerServiceImpl.createOrUpdateDataset(buildServerInfo(), dataset)
+        val createOrUpdateDataset = ChutneyServerServiceImpl.createOrUpdateDataset(buildServerInfo(), dataset)
 
         // Then
+        assertThat(createOrUpdateDataset).isEqualTo(dataset.id)
         assertThat(wireMockServer.allServeEvents).hasSize(2)
+
         val createRequestReceived = serverEventRequestBodyAsJson(
             wireMockServer.getServeEvents(forStubMapping(createDatasetStub.id)).requests[0]
         )
