@@ -23,7 +23,7 @@ import static com.chutneytesting.ServerConfigurationValues.SCHEDULED_PURGE_MAX_S
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.execution.api.schedule.ScheduleCampaign;
-import com.chutneytesting.execution.domain.PurgeServiceImpl;
+import com.chutneytesting.execution.domain.purge.PurgeServiceImpl;
 import com.chutneytesting.execution.domain.schedule.CampaignScheduler;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.history.PurgeService;
@@ -121,9 +121,9 @@ public class SchedulingConfiguration implements AsyncConfigurer {
             campaignRepository,
             campaignExecutionRepository,
             maxScenarioExecutionsConfig,
-            24,
+            86400000,
             maxCampaignExecutionsConfig,
-            24
+            86400000
         );
     }
 }

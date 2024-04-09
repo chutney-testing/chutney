@@ -1,20 +1,21 @@
 /*
- * Copyright 2017-2023 Enedis
+ *  Copyright 2017-2023 Enedis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-package com.chutneytesting.execution.domain;
+package com.chutneytesting.execution.domain.purge;
 
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.FAILURE;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
@@ -749,7 +750,7 @@ public class PurgeServiceTest {
                 //  a configuration limit set to 2 for scenarios' executions
                 // And a configuration max date set to yesterday
                 Integer maxScenarioExecutionsConfiguration = 2;
-                Integer scenarioBeforeHoursTimeExecutionsConfiguration = 24;
+                Integer scenarioBeforeTimeExecutionsConfiguration = 86400000;
                 String scenarioId = "1";
                 LocalDateTime now = now();
 
@@ -771,7 +772,7 @@ public class PurgeServiceTest {
                     mock(CampaignRepository.class),
                     mock(CampaignExecutionRepository.class),
                     maxScenarioExecutionsConfiguration,
-                    scenarioBeforeHoursTimeExecutionsConfiguration,
+                    scenarioBeforeTimeExecutionsConfiguration,
                     100,
                     0);
                 PurgeReport report = sut.purge();
@@ -787,7 +788,7 @@ public class PurgeServiceTest {
                 // Three scenario's executions independents of any campaigns' execution
                 // And a configuration limit set to 1 for scenarios' executions
                 Integer maxScenarioExecutionsConfiguration = 1;
-                Integer scenarioBeforeHoursTimeExecutionsConfiguration = 24;
+                Integer scenarioBeforeTimeExecutionsConfiguration = 86400000;
                 String scenarioId = "1";
 
                 TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
@@ -810,7 +811,7 @@ public class PurgeServiceTest {
                     mock(CampaignRepository.class),
                     mock(CampaignExecutionRepository.class),
                     maxScenarioExecutionsConfiguration,
-                    scenarioBeforeHoursTimeExecutionsConfiguration,
+                    scenarioBeforeTimeExecutionsConfiguration,
                     100,
                     0);
                 PurgeReport report = sut.purge();
@@ -827,7 +828,7 @@ public class PurgeServiceTest {
         class Campaigns {
 
             @Test
-            void nor_purge_when_only_executions_newer_than_max_date() {
+            void no_purge_when_only_executions_newer_than_max_date() {
                 // Given
                 // Three campaign's executions with only one scenario's execution each
                 // And a configuration limit set to 10 for scenarios' executions
@@ -835,11 +836,10 @@ public class PurgeServiceTest {
                 // And a configuration max date set to one day
                 Integer maxScenarioExecutionsConfiguration = 10;
                 Integer maxCampaignExecutionsConfiguration = 1;
-                Integer campaignsBeforeHoursTimeExecutionsConfiguration = 24;
+                Integer campaignsBeforeTimeExecutionsConfiguration = 86400000;
                 String scenarioId = "1";
                 Long campaignId = 1L;
                 LocalDateTime now = now();
-                LocalDateTime onDayEarlier = now.minusDays(1);
 
 
                 TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
@@ -880,7 +880,7 @@ public class PurgeServiceTest {
                     maxScenarioExecutionsConfiguration,
                     0,
                     maxCampaignExecutionsConfiguration,
-                    campaignsBeforeHoursTimeExecutionsConfiguration);
+                    campaignsBeforeTimeExecutionsConfiguration);
                 PurgeReport report = sut.purge();
 
                 // Then
@@ -901,7 +901,7 @@ public class PurgeServiceTest {
                 // And a configuration max date set to one day
                 Integer maxScenarioExecutionsConfiguration = 10;
                 Integer maxCampaignExecutionsConfiguration = 1;
-                Integer campaignsBeforeHoursTimeExecutionsConfiguration = 24;
+                Integer campaignsBeforeTimeExecutionsConfiguration = 86400000;
                 String scenarioId = "1";
                 Long campaignId = 1L;
                 LocalDateTime now = now();
@@ -946,7 +946,7 @@ public class PurgeServiceTest {
                     maxScenarioExecutionsConfiguration,
                     0,
                     maxCampaignExecutionsConfiguration,
-                    campaignsBeforeHoursTimeExecutionsConfiguration);
+                    campaignsBeforeTimeExecutionsConfiguration);
                 PurgeReport report = sut.purge();
 
                 // Then

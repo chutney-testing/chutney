@@ -1,21 +1,24 @@
 /*
- * Copyright 2017-2023 Enedis
+ *  Copyright 2017-2023 Enedis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-package com.chutneytesting.execution.domain;
+package com.chutneytesting.execution.domain.purge;
 
+import static com.chutneytesting.execution.domain.purge.PurgeExecutionsFilters.isExecutionDateBeforeGivenTime;
+import static com.chutneytesting.execution.domain.purge.PurgeExecutionsFilters.isScenarioExecutionLinkedWithCampaignExecution;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -77,14 +80,14 @@ public class PurgeServiceImpl implements PurgeService {
         CampaignRepository campaignRepository,
         CampaignExecutionRepository campaignExecutionRepository,
         Integer maxScenarioExecutionsConfiguration,
-        Integer scenarioBeforeHoursTimeExecutionsConfiguration,
+        Integer scenarioBeforeMillisecondsTimeExecutionsConfiguration,
         Integer maxCampaignExecutionsConfiguration,
-        Integer campaignsBeforeHoursTimeExecutionsConfiguration
+        Integer campaignsBeforeMillisecondsTimeExecutionsConfiguration
         ) {
         Integer maxScenarioExecutions = validateConfigurationLimit(true, maxScenarioExecutionsConfiguration, "maxScenarioExecutions", 10);
         Integer maxCampaignExecutions = validateConfigurationLimit(true, maxCampaignExecutionsConfiguration, "maxCampaignExecutions", 10);
-        Integer scenarioBeforeHoursTimeExecutions = validateConfigurationLimit(false, scenarioBeforeHoursTimeExecutionsConfiguration, "scenarioBeforeHoursTimeExecutions", 24);
-        Integer campaignsBeforeHoursTimeExecutions = validateConfigurationLimit(false, campaignsBeforeHoursTimeExecutionsConfiguration, "campaignsBeforeHoursTimeExecutionsConfiguration", 24);
+        Integer scenarioBeforeHoursTimeExecutions = validateConfigurationLimit(false, scenarioBeforeMillisecondsTimeExecutionsConfiguration, "scenarioBeforeMillisecondsTimeExecutions", 86400000);
+        Integer campaignsBeforeHoursTimeExecutions = validateConfigurationLimit(false, campaignsBeforeMillisecondsTimeExecutionsConfiguration, "campaignsBeforeMillisecondsTimeExecutions", 86400000);
 
         this.scenarioPurgeService = buildScenarioService(testCaseRepository, executionsRepository, maxScenarioExecutions, scenarioBeforeHoursTimeExecutions);
         this.campaignPurgeService = buildCampaignService(campaignRepository, campaignExecutionRepository, maxCampaignExecutions, campaignsBeforeHoursTimeExecutions);
@@ -110,8 +113,6 @@ public class PurgeServiceImpl implements PurgeService {
         return configurationLimit;
     }
 
-    private static final Predicate<ExecutionSummary> emptyCampaignReport = es -> es.campaignReport().isEmpty();
-
     private static PurgeExecutionService<TestCaseMetadata, String, ExecutionSummary> buildScenarioService(
         TestCaseRepository testCaseRepository,
         ExecutionHistoryRepository executionsRepository,
@@ -123,7 +124,7 @@ public class PurgeServiceImpl implements PurgeService {
             testCaseRepository::findAll,
             TestCaseMetadata::id,
             executionsRepository::getExecutions,
-            emptyCampaignReport.and(timeBefore(ExecutionSummary::time, beforeHoursTimeExecutions)),
+            isScenarioExecutionLinkedWithCampaignExecution.and(isExecutionDateBeforeGivenTime(ExecutionSummary::time, beforeHoursTimeExecutions)),
             ExecutionSummary::executionId,
             ExecutionSummary::time,
             ExecutionSummary::status,
@@ -143,7 +144,7 @@ public class PurgeServiceImpl implements PurgeService {
             campaignRepository::findAll,
             campaign -> campaign.id,
             campaignExecutionRepository::getExecutionHistory,
-            timeBefore(cer -> cer.startDate, beforeHoursTimeExecutions),
+            isExecutionDateBeforeGivenTime(cer -> cer.startDate, beforeHoursTimeExecutions),
             cer -> cer.executionId,
             cer -> cer.startDate,
             CampaignExecution::getStatus,
@@ -182,20 +183,6 @@ public class PurgeServiceImpl implements PurgeService {
         Set<Long> purgedScenariosExecutionsIds = scenarioPurgeService.purgeExecutions();
         LOGGER.info("Purge report : {} scenarios' executions deleted - {} campaigns' executions deleted", purgedScenariosExecutionsIds.size(), purgedCampaignsExecutionsIds.size());
         return new PurgeReport(purgedScenariosExecutionsIds, purgedCampaignsExecutionsIds);
-    }
-
-    private static <Execution> Predicate<Execution> timeBefore(
-        Function<Execution, LocalDateTime> executionDateFunction,
-        int hours
-    ) {
-        if (hours <= 0) {
-            return e -> true;
-        } else {
-            return exec -> {
-                LocalDateTime now = LocalDateTime.now().minusHours(hours);
-                return executionDateFunction.apply(exec).isBefore(now);
-            };
-        }
     }
 
     /**
