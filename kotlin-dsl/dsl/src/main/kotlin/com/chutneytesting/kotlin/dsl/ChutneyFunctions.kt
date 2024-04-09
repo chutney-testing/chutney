@@ -175,6 +175,10 @@ fun micrometerRegistry(registryClassName: String, elEval: Boolean = true): Strin
 }
 
 
+fun freeSystemPort(elEval: Boolean = true): String {
+    return chutneyFunction("freeSystemPort", elEval)
+}
+
 fun tcpPort(elEval: Boolean = true): String {
     return chutneyFunction("tcpPort", elEval)
 }

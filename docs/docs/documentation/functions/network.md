@@ -36,6 +36,18 @@ Following functions help you to :
 
 # TcpPort
 
+!!! note "int freeSystemPort()"
+
+    Find a free port given by the undelying system.
+
+    **Returns** :
+
+    * Returns an available TCP Port number
+
+    **Examples** :
+
+    SpEL : `${#freeSystemPort()}`
+
 !!! note "int tcpPort()"
 
     Find an available TCP port randomly selected from the range [1024, 65535].
