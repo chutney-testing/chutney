@@ -13,7 +13,7 @@ import kotlin.io.path.Path
  * Serialize and Update if asked, Chutney scenarios.
  *
  * By default, scenarios are those returned by Scenario annotated functions found in given package name.
- * @see SynchronizeScenariosBuilder.scenariosBuilder
+ * @see SynchronizeScenariosBuilder.searchScenarios
  *
  * @param packageName The package name to search for scenarios
  * @param serverInfo The remote server definition
@@ -26,7 +26,7 @@ fun synchronizeScenarios(
     serverInfo: ChutneyServerInfo? = null,
     updateRemote: Boolean = false,
     path: String = "src/main/chutney/generated",
-    block: SynchronizeScenariosBuilder.() -> Unit = SynchronizeScenariosBuilder.scenariosBuilder(packageName)
+    block: SynchronizeScenariosBuilder.() -> Unit = SynchronizeScenariosBuilder.searchScenarios(packageName)
 ) {
     println("+-----------------------------------------------------------------------------------------------------------------------------------")
     val start = System.currentTimeMillis()

@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 
-class Datasets : ChutneyServerServiceImplTest() {
+class DatasetsTest : ChutneyServerServiceImplTest() {
     @ParameterizedTest()
     @ValueSource(ints = [500, 400])
     fun create_dataset(readStubStatus: Int) {
@@ -41,7 +41,7 @@ class Datasets : ChutneyServerServiceImplTest() {
                 listOf(KeyValue("m1", "vm11"), KeyValue("m2", "vm12")),
                 listOf(KeyValue("m1", "vm21"), KeyValue("m2", "vm22"))
             ),
-            tags = setOf("TAG_1", "TAG_2")
+            tags = listOf("TAG_1", "TAG_2")
         )
 
         wireMockServer.stubFor(
@@ -133,7 +133,7 @@ class Datasets : ChutneyServerServiceImplTest() {
                 listOf(KeyValue("m1", "vm11"), KeyValue("m2", "vm12")),
                 listOf(KeyValue("m1", "vm21"), KeyValue("m2", "vm22"))
             ),
-            tags = setOf("TAG_1", "TAG_2")
+            tags = listOf("TAG_1", "TAG_2")
         )
 
         wireMockServer.stubFor(

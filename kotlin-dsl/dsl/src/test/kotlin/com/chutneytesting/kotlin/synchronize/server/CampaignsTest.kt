@@ -24,11 +24,11 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 
-class Campaigns : ChutneyServerServiceImplTest() {
+class CampaignsTest : ChutneyServerServiceImplTest() {
     @Test
     fun new_id_from_remote() {
         // Given
-        val campaign = Campaign(title = "Campaign title", tags = setOf("TAG_1", "TAG_2"))
+        val campaign = Campaign(title = "Campaign title", environment = "DEV", tags = listOf("TAG_1", "TAG_2"))
         val newIdFromRemote = 666
 
         val createStub = wireMockServer.stubFor(
@@ -42,7 +42,7 @@ class Campaigns : ChutneyServerServiceImplTest() {
                                   "description": "",
                                   "scenarioIds": [],
                                   "campaignExecutionReports": [],
-                                  "environment": "DEFAULT",
+                                  "environment": "DEV",
                                   "parallelRun": false,
                                   "retryAuto": false,
                                   "tags": ["TAG_1", "TAG_2"]
@@ -89,7 +89,7 @@ class Campaigns : ChutneyServerServiceImplTest() {
             parallelRun = true,
             retryAuto = true,
             datasetId = "DATASET",
-            tags = setOf("TAG_1", "TAG_2")
+            tags = listOf("TAG_1", "TAG_2")
         )
 
         val createStub = wireMockServer.stubFor(

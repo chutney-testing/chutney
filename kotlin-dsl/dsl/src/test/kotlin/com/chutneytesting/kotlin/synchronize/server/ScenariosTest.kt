@@ -38,13 +38,13 @@ class ScenariosTest : ChutneyServerServiceImplTest() {
                 )
         )
 
-        val environments = ChutneyServerServiceImpl.getAllScenarios(buildServerInfo())
+        val scenarios = ChutneyServerServiceImpl.getAllScenarios(buildServerInfo())
 
         wireMockServer.verify(
             1,
             getRequestedFor(urlPathMatching("/api/scenario/v2"))
         )
-        assertThat(environments).isEmpty()
+        assertThat(scenarios).isEmpty()
     }
 
     @Nested

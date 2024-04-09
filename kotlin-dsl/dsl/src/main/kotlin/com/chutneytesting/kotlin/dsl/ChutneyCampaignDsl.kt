@@ -21,10 +21,10 @@ data class Campaign(
     val id: Int? = null,
     val title: String,
     val description: String? = null,
-    val environment: String = "DEFAULT",
+    val environment: String,
     val parallelRun: Boolean = false,
     val retryAuto: Boolean = false,
     val datasetId: String? = null,
     val scenarioIds: List<Int> = emptyList(),
-    val tags: Set<String> = emptySet()
+    val tags: List<String> = emptyList()
 )

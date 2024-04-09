@@ -23,16 +23,16 @@ import org.junit.jupiter.api.Test
 class ChutneyCampaignDslTest {
     @Test
     fun instantiate_campaign_with_title() {
-        val sut = Campaign(title = "Campaign title")
+        val sut = Campaign(title = "Campaign title", environment = "DEV")
         assertThat(sut)
             .hasFieldOrPropertyWithValue("id", null)
             .hasFieldOrPropertyWithValue("title", "Campaign title")
             .hasFieldOrPropertyWithValue("description", null)
-            .hasFieldOrPropertyWithValue("environment", "DEFAULT")
+            .hasFieldOrPropertyWithValue("environment", "DEV")
             .hasFieldOrPropertyWithValue("parallelRun", false)
             .hasFieldOrPropertyWithValue("retryAuto", false)
             .hasFieldOrPropertyWithValue("datasetId", null)
             .hasFieldOrPropertyWithValue("scenarioIds", emptyList<Long>())
-            .hasFieldOrPropertyWithValue("tags", emptySet<String>())
+            .hasFieldOrPropertyWithValue("tags", emptyList<String>())
     }
 }

@@ -22,7 +22,7 @@ data class Dataset(
     val description: String = "",
     val uniqueValues: Set<KeyValue> = emptySet(),
     val multipleValues: List<List<KeyValue>> = emptyList(),
-    val tags: Set<String> = emptySet()
+    val tags: List<String> = emptyList()
 ) {
     val id: String = name.replace(" ", "_")
 
