@@ -66,8 +66,6 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     Authorization = Authorization;
 
-    private scenarioUpdatesubscription: Subscription;
-
 
     constructor(
         private router: Router,
@@ -114,7 +112,6 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.urlParams?.unsubscribe();
-        this.scenarioUpdatesubscription?.unsubscribe();
     }
 
     private fetchAndUpdateScenario(): Observable<Array<ScenarioIndex>> {
