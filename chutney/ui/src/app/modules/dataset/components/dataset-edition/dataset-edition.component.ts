@@ -35,7 +35,7 @@ import { Dataset, KeyValue } from '@model';
 })
 export class DatasetEditionComponent extends CanDeactivatePage implements OnInit, OnDestroy, AfterViewInit {
 
-    dataset: Dataset = new Dataset('', '', [], new Date(), [], [], 0);
+    dataset: Dataset = new Dataset('', '', [], new Date(), [], []);
 
     activeTab = 'keyValue';
     datasetForm: FormGroup;
@@ -185,7 +185,6 @@ export class DatasetEditionComponent extends CanDeactivatePage implements OnInit
         const mkv = this.datasetForm.controls['multiKeyValues'] as FormArray;
         const multiKeyValues = mkv.value ? mkv.value.map(a => a.map((p) => new KeyValue(p.key, p.value))) : [];
 
-        const version = this.dataset.id ? this.dataset.version : 0;
         const id = this.dataset.id ? this.dataset.id : null;
 
         return new Dataset(
@@ -195,7 +194,6 @@ export class DatasetEditionComponent extends CanDeactivatePage implements OnInit
             date,
             keyValues,
             multiKeyValues,
-            version,
             id
         );
     }

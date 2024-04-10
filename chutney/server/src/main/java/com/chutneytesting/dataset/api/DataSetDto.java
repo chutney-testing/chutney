@@ -41,11 +41,6 @@ public interface DataSetDto {
     String name();
 
     @Value.Default()
-    default Integer version() {
-        return 0;
-    }
-
-    @Value.Default()
     default String description() {
         return "";
     }

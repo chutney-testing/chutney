@@ -16,39 +16,88 @@
 
 package com.chutneytesting.dataset.api;
 
-import static com.chutneytesting.dataset.api.DataSetMapper.fromDto;
-import static com.chutneytesting.dataset.api.DataSetMapper.toDto;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.chutneytesting.server.core.domain.tools.ui.ImmutableKeyValue;
 import com.chutneytesting.server.core.domain.tools.ui.KeyValue;
-import java.util.Arrays;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import java.util.function.Predicate;
+import net.jqwik.api.Arbitraries;
+import net.jqwik.api.Arbitrary;
+import net.jqwik.api.Builders;
+import net.jqwik.api.ForAll;
+import net.jqwik.api.Property;
+import net.jqwik.api.Provide;
+import net.jqwik.time.api.DateTimes;
 
 class DataSetMapperTest {
 
-    // TODO issue https://github.com/chutney-testing/chutney/issues/532 for more details
-    @Test
-    @Disabled
-    public void should_keep_column_order() {
-        KeyValue[] constants = {keyOf("key1", "v1"), keyOf("key2", "v2"), keyOf("key3", "v3"), keyOf("key4", "v4")};
-        List<KeyValue> datatable = List.of(keyOf("col1", "v1"), keyOf("col2", "v2"), keyOf("col3", "v3"), keyOf("col4", "v4"));
-        DataSetDto dataSetDto = ImmutableDataSetDto.builder()
-            .name("name")
-            .addConstants(constants)
-            .addDatatable(datatable)
-            .build();
-
-        DataSetDto dataset = toDto(fromDto(dataSetDto));
-
-        assertThat(dataset.constants()).isEqualTo(Arrays.asList(constants));
-        assertThat(dataset.datatable()).isEqualTo(datatable);
+    @Property(tries = 100)
+    void map_dto_back_and_forth(@ForAll("validDto") DataSetDto dto) {
+        DataSetDto mapDto = DataSetMapper.toDto(DataSetMapper.fromDto(dto));
+        assertThat(mapDto.id()).isEqualTo(dto.id());
+        assertThat(mapDto.name()).isEqualTo(dto.name());
+        assertThat(mapDto.description()).isEqualTo(dto.description());
+        assertThat(mapDto.lastUpdated()).isEqualTo(dto.lastUpdated());
+        assertThat(mapDto.constants()).containsExactlyInAnyOrderElementsOf(dto.constants());
+        assertThat(
+            mapDto.datatable().stream().flatMap(List::stream).toList()
+        ).containsExactlyInAnyOrderElementsOf(
+            dto.datatable().stream().flatMap(List::stream).toList()
+        );
     }
 
-    private KeyValue keyOf(String key, String value) {
-        return ImmutableKeyValue.builder().key(key).value(value).build();
+    @Provide
+    @SuppressWarnings("unused")
+    private Arbitrary<DataSetDto> validDto() {
+        return Builders.withBuilder(ImmutableDataSetDto::builder)
+            .use(Arbitraries.strings().ofMinLength(1)).in(ImmutableDataSetDto.Builder::id)
+            .use(arbitraryName()).in(ImmutableDataSetDto.Builder::name)
+            .use(Arbitraries.strings()).in(ImmutableDataSetDto.Builder::description)
+            .use(DateTimes.instants()).in(ImmutableDataSetDto.Builder::lastUpdated)
+            .use(keyValueArbitrary().list()).in(ImmutableDataSetDto.Builder::constants)
+            .use(valueListArbitrary(arbitraryKey().list().sample()).list()).in(ImmutableDataSetDto.Builder::datatable)
+            .build(ImmutableDataSetDto.Builder::build);
     }
 
+    Predicate<String> strippedNotBlank = Predicate.not(s -> s.strip().isBlank());
+    Predicate<String> strippedSameLength = s -> s.length() == s.strip().length();
+    Predicate<String> withoutTwoConsecutiveSpaces = Predicate.not(s -> s.matches(" {2}"));
+    Predicate<String> trimmedNotBlank = Predicate.not(s -> s.trim().isBlank());
+    Predicate<String> trimmedSameLength = s -> s.length() == s.trim().length();
+
+    private Arbitrary<String> arbitraryName() {
+        return Arbitraries.strings().ofMinLength(1)
+            .filter(strippedNotBlank)
+            .filter(strippedSameLength)
+            .filter(withoutTwoConsecutiveSpaces);
+    }
+
+    private Arbitrary<String> arbitraryKey() {
+        return Arbitraries.strings().ofMinLength(1)
+            .filter(trimmedNotBlank)
+            .filter(trimmedSameLength);
+    }
+
+    private Arbitrary<String> arbitraryValue() {
+        return Arbitraries.strings()
+            .filter(Predicate.not(s -> s.trim().isBlank()))
+            .filter(s -> s.length() == s.trim().length());
+    }
+
+    private Arbitrary<KeyValue> keyValueArbitrary() {
+        return Builders.withBuilder(ImmutableKeyValue::builder)
+            .use(arbitraryKey()).in(ImmutableKeyValue.Builder::key)
+            .use(arbitraryValue()).in(ImmutableKeyValue.Builder::value)
+            .build(ImmutableKeyValue.Builder::build);
+    }
+
+    private Arbitrary<? extends List<KeyValue>> valueListArbitrary(List<String> keys) {
+        Arbitrary<String> valueArbitrary = arbitraryValue();
+        return Arbitraries.just(
+            keys.stream()
+                .map(k -> (KeyValue) ImmutableKeyValue.builder().key(k).value(valueArbitrary.sample()).build())
+                .toList()
+        );
+    }
 }

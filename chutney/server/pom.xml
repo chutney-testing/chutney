@@ -235,6 +235,10 @@
             <artifactId>jqwik</artifactId>
         </dependency>
         <dependency>
+            <groupId>net.jqwik</groupId>
+            <artifactId>jqwik-time</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.testcontainers</groupId>
             <artifactId>postgresql</artifactId>
             <scope>test</scope>

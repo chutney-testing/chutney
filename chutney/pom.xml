@@ -368,6 +368,12 @@
                 <scope>test</scope>
             </dependency>
             <dependency>
+                <groupId>net.jqwik</groupId>
+                <artifactId>jqwik-time</artifactId>
+                <version>${jqwik.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
                 <groupId>org.testcontainers</groupId>
                 <artifactId>testcontainers-bom</artifactId>
                 <version>${testcontainers.version}</version>
