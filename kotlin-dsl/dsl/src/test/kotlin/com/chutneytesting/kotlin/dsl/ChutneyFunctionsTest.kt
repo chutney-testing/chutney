@@ -114,6 +114,7 @@ class ChutneyFunctionsTest {
 
         assertELWrap(micrometerRegistry("className"))
 
+        assertELWrap(freeSystemPort())
         assertELWrap(tcpPort())
         assertELWrap(tcpPorts(2))
         assertELWrap(tcpPortMin(2))

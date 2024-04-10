@@ -16,12 +16,14 @@
 
 package com.chutneytesting.tools;
 
+import java.io.IOException;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.util.Random;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.Semaphore;
 import javax.net.ServerSocketFactory;
 
 /**
@@ -62,6 +64,28 @@ public class SocketUtils {
      * &lt;bean id="bean2" ... p:port="#{socketUtils.findAvailableTcpPort(30000)}" /&gt;</code></pre>
      */
     public SocketUtils() {
+    }
+
+    private static final Semaphore systemPortLock = new Semaphore(1);
+
+    /**
+     * Find free TCP port automatically allocated
+     *
+     * @return an available TCP port number.
+     * @throws RuntimeException if exception instantiating the socket
+     */
+    public static int freePortFromSystem() {
+        try {
+            systemPortLock.acquire();
+            try (ServerSocket socket = new ServerSocket(0)) {
+                socket.setReuseAddress(true);
+                return socket.getLocalPort();
+            }
+        } catch (InterruptedException | IOException e) {
+            throw new RuntimeException(e);
+        } finally {
+            systemPortLock.release();
+        }
     }
 
     /**
