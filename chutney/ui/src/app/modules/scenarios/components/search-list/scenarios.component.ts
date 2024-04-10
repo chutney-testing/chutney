@@ -96,7 +96,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         });
 
         this.fetchAndUpdateScenario().pipe(map(scenarios => {
-            if (!this.noScenarioIsRunning(scenarios)) {
+            if (this.atLeastOneScenarioIsRunning(scenarios)) {
                 this.subscribeForScenarios()
             };
         })).subscribe()
@@ -106,7 +106,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         interval(3000)
         .pipe(
             mergeMap(() => this.fetchAndUpdateScenario()),
-            takeWhile(t => !this.noScenarioIsRunning(t)))
+            takeWhile(t => this.atLeastOneScenarioIsRunning(t)))
         .subscribe()
     }
 
@@ -130,8 +130,8 @@ export class ScenariosComponent implements OnInit, OnDestroy {
             }));
     }
 
-    private noScenarioIsRunning(scenarios: Array<ScenarioIndex>) : boolean {
-        return scenarios.filter(scenario => scenario.status === ExecutionStatus.RUNNING).length == 0
+    private atLeastOneScenarioIsRunning(scenarios: Array<ScenarioIndex>) : boolean {
+        return scenarios.filter(scenario => scenario.status === ExecutionStatus.RUNNING).length > 0
     }
 
     private initFilters() {
