@@ -5,11 +5,11 @@ import com.chutneytesting.kotlin.dsl.ChutneyScenario
 import com.chutneytesting.kotlin.dsl.Scenario
 import com.chutneytesting.kotlin.dsl.SuccessAction
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
+import com.github.tomakehurst.wiremock.client.ResponseDefinitionBuilder.okForJson
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
 import com.github.tomakehurst.wiremock.matching.UrlPattern
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONObject
 import org.junit.jupiter.api.Test
@@ -30,7 +30,6 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
 
     @Test
     fun should_create_new_scenario_local_file(@TempDir tempDir: Path) {
-
         // When & then
         assertScenarioSynchronization(tempDir = tempDir, scenario = localScenario)
         wireMockServer.verify(0, RequestPatternBuilder.allRequests());
@@ -38,7 +37,6 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
 
     @Test
     fun should_update_scenario_local_file(@TempDir tempDir: Path) {
-
         // Given
         assertScenarioSynchronization(tempDir = tempDir, scenario = localScenario)
 
@@ -55,11 +53,10 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
 
     @Test
     fun should_create_remote_scenario_and_rename_scenario_local_file(@TempDir tempDir: Path) {
-
         // Given
         assertScenarioSynchronization(tempDir = tempDir, scenario = localScenario)
 
-        val modifiedScenario = Scenario(title = "A scenario") {
+        val modifiedScenario = Scenario(title = "A scenario", tags = listOf("TAG1", "TAG_2")) {
             When("Something happens with success") {
                 SuccessAction()
             }
@@ -69,8 +66,7 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
         wireMockServer.stubFor(
             WireMock.post(WireMock.urlEqualTo("/api/scenario/v2/raw"))
                 .willReturn(
-                    WireMock.aResponse()
-                        .withBody(createdScenarioId.toString())
+                    okForJson(createdScenarioId.toString())
                 )
         )
 
@@ -87,9 +83,11 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
             it.request.url == "/api/scenario/v2/raw" && it.request.method.value() == "POST"
         }.map { it.request.bodyAsString }
         assertThat(requestJson.size).isEqualTo(1)
-        assertThat(requestJson.first()).contains(localScenario.title)
-        assertThat(requestJson.first()).contains("Something happens with success")
-        assertThat(requestJson.first()).contains("KOTLIN")
+        assertThat(requestJson.first())
+            .contains(localScenario.title)
+            .contains("Something happens with success")
+            .contains("TAG1")
+            .contains("TAG_2")
     }
 
     @Test
@@ -141,16 +139,15 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
             it.request.url == "/api/scenario/v2/raw" && it.request.method.value() == "POST"
         }.map { it.request.bodyAsString }
         assertThat(requestJson.size).isEqualTo(1)
-        assertThat(requestJson.first()).contains(existingScenario.title)
-        assertThat(requestJson.first()).contains(existingScenario.id.toString())
-        assertThat(requestJson.first()).contains("Something happens with success")
-        assertThat(requestJson.first()).contains("TEST")
-        assertThat(requestJson.first()).contains("KOTLIN")
+        assertThat(requestJson.first())
+            .contains(existingScenario.title)
+            .contains(existingScenario.id.toString())
+            .contains("Something happens with success")
+            .contains("TEST")
     }
 
     @Test
     fun should_create_scenario_with_explicit_id() {
-
         // Given
         val scenario = ChutneyScenario(123, "title", "description")
         val expectedBodyRequest  = mapOf("content" to "{" + System.lineSeparator() + "  \"title\": \"title\"," + System.lineSeparator() + "  \"description\": \"description\"" + System.lineSeparator() + "}" + System.lineSeparator(),
@@ -181,7 +178,7 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
         ChutneyServerServiceImpl.createOrUpdateJsonScenario(chutneyServerInfo, scenario)
 
         // Then
-        Assertions.assertThat(wireMockServer.allServeEvents.filter {
+        assertThat(wireMockServer.allServeEvents.filter {
             it.request.url == "/api/scenario/v2/raw" && it.request.method.value() == "POST"
         }.toList().size).isEqualTo(1)
     }
@@ -193,11 +190,12 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
         updateRemote: Boolean = false
     ) {
         // When
-        scenario.synchronise(
-            serverInfo = chutneyServerInfo,
-            path = tempDir.absolutePathString(),
-            updateRemote = updateRemote
-        )
+        if (updateRemote) {
+            val syncScenario = scenario.synchronise(serverInfo = chutneyServerInfo)
+            syncScenario.jsonSerialize(path = tempDir.absolutePathString())
+        } else {
+            scenario.jsonSerialize(path = tempDir.absolutePathString())
+        }
 
         // Then
         val tmpDirFiles = File(tempDir.absolutePathString()).walkTopDown().filter { it.isFile }

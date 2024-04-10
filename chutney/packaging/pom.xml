@@ -105,7 +105,7 @@
                         <layout>ZIP</layout>
                         <mainClass>${mainClass}</mainClass>
                         <finalName>${chutney.package.file}</finalName>
-                        <wait>1000</wait>
+                        <wait>2000</wait>
                         <jmxPort>54321</jmxPort>
                     </configuration>
                     <executions>

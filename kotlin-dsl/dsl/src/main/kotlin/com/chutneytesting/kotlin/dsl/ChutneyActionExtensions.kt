@@ -1195,7 +1195,7 @@ fun ChutneyStepBuilder.SeleniumFirefoxDriverInitAction(
     driverPath: String? = null,
     browserPath: String? = null,
     firefoxProfile: String? = null,
-    firefoxPreferences: Map<String, Object>? = null,
+    firefoxPreferences: Map<String, Any>? = null,
     outputs: Map<String, Any> = mapOf(),
     validations: Map<String, Any> = mapOf(),
     strategy: Strategy? = null
@@ -2156,14 +2156,15 @@ fun ChutneyStepBuilder.RadiusAccountingAction(
 
 // Helpers
 private fun <T> List<Pair<String, T?>?>.notEmptyToMap(): Map<String, T> {
-    return (this
+    return this
         .filterNotNull()
         .filter { it.second != null }
+        .filterIsInstance<Pair<String, T>>()
         .filter {
             when (it.second) {
                 is Collection<*> -> (it.second as Collection<*>).isNotEmpty()
                 is Map<*, *> -> (it.second as Map<*, *>).isNotEmpty()
                 else -> true
             }
-        } as List<Pair<String, T>>).toMap()
+        }.toMap()
 }

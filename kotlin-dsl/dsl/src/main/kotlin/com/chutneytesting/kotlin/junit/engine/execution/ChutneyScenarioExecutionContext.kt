@@ -239,7 +239,7 @@ class ChutneyScenarioExecutionContext(
             } else {
                 ChutneyStepImpl(step.definition().type)
             },
-            step.definition().strategy.map { Strategy(it.type, it.strategyProperties as Map<String, String>) }.orElse(null)
+            step.definition().strategy.map { Strategy(it.type, it.strategyProperties.mapValues { v -> v.toString() }) }.orElse(null)
         )
     }
 

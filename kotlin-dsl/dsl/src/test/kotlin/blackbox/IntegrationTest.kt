@@ -12,6 +12,7 @@ import org.testcontainers.junit.jupiter.Testcontainers
 import util.WSLUtil
 import java.io.File
 import java.nio.file.Files
+import java.time.Duration
 
 @Testcontainers
 class IntegrationTest {
@@ -35,7 +36,7 @@ class IntegrationTest {
             // Start server
             chutneyServer = GenericContainer<Nothing>("ghcr.io/chutney-testing/chutney/server:latest")
                 .apply {
-                    //withStartupTimeout(Duration.ofSeconds(30))
+                    withStartupTimeout(Duration.ofSeconds(80))
                     withExposedPorts(8443)
                     withFileSystemBind(WSLUtil.wslPath(tempDirectory), "/config", BindMode.READ_WRITE)
                 }

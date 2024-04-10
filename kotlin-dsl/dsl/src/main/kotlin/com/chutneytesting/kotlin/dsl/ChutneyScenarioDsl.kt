@@ -15,12 +15,23 @@ import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 @DslMarker
 annotation class ChutneyScenarioDsl
 
-fun Scenario(id: Int? = null, title: String, defaultDataset: String? = null, block: ChutneyScenarioBuilder.() -> Unit): ChutneyScenario {
-    return ChutneyScenarioBuilder(id, title, defaultDataset).apply(block).build()
+fun Scenario(
+    id: Int? = null,
+    title: String,
+    defaultDataset: String? = null,
+    tags: List<String> = emptyList(),
+    block: ChutneyScenarioBuilder.() -> Unit
+): ChutneyScenario {
+    return ChutneyScenarioBuilder(id, title, defaultDataset, tags).apply(block).build()
 }
 
 @ChutneyScenarioDsl
-class ChutneyScenarioBuilder(val id: Int? = null, val title: String = "", val defaultDataset: String? = null) {
+class ChutneyScenarioBuilder(
+    val id: Int? = null,
+    val title: String = "",
+    val defaultDataset: String? = null,
+    val tags: List<String> = emptyList(),
+) {
     var description = title
     private val givens = mutableListOf<ChutneyStep>()
     private var `when`: ChutneyStep? = null
@@ -64,7 +75,7 @@ class ChutneyScenarioBuilder(val id: Int? = null, val title: String = "", val de
         }
     }
 
-    fun build(): ChutneyScenario = ChutneyScenario(id, title, description, defaultDataset, givens, `when`, thens)
+    fun build(): ChutneyScenario = ChutneyScenario(id, title, description, defaultDataset, tags, givens, `when`, thens)
 }
 
 @JsonInclude(NON_EMPTY)
@@ -153,7 +164,7 @@ object Mapper {
         var json = mapper.writeValueAsString(value)
         json = json.replace(": [ ]", ": []")
         json = json.replace(": { }", ": {}")
-        json += System.getProperty("line.separator")
+        json += System.lineSeparator()
         return json
     }
 }
@@ -178,6 +189,7 @@ class ChutneyScenario(
     val title: String = "",
     val description: String = "",
     @JsonIgnore val defaultDataset: String? = null,
+    @JsonIgnore val tags: List<String> = emptyList(),
     @JsonInclude(NON_EMPTY) val givens: List<ChutneyStep> = mutableListOf(),
     @JsonInclude(NON_NULL) val `when`: ChutneyStep? = null,
     @JsonInclude(NON_EMPTY) val thens: List<ChutneyStep> = mutableListOf()

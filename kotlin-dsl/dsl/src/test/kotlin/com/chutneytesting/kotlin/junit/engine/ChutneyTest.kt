@@ -154,7 +154,7 @@ class ChutneyTest {
     fun withIfStrategy(): ChutneyScenario {
         return Scenario(title = "A scenario") {
             Given("Two values") {
-                ContextPutTask(
+                ContextPutAction(
                     entries = mapOf(
                         "value1" to "",
                         "value2" to ""
@@ -163,12 +163,12 @@ class ChutneyTest {
             }
             When("Updating values or not depending of strategy") {
                 Step("Put will be done", IfStrategy(condition = "(1+1) == 2".elEval())) {
-                    ContextPutTask(
+                    ContextPutAction(
                         entries = mapOf("value1" to "should_be_there")
                     )
                 }
                 Step("Put will not be done", IfStrategy(condition = "(1+1) == 3".elEval())) {
-                    ContextPutTask(
+                    ContextPutAction(
                         entries = mapOf("value2" to "should_not_be_there")
                     )
                 }

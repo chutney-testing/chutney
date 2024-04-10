@@ -13,6 +13,7 @@ import org.testcontainers.containers.Network
 import org.testcontainers.images.PullPolicy
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
+import java.time.Duration
 
 @Testcontainers
 class SeleniumTest {
@@ -23,6 +24,7 @@ class SeleniumTest {
         .withNetworkAliases("chutneyServer")
         .withExposedPorts(8443)
         .withNetwork(network)
+        .withStartupTimeout(Duration.ofSeconds(80))
 
     val webDriverContainer = BrowserWebDriverContainer()
         .withCapabilities(FirefoxOptions().setAcceptInsecureCerts(true))
