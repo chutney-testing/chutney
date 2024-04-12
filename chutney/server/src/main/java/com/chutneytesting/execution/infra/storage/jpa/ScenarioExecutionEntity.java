@@ -84,9 +84,6 @@ public class ScenarioExecutionEntity {
     @Column(name = "DATASET_ID")
     private String datasetId;
 
-    @Column(name = "DATASET_VERSION")
-    private Integer datasetVersion;
-
     @Column(name = "VERSION")
     @Version
     private Integer version;
@@ -107,7 +104,6 @@ public class ScenarioExecutionEntity {
         String environment,
         String userId,
         String datasetId,
-        Integer datasetVersion,
         String tags,
         Integer version
     ) {
@@ -123,7 +119,6 @@ public class ScenarioExecutionEntity {
         this.environment = environment;
         this.userId = userId;
         this.datasetId = datasetId;
-        this.datasetVersion = datasetVersion;
         this.tags = tags;
         this.version = version;
     }
@@ -188,10 +183,6 @@ public class ScenarioExecutionEntity {
         return datasetId;
     }
 
-    public Integer datasetVersion() {
-        return datasetVersion;
-    }
-
     public String tags() {
         return tags;
     }
@@ -214,7 +205,6 @@ public class ScenarioExecutionEntity {
             execution.environment(),
             execution.user(),
             execution.datasetId().orElse(null),
-            execution.datasetVersion().orElse(null),
             truncateExecutionTags(TagListMapper.tagsToString(execution.tags().orElse(null))),
             version
         );
@@ -235,7 +225,6 @@ public class ScenarioExecutionEntity {
             .testCaseTitle(scenarioTitle)
             .environment(environment)
             .datasetId(ofNullable(datasetId))
-            .datasetVersion(ofNullable(datasetVersion))
             .user(userId)
             .campaignReport(ofNullable(campaignReport))
             .scenarioId(scenarioId)

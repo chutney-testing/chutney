@@ -986,7 +986,6 @@ public class PurgeServiceTest {
             partialExecution,
             campaignEnv,
             firsScenarioExecution.datasetId().orElse(null),
-            firsScenarioExecution.datasetVersion().orElse(null),
             firsScenarioExecution.user()
         );
     }

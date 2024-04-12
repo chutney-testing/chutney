@@ -115,7 +115,7 @@ public abstract class AbstractLocalDatabaseTest {
     }
 
     protected ScenarioExecutionEntity givenScenarioExecution(Long scenarioId, ServerReportStatus status) {
-        ScenarioExecutionEntity execution = new ScenarioExecutionEntity(null, scenarioId.toString(), null, now().toEpochMilli(), 0L, status, null, null, "", "", "", null, null, TagListMapper.tagsToString(defaultScenarioTags()), null);
+        ScenarioExecutionEntity execution = new ScenarioExecutionEntity(null, scenarioId.toString(), null, now().toEpochMilli(), 0L, status, null, null, "", "", "", null, TagListMapper.tagsToString(defaultScenarioTags()), null);
         return transactionTemplate.execute(ts -> {
             entityManager.persist(execution);
             return execution;

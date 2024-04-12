@@ -47,7 +47,6 @@ public class CampaignExecution {
     public final boolean partialExecution;
     public final String executionEnvironment;
     public final Optional<String> dataSetId;
-    public final Optional<Integer> dataSetVersion;
     public final String userId;
 
     // Not mandatory
@@ -61,7 +60,6 @@ public class CampaignExecution {
                              boolean partialExecution,
                              String executionEnvironment,
                              String dataSetId,
-                             Integer dataSetVersion,
                              String userId) {
         this.executionId = executionId;
         this.campaignId = null;
@@ -72,7 +70,6 @@ public class CampaignExecution {
         this.startDate = now();
         this.status = RUNNING;
         this.dataSetId = ofNullable(dataSetId);
-        this.dataSetVersion = ofNullable(dataSetVersion);
         this.userId = userId;
     }
 
@@ -83,7 +80,6 @@ public class CampaignExecution {
                              boolean partialExecution,
                              String executionEnvironment,
                              String dataSetId,
-                             Integer dataSetVersion,
                              String userId) {
         this.executionId = executionId;
         this.campaignId = campaignId;
@@ -94,7 +90,6 @@ public class CampaignExecution {
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
         this.dataSetId = ofNullable(dataSetId);
-        this.dataSetVersion = ofNullable(dataSetVersion);
         this.userId = userId;
     }
 
@@ -106,7 +101,6 @@ public class CampaignExecution {
         String executionEnvironment,
         String userId,
         Optional<String> dataSetId,
-        Optional<Integer> dataSetVersion,
         LocalDateTime startDate,
         ServerReportStatus status,
         List<ScenarioExecutionCampaign> scenarioExecutions
@@ -117,7 +111,6 @@ public class CampaignExecution {
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
         this.dataSetId = dataSetId;
-        this.dataSetVersion = dataSetVersion;
         this.userId = userId;
 
         if (scenarioExecutions == null) {
@@ -145,7 +138,6 @@ public class CampaignExecution {
                         .duration(0)
                         .environment(executionEnvironment)
                         .datasetId(dataSetId)
-                        .datasetVersion(dataSetVersion)
                         .user(userId)
                         .scenarioId(testCase.id())
                         .build())));
@@ -167,7 +159,6 @@ public class CampaignExecution {
                     .duration(0)
                     .environment(executionEnvironment)
                     .datasetId(dataSetId)
-                    .datasetVersion(dataSetVersion)
                     .user(userId)
                     .scenarioId(testCase.id())
                     .build()));
@@ -263,7 +254,6 @@ public class CampaignExecution {
             .setCampaignName(campaignName)
             .setExecutionEnvironment(executionEnvironment)
             .setDataSetId(dataSetId.orElse(null))
-            .setDataSetVersion(dataSetVersion.orElse(null))
             .setUserId(userId)
             .setStartDate(startDate)
             .setStatus(status)

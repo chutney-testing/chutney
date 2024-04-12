@@ -81,7 +81,6 @@ public class ScenarioExecutionReportEntity {
             .environment(scenarioExecution.environment())
             .user(scenarioExecution.userId())
             .datasetId(ofNullable(scenarioExecution.datasetId()))
-            .datasetVersion(ofNullable(scenarioExecution.datasetVersion()))
             .scenarioId(scenarioExecution.scenarioId())
             .tags(TagListMapper.tagsStringToSet(scenarioExecution.tags()))
             .build();

@@ -27,7 +27,6 @@ import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.jira.api.JiraXrayEmbeddedApi;
 import com.chutneytesting.jira.domain.exception.NoJiraConfigurationException;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
-import com.chutneytesting.server.core.domain.dataset.DataSetHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.ExecutionRequest;
 import com.chutneytesting.server.core.domain.execution.FailedExecutionAttempt;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngine;
@@ -74,8 +73,6 @@ public class CampaignExecutionEngine {
     private final ScenarioExecutionEngine scenarioExecutionEngine;
     private final ExecutionHistoryRepository executionHistoryRepository;
     private final TestCaseRepository testCaseRepository;
-    //TODO please not use type Optional as field
-    private final Optional<DataSetHistoryRepository> dataSetHistoryRepository;
     private final JiraXrayEmbeddedApi jiraXrayEmbeddedApi;
     private final ChutneyMetrics metrics;
     private final DataSetRepository datasetRepository;
@@ -88,7 +85,6 @@ public class CampaignExecutionEngine {
                                    ScenarioExecutionEngine scenarioExecutionEngine,
                                    ExecutionHistoryRepository executionHistoryRepository,
                                    TestCaseRepository testCaseRepository,
-                                   Optional<DataSetHistoryRepository> dataSetHistoryRepository,
                                    JiraXrayEmbeddedApi jiraXrayEmbeddedApi,
                                    ChutneyMetrics metrics,
                                    ExecutorService executorService,
@@ -98,7 +94,6 @@ public class CampaignExecutionEngine {
         this.scenarioExecutionEngine = scenarioExecutionEngine;
         this.executionHistoryRepository = executionHistoryRepository;
         this.testCaseRepository = testCaseRepository;
-        this.dataSetHistoryRepository = dataSetHistoryRepository;
         this.jiraXrayEmbeddedApi = jiraXrayEmbeddedApi;
         this.metrics = metrics;
         this.executor = executorService;
@@ -158,7 +153,6 @@ public class CampaignExecutionEngine {
             !failedIds.isEmpty(),
             campaign.executionEnvironment(),
             isNotBlank(campaign.externalDatasetId) ? campaign.externalDatasetId : null,
-            isNotBlank(campaign.externalDatasetId) && dataSetHistoryRepository.isPresent() ? dataSetHistoryRepository.get().lastVersion(campaign.externalDatasetId) : null,
             userId
         );
 

@@ -78,9 +78,9 @@ public class CampaignExecutionDBRepositoryTest {
             Long campaignExecutionId2 = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
             Long campaignExecutionId3 = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
 
-            CampaignExecution campaignExecution1 = new CampaignExecution(campaignExecutionId1, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", 5, "user");
-            CampaignExecution campaignExecution2 = new CampaignExecution(campaignExecutionId2, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", 5, "user");
-            CampaignExecution campaignExecution3 = new CampaignExecution(campaignExecutionId3, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", 5, "user");
+            CampaignExecution campaignExecution1 = new CampaignExecution(campaignExecutionId1, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", "user");
+            CampaignExecution campaignExecution2 = new CampaignExecution(campaignExecutionId2, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", "user");
+            CampaignExecution campaignExecution3 = new CampaignExecution(campaignExecutionId3, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", "user");
 
             sut.saveCampaignExecution(campaign.id(), campaignExecution1);
             sut.saveCampaignExecution(campaign.id(), campaignExecution2);
@@ -107,7 +107,7 @@ public class CampaignExecutionDBRepositoryTest {
             ScenarioExecutionEntity scenarioExecution = givenScenarioExecution(scenarioEntity.getId(), ServerReportStatus.NOT_EXECUTED);
             ScenarioExecutionCampaign scenarioExecutionReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecution.toDomain());
             Long campaignExecutionId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", 5, "user");
+            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", "user");
             sut.saveCampaignExecution(campaign.id(), campaignExecution);
 
             List<CampaignExecution> reports = sut.getExecutionHistory(campaign.id());
@@ -118,7 +118,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("campaignName", campaignExecution.campaignName)
                 .hasFieldOrPropertyWithValue("partialExecution", campaignExecution.partialExecution)
                 .hasFieldOrPropertyWithValue("dataSetId", campaignExecution.dataSetId)
-                .hasFieldOrPropertyWithValue("dataSetVersion", campaignExecution.dataSetVersion)
                 .hasFieldOrPropertyWithValue("executionEnvironment", campaignExecution.executionEnvironment)
                 .hasFieldOrPropertyWithValue("userId", campaignExecution.userId)
             ;
@@ -132,7 +131,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("status", scenarioExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioExecution.environment())
                 .hasFieldOrPropertyWithValue("datasetId", scenarioExecution.datasetId())
-                .hasFieldOrPropertyWithValue("datasetVersion", scenarioExecution.datasetVersion())
             ;
         }
 
@@ -147,7 +145,7 @@ public class CampaignExecutionDBRepositoryTest {
             ScenarioExecutionEntity scenarioTwoExecution = givenScenarioExecution(scenarioEntityTwo.getId(), ServerReportStatus.FAILURE);
             ScenarioExecutionCampaign scenarioTwoExecutionReport = new ScenarioExecutionCampaign(scenarioEntityTwo.getId().toString(), scenarioEntityTwo.getTitle(), scenarioTwoExecution.toDomain());
             Long campaignExecutionId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), new ArrayList<>(List.of(scenarioOneExecutionReport, scenarioTwoExecutionReport)), campaign.title(), true, "env", "", 5, "user");
+            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), new ArrayList<>(List.of(scenarioOneExecutionReport, scenarioTwoExecutionReport)), campaign.title(), true, "env", "", "user");
             sut.saveCampaignExecution(campaign.id(), campaignExecution);
 
             List<CampaignExecution> reports = sut.getExecutionHistory(campaign.id());
@@ -158,7 +156,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("campaignName", campaignExecution.campaignName)
                 .hasFieldOrPropertyWithValue("partialExecution", campaignExecution.partialExecution)
                 .hasFieldOrPropertyWithValue("dataSetId", campaignExecution.dataSetId)
-                .hasFieldOrPropertyWithValue("dataSetVersion", campaignExecution.dataSetVersion)
                 .hasFieldOrPropertyWithValue("executionEnvironment", campaignExecution.executionEnvironment)
                 .hasFieldOrPropertyWithValue("userId", campaignExecution.userId)
             ;
@@ -173,7 +170,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("status", scenarioOneExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioOneExecution.environment())
                 .hasFieldOrPropertyWithValue("datasetId", scenarioOneExecution.datasetId())
-                .hasFieldOrPropertyWithValue("datasetVersion", scenarioOneExecution.datasetVersion())
             ;
             assertThat(reports.get(0).scenarioExecutionReports()).element(1)
                 .hasFieldOrPropertyWithValue("scenarioId", scenarioEntityTwo.getId().toString())
@@ -183,7 +179,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("status", scenarioTwoExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioTwoExecution.environment())
                 .hasFieldOrPropertyWithValue("datasetId", scenarioTwoExecution.datasetId())
-                .hasFieldOrPropertyWithValue("datasetVersion", scenarioTwoExecution.datasetVersion())
             ;
         }
 
@@ -202,7 +197,7 @@ public class CampaignExecutionDBRepositoryTest {
             ScenarioExecutionEntity scenarioOneExecution = givenScenarioExecution(scenarioEntityOne.getId(), ServerReportStatus.SUCCESS);
             ScenarioExecutionCampaign scenarioOneExecutionReport = new ScenarioExecutionCampaign(scenarioEntityOne.getId().toString(), scenarioEntityOne.getTitle(), scenarioOneExecution.toDomain());
             Long campaignExecutionId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioOneExecutionReport), campaign.title(), true, "env", "", 5, "user");
+            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioOneExecutionReport), campaign.title(), true, "env", "", "user");
             sut.startExecution(campaign.id(), campaignExecution);
             sut.saveCampaignExecution(campaign.id(), campaignExecution);
 
@@ -214,7 +209,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("campaignName", campaignExecution.campaignName)
                 .hasFieldOrPropertyWithValue("partialExecution", campaignExecution.partialExecution)
                 .hasFieldOrPropertyWithValue("dataSetId", campaignExecution.dataSetId)
-                .hasFieldOrPropertyWithValue("dataSetVersion", campaignExecution.dataSetVersion)
                 .hasFieldOrPropertyWithValue("executionEnvironment", campaignExecution.executionEnvironment)
                 .hasFieldOrPropertyWithValue("userId", campaignExecution.userId)
             ;
@@ -245,7 +239,7 @@ public class CampaignExecutionDBRepositoryTest {
             ScenarioExecutionEntity scenarioExecution = givenScenarioExecution(scenarioEntity.getId(), ServerReportStatus.NOT_EXECUTED);
             ScenarioExecutionCampaign scenarioExecutionReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecution.toDomain());
             Long campaignExecutionId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", 5, "user");
+            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionReport), campaign.title(), true, "env", "", "user");
             sut.saveCampaignExecution(campaign.id(), campaignExecution);
 
             sut.clearAllExecutionHistory(campaign.id());
@@ -269,25 +263,25 @@ public class CampaignExecutionDBRepositoryTest {
             ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), ServerReportStatus.NOT_EXECUTED);
             ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
             Long campaignExecutionOneId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecutionOneReport = new CampaignExecution(campaignExecutionOneId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "", 5, "user");
+            CampaignExecution campaignExecutionOneReport = new CampaignExecution(campaignExecutionOneId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "", "user");
             sut.saveCampaignExecution(campaign.id(), campaignExecutionOneReport);
 
             ScenarioExecutionEntity scenarioExecutionTwo = givenScenarioExecution(scenarioEntity.getId(), ServerReportStatus.SUCCESS);
             ScenarioExecutionCampaign scenarioExecutionTwoReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionTwo.toDomain());
             Long campaignExecutionTwoId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecutionTwoReport = new CampaignExecution(campaignExecutionTwoId, campaign.id(), singletonList(scenarioExecutionTwoReport), campaign.title(), true, "env", "", 5, "user");
+            CampaignExecution campaignExecutionTwoReport = new CampaignExecution(campaignExecutionTwoId, campaign.id(), singletonList(scenarioExecutionTwoReport), campaign.title(), true, "env", "", "user");
             sut.saveCampaignExecution(campaign.id(), campaignExecutionTwoReport);
 
             ScenarioExecutionEntity scenarioExecutionThree = givenScenarioExecution(scenarioEntity.getId(), ServerReportStatus.FAILURE);
             ScenarioExecutionCampaign scenarioExecutionThreeReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionThree.toDomain());
             Long campaignExecutionThreeId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecutionThreeReport = new CampaignExecution(campaignExecutionThreeId, campaign.id(), singletonList(scenarioExecutionThreeReport), campaign.title(), true, "env", "", 5, "user");
+            CampaignExecution campaignExecutionThreeReport = new CampaignExecution(campaignExecutionThreeId, campaign.id(), singletonList(scenarioExecutionThreeReport), campaign.title(), true, "env", "", "user");
             sut.saveCampaignExecution(campaign.id(), campaignExecutionThreeReport);
 
             ScenarioExecutionEntity scenarioExecutionFour = givenScenarioExecution(scenarioEntity.getId(), ServerReportStatus.RUNNING);
             ScenarioExecutionCampaign scenarioExecutionFourReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionFour.toDomain());
             Long campaignExecutionFourId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecutionFourReport = new CampaignExecution(campaignExecutionFourId, campaign.id(), singletonList(scenarioExecutionFourReport), campaign.title(), true, "env", "", 5, "user");
+            CampaignExecution campaignExecutionFourReport = new CampaignExecution(campaignExecutionFourId, campaign.id(), singletonList(scenarioExecutionFourReport), campaign.title(), true, "env", "", "user");
             sut.saveCampaignExecution(campaign.id(), campaignExecutionFourReport);
 
 

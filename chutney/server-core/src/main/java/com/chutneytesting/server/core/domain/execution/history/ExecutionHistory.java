@@ -53,8 +53,6 @@ public interface ExecutionHistory {
 
         Optional<String> datasetId();
 
-        Optional<Integer> datasetVersion();
-
         String user();
 
         Optional<CampaignExecution> campaignReport();
