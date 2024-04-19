@@ -16,6 +16,7 @@
 
 package com.chutneytesting.campaign.infra.jpa;
 
+import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,19 +43,23 @@ public class CampaignScenarioEntity {
     @Column(name = "SCENARIO_ID")
     private String scenarioId;
 
+    @Column(name = "DATASET_ID")
+    private String datasetId;
+
     @Column(name = "RANK")
     private Integer rank;
 
     public CampaignScenarioEntity() {
     }
 
-    public CampaignScenarioEntity(String scenarioId, Integer rank) {
-        this(null, scenarioId, rank);
+    private CampaignScenarioEntity(String scenarioId, String datasetId, Integer rank) {
+        this(null, scenarioId, datasetId, rank);
     }
 
-    public CampaignScenarioEntity(CampaignEntity campaign, String scenarioId, Integer rank) {
+    public CampaignScenarioEntity(CampaignEntity campaign, String scenarioId, String datasetId, Integer rank) {
         this.campaign = campaign;
         this.scenarioId = scenarioId;
+        this.datasetId = datasetId;
         this.rank = rank;
     }
 
@@ -66,21 +71,17 @@ public class CampaignScenarioEntity {
         return campaign;
     }
 
-    public Integer rank() {
-        return rank;
+    public String datasetId() {
+        return datasetId;
     }
 
     public void forCampaign(CampaignEntity campaign) {
         this.campaign = campaign;
     }
 
-    public static List<CampaignScenarioEntity> fromDomain(com.chutneytesting.server.core.domain.scenario.campaign.Campaign campaign) {
-        return IntStream.range(0, campaign.scenarioIds.size())
-            .mapToObj(idx -> new CampaignScenarioEntity(campaign.scenarioIds.get(idx), idx))
+    public static List<CampaignScenarioEntity> fromDomain(Campaign campaign) {
+        return IntStream.range(0, campaign.campaignScenarios.size())
+            .mapToObj(idx -> new CampaignScenarioEntity(campaign.campaignScenarios.get(idx).scenarioId(), campaign.campaignScenarios.get(idx).datasetId(), idx))
             .toList();
-    }
-
-    public void rank(Integer rank) {
-        this.rank = rank;
     }
 }

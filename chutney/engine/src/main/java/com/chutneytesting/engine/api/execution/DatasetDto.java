@@ -16,6 +16,9 @@
 
 package com.chutneytesting.engine.api.execution;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -32,4 +35,7 @@ public class DatasetDto {
             .toList();
     }
 
+    public DatasetDto() {
+        this(emptyMap(), emptyList());
+    }
 }

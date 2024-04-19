@@ -68,7 +68,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 public class CampaignControllerTest {
 
     private static final CampaignDto SAMPLE_CAMPAIGN = new CampaignDto(null, "test", "desc", Lists.newArrayList("1", "2", "3"),
-        emptyList(), "env", false, false, null, emptyList());
+        null, emptyList(), "env", false, false, null, emptyList());
     private static final String urlTemplate = "/api/ui/campaign/v1/";
 
     private final FakeCampaignRepository repository = new FakeCampaignRepository();
@@ -99,8 +99,13 @@ public class CampaignControllerTest {
         CampaignDto actual = insertCampaign(SAMPLE_CAMPAIGN);
 
         // Then
-        assertThat(actual).usingRecursiveComparison().ignoringFields("id").isEqualTo(SAMPLE_CAMPAIGN);
+        assertThat(actual).usingRecursiveComparison().ignoringFields("id", "scenarios").isEqualTo(SAMPLE_CAMPAIGN);
         assertThat(actual.getId()).isNotNull();
+        assertThat(actual.getScenarios()).containsExactly(
+            new CampaignDto.CampaignScenarioDto("1", null),
+            new CampaignDto.CampaignScenarioDto("2", null),
+            new CampaignDto.CampaignScenarioDto("3", null)
+        );
     }
 
     @Test
@@ -126,6 +131,7 @@ public class CampaignControllerTest {
             updatedTitle,
             existingCampaign.getDescription(),
             existingCampaign.getScenarioIds(),
+            emptyList(),
             existingCampaign.getCampaignExecutionReports(),
             existingCampaign.getEnvironment(), false, false, null, emptyList());
 
@@ -146,6 +152,7 @@ public class CampaignControllerTest {
             existingCampaign.getTitle(),
             existingCampaign.getDescription(),
             updatedScenarioIds,
+            null,
             existingCampaign.getCampaignExecutionReports(),
             existingCampaign.getEnvironment(), false, false, null, emptyList());
 
@@ -154,8 +161,9 @@ public class CampaignControllerTest {
 
         // Then
         assertThat(receivedCampaign.getScenarioIds()).isEqualTo(updatedScenarioIds);
+        assertThat(receivedCampaign.getScenarios()).isEmpty();
         assertThat(receivedCampaign.getDatasetId()).isNull();
-        assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("scenarioIds", "datasetId").isEqualTo(existingCampaign);
+        assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("scenarioIds", "scenarios", "datasetId").isEqualTo(existingCampaign);
     }
 
     @Test
@@ -165,6 +173,7 @@ public class CampaignControllerTest {
             existingCampaign.getTitle(),
             existingCampaign.getDescription(),
             existingCampaign.getScenarioIds(),
+            null,
             existingCampaign.getCampaignExecutionReports(),
             existingCampaign.getEnvironment(), false, false, null, List.of("Tag"));
 
@@ -205,7 +214,7 @@ public class CampaignControllerTest {
     @Test
     public void should_find_all_existing_campaign() throws Exception {
         // Given
-        CampaignDto anotherExistingCampaign = insertCampaign(new CampaignDto(42L, "title", "description", emptyList(), emptyList(), "env", false, false, null, null));
+        CampaignDto anotherExistingCampaign = insertCampaign(new CampaignDto(42L, "title", "description", emptyList(), emptyList(), emptyList(), "env", false, false, null, null));
 
         // When
         execute(MockMvcRequestBuilders.get(urlTemplate))
@@ -223,7 +232,7 @@ public class CampaignControllerTest {
         // Given
         removeCampaign(existingCampaign.getId());
         CampaignDto campaignToCreate = new CampaignDto(42L, "CAMPAIGN_LINKED_TO_SCENARIO", "description", Lists.newArrayList("4", "5", "6"),
-            emptyList(), "env", false, false, null, null);
+            emptyList(), emptyList(), "env", false, false, null, null);
         insertCampaign(campaignToCreate);
 
         // When
@@ -244,7 +253,7 @@ public class CampaignControllerTest {
         // Given
         removeCampaign(existingCampaign.getId());
         CampaignDto campaignToCreate = new CampaignDto(42L, "CAMPAIGN_WITHOUT_SCENARIO", "description", emptyList(),
-            emptyList(), "env", false, false, null, null);
+            emptyList(), emptyList(), "env", false, false, null, null);
         insertCampaign(campaignToCreate);
 
         // When
@@ -314,7 +323,7 @@ public class CampaignControllerTest {
         when(execution0.time()).thenReturn(LocalDateTime.now().minusDays(1));
         CampaignExecution campaignExecution0 = new CampaignExecution(1L, 1L, singletonList(new ScenarioExecutionCampaign("20", "...", execution0)), "title", false, "", null, "");
         CampaignDto anotherExistingCampaign = new CampaignDto(null, "title", "description", emptyList(),
-            emptyList(), "env", false, false, null, null);
+            emptyList(), emptyList(), "env", false, false, null, null);
         anotherExistingCampaign = insertCampaign(anotherExistingCampaign);
         repository.saveCampaignExecution(anotherExistingCampaign.getId(), campaignExecution0);
 
@@ -343,7 +352,7 @@ public class CampaignControllerTest {
         // Given
         removeCampaign(existingCampaign.getId());
         CampaignDto campaignToCreate = new CampaignDto(42L, "CAMPAIGN_LINKED_TO_SCENARIO", "description", Lists.newArrayList("55", "44-44"),
-            emptyList(), "env", false, false, null, null);
+            emptyList(), emptyList(), "env", false, false, null, null);
         insertCampaign(campaignToCreate);
 
         when(repositoryAggregator.findMetadataById("44-44"))
@@ -370,7 +379,7 @@ public class CampaignControllerTest {
     }
 
     /**
-     * Insert a campaign into the data base and returns insertion result.
+     * Insert a campaign into the database and returns insertion result.
      *
      * @param campaign The campaign to insert.
      * @return The database inserted campaign result.

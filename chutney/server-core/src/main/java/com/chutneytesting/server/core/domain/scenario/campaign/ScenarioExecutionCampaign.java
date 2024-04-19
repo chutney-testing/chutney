@@ -21,18 +21,11 @@ import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus
 import java.util.Comparator;
 import java.util.Objects;
 
-public class ScenarioExecutionCampaign {
-    public final String scenarioId;
-    public final String scenarioName;
-    public final ExecutionHistory.ExecutionSummary execution;
-
-    public ScenarioExecutionCampaign(String scenarioId,
-                                     String scenarioName,
-                                     ExecutionHistory.ExecutionSummary execution) {
-        this.scenarioId = scenarioId;
-        this.scenarioName = scenarioName;
-        this.execution = execution;
-    }
+public record ScenarioExecutionCampaign(
+    String scenarioId,
+    String scenarioName,
+    ExecutionHistory.ExecutionSummary execution
+) {
 
     public ServerReportStatus status() {
         return execution.status();
@@ -47,11 +40,12 @@ public class ScenarioExecutionCampaign {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ScenarioExecutionCampaign that = (ScenarioExecutionCampaign) o;
-        return scenarioId.equals(that.scenarioId);
+        return Objects.equals(scenarioId, that.scenarioId) &&
+            Objects.equals(execution.datasetId(), that.execution.datasetId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(scenarioId);
+        return Objects.hash(scenarioId, execution.datasetId());
     }
 }

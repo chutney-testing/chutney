@@ -16,13 +16,14 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
+import com.chutneytesting.server.core.domain.scenario.campaign.Campaign.CampaignScenario;
 import java.util.List;
 
 public class CampaignBuilder {
     private Long id;
     private String title;
     private String description;
-    private List<String> scenarioIds;
+    private List<CampaignScenario> campaignScenarios;
     private String environment;
     private boolean parallelRun;
     private boolean retryAuto;
@@ -51,8 +52,8 @@ public class CampaignBuilder {
         return this;
     }
 
-    public CampaignBuilder setScenarioIds(List<String> scenarioIds) {
-        this.scenarioIds = scenarioIds;
+    public CampaignBuilder setCampaignScenarios(List<CampaignScenario> campaignScenarios) {
+        this.campaignScenarios = campaignScenarios;
         return this;
     }
 
@@ -85,7 +86,7 @@ public class CampaignBuilder {
         this.id = campaign.id;
         this.title = campaign.title;
         this.description = campaign.description;
-        this.scenarioIds = campaign.scenarioIds;
+        this.campaignScenarios = campaign.campaignScenarios;
         this.environment = campaign.executionEnvironment();
         this.parallelRun = campaign.parallelRun;
         this.retryAuto = campaign.retryAuto;
@@ -96,6 +97,6 @@ public class CampaignBuilder {
     }
 
     public Campaign build() {
-        return new Campaign(id, title, description, scenarioIds, environment, parallelRun, retryAuto, externalDatasetId, tags);
+        return new Campaign(id, title, description, campaignScenarios, environment, parallelRun, retryAuto, externalDatasetId, tags);
     }
 }

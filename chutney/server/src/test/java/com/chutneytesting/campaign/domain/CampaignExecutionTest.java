@@ -24,6 +24,7 @@ import static com.chutneytesting.server.core.domain.execution.report.ServerRepor
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static java.util.function.Predicate.not;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -36,11 +37,13 @@ import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignTestcaseToExecute;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.IntStream;
 import org.assertj.core.util.Lists;
@@ -125,34 +128,40 @@ public class CampaignExecutionTest {
         LocalDateTime beforeStartExecution = LocalDateTime.now().minusSeconds(1);
 
         // When
-        campaignReport.initExecution(singletonList(testCase), "env", "user");
+        campaignReport.initExecution(singletonList(new CampaignTestcaseToExecute(testCase, null)), "env", "user");
 
         // Then
         assertThat(campaignReport.scenarioExecutionReports()).hasSize(1);
-        ScenarioExecutionCampaign startedScenarioExecution = campaignReport.scenarioExecutionReports().get(0);
-        assertThat(startedScenarioExecution.scenarioId).isEqualTo(testCase.metadata().id());
-        assertThat(startedScenarioExecution.scenarioName).isEqualTo(testCase.metadata().title());
-        assertThat(startedScenarioExecution.execution.executionId()).isEqualTo(-1L);
-        assertThat(startedScenarioExecution.execution.time()).isAfter(beforeStartExecution);
-        assertThat(startedScenarioExecution.execution.status()).isEqualTo(NOT_EXECUTED);
-        assertThat(startedScenarioExecution.execution.environment()).isEqualTo("env");
-        assertThat(startedScenarioExecution.execution.datasetId()).isEqualTo(campaignReport.dataSetId);
-        assertThat(startedScenarioExecution.execution.user()).isEqualTo(campaignReport.userId);
+        assertThat(campaignReport.scenarioExecutionReports().get(0)).satisfies(report -> {
+            assertThat(report.scenarioId()).isEqualTo(testCase.metadata().id());
+            assertThat(report.scenarioName()).isEqualTo(testCase.metadata().title());
+            assertThat(report.execution()).satisfies(executionSummary -> {
+                assertThat(executionSummary.executionId()).isEqualTo(-1L);
+                assertThat(executionSummary.time()).isAfter(beforeStartExecution);
+                assertThat(executionSummary.status()).isEqualTo(NOT_EXECUTED);
+                assertThat(executionSummary.environment()).isEqualTo("env");
+                assertThat(executionSummary.datasetId()).isEqualTo(campaignReport.dataSetId);
+                assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
+            });
+        });
 
         // When
-        campaignReport.startScenarioExecution(testCase, "env", "user");
+        campaignReport.startScenarioExecution(new CampaignTestcaseToExecute(testCase, null), "env", "user");
 
         // Then
         assertThat(campaignReport.scenarioExecutionReports()).hasSize(1);
-        startedScenarioExecution = campaignReport.scenarioExecutionReports().get(0);
-        assertThat(startedScenarioExecution.scenarioId).isEqualTo(testCase.metadata().id());
-        assertThat(startedScenarioExecution.scenarioName).isEqualTo(testCase.metadata().title());
-        assertThat(startedScenarioExecution.execution.executionId()).isEqualTo(-1L);
-        assertThat(startedScenarioExecution.execution.time()).isAfter(beforeStartExecution);
-        assertThat(startedScenarioExecution.execution.status()).isEqualTo(RUNNING);
-        assertThat(startedScenarioExecution.execution.environment()).isEqualTo("env");
-        assertThat(startedScenarioExecution.execution.user()).isEqualTo(campaignReport.userId);
-        assertThat(startedScenarioExecution.execution.datasetId()).isEqualTo(campaignReport.dataSetId);
+        assertThat(campaignReport.scenarioExecutionReports().get(0)).satisfies(report -> {
+            assertThat(report.scenarioId()).isEqualTo(testCase.metadata().id());
+            assertThat(report.scenarioName()).isEqualTo(testCase.metadata().title());
+            assertThat(report.execution()).satisfies(executionSummary -> {
+                assertThat(executionSummary.executionId()).isEqualTo(-1L);
+                assertThat(executionSummary.time()).isAfter(beforeStartExecution);
+                assertThat(executionSummary.status()).isEqualTo(RUNNING);
+                assertThat(executionSummary.environment()).isEqualTo("env");
+                assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
+                assertThat(executionSummary.datasetId()).isEqualTo(campaignReport.dataSetId);
+            });
+        });
     }
 
     @Test
@@ -160,17 +169,18 @@ public class CampaignExecutionTest {
         // Given
         CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "");
         TestCase testCase = buildTestCase("1", "title");
-        campaignReport.initExecution(singletonList(testCase), "env", "user");
-        campaignReport.startScenarioExecution(testCase, "env", "user");
+        var testcaseToExecute = new CampaignTestcaseToExecute(testCase, null);
+        campaignReport.initExecution(singletonList(testcaseToExecute), "env", "user");
+        campaignReport.startScenarioExecution(testcaseToExecute, "env", "user");
 
-        ScenarioExecutionCampaign scenarioReport_SUCCESS = buildScenarioReportFromMockedExecution(testCase.id(), testCase.metadata().title(), SUCCESS);
+        ScenarioExecutionCampaign scenarioReport_SUCCESS = buildScenarioReportFromMockedExecution(testCase.id(), null, testCase.metadata().title(), SUCCESS);
 
         // When
         campaignReport.endScenarioExecution(scenarioReport_SUCCESS);
 
         // Then
         assertThat(campaignReport.scenarioExecutionReports()).hasSize(1);
-        assertThat(campaignReport.scenarioExecutionReports().get(0).execution.status()).isEqualTo(SUCCESS);
+        assertThat(campaignReport.scenarioExecutionReports().get(0).execution().status()).isEqualTo(SUCCESS);
     }
 
     @Test
@@ -284,6 +294,19 @@ public class CampaignExecutionTest {
         assertThat(sut.getDuration()).isEqualTo(6);
     }
 
+    @Test
+    void compute_failed_scenarios_executions() {
+        CampaignExecution sut = new CampaignExecution(1L, "...", false, "", null, "");
+        addScenarioExecutions(sut, "1", "dataset_1", "", SUCCESS);
+        addScenarioExecutions(sut, "2", "dataset_2", "", FAILURE);
+        addScenarioExecutions(sut, "3", "dataset_1", "", SUCCESS);
+
+        assertThat(sut.failedScenarioExecutions()).hasSize(1).singleElement()
+            .isInstanceOf(ScenarioExecutionCampaign.class)
+            .hasFieldOrPropertyWithValue("scenarioId", "2")
+            .returns(Optional.of("dataset_2"), sec -> sec.execution().datasetId());
+    }
+
     private List<ScenarioExecutionCampaign> stubScenarioExecution(List<LocalDateTime> times, List<Long> durations) {
         ExecutionHistory.ExecutionSummary execution = mock(ExecutionHistory.ExecutionSummary.class);
         when(execution.time()).thenReturn(times.get(0), times.subList(1, durations.size()).toArray(new LocalDateTime[0]));
@@ -300,20 +323,26 @@ public class CampaignExecutionTest {
     }
 
     private void addScenarioExecutions(CampaignExecution campaignReport, String scenarioId, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
+        addScenarioExecutions(campaignReport, scenarioId, null, scenarioTitle, scenarioExecutionStatus);
+    }
+
+    private void addScenarioExecutions(CampaignExecution campaignReport, String scenarioId, String datasetId, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
         TestCase testCase = buildTestCase(scenarioId, scenarioTitle);
-        campaignReport.initExecution(singletonList(testCase), "", "");
-        campaignReport.startScenarioExecution(testCase, "", "");
+        var testcaseToExecute = new CampaignTestcaseToExecute(testCase, datasetId);
+        campaignReport.initExecution(singletonList(testcaseToExecute), "", "");
+        campaignReport.startScenarioExecution(testcaseToExecute, "", "");
 
-        ScenarioExecutionCampaign scenarioReport_FAILURE = buildScenarioReportFromMockedExecution(scenarioId, scenarioTitle, scenarioExecutionStatus);
+        ScenarioExecutionCampaign scenarioReport = buildScenarioReportFromMockedExecution(scenarioId, datasetId, scenarioTitle, scenarioExecutionStatus);
 
-        campaignReport.endScenarioExecution(scenarioReport_FAILURE);
+        campaignReport.endScenarioExecution(scenarioReport);
 
         assertThat(campaignReport.status()).isEqualTo(RUNNING);
     }
 
-    private ScenarioExecutionCampaign buildScenarioReportFromMockedExecution(String scenarioId, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
+    private ScenarioExecutionCampaign buildScenarioReportFromMockedExecution(String scenarioId, String datasetId, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
         ExecutionHistory.ExecutionSummary execution = mock(ExecutionHistory.ExecutionSummary.class);
         when(execution.status()).thenReturn(scenarioExecutionStatus);
+        when(execution.datasetId()).thenReturn(Optional.ofNullable(datasetId).filter(not(String::isBlank)));
         return new ScenarioExecutionCampaign(scenarioId, scenarioTitle, execution);
     }
 

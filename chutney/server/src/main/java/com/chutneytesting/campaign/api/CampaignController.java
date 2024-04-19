@@ -107,7 +107,7 @@ public class CampaignController {
         CampaignExecution campaignExecution = campaignExecutionRepository.getCampaignExecutionById(campaignExecutionId);
 
         List<ExecutionHistory.Execution> executions = campaignExecution.scenarioExecutionReports().stream()
-            .map(ser -> executionHistoryRepository.getExecution(ser.scenarioId, ser.execution.executionId()))
+            .map(ser -> executionHistoryRepository.getExecution(ser.scenarioId(), ser.execution().executionId()))
             .toList();
 
         return CampaignExecutionReportMapper.fullExecutionToDto(campaignExecution, executions);

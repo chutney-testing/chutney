@@ -17,6 +17,8 @@
 package com.chutneytesting.campaign.api.dto;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
@@ -30,7 +32,8 @@ public class CampaignMapper {
             campaign.id,
             campaign.title,
             campaign.description,
-            campaign.scenarioIds,
+            campaign.campaignScenarios.stream().map(Campaign.CampaignScenario::scenarioId).toList(),
+            campaign.campaignScenarios.stream().map(CampaignMapper::toDto).toList(),
             emptyList(),
             campaign.executionEnvironment(),
             campaign.parallelRun,
@@ -44,7 +47,8 @@ public class CampaignMapper {
             campaign.id,
             campaign.title,
             campaign.description,
-            campaign.scenarioIds,
+            campaign.campaignScenarios.stream().map(Campaign.CampaignScenario::scenarioId).toList(),
+            campaign.campaignScenarios.stream().map(CampaignMapper::toDto).toList(),
             reportToDto(campaignExecutions),
             campaign.executionEnvironment(),
             campaign.parallelRun,
@@ -58,7 +62,7 @@ public class CampaignMapper {
             dto.getId(),
             dto.getTitle(),
             dto.getDescription(),
-            dto.getScenarioIds(),
+            campaignScenariosFromDto(dto),
             dto.getEnvironment(),
             dto.isParallelRun(),
             dto.isRetryAuto(),
@@ -67,9 +71,24 @@ public class CampaignMapper {
         );
     }
 
+    public static CampaignDto.CampaignScenarioDto toDto(Campaign.CampaignScenario campaignScenario) {
+        return new CampaignDto.CampaignScenarioDto(campaignScenario.scenarioId(), campaignScenario.datasetId());
+    }
+
+    public static Campaign.CampaignScenario fromDto(CampaignDto.CampaignScenarioDto dto) {
+        return new Campaign.CampaignScenario(dto.scenarioId(), dto.datasetId());
+    }
+
     private static List<CampaignExecutionReportDto> reportToDto(List<CampaignExecution> campaignExecutions) {
         return campaignExecutions != null ? campaignExecutions.stream()
             .map(CampaignExecutionReportMapper::toDto)
             .collect(toList()) : emptyList();
+    }
+
+    private static List<Campaign.CampaignScenario> campaignScenariosFromDto(CampaignDto dto) {
+        if (ofNullable(dto.getScenarios()).filter(not(List::isEmpty)).isPresent()) {
+            return dto.getScenarios().stream().map(sc -> new Campaign.CampaignScenario(sc.scenarioId(), sc.datasetId())).toList();
+        }
+        return dto.getScenarioIds().stream().map(sid -> new Campaign.CampaignScenario(sid, null)).toList();
     }
 }

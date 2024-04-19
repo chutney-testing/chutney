@@ -23,9 +23,9 @@ public class ScenarioExecutionReportCampaignMapper {
 
     public static ScenarioExecutionReportOutlineDto toDto(ScenarioExecutionCampaign scenarioReport) {
         return new ScenarioExecutionReportOutlineDto(
-            scenarioReport.scenarioId,
-            scenarioReport.scenarioName,
-            scenarioReport.execution
+            scenarioReport.scenarioId(),
+            scenarioReport.scenarioName(),
+            scenarioReport.execution()
         );
     }
 

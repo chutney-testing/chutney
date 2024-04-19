@@ -29,6 +29,7 @@ public class CampaignDto {
     private String title;
     private String description;
     private List<String> scenarioIds;
+    private List<CampaignScenarioDto> scenarios;
     private List<CampaignExecutionReportDto> campaignExecutionReports;
     private String environment;
     private boolean parallelRun;
@@ -43,6 +44,7 @@ public class CampaignDto {
                        String title,
                        String description,
                        List<String> scenarioIds,
+                       List<CampaignScenarioDto> scenarios,
                        List<CampaignExecutionReportDto> campaignExecutionReports,
                        String environment,
                        boolean parallelRun,
@@ -53,6 +55,7 @@ public class CampaignDto {
         this.title = title;
         this.description = description;
         this.scenarioIds = scenarioIds;
+        this.scenarios = ofNullable(scenarios).orElseGet(ArrayList::new);
         this.campaignExecutionReports = ofNullable(campaignExecutionReports).orElseGet(ArrayList::new);
         this.environment = environment;
         this.parallelRun = parallelRun;
@@ -77,6 +80,10 @@ public class CampaignDto {
         return scenarioIds;
     }
 
+    public List<CampaignScenarioDto> getScenarios() {
+        return scenarios;
+    }
+
     public List<CampaignExecutionReportDto> getCampaignExecutionReports() {
         return campaignExecutionReports;
     }
@@ -99,5 +106,8 @@ public class CampaignDto {
 
     public List<String> getTags() {
         return tags;
+    }
+
+    public record CampaignScenarioDto(String scenarioId, String datasetId) {
     }
 }
