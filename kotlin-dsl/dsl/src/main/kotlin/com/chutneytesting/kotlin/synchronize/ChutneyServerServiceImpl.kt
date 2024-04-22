@@ -174,6 +174,7 @@ object ChutneyServerServiceImpl : ChutneyServerService {
           "title": "$title",
           "description": "$description",
           "scenarioIds": ${om.writeValueAsString(scenarioIds.map(Int::toString))},
+          "scenarios": [${scenarios.joinToString(",") { it.payload() }}],
           "environment": "$environment",
           "parallelRun": $parallelRun,
           "retryAuto": $retryAuto,
@@ -181,6 +182,10 @@ object ChutneyServerServiceImpl : ChutneyServerService {
           "tags": ${om.writeValueAsString(tags)}
         }
     """.trimIndent()
+    }
+
+    private fun Campaign.CampaignScenario.payload(): String {
+        return """{"scenarioId": "$scenarioId"${datasetId?.let { id -> """, "datasetId": "$id" """ } ?: ""}}"""
     }
 
     override fun createOrUpdateCampaign(serverInfo: ChutneyServerInfo, campaign: Campaign): Int {

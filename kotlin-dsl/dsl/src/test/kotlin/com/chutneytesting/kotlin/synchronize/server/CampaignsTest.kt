@@ -18,6 +18,7 @@
 package com.chutneytesting.kotlin.synchronize.server
 
 import com.chutneytesting.kotlin.dsl.Campaign
+import com.chutneytesting.kotlin.dsl.Campaign.CampaignScenario
 import com.chutneytesting.kotlin.synchronize.ChutneyServerServiceImpl
 import com.github.tomakehurst.wiremock.admin.model.ServeEventQuery.forStubMapping
 import com.github.tomakehurst.wiremock.client.WireMock.*
@@ -84,7 +85,11 @@ class CampaignsTest : ChutneyServerServiceImplTest() {
             id = 666,
             title = "Campaign title",
             description = "Campaign description",
-            scenarioIds = listOf(111, 666, 8888),
+            scenarios = listOf(
+                CampaignScenario(111, "dataset_1"),
+                CampaignScenario(666),
+                CampaignScenario(8888, "dataset_2")
+            ),
             environment = "STAGING",
             parallelRun = true,
             retryAuto = true,
@@ -102,6 +107,7 @@ class CampaignsTest : ChutneyServerServiceImplTest() {
                                   "title": "${campaign.title}",
                                   "description": "",
                                   "scenarioIds": ["111", "666", "8888"],
+                                  "scenarios": [{"scenarioId": "111", "datasetId": "dataset_1"}, {"scenarioId": "666"}, {"scenarioId": "8888", "datasetId": "dataset_2"}],
                                   "campaignExecutionReports": [],
                                   "datasetId": "${campaign.datasetId}",
                                   "environment": "${campaign.environment}",
@@ -133,9 +139,12 @@ class CampaignsTest : ChutneyServerServiceImplTest() {
         assertThat(createRequestReceived.get("environment").textValue()).isEqualTo(campaign.environment)
         assertThat(createRequestReceived.get("parallelRun").booleanValue()).isEqualTo(campaign.parallelRun)
         assertThat(createRequestReceived.get("retryAuto").booleanValue()).isEqualTo(campaign.retryAuto)
-        assertThat(createRequestReceived.get("scenarioIds")).hasSize(3)
-            .map<String> { jsonNode -> jsonNode.textValue() }
-            .containsExactlyElementsOf(campaign.scenarioIds.map(Int::toString))
+        assertThat(createRequestReceived.get("scenarioIds")).isEmpty()
+        assertThat(createRequestReceived.get("scenarios")).hasSize(3)
+            .map<CampaignScenario> { jsonNode ->
+                CampaignScenario(jsonNode.get("scenarioId").textValue().toInt(), jsonNode.get("datasetId")?.textValue())
+            }
+            .containsExactlyElementsOf(campaign.scenarios)
         assertThat(createRequestReceived.get("tags")).hasSize(2)
             .map<String> { jsonNode -> jsonNode.textValue() }
             .containsExactlyInAnyOrderElementsOf(campaign.tags)
