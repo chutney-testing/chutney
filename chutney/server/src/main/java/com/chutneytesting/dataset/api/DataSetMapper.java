@@ -18,8 +18,6 @@ package com.chutneytesting.dataset.api;
 
 
 import com.chutneytesting.server.core.domain.dataset.DataSet;
-import com.chutneytesting.server.core.domain.tools.ui.KeyValue;
-import java.util.stream.Collectors;
 
 public class DataSetMapper {
 
