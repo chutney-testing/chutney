@@ -18,8 +18,8 @@ To launch Chutney in _local-dev_ mode, use
 
 ### Prerequisites
 
-* [Maven](https://maven.apache.org/) - version 3.3 or higher - Java dependency management
-* [Node](https://nodejs.org/en/) - version 12.16.2 or higher - JavaScript runtime
+* [Maven](https://maven.apache.org/) - version 3.9.2 or higher - Java dependency management
+* [Node](https://nodejs.org/en/) - version 20.10.0 or higher - JavaScript runtime
 * [Npm] (https://www.npmjs.com/) - version 6.14.4 or higher - JavaScript package manager
 
 If you use **direnv** and **nix** packages manager, we provide 2 files for the ui module : [.env.nix](../.env.nix) and [.envrc](../.envrc).

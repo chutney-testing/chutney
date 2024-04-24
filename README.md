@@ -12,7 +12,7 @@
 
 * [Introduction](#introduction)
 * [Installation](#installation)
-* [Write your first Scenario](#write_your_first_scenario)
+* [Scenario Example](#scenario_example)
 * [Documentation](#documentation)
 * [Contributing](#contrib)
 * [Support](#support)
@@ -49,130 +49,105 @@ In order to install Chutney on your machine you need to have installed :
 * JDK 17 or newer
 * Docker (only to run integration tests)
 
+#### Getting Started
 
+See the [Getting started](chutney/GETTING_STARTED.md), which document :
+* How to install and use Chutney as a User
+* How to install and setup the required environment for developing
 
-#### Run the server
-
-* Clone the repository
-* From project root, go to chutney folder
-* Build the project with the command : `mvn clean compile`
-* Now you can start the server with the predefined configuration 'start_local_server'
-
-You can also run the server with Docker with the command : `docker build --tag ghcr.io/chutney-testing/chutney/server:latest . -f ./.docker/server/Dockerfile`
-[More information about Chutney and Docker](https://github.com/chutney-testing/chutney/tree/main/chutney/.docker)
-
-#### Run the web app
-
-
-* Once you built the server, you need to go to the ui module (from chutney folder)
-* During compilation, Chutney downloaded a version of Node. If you don't have Node installed, you can make your environment variable points to it, for Windows you can run `$env:Path += ";./node"`
-* Now are ready to start the front app, just use the downloaded npm with the command : `node .\node\node_modules\npm start`
-
-You can also run the front app with Docker with the command : `docker build --tag ghcr.io/chutney-testing/chutney/ui:latest . -f ./.docker/ui/Dockerfile`
-[More information about Chutney and Docker](https://github.com/chutney-testing/chutney/tree/main/chutney/.docker)
-
-
-#### Use kotlin-dsl in your project
-
-To wrte your own scenarios, you can create a Kotlin project with the following dependencies :
-
-* [com.chutneytesting:chutney-kotlin-dsl](https://central.sonatype.com/artifact/com.chutneytesting/chutney-kotlin-dsl?smo=true)
-* [org.jetbrains.kotlin:kotlin-stdlib](https://central.sonatype.com/artifact/org.jetbrains.kotlin/kotlin-stdlib?smo=true)
-* [org.junit.jupiter:junit-jupiter-api](https://search.maven.org/artifact/org.junit.jupiter/junit-jupiter-api)
-
-
-    <dependencies>
-    <dependency>
-        <groupId>com.chutneytesting</groupId>
-        <artifactId>chutney-kotlin-dsl</artifactId> <!---->
-        <version>1.7.0</version>
-    </dependency>
-       <dependency>
-            <groupId>org.jetbrains.kotlin</groupId>
-            <artifactId>kotlin-stdlib</artifactId> <!---->
-            <version>1.6.10</version>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>5.8.2</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId> <!-- Optional  -->
-            <version>5.8.2</version>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-
+For more information see the getting started from the [official documentation here](https://www.chutney-testing.com/getting_started/requirements/)
 
 -------------
 
-## <a name="write_your_first_scenario"></a> Write your first Scenario
+## <a name="scenario_example"></a> Scenario Example
 
-In order to write a scenario, you also need to declare environments and services you want to test.
+You can find all the documentation of [how to write a scenario here](https://www.chutney-testing.com/getting_started/write/)
 
-### Define your test environment
-#### Declare a target
-Under src/main/kotlin create a package (ex. com.chutneytesting.getstart) and create a Kotlin file (ex. Environments.kt) with the following content :
 
-    package com.chutneytesting.getstart
-    
-    import com.chutneytesting.kotlin.dsl.ChutneyTarget
-    
-    val google = ChutneyTarget(
-        name = "search_engine",
-        url = "https://www.google.fr"
-    )
-    The target name search_engine is used as a reference in your scenarios
-    The google variable is a reference to set a target in an environment
+### Example of a scenario
 
-* The target name search_engine is used as a reference in your scenarios
-* The google variable is a reference to set a target in an environment
+Here is an example of a scenario written in Kotlin
 
-#### Declare an environment
-Now you can declare an environment within the same file, add the following content :
+    const val HTTP_TARGET_NAME = "HTTP_TARGET"
 
-    val environment = ChutneyEnvironment(
-        name = "The World Wide Web",
-        description = "The World Wide Web",
-        targets = listOf(
-            google
-        )
-    )
-* We reference the target google using the variable name.
-* The environment name and description can be anything meaningful to you. The name will be shown in the execution report.
-* The variable name environment is a reference to set the environment on running tests
+    const val FILMS_ENDPOINT = "/films"
+    private val JSON_CONTENT_TYPE = "Content-Type" to "application/json";
 
-#### Write a scenario
-Under src/main/kotlin, in the same package or another, create a Kotlin file (ex. Scenarios.kt) with the following content :
+    var FILM = """
+    {
+        "title": "Castle in the Sky",
+        "director": "Hayao Miyazaki",
+        "rating": "%rating%",
+        "category": "fiction"
+    }
+    """
 
-    package com.chutneytesting.getstart
-    
-    import com.chutneytesting.kotlin.dsl.HttpGetAction
-    import com.chutneytesting.kotlin.dsl.Scenario
-    import com.chutneytesting.kotlin.dsl.SuccessAction
-    import com.chutneytesting.kotlin.dsl.spEL
-    
-    val search_scenario = Scenario(title = "Search documents") {
-        When("I visit a search engine") {
-            HttpGetAction(
-                target = "search_engine",
-                uri = "/",
-                validations = mapOf("request accepted" to "status == 200".spEL())
+
+    val http_scenario = Scenario(title = "Films library") {
+        Given("I save a new film") {
+            HttpPostAction(
+                target = HTTP_TARGET_NAME,
+                uri = FILMS_ENDPOINT,
+                body = FILM.trimIndent(),
+                headers = mapOf(
+                    JSON_CONTENT_TYPE
+                ),
+                validations = mapOf(
+                    statusValidation(201)
+                ),
+                outputs = mapOf(
+                    "filmId" to "#body".elEval()
+                )
             )
         }
-        Then("I am on the front page") {
-            SuccessAction()
+    
+        When ("I update rating") {
+            HttpPatchAction(
+                target = HTTP_TARGET_NAME,
+                uri = "$FILMS_ENDPOINT/\${#filmId}",
+                body = """
+                    {
+                    "rating": "79",
+                    }
+                """.trimIndent(),
+                headers = mapOf(
+                    JSON_CONTENT_TYPE
+                ),
+                validations = mapOf(
+                    statusValidation(200)
+                )
+            )
+        }
+    
+        Then ("I check that rating was updated") {
+            Step("I get film by id") {
+                HttpGetAction(
+                    target = HTTP_TARGET_NAME,
+                    uri = "$FILMS_ENDPOINT/\${#filmId}",
+                    headers = mapOf(
+                        JSON_CONTENT_TYPE
+                    ),
+                    validations = mapOf(
+                        statusValidation(200)
+                    ),
+                    outputs = mapOf(
+                        "title" to "jsonPath(#body, '\$.title')".spEL(),
+                        "rating" to "jsonPath(#body, '\$.rating')".spEL()
+                    )
+                )
+            }
+        Step ("I check rating"){
+            AssertAction(
+                asserts = listOf(
+                    "title.equals('Castle in the Sky')".spEL(),
+                    "rating.equals(\"79\")".spEL()
+                )
+            )
         }
     }
-* The scenario title Search documents will be shown in the execution report.
-* There are 2 steps When I visit a search engine and Then I am on the front page
-* The first step will execute an HTTP GET call on the target name search_engine on the uri /
-  * It also has one validation request accepted to check the response code status is 200.
-* The second step does nothing meaningful in this example
-
+* In this example the scenario will save the content of FILM to an external server.
+* Then it will update it, fetch it and finally verify that the FILM has indeed been updated.
+* In this scenario we perform Http Actions, you can find [all available Chutney Actions here](https://www.chutney-testing.com/documentation/actions/)
 
 -------------
 
@@ -185,6 +160,8 @@ You can find the technical documentation of the 4 projects here :
 * [Idea-plugin](https://github.com/chutney-testing/chutney/tree/main/idea-plugin#readme)
 
 Get the [official documentation](https://www.chutney-testing.com/) for more information about how Chutney works.
+
+
 
 -------------
 
@@ -202,9 +179,6 @@ You don't need to be a developer to contribute, nor do much, you can simply:
 
 To help you start, we invite you to read:
 * [Contributing](chutney/CONTRIBUTING.md), which gives you rules and code conventions to respect
-* [Getting started](chutney/GETTING_STARTED.md), which document :
-    * How to install and use Chutney as a User
-    * How to install and setup the required environment for developing
 * [Help Wanted](chutney/HELP_WANTED.md), if you wish to help us, but you don't know where to start, you might find some ideas in here !
 
 To contribute to this documentation (README, CONTRIBUTING, etc.), we conforms to the [CommonMark Spec](https://spec.commonmark.org/)
@@ -222,13 +196,13 @@ For a more informal place to chat, if you worry about feeling dumb in the open o
 ## <a name="team"></a> Team
 
 Core contributors :
-  * [Nicolas Brouand](https://github.com/nbrouand)
-  * [Alexandre Delaunay](https://github.com/DelaunayAlex)
-  * [Matthieu Gensollen](https://github.com/boddissattva)
-  * [Karim Goubbaa](https://github.com/KarimGl)
+* [Mael Besson](https://github.com/bessonm)
+* [Nicolas Brouand](https://github.com/nbrouand)
+* [Alexandre Delaunay](https://github.com/DelaunayAlex)
+* [Matthieu Gensollen](https://github.com/boddissattva)
+* [Karim Goubbaa](https://github.com/KarimGl)
+* [Loic Ledoyen](https://github.com/ledoyen)
 
 ### <a name="contributors"></a> Contributors
 
 We strive to provide a benevolent environment and support any [contribution](#contrib).
-
-Before going open source, Chutney was inner-sourced and received contribution from over 30 persons

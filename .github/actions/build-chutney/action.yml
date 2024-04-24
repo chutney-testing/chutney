@@ -40,7 +40,10 @@ runs:
 
     - name: Codecov
       if: ${{ ! contains(inputs.goals, '-DskipTests') }}
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4.0.1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        slug: chutney-testing/chutney
 
     - name: Temporarily cache jar artifacts
       if: inputs.cache-artifacts != ''
