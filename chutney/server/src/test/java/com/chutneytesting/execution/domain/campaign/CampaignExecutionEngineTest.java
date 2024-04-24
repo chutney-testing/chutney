@@ -45,7 +45,6 @@ import com.chutneytesting.jira.api.JiraXrayEmbeddedApi;
 import com.chutneytesting.jira.api.ReportForJira;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
-import com.chutneytesting.server.core.domain.dataset.DataSetHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.ExecutionRequest;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngine;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
@@ -88,7 +87,6 @@ public class CampaignExecutionEngineTest {
     private final ScenarioExecutionEngine scenarioExecutionEngine = mock(ScenarioExecutionEngine.class);
     private final ExecutionHistoryRepository executionHistoryRepository = mock(ExecutionHistoryRepository.class);
     private final TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
-    private final DataSetHistoryRepository dataSetHistoryRepository = mock(DataSetHistoryRepository.class);
     private final JiraXrayEmbeddedApi jiraXrayPlugin = mock(JiraXrayEmbeddedApi.class);
     private final ChutneyMetrics metrics = mock(ChutneyMetrics.class);
     private final DataSetRepository datasetRepository = mock(DataSetRepository.class);
@@ -111,7 +109,7 @@ public class CampaignExecutionEngineTest {
 
     @BeforeEach
     public void setUp() {
-        sut = new CampaignExecutionEngine(campaignRepository, campaignExecutionRepository, scenarioExecutionEngine, executionHistoryRepository, testCaseRepository, of(dataSetHistoryRepository), jiraXrayPlugin, metrics, executorService, datasetRepository, objectMapper);
+        sut = new CampaignExecutionEngine(campaignRepository, campaignExecutionRepository, scenarioExecutionEngine, executionHistoryRepository, testCaseRepository, jiraXrayPlugin, metrics, executorService, datasetRepository, objectMapper);
         firstTestCase = createGwtTestCase("1");
         secondTestCase = createGwtTestCase("2");
         when(testCaseRepository.findExecutableById(firstTestCase.id())).thenReturn(of(firstTestCase));
@@ -272,7 +270,7 @@ public class CampaignExecutionEngineTest {
         String env = "env";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L,"", false, env, null, null, "");
+        CampaignExecution mockReport = new CampaignExecution(1L, "", false, env, null, "");
         when(campaignExecutionRepository.currentExecutions(1L)).thenReturn(List.of(mockReport));
 
         // When
@@ -286,7 +284,7 @@ public class CampaignExecutionEngineTest {
         String otherEnv = "otherEnv";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L,"", false, otherEnv, null, null, "");
+        CampaignExecution mockReport = new CampaignExecution(1L, "", false, otherEnv, null, "");
         when(campaignExecutionRepository.currentExecutions(anyLong())).thenReturn(List.of(mockReport));
 
         // When
@@ -317,7 +315,7 @@ public class CampaignExecutionEngineTest {
     public void should_return_last_existing_campaign_execution_for_existing_campaign() {
         // Given
         Campaign campaign = createCampaign();
-        CampaignExecution campaignExecution = new CampaignExecution(123L, campaign.id, emptyList(), "", false, campaign.executionEnvironment(), null, null, "");
+        CampaignExecution campaignExecution = new CampaignExecution(123L, campaign.id, emptyList(), "", false, campaign.executionEnvironment(), null, "");
 
 
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
@@ -382,10 +380,10 @@ public class CampaignExecutionEngineTest {
     @Test
     public void should_retrieve_current_campaign_execution_on_a_given_env() {
         String env = "env";
-        CampaignExecution report = new CampaignExecution(1L, 33L, emptyList(), "", false, env, null, null, "");
+        CampaignExecution report = new CampaignExecution(1L, 33L, emptyList(), "", false, env, null, "");
         String otherEnv = "otherEnv";
-        CampaignExecution report2 = new CampaignExecution(2L, 33L, emptyList(), "", false, otherEnv, null, null, "");
-        CampaignExecution report3 = new CampaignExecution(3L, 42L, emptyList(), "", false, otherEnv, null, null, "");
+        CampaignExecution report2 = new CampaignExecution(2L, 33L, emptyList(), "", false, otherEnv, null, "");
+        CampaignExecution report3 = new CampaignExecution(3L, 42L, emptyList(), "", false, otherEnv, null, "");
         when(campaignExecutionRepository.currentExecutions(33L)).thenReturn(List.of(report, report2));
         when(campaignExecutionRepository.currentExecutions(42L)).thenReturn(List.of(report3));
 

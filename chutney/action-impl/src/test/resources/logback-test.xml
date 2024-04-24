@@ -19,10 +19,14 @@
     <logger name="liquibase" level="WARN"/>
     <logger name="LiquibaseSchemaResolver" level="WARN"/>
     <logger name="org.apache" level="WARN"/>
+    <logger name="org.apache.sshd" level="ERROR"/>
+    <logger name="org.apache.zookeeper" level="ERROR"/>
     <logger name="org.apache.maven.surefire.booter" level="WARN"/>
+    <logger name="org.apache.kafka" level="ERROR"/>
+    <logger name="kafka" level="ERROR"/>
     <logger name="org.eclipse" level="WARN"/>
     <logger name="org.hibernate" level="WARN"/>
-    <logger name="org.mongodb" level="INFO"/>
+    <logger name="org.mongodb" level="WARN"/>
     <logger name="org.jboss" level="WARN"/>
     <logger name="qpid" level="WARN"/>
     <logger name="org.springframework" level="WARN" />

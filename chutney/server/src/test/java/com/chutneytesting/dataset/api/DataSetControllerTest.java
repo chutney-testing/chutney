@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
-import com.chutneytesting.server.core.domain.tools.ui.ImmutableKeyValue;
 import java.util.List;
 import org.junit.jupiter.api.Test;
 

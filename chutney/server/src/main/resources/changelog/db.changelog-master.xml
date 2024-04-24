@@ -1026,4 +1026,20 @@
             <column name="TAGS" type="VARCHAR(500)"/>
         </addColumn>
     </changeSet>
+
+    <changeSet id="drop-scenario-executions-dataset-version" author="ICG">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="DATASET_VERSION" tableName="SCENARIO_EXECUTIONS"/>
+        </preConditions>
+        <comment>Remove DATASET_VERSION column</comment>
+        <dropColumn tableName="SCENARIO_EXECUTIONS" columnName="DATASET_VERSION"></dropColumn>
+    </changeSet>
+
+    <changeSet id="drop-campaign-executions-dataset-version" author="ICG">
+        <preConditions onFail="MARK_RAN">
+            <columnExists columnName="DATASET_VERSION" tableName="CAMPAIGN_EXECUTIONS"/>
+        </preConditions>
+        <comment>Remove DATASET_VERSION column</comment>
+        <dropColumn tableName="CAMPAIGN_EXECUTIONS" columnName="DATASET_VERSION"></dropColumn>
+    </changeSet>
 </databaseChangeLog>

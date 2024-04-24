@@ -102,8 +102,8 @@ public class DataSet {
         }
 
         public DataSet build() {
-            if (!Objects.isNull(id) && id.isEmpty()) {
-                throw new IllegalArgumentException("Dataset id cannot be empty");
+            if (ofNullable(id).map(String::isBlank).orElse(false)) {
+                throw new IllegalArgumentException("Dataset id cannot be blank");
             }
 
             return new DataSet(

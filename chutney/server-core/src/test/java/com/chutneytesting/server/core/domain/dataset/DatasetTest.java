@@ -22,25 +22,37 @@ import static org.assertj.core.api.Assertions.assertThatIllegalArgumentException
 
 import java.util.Map;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 public class DatasetTest {
 
     @Test
-    void should_strip_whitespaces_in_name() {
+    void name_is_stripped() {
         String expectedName = "name with spaces";
         DataSet actual = DataSet.builder().withName("   name   with   spaces  ").build();
         assertThat(actual.name).isEqualTo(expectedName);
     }
 
     @Test
-    public void should_not_have_empty_id() {
+    void name_is_mandatory() {
         assertThatIllegalArgumentException()
-            .isThrownBy(() -> DataSet.builder().withId("").build())
-            .withMessage("Dataset id cannot be empty");
+            .isThrownBy(() -> DataSet.builder().build())
+            .withMessage("Dataset name mandatory");
+    }
+
+    @ParameterizedTest
+    @EmptySource
+    @ValueSource(strings = {" ", "  "})
+    void id_must_not_be_blank(String id) {
+        assertThatIllegalArgumentException()
+            .isThrownBy(() -> DataSet.builder().withId(id).build())
+            .withMessage("Dataset id cannot be blank");
     }
 
     @Test
-    public void should_get_rid_of_empty_keys_and_lines() {
+    void empty_keys_and_lines_are_ignored() {
         // Edge case
         DataSet dataSet = DataSet.builder()
             .withName("my name")
@@ -75,7 +87,7 @@ public class DatasetTest {
     }
 
     @Test
-    public void should_strip_whitespaces_in_keys_and_values() {
+    void keys_and_values_are_trimmed() {
         Map<String, String> expectedMap = Map.of("key1", "value", "key2", "value");
         DataSet dataSet = DataSet.builder()
             .withName("my name")

@@ -40,7 +40,6 @@ import com.chutneytesting.execution.infra.execution.ExecutionRequestMapper;
 import com.chutneytesting.execution.infra.execution.ServerTestEngineJavaImpl;
 import com.chutneytesting.jira.api.JiraXrayEmbeddedApi;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
-import com.chutneytesting.server.core.domain.dataset.DataSetHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngine;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngineAsync;
 import com.chutneytesting.server.core.domain.execution.ServerTestEngine;
@@ -52,7 +51,6 @@ import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
 import com.chutneytesting.tools.ui.MyMixInForIgnoreType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.core.json.JsonWriteFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.SerializerProvider;
@@ -67,7 +65,6 @@ import java.time.Clock;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.sql.DataSource;
 import liquibase.integration.spring.SpringLiquibase;
 import org.jdom2.Element;
@@ -97,7 +94,7 @@ public class ServerConfiguration {
 
     @PostConstruct
     public void logPort() throws UnknownHostException {
-        LOGGER.debug("Starting server " + InetAddress.getLocalHost().getCanonicalHostName() + " on " + port);
+      LOGGER.debug("Starting server {} on {}", InetAddress.getLocalHost().getCanonicalHostName(), port);
     }
 
     /**
@@ -191,7 +188,6 @@ public class ServerConfiguration {
                                                     ScenarioExecutionEngine scenarioExecutionEngine,
                                                     ExecutionHistoryRepository executionHistoryRepository,
                                                     TestCaseRepositoryAggregator testCaseRepository,
-                                                    Optional<DataSetHistoryRepository> dataSetHistoryRepository,
                                                     JiraXrayEmbeddedApi jiraXrayEmbeddedApi,
                                                     ChutneyMetrics metrics,
                                                     @Qualifier("campaignExecutor") TaskExecutor campaignExecutor,
@@ -203,7 +199,6 @@ public class ServerConfiguration {
             scenarioExecutionEngine,
             executionHistoryRepository,
             testCaseRepository,
-            dataSetHistoryRepository,
             jiraXrayEmbeddedApi,
             metrics,
             new ExecutorServiceAdapter(campaignExecutor),

@@ -63,9 +63,6 @@ public class CampaignExecutionEntity {
     @Column(name = "DATASET_ID")
     private String datasetId;
 
-    @Column(name = "DATASET_VERSION")
-    private Integer datasetVersion;
-
     @Column(name = "VERSION")
     @Version
     private Integer version;
@@ -74,10 +71,10 @@ public class CampaignExecutionEntity {
     }
 
     public CampaignExecutionEntity(Long campaignId, String environment) {
-        this(null, campaignId, null, null, environment, null, null, null, null);
+        this(null, campaignId, null, null, environment, null, null, null);
     }
 
-    public CampaignExecutionEntity(Long id, Long campaignId, List<ScenarioExecutionEntity> scenarioExecutions, Boolean partial, String environment, String userId, String datasetId, Integer datasetVersion, Integer version) {
+    public CampaignExecutionEntity(Long id, Long campaignId, List<ScenarioExecutionEntity> scenarioExecutions, Boolean partial, String environment, String userId, String datasetId, Integer version) {
         this.id = id;
         this.campaignId = campaignId;
         this.scenarioExecutions = scenarioExecutions;
@@ -85,7 +82,6 @@ public class CampaignExecutionEntity {
         this.environment = environment;
         this.userId = userId;
         this.datasetId = datasetId;
-        this.datasetVersion = datasetVersion;
         this.version = version;
     }
 
@@ -110,7 +106,6 @@ public class CampaignExecutionEntity {
         environment = report.executionEnvironment;
         userId = report.userId;
         datasetId = report.dataSetId.orElse(null);
-        datasetVersion = report.dataSetVersion.orElse(null);
         this.scenarioExecutions.clear();
         scenarioExecutions.forEach(se -> {
             se.forCampaignExecution(this);
@@ -149,7 +144,6 @@ public class CampaignExecutionEntity {
             ofNullable(partial).orElse(false),
             environment,
             datasetId,
-            datasetVersion,
             userId);
     }
 

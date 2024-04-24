@@ -70,7 +70,6 @@ class CampaignServiceTest {
             .setCampaignName("test name")
             .setExecutionId(43L)
             .setDataSetId("dataset id test")
-            .setDataSetVersion(44)
             .setStartDate(LocalDateTime.MAX)
             .addScenarioExecutionReport(scenarioExecutionReport1)
             .addScenarioExecutionReport(scenarioExecutionReport2)

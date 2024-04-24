@@ -139,7 +139,7 @@ class LiquibaseChangelogTest {
             @DisplayName("Set scenario executions sequence correctly")
             void set_scenario_executions_sequence_value_after_migration() {
                 ScenarioExecutionEntity execution = transactionTemplate.execute(status -> {
-                    ScenarioExecutionEntity e = new ScenarioExecutionEntity(null, "1", null, null, null, null, null, null, null, null, null, null, null, null, null);
+                    ScenarioExecutionEntity e = new ScenarioExecutionEntity(null, "1", null, null, null, null, null, null, null, null, null, null, null, null);
                     entityManager.persist(e);
                     return e;
                 });
@@ -150,7 +150,7 @@ class LiquibaseChangelogTest {
             @DisplayName("Set campaign executions sequence correctly")
             void set_campaign_executions_sequence_value_after_migration() {
                 CampaignExecutionEntity execution = transactionTemplate.execute(status -> {
-                    CampaignExecutionEntity e = new CampaignExecutionEntity(null, 2L, null, null, null, null, null, null, null);
+                    CampaignExecutionEntity e = new CampaignExecutionEntity(null, 2L, null, null, null, null, null, null);
                     entityManager.persist(e);
                     return e;
                 });

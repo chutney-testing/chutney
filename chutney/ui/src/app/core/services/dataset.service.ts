@@ -41,7 +41,6 @@ export class DataSetService {
                     dto.lastUpdated,
                     [],
                     [],
-                    dto.version,
                     dto.id
                 ));
 
@@ -84,7 +83,6 @@ export class DataSetService {
             dto.lastUpdated,
             dto.uniqueValues.map(o => new KeyValue(o.key, o.value)),
             dto.multipleValues.map(l => l.map(o => new KeyValue(o.key, o.value))),
-            dto.version,
             dto.id);
     }
 

@@ -24,7 +24,6 @@ export class Dataset {
         public lastUpdated: Date,
         public uniqueValues: Array<KeyValue>,
         public multipleValues: Array<Array<KeyValue>>,
-        public version?: number,
         public id?: string) {
     }
 

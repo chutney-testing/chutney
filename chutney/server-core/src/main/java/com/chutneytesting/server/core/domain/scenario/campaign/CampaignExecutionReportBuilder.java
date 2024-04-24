@@ -30,7 +30,6 @@ public class CampaignExecutionReportBuilder {
     private boolean partialExecution;
     private String executionEnvironment;
     private String dataSetId;
-    private Integer dataSetVersion;
     private String userId;
 
     // Optional fields
@@ -82,11 +81,6 @@ public class CampaignExecutionReportBuilder {
         return this;
     }
 
-    public CampaignExecutionReportBuilder setDataSetVersion(Integer dataSetVersion) {
-        this.dataSetVersion = dataSetVersion;
-        return this;
-    }
-
     public CampaignExecutionReportBuilder setUserId(String userId) {
         this.userId = userId;
         return this;
@@ -116,7 +110,6 @@ public class CampaignExecutionReportBuilder {
             executionEnvironment,
             userId,
             ofNullable(dataSetId),
-            ofNullable(dataSetVersion),
             startDate,
             status,
             scenarioExecutionReports
