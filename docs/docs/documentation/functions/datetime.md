@@ -188,3 +188,46 @@ Following functions help you write and shorten SpEL when you need to handle time
     SpEL without : `${T(java.time.temporal.ChronoUnit).valueOf("hours".toUpperCase())}`
 
     SpEL with    : `${#timeUnit("h")}`
+
+## zoneRules
+
+!!! note "ZoneRules zoneRules(String zoneId)"
+
+    Gets the time-zone rules for this zone id allowing calculations to be performed.
+
+    See [ZoneId.of(zoneId)](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZoneId.html#of(java.lang.String)){:target="_blank"} and
+        [ZoneId.getRules()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZoneId.html#getRules()){:target="_blank"} for further details
+
+    **Parameters** :
+
+    * `String zoneId` : The zone id you want to get rules from
+        * ex. "GMT", "Z", "+02:00"
+
+    **Returns** :
+    
+    * A `ZoneRules`
+
+    **Examples** :
+
+    SpEL without : `${T(java.time.ZoneId).of('Z').getRules().nextTransition(T(java.time.Instant).now())}`
+
+    SpEL with    : `${#zoneRules('Z').nextTransition(#now())}`
+
+## systemZoneRules
+
+!!! note "ZoneRules systemZoneRules()"
+
+    Gets the time-zone rules for the system default zone id allowing calculations to be performed.
+
+    See [ZoneId.systemDefault()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZoneId.html#systemDefault()){:target="_blank"} and
+        [ZoneId.getRules()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZoneId.html#getRules()){:target="_blank"} for further details
+
+    **Returns** :
+    
+    * A `ZoneRules`
+
+    **Examples** :
+
+    SpEL without : `${T(java.time.ZoneId).systemDefault().getRules().nextTransition(T(java.time.Instant).now())}`
+
+    SpEL with    : `${#systemDefault().nextTransition(#now())}`
