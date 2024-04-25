@@ -4,7 +4,7 @@ This function helps you handle values which may be null.
 
 !!! note "Object nullable(Object input)"
 
-    See [Optional.ofNullable()](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Optional.html#ofNullable(T)){:target="_blank"} for further details
+    See [Optional.ofNullable()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/util/Optional.html#ofNullable(T)){:target="_blank"} for further details
 
     **Returns** :
     

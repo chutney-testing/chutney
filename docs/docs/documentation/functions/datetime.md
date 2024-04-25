@@ -8,7 +8,7 @@ Following functions help you write and shorten SpEL when you need to handle time
 
     Returns a String of the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.
 
-    See [System.currentTimeMillis()](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/System.html#currentTimeMillis()){:target="_blank"} for further details
+    See [System.currentTimeMillis()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.html#currentTimeMillis()){:target="_blank"} for further details
 
     **Returns** :
 
@@ -24,8 +24,8 @@ Following functions help you write and shorten SpEL when you need to handle time
 
 !!! note "Temporal date(String date, String... format)"
 
-    See [Date(Temporal)](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/temporal/Temporal.html){:target="_blank"}
-    & [DateTimeFormatter.parseBest()](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/format/DateTimeFormatter.html#parseBest(java.lang.CharSequence,java.time.temporal.TemporalQuery...)){:target="_blank"} for further details
+    See [Date(Temporal)](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/Temporal.html){:target="_blank"}
+    & [DateTimeFormatter.parseBest()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html#parseBest(java.lang.CharSequence,java.time.temporal.TemporalQuery...)){:target="_blank"} for further details
 
     **Parameters** :
 
@@ -49,7 +49,7 @@ Following functions help you write and shorten SpEL when you need to handle time
     Creates a formatter from a given pattern.  
     ex. Pattern `d MMM uuuu` will format date `2011-12-03` to `3 Dec 2011`.
 
-    See [DateTimeFormatter.ofPattern()](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)){:target="_blank"} for further details
+    See [DateTimeFormatter.ofPattern()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)){:target="_blank"} for further details
 
     **Returns** :
 
@@ -68,7 +68,7 @@ Following functions help you write and shorten SpEL when you need to handle time
 
     Creates a formatter from a given pattern and given locale.
 
-    See [DateTimeFormatter.ofPattern()](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)){:target="_blank"} for further details
+    See [DateTimeFormatter.ofPattern()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)){:target="_blank"} for further details
 
     **Returns** :
 
@@ -85,7 +85,7 @@ Following functions help you write and shorten SpEL when you need to handle time
 
 !!! note "DateTimeFormatter isoDateFormatter(String type)"
 
-    See [isoDateFormatter(DateTimeFormatter)](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/format/DateTimeFormatter.html){:target="_blank"} for further details
+    See [isoDateFormatter(DateTimeFormatter)](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html){:target="_blank"} for further details
 
     **Parameters** :
 
@@ -123,7 +123,7 @@ Following functions help you write and shorten SpEL when you need to handle time
 
     Returns the current date-time from the system clock.
 
-    See [ZonedDateTime.now()](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/ZonedDateTime.html#now()){:target="_blank"} for further details
+    See [ZonedDateTime.now()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html#now()){:target="_blank"} for further details
 
     **Returns** :
 
@@ -142,7 +142,7 @@ Following functions help you write and shorten SpEL when you need to handle time
     Create a TemporalAmount from a given string.  
     This is usefull when combine with other methods or functions.
 
-    See [timeAmount(TemporalAmount)](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/temporal/TemporalAmount.html){:target="_blank"} for further details
+    See [timeAmount(TemporalAmount)](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/TemporalAmount.html){:target="_blank"} for further details
 
     **Returns** :
     
@@ -158,7 +158,7 @@ Following functions help you write and shorten SpEL when you need to handle time
 
 !!! note "ChronoUnit timeUnit(String unit)"
 
-    See [timeUnit(ChronoUnit)](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/time/temporal/ChronoUnit.html){:target="_blank"} for further details
+    See [timeUnit(ChronoUnit)](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/ChronoUnit.html){:target="_blank"} for further details
 
     **Parameters** :
 
