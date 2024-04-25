@@ -61,8 +61,8 @@ public class PurgeServiceImpl implements PurgeService {
         ExecutionHistoryRepository executionsRepository,
         CampaignRepository campaignRepository,
         CampaignExecutionRepository campaignExecutionRepository,
-        Integer maxScenarioExecutionsConfiguration,
-        Integer maxCampaignExecutionsConfiguration
+        int maxScenarioExecutionsConfiguration,
+        int maxCampaignExecutionsConfiguration
     ) {
         this(testCaseRepository,
             executionsRepository,
@@ -79,25 +79,25 @@ public class PurgeServiceImpl implements PurgeService {
         ExecutionHistoryRepository executionsRepository,
         CampaignRepository campaignRepository,
         CampaignExecutionRepository campaignExecutionRepository,
-        Integer maxScenarioExecutionsConfiguration,
-        Integer scenarioBeforeMillisecondsTimeExecutionsConfiguration,
-        Integer maxCampaignExecutionsConfiguration,
-        Integer campaignsBeforeMillisecondsTimeExecutionsConfiguration
-        ) {
-        Integer maxScenarioExecutions = validateConfigurationLimit(true, maxScenarioExecutionsConfiguration, "maxScenarioExecutions", 10);
-        Integer maxCampaignExecutions = validateConfigurationLimit(true, maxCampaignExecutionsConfiguration, "maxCampaignExecutions", 10);
-        Integer scenarioBeforeHoursTimeExecutions = validateConfigurationLimit(false, scenarioBeforeMillisecondsTimeExecutionsConfiguration, "scenarioBeforeMillisecondsTimeExecutions", 86400000);
-        Integer campaignsBeforeHoursTimeExecutions = validateConfigurationLimit(false, campaignsBeforeMillisecondsTimeExecutionsConfiguration, "campaignsBeforeMillisecondsTimeExecutions", 86400000);
+        int maxScenarioExecutionsConfiguration,
+        int scenarioBeforeMillisecondsTimeExecutionsConfiguration,
+        int maxCampaignExecutionsConfiguration,
+        int campaignsBeforeMillisecondsTimeExecutionsConfiguration
+    ) {
+        int maxScenarioExecutions = validateConfigurationLimit(true, maxScenarioExecutionsConfiguration, "maxScenarioExecutions", 10);
+        int maxCampaignExecutions = validateConfigurationLimit(true, maxCampaignExecutionsConfiguration, "maxCampaignExecutions", 10);
+        int scenarioBeforeHoursTimeExecutions = validateConfigurationLimit(false, scenarioBeforeMillisecondsTimeExecutionsConfiguration, "scenarioBeforeMillisecondsTimeExecutions", 86400000);
+        int campaignsBeforeHoursTimeExecutions = validateConfigurationLimit(false, campaignsBeforeMillisecondsTimeExecutionsConfiguration, "campaignsBeforeMillisecondsTimeExecutions", 86400000);
 
         this.scenarioPurgeService = buildScenarioService(testCaseRepository, executionsRepository, maxScenarioExecutions, scenarioBeforeHoursTimeExecutions);
         this.campaignPurgeService = buildCampaignService(campaignRepository, campaignExecutionRepository, maxCampaignExecutions, campaignsBeforeHoursTimeExecutions);
     }
 
-    private static Integer validateConfigurationLimit(
-        Boolean strictlyPositive,
-        Integer configurationLimit,
+    private static int validateConfigurationLimit(
+        boolean strictlyPositive,
+        int configurationLimit,
         String configName,
-        Integer defaultValue
+        int defaultValue
     ) {
         if (strictlyPositive) {
             if (configurationLimit <= 0) {
@@ -116,8 +116,8 @@ public class PurgeServiceImpl implements PurgeService {
     private static PurgeExecutionService<TestCaseMetadata, String, ExecutionSummary> buildScenarioService(
         TestCaseRepository testCaseRepository,
         ExecutionHistoryRepository executionsRepository,
-        Integer maxScenarioExecutions,
-        Integer beforeHoursTimeExecutions
+        int maxScenarioExecutions,
+        int beforeHoursTimeExecutions
     ) {
         return new PurgeExecutionService<>(
             maxScenarioExecutions,
@@ -136,8 +136,8 @@ public class PurgeServiceImpl implements PurgeService {
     private PurgeExecutionService<Campaign, Long, CampaignExecution> buildCampaignService(
         CampaignRepository campaignRepository,
         CampaignExecutionRepository campaignExecutionRepository,
-        Integer maxCampaignExecutions,
-        Integer beforeHoursTimeExecutions
+        int maxCampaignExecutions,
+        int beforeHoursTimeExecutions
     ) {
         return new PurgeExecutionService<>(
             maxCampaignExecutions,
