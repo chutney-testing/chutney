@@ -16,6 +16,9 @@
 
 package com.chutneytesting.action.function;
 
+import static java.util.Optional.ofNullable;
+import static java.util.function.Predicate.not;
+
 import com.chutneytesting.action.spi.SpelFunction;
 import com.chutneytesting.action.spi.time.DurationUnit;
 import com.chutneytesting.tools.Try;
@@ -24,11 +27,13 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.Period;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
+import java.time.zone.ZoneRules;
 import java.util.concurrent.atomic.AtomicReference;
 import org.apache.commons.lang3.LocaleUtils;
 
@@ -126,6 +131,17 @@ public class DateTimeFunctions {
         }
 
         return cu.get();
+    }
+
+    @SpelFunction
+    public static ZoneRules zoneRules(String zoneId) {
+        return ofNullable(zoneId).filter(not(String::isBlank)).map(ZoneId::of).map(ZoneId::getRules)
+            .orElseGet(DateTimeFunctions::systemZoneRules);
+    }
+
+    @SpelFunction
+    public static ZoneRules systemZoneRules() {
+        return ZoneId.systemDefault().getRules();
     }
 
     private static Temporal parseDateWithFormatter(String date, DateTimeFormatter dateFormatter) {
