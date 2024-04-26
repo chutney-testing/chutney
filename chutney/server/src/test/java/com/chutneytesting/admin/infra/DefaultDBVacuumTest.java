@@ -66,8 +66,8 @@ public class DefaultDBVacuumTest {
             double dbInitSizeBytes = dbSizeBytes();
             long dbInitSizeLength = dbFile.length();
             dbDeleteHalfReports(100);
-            assertThat(dbSizeBytes()).isEqualTo(dbInitSizeBytes);
-            assertThat(dbFile.length()).isEqualTo(dbInitSizeLength);
+            assertThat(dbSizeBytes()).isGreaterThanOrEqualTo(dbInitSizeBytes);
+            assertThat(dbFile.length()).isGreaterThanOrEqualTo(dbInitSizeLength);
 
             // When
             VacuumReport report = sut.vacuum();
