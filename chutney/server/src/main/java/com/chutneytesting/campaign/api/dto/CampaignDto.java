@@ -28,7 +28,6 @@ public class CampaignDto {
     private Long id;
     private String title;
     private String description;
-    private List<String> scenarioIds;
     private List<CampaignScenarioDto> scenarios;
     private List<CampaignExecutionReportDto> campaignExecutionReports;
     private String environment;
@@ -43,7 +42,6 @@ public class CampaignDto {
     public CampaignDto(Long id,
                        String title,
                        String description,
-                       List<String> scenarioIds,
                        List<CampaignScenarioDto> scenarios,
                        List<CampaignExecutionReportDto> campaignExecutionReports,
                        String environment,
@@ -54,7 +52,6 @@ public class CampaignDto {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.scenarioIds = scenarioIds;
         this.scenarios = ofNullable(scenarios).orElseGet(ArrayList::new);
         this.campaignExecutionReports = ofNullable(campaignExecutionReports).orElseGet(ArrayList::new);
         this.environment = environment;
@@ -74,10 +71,6 @@ public class CampaignDto {
 
     public String getDescription() {
         return description;
-    }
-
-    public List<String> getScenarioIds() {
-        return scenarioIds;
     }
 
     public List<CampaignScenarioDto> getScenarios() {
@@ -109,5 +102,8 @@ public class CampaignDto {
     }
 
     public record CampaignScenarioDto(String scenarioId, String datasetId) {
+        public CampaignScenarioDto(String scenarioId) {
+            this(scenarioId, null);
+        }
     }
 }

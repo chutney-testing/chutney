@@ -126,7 +126,7 @@ public class CampaignExecutionEngineTest {
         when(scenarioExecutionEngine.execute(any(ExecutionRequest.class))).thenReturn(mock(ScenarioExecutionReport.class));
 
         // When
-        CampaignExecution cer = sut.executeScenarioInCampaign(emptyList(), campaign, "user");
+        CampaignExecution cer = sut.executeScenarioInCampaign(campaign, "user");
 
         ArgumentCaptor<ReportForJira> reportForJiraCaptor = ArgumentCaptor.forClass(ReportForJira.class);
         verify(jiraXrayPlugin).updateTestExecution(eq(campaign.id), eq(cer.executionId), eq(firstTestCase.metadata.id), reportForJiraCaptor.capture());
@@ -143,14 +143,14 @@ public class CampaignExecutionEngineTest {
         when(scenarioExecutionEngine.execute(any(ExecutionRequest.class))).thenReturn(mock(ScenarioExecutionReport.class));
 
         // When
-        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(emptyList(), campaign, "user");
+        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(campaign, "user");
 
         // Then
         verify(testCaseRepository, times(2)).findExecutableById(anyString());
         verify(scenarioExecutionEngine, times(2)).execute(any(ExecutionRequest.class));
         verify(executionHistoryRepository, times(4)).getExecution(anyString(), anyLong());
 
-        assertThat(campaignExecution.scenarioExecutionReports()).hasSize(campaign.campaignScenarios.size());
+        assertThat(campaignExecution.scenarioExecutionReports()).hasSize(campaign.scenarios.size());
         assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().executionId()).isEqualTo(firstScenarioExecutionId);
         assertThat(campaignExecution.scenarioExecutionReports().get(1).execution().executionId()).isEqualTo(secondScenarioExecutionId);
         assertThat(campaignExecution.partialExecution).isFalse();
@@ -199,7 +199,7 @@ public class CampaignExecutionEngineTest {
         // When
         AtomicReference<CampaignExecution> campaignExecutionReport = new AtomicReference<>();
 
-        Executors.newFixedThreadPool(1).submit(() -> campaignExecutionReport.set(sut.executeScenarioInCampaign(emptyList(), campaign, "user")));
+        Executors.newFixedThreadPool(1).submit(() -> campaignExecutionReport.set(sut.executeScenarioInCampaign(campaign, "user")));
 
         awaitDuring(500, MILLISECONDS);
         sut.stopExecution(0L);
@@ -228,7 +228,7 @@ public class CampaignExecutionEngineTest {
         when(executionHistoryRepository.getExecution(eq(secondTestCase.id()), or(eq(0L), eq(20L)))).thenReturn(failedExecutionWithId(20L));
 
         // When
-        sut.executeScenarioInCampaign(emptyList(), campaign, "user");
+        sut.executeScenarioInCampaign(campaign, "user");
 
         // Then
         verify(scenarioExecutionEngine, times(4)).execute(any(ExecutionRequest.class));
@@ -249,7 +249,7 @@ public class CampaignExecutionEngineTest {
         // When
         StopWatch watch = new StopWatch();
         watch.start();
-        sut.executeScenarioInCampaign(emptyList(), campaign, "user");
+        sut.executeScenarioInCampaign(campaign, "user");
         watch.stop();
 
         // Then
@@ -273,7 +273,7 @@ public class CampaignExecutionEngineTest {
         when(campaignExecutionRepository.currentExecutions(1L)).thenReturn(List.of(mockReport));
 
         // When
-        assertThatThrownBy(() -> sut.executeScenarioInCampaign(emptyList(), campaign, "user"))
+        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user"))
             .isInstanceOf(CampaignAlreadyRunningException.class);
     }
 
@@ -287,7 +287,7 @@ public class CampaignExecutionEngineTest {
         when(campaignExecutionRepository.currentExecutions(anyLong())).thenReturn(List.of(mockReport));
 
         // When
-        assertDoesNotThrow(()-> sut.executeScenarioInCampaign(emptyList(), campaign, "user"));
+        assertDoesNotThrow(() -> sut.executeScenarioInCampaign(campaign, "user"));
     }
 
     @Test

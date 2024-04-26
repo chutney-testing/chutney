@@ -111,8 +111,8 @@ public class SecuredControllerSpringBootIntegrationTest {
             {GET, "/api/v1/description", "ADMIN_ACCESS", null, OK},
             {POST, "/api/v1/agentnetwork/explore", "ADMIN_ACCESS", "{\"creationDate\":\"1235\"}", OK},
 
-            {POST, "/api/ui/campaign/v1", "CAMPAIGN_WRITE", "{\"title\":\"secu\",\"description\":\"desc\",\"scenarioIds\":[],\"tags\":[]}", OK},
-            {PUT, "/api/ui/campaign/v1", "CAMPAIGN_WRITE", "{\"title\":\"secu\",\"description\":\"desc\",\"scenarioIds\":[],\"tags\":[]}", OK},
+            {POST, "/api/ui/campaign/v1", "CAMPAIGN_WRITE", "{\"title\":\"secu\",\"description\":\"desc\",\"scenarios\":[],\"tags\":[]}", OK},
+            {PUT, "/api/ui/campaign/v1", "CAMPAIGN_WRITE", "{\"title\":\"secu\",\"description\":\"desc\",\"scenarios\":[],\"tags\":[]}", OK},
             {DELETE, "/api/ui/campaign/v1/666", "CAMPAIGN_WRITE", null, OK},
             {GET, "/api/ui/campaign/v1/666", "CAMPAIGN_READ", null, NOT_FOUND},
             {GET, "/api/ui/campaign/v1/666/scenarios", "CAMPAIGN_READ", null, NOT_FOUND},

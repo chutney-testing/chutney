@@ -27,9 +27,9 @@ import org.junit.jupiter.api.Test;
 
 class CampaignMapperTest {
     @Test
-    void map_scenarioIds_and_scenarios_from_domain() {
+    void map_scenarios_from_domain() {
         Campaign campaign = new Campaign(null, null, null,
-            List.of(new Campaign.CampaignScenario("id1", "dataset1"), new Campaign.CampaignScenario("id2", null)),
+            List.of(new Campaign.CampaignScenario("id1", "dataset1"), new Campaign.CampaignScenario("id2")),
             null, false, false, null, null
         );
 
@@ -37,10 +37,9 @@ class CampaignMapperTest {
         CampaignDto dto = CampaignMapper.toDto(campaign, emptyList());
 
         ThrowingConsumer<CampaignDto> assertions = d -> {
-            assertThat(d.getScenarioIds()).contains("id1", "id2");
             assertThat(d.getScenarios()).contains(
                 new CampaignDto.CampaignScenarioDto("id1", "dataset1"),
-                new CampaignDto.CampaignScenarioDto("id2", null)
+                new CampaignDto.CampaignScenarioDto("id2")
             );
         };
 
@@ -49,36 +48,14 @@ class CampaignMapperTest {
     }
 
     @Test
-    void map_scenarios_from_legacy_dto() {
-        CampaignDto dto = new CampaignDto(null, null, null, List.of("1", "2"), null, null, null, false, false, null, null);
-        Campaign campaign = CampaignMapper.fromDto(dto);
-        assertThat(campaign.campaignScenarios).containsExactly(
-            new Campaign.CampaignScenario("1", null),
-            new Campaign.CampaignScenario("2", null)
-        );
-    }
-
-    @Test
     void map_scenarios_from_dto() {
-        CampaignDto dto = new CampaignDto(null, null, null, null,
-            List.of(new CampaignDto.CampaignScenarioDto("1", "dataset1"), new CampaignDto.CampaignScenarioDto("2", null)),
+        CampaignDto dto = new CampaignDto(null, null, null,
+            List.of(new CampaignDto.CampaignScenarioDto("1", "dataset1"), new CampaignDto.CampaignScenarioDto("2")),
             null, null, false, false, null, null);
         Campaign campaign = CampaignMapper.fromDto(dto);
-        assertThat(campaign.campaignScenarios).containsExactly(
+        assertThat(campaign.scenarios).containsExactly(
             new Campaign.CampaignScenario("1", "dataset1"),
-            new Campaign.CampaignScenario("2", null)
-        );
-    }
-
-    @Test
-    void map_scenarios_from_dto_override_legacy_scenarioIds() {
-        CampaignDto dto = new CampaignDto(null, null, null, List.of("11", "22"),
-            List.of(new CampaignDto.CampaignScenarioDto("1", "dataset1"), new CampaignDto.CampaignScenarioDto("2", null)),
-            null, null, false, false, null, null);
-        Campaign campaign = CampaignMapper.fromDto(dto);
-        assertThat(campaign.campaignScenarios).containsExactly(
-            new Campaign.CampaignScenario("1", "dataset1"),
-            new Campaign.CampaignScenario("2", null)
+            new Campaign.CampaignScenario("2")
         );
     }
 }

@@ -37,8 +37,8 @@ import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
-import com.chutneytesting.server.core.domain.scenario.campaign.CampaignTestcaseToExecute;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
+import com.chutneytesting.server.core.domain.scenario.campaign.TestCaseDataset;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -128,7 +128,7 @@ public class CampaignExecutionTest {
         LocalDateTime beforeStartExecution = LocalDateTime.now().minusSeconds(1);
 
         // When
-        campaignReport.initExecution(singletonList(new CampaignTestcaseToExecute(testCase, null)), "env", "user");
+        campaignReport.initExecution(singletonList(new TestCaseDataset(testCase, null)), "env", "user");
 
         // Then
         assertThat(campaignReport.scenarioExecutionReports()).hasSize(1);
@@ -146,7 +146,7 @@ public class CampaignExecutionTest {
         });
 
         // When
-        campaignReport.startScenarioExecution(new CampaignTestcaseToExecute(testCase, null), "env", "user");
+        campaignReport.startScenarioExecution(new TestCaseDataset(testCase, null), "env", "user");
 
         // Then
         assertThat(campaignReport.scenarioExecutionReports()).hasSize(1);
@@ -169,7 +169,7 @@ public class CampaignExecutionTest {
         // Given
         CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "");
         TestCase testCase = buildTestCase("1", "title");
-        var testcaseToExecute = new CampaignTestcaseToExecute(testCase, null);
+        var testcaseToExecute = new TestCaseDataset(testCase, null);
         campaignReport.initExecution(singletonList(testcaseToExecute), "env", "user");
         campaignReport.startScenarioExecution(testcaseToExecute, "env", "user");
 
@@ -328,7 +328,7 @@ public class CampaignExecutionTest {
 
     private void addScenarioExecutions(CampaignExecution campaignReport, String scenarioId, String datasetId, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
         TestCase testCase = buildTestCase(scenarioId, scenarioTitle);
-        var testcaseToExecute = new CampaignTestcaseToExecute(testCase, datasetId);
+        var testcaseToExecute = new TestCaseDataset(testCase, datasetId);
         campaignReport.initExecution(singletonList(testcaseToExecute), "", "");
         campaignReport.startScenarioExecution(testcaseToExecute, "", "");
 

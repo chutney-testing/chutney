@@ -80,8 +80,8 @@ public class CampaignScenarioEntity {
     }
 
     public static List<CampaignScenarioEntity> fromDomain(Campaign campaign) {
-        return IntStream.range(0, campaign.campaignScenarios.size())
-            .mapToObj(idx -> new CampaignScenarioEntity(campaign.campaignScenarios.get(idx).scenarioId(), campaign.campaignScenarios.get(idx).datasetId(), idx))
+        return IntStream.range(0, campaign.scenarios.size())
+            .mapToObj(idx -> new CampaignScenarioEntity(campaign.scenarios.get(idx).scenarioId(), campaign.scenarios.get(idx).datasetId(), idx))
             .toList();
     }
 }

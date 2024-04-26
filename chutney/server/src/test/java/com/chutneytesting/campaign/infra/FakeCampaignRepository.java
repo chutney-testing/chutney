@@ -51,7 +51,7 @@ public class FakeCampaignRepository implements CampaignRepository, CampaignExecu
         if (campaign.id != null && campaignsById.containsKey(campaign.id)) {
             saved = campaign;
         } else {
-            saved = new Campaign(sequence.incrementAndGet(), campaign.title, campaign.description, campaign.campaignScenarios, "env", false, false, null, campaign.tags);
+            saved = new Campaign(sequence.incrementAndGet(), campaign.title, campaign.description, campaign.scenarios, "env", false, false, null, campaign.tags);
         }
         campaignsById.put(saved.id, saved);
         campaignsByName.put(saved.title, saved);
@@ -62,7 +62,7 @@ public class FakeCampaignRepository implements CampaignRepository, CampaignExecu
     @Override
     public void saveCampaignExecution(Long campaignId, CampaignExecution execution) {
         ofNullable(campaignsById.get(campaignId)).ifPresent(campaign -> {
-            Campaign c = new Campaign(campaign.id, campaign.title, campaign.title, campaign.campaignScenarios, campaign.executionEnvironment(), false, false, null, null);
+            Campaign c = new Campaign(campaign.id, campaign.title, campaign.title, campaign.scenarios, campaign.executionEnvironment(), false, false, null, null);
             createOrUpdate(c);
         });
 
@@ -118,7 +118,7 @@ public class FakeCampaignRepository implements CampaignRepository, CampaignExecu
 
     @Override
     public List<String> findScenariosIds(Long campaignId) {
-        return campaignsById.get(campaignId).campaignScenarios.stream().map(Campaign.CampaignScenario::scenarioId).toList();
+        return campaignsById.get(campaignId).scenarios.stream().map(Campaign.CampaignScenario::scenarioId).toList();
     }
 
     @Override
@@ -134,7 +134,7 @@ public class FakeCampaignRepository implements CampaignRepository, CampaignExecu
     @Override
     public List<Campaign> findCampaignsByScenarioId(String scenarioId) {
         return campaignsById.values().stream()
-            .filter(campaign -> campaign.campaignScenarios.stream().anyMatch(cs -> scenarioId.equals(cs.scenarioId())))
+            .filter(campaign -> campaign.scenarios.stream().anyMatch(cs -> scenarioId.equals(cs.scenarioId())))
             .collect(Collectors.toList());
     }
 

@@ -31,6 +31,7 @@ import static util.WaitUtils.awaitDuring;
 import com.chutneytesting.RestExceptionHandler;
 import com.chutneytesting.WebConfiguration;
 import com.chutneytesting.campaign.api.dto.CampaignDto;
+import com.chutneytesting.campaign.api.dto.CampaignDto.CampaignScenarioDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.campaign.infra.FakeCampaignRepository;
@@ -47,13 +48,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -67,9 +67,9 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 public class CampaignControllerTest {
 
-    private static final CampaignDto SAMPLE_CAMPAIGN = new CampaignDto(null, "test", "desc", Lists.newArrayList("1", "2", "3"),
-        null, emptyList(), "env", false, false, null, emptyList());
-    private static final String urlTemplate = "/api/ui/campaign/v1/";
+    private static final CampaignDto SAMPLE_CAMPAIGN = new CampaignDto(null, "test", "desc",
+        Stream.of("1", "2", "3").map(CampaignScenarioDto::new).toList(), emptyList(), "env", false, false, null, emptyList());
+    private static final String BASE_URL = CampaignController.BASE_URL + "/";
 
     private final FakeCampaignRepository repository = new FakeCampaignRepository();
     private TestCaseRepositoryAggregator repositoryAggregator;
@@ -102,21 +102,21 @@ public class CampaignControllerTest {
         assertThat(actual).usingRecursiveComparison().ignoringFields("id", "scenarios").isEqualTo(SAMPLE_CAMPAIGN);
         assertThat(actual.getId()).isNotNull();
         assertThat(actual.getScenarios()).containsExactly(
-            new CampaignDto.CampaignScenarioDto("1", null),
-            new CampaignDto.CampaignScenarioDto("2", null),
-            new CampaignDto.CampaignScenarioDto("3", null)
+            new CampaignScenarioDto("1", null),
+            new CampaignScenarioDto("2", null),
+            new CampaignScenarioDto("3", null)
         );
     }
 
     @Test
     public void should_not_found_campaign_when_it_does_not_exist() throws Exception {
-        execute(MockMvcRequestBuilders.get(urlTemplate + MAX_VALUE))
+        execute(MockMvcRequestBuilders.get(BASE_URL + MAX_VALUE))
             .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
     public void should_found_campaign_when_it_exists() throws Exception {
-        execute(MockMvcRequestBuilders.get(urlTemplate + existingCampaign.getId()))
+        execute(MockMvcRequestBuilders.get(BASE_URL + existingCampaign.getId()))
             .andExpect(MockMvcResultMatchers.status().isOk());
         CampaignDto receivedCampaign = resultExtractor.campaign();
         assertThat(receivedCampaign).usingRecursiveComparison().isEqualTo(existingCampaign);
@@ -130,8 +130,7 @@ public class CampaignControllerTest {
         CampaignDto modifiedCampaign = new CampaignDto(existingCampaign.getId(),
             updatedTitle,
             existingCampaign.getDescription(),
-            existingCampaign.getScenarioIds(),
-            emptyList(),
+            existingCampaign.getScenarios(),
             existingCampaign.getCampaignExecutionReports(),
             existingCampaign.getEnvironment(), false, false, null, emptyList());
 
@@ -147,11 +146,9 @@ public class CampaignControllerTest {
     @Test
     public void should_update_campaign_scenarios() throws Exception {
         // Given
-        List<String> updatedScenarioIds = new ArrayList<>();
         CampaignDto modifiedCampaign = new CampaignDto(existingCampaign.getId(),
             existingCampaign.getTitle(),
             existingCampaign.getDescription(),
-            updatedScenarioIds,
             null,
             existingCampaign.getCampaignExecutionReports(),
             existingCampaign.getEnvironment(), false, false, null, emptyList());
@@ -160,10 +157,9 @@ public class CampaignControllerTest {
         CampaignDto receivedCampaign = insertCampaign(modifiedCampaign);
 
         // Then
-        assertThat(receivedCampaign.getScenarioIds()).isEqualTo(updatedScenarioIds);
         assertThat(receivedCampaign.getScenarios()).isEmpty();
         assertThat(receivedCampaign.getDatasetId()).isNull();
-        assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("scenarioIds", "scenarios", "datasetId").isEqualTo(existingCampaign);
+        assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("scenarios", "datasetId").isEqualTo(existingCampaign);
     }
 
     @Test
@@ -172,7 +168,6 @@ public class CampaignControllerTest {
         CampaignDto modifiedCampaign = new CampaignDto(existingCampaign.getId(),
             existingCampaign.getTitle(),
             existingCampaign.getDescription(),
-            existingCampaign.getScenarioIds(),
             null,
             existingCampaign.getCampaignExecutionReports(),
             existingCampaign.getEnvironment(), false, false, null, List.of("Tag"));
@@ -183,19 +178,20 @@ public class CampaignControllerTest {
         // Then
         assertThat(receivedCampaign.getTags()).containsExactly("TAG");
         assertThat(receivedCampaign.getDatasetId()).isNull();
-        assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("tags", "datasetId").isEqualTo(existingCampaign);
+        assertThat(receivedCampaign.getScenarios()).isEmpty();
+        assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("scenarios", "tags", "datasetId").isEqualTo(existingCampaign);
     }
 
     @Test
     public void should_return_true_when_deleting_existing_campaign() throws Exception {
-        execute(delete(urlTemplate + existingCampaign.getId()))
+        execute(delete(BASE_URL + existingCampaign.getId()))
             .andExpect(MockMvcResultMatchers.status().isOk());
         assertThat(resultExtractor.content()).isEqualTo("true");
     }
 
     @Test
     public void should_return_false_when_trying_to_delete_non_existing_campaign() throws Exception {
-        execute(delete(urlTemplate + MAX_VALUE))
+        execute(delete(BASE_URL + MAX_VALUE))
             .andExpect(MockMvcResultMatchers.status().isOk());
         assertThat(resultExtractor.content()).isEqualTo("false");
     }
@@ -204,20 +200,20 @@ public class CampaignControllerTest {
     @Test
     public void should_not_found_deleted_campaign() throws Exception {
         // Given
-        execute(delete(urlTemplate + existingCampaign.getId()));
+        execute(delete(BASE_URL + existingCampaign.getId()));
 
         // When
-        execute(MockMvcRequestBuilders.get(urlTemplate + existingCampaign.getId()))
+        execute(MockMvcRequestBuilders.get(BASE_URL + existingCampaign.getId()))
             /*Then*/.andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     @Test
     public void should_find_all_existing_campaign() throws Exception {
         // Given
-        CampaignDto anotherExistingCampaign = insertCampaign(new CampaignDto(42L, "title", "description", emptyList(), emptyList(), emptyList(), "env", false, false, null, null));
+        CampaignDto anotherExistingCampaign = insertCampaign(new CampaignDto(42L, "title", "description", emptyList(), emptyList(), "env", false, false, null, null));
 
         // When
-        execute(MockMvcRequestBuilders.get(urlTemplate))
+        execute(MockMvcRequestBuilders.get(BASE_URL))
             .andExpect(MockMvcResultMatchers.status().isOk());
         CampaignDto[] campaigns = resultExtractor.campaigns();
 
@@ -231,12 +227,12 @@ public class CampaignControllerTest {
     public void should_find_campaigns_related_to_certain_scenario() throws Exception {
         // Given
         removeCampaign(existingCampaign.getId());
-        CampaignDto campaignToCreate = new CampaignDto(42L, "CAMPAIGN_LINKED_TO_SCENARIO", "description", Lists.newArrayList("4", "5", "6"),
-            emptyList(), emptyList(), "env", false, false, null, null);
+        CampaignDto campaignToCreate = new CampaignDto(42L, "CAMPAIGN_LINKED_TO_SCENARIO", "description",
+            Stream.of("4", "5", "6").map(CampaignScenarioDto::new).toList(), emptyList(), "env", false, false, null, null);
         insertCampaign(campaignToCreate);
 
         // When
-        execute(MockMvcRequestBuilders.get(urlTemplate + "/scenario/4"))
+        execute(MockMvcRequestBuilders.get(BASE_URL + "/scenario/4"))
             .andExpect(MockMvcResultMatchers.status().isOk());
         CampaignDto[] campaigns = resultExtractor.campaigns();
 
@@ -252,12 +248,11 @@ public class CampaignControllerTest {
     public void should_find_no_campaign_related_to_an_orphan_scenario() throws Exception {
         // Given
         removeCampaign(existingCampaign.getId());
-        CampaignDto campaignToCreate = new CampaignDto(42L, "CAMPAIGN_WITHOUT_SCENARIO", "description", emptyList(),
-            emptyList(), emptyList(), "env", false, false, null, null);
+        CampaignDto campaignToCreate = new CampaignDto(42L, "CAMPAIGN_WITHOUT_SCENARIO", "description", emptyList(), emptyList(), "env", false, false, null, null);
         insertCampaign(campaignToCreate);
 
         // When
-        execute(MockMvcRequestBuilders.get(urlTemplate + "/scenario/1"))
+        execute(MockMvcRequestBuilders.get(BASE_URL + "/scenario/1"))
             .andExpect(MockMvcResultMatchers.status().isOk());
         CampaignDto[] campaigns = resultExtractor.campaigns();
 
@@ -282,7 +277,7 @@ public class CampaignControllerTest {
         repository.saveCampaignExecution(existingCampaign.getId(), report4);
 
         // When
-        execute(MockMvcRequestBuilders.get(urlTemplate + existingCampaign.getId()))
+        execute(MockMvcRequestBuilders.get(BASE_URL + existingCampaign.getId()))
             .andExpect(MockMvcResultMatchers.status().isOk());
         CampaignDto receivedCampaign = resultExtractor.campaign();
 
@@ -303,7 +298,7 @@ public class CampaignControllerTest {
         repository.saveCampaignExecution(existingCampaign.getId(), report1);
 
         // When
-        execute(MockMvcRequestBuilders.get(urlTemplate + existingCampaign.getId()))
+        execute(MockMvcRequestBuilders.get(BASE_URL + existingCampaign.getId()))
             .andExpect(MockMvcResultMatchers.status().isOk());
         CampaignDto receivedCampaign = resultExtractor.campaign();
 
@@ -322,8 +317,7 @@ public class CampaignControllerTest {
         ExecutionHistory.ExecutionSummary execution0 = mock(ExecutionHistory.ExecutionSummary.class);
         when(execution0.time()).thenReturn(LocalDateTime.now().minusDays(1));
         CampaignExecution campaignExecution0 = new CampaignExecution(1L, 1L, singletonList(new ScenarioExecutionCampaign("20", "...", execution0)), "title", false, "", null, "");
-        CampaignDto anotherExistingCampaign = new CampaignDto(null, "title", "description", emptyList(),
-            emptyList(), emptyList(), "env", false, false, null, null);
+        CampaignDto anotherExistingCampaign = new CampaignDto(null, "title", "description", emptyList(), emptyList(), "env", false, false, null, null);
         anotherExistingCampaign = insertCampaign(anotherExistingCampaign);
         repository.saveCampaignExecution(anotherExistingCampaign.getId(), campaignExecution0);
 
@@ -336,7 +330,7 @@ public class CampaignControllerTest {
 
         // When
         // last executions asked for
-        execute(MockMvcRequestBuilders.get(urlTemplate + "/lastexecutions/5"))
+        execute(MockMvcRequestBuilders.get(BASE_URL + "/lastexecutions/5"))
             .andExpect(MockMvcResultMatchers.status().isOk());
         CampaignExecutionReportDto[] lastExecutions = resultExtractor.reports();
 
@@ -351,8 +345,8 @@ public class CampaignControllerTest {
     public void should_retrieve_scenarios_of_a_campaign() throws Exception {
         // Given
         removeCampaign(existingCampaign.getId());
-        CampaignDto campaignToCreate = new CampaignDto(42L, "CAMPAIGN_LINKED_TO_SCENARIO", "description", Lists.newArrayList("55", "44-44"),
-            emptyList(), emptyList(), "env", false, false, null, null);
+        CampaignDto campaignToCreate = new CampaignDto(42L, "CAMPAIGN_LINKED_TO_SCENARIO", "description",
+            Stream.of("55", "44-44").map(CampaignScenarioDto::new).toList(), emptyList(), "env", false, false, null, null);
         insertCampaign(campaignToCreate);
 
         when(repositoryAggregator.findMetadataById("44-44"))
@@ -362,7 +356,7 @@ public class CampaignControllerTest {
         when(repositoryAggregator.findMetadataById("55")).thenReturn(Optional.of(TestCaseMetadataImpl.builder().withId("55").build()));
 
         // When
-        execute(MockMvcRequestBuilders.get(urlTemplate + "2" + "/scenarios"))
+        execute(MockMvcRequestBuilders.get(BASE_URL + "2" + "/scenarios"))
             .andExpect(MockMvcResultMatchers.status().isOk());
         TestCaseIndexDto[] scenarios = resultExtractor.scenarios();
 
@@ -385,7 +379,7 @@ public class CampaignControllerTest {
      * @return The database inserted campaign result.
      */
     private CampaignDto insertCampaign(CampaignDto campaign) throws Exception {
-        execute(post(urlTemplate)
+        execute(post(BASE_URL)
             .content(om.writeValueAsString(campaign))
             .contentType(APPLICATION_JSON_VALUE))
             .andExpect(MockMvcResultMatchers.status().isOk());
@@ -393,7 +387,7 @@ public class CampaignControllerTest {
     }
 
     private void removeCampaign(Long idCampaign) throws Exception {
-        execute(delete(urlTemplate + idCampaign));
+        execute(delete(BASE_URL + idCampaign));
     }
 
 

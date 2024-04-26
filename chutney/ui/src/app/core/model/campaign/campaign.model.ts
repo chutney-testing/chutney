@@ -21,7 +21,7 @@ export class Campaign {
     constructor(public id?: number,
         public title: string = '',
         public description: string = '',
-        public scenarioIds: Array<string> = [],
+        public scenarios: Array<CampaignScenario> = [],
         public campaignExecutionReports: Array<CampaignExecutionReport> = [],
         public environment: string = '',
         public parallelRun?: false,
@@ -29,4 +29,8 @@ export class Campaign {
         public datasetId?: string,
         public tags: Array<string> = []) {
     }
+}
+
+export class CampaignScenario {
+    constructor(public scenarioId: string, public datasetId: string = null) {}
 }

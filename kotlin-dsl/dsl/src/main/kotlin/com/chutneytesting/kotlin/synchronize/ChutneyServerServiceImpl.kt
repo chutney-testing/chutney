@@ -173,7 +173,6 @@ object ChutneyServerServiceImpl : ChutneyServerService {
           ${Optional.ofNullable(id).map { l -> "\"id\": $l," }.orElseGet { "" }}
           "title": "$title",
           "description": "$description",
-          "scenarioIds": ${om.writeValueAsString(scenarioIds.map(Int::toString))},
           "scenarios": [${scenarios.joinToString(",") { it.payload() }}],
           "environment": "$environment",
           "parallelRun": $parallelRun,

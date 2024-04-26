@@ -124,8 +124,8 @@ public class CampaignExecution {
         }
     }
 
-    public void initExecution(List<CampaignTestcaseToExecute> testCases, String executionEnvironment, String userId) {
-        testCases.forEach(testCase ->
+    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment, String userId) {
+        testCaseDatasets.forEach(testCase ->
             this.scenarioExecutions.add(
                 new ScenarioExecutionCampaign(
                     testCase.testcase().id(),
@@ -143,33 +143,33 @@ public class CampaignExecution {
                         .build())));
     }
 
-    public void startScenarioExecution(CampaignTestcaseToExecute testCase, String executionEnvironment, String userId) throws UnsupportedOperationException {
+    public void startScenarioExecution(TestCaseDataset testCaseDataset, String executionEnvironment, String userId) throws UnsupportedOperationException {
         OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
-                return se.scenarioId().equals(testCase.testcase().id()) &&
-                    se.execution().datasetId().equals(selectDatasetId(testCase));
+                return se.scenarioId().equals(testCaseDataset.testcase().id()) &&
+                    se.execution().datasetId().equals(selectDatasetId(testCaseDataset));
             })
             .findFirst();
         this.scenarioExecutions.set(indexOpt.getAsInt(),
             new ScenarioExecutionCampaign(
-                testCase.testcase().id(),
-                testCase.testcase().metadata().title(),
+                testCaseDataset.testcase().id(),
+                testCaseDataset.testcase().metadata().title(),
                 ImmutableExecutionHistory.ExecutionSummary.builder()
                     .executionId(-1L)
-                    .testCaseTitle(testCase.testcase().metadata().title())
+                    .testCaseTitle(testCaseDataset.testcase().metadata().title())
                     .time(now())
                     .status(RUNNING)
                     .duration(0)
                     .environment(executionEnvironment)
-                    .datasetId(selectDatasetId(testCase))
+                    .datasetId(selectDatasetId(testCaseDataset))
                     .user(userId)
-                    .scenarioId(testCase.testcase().id())
+                    .scenarioId(testCaseDataset.testcase().id())
                     .build()));
     }
 
-    private Optional<String> selectDatasetId(CampaignTestcaseToExecute testCase) {
-        return ofNullable(testCase.datasetId()).or(() -> dataSetId).filter(not(String::isBlank));
+    private Optional<String> selectDatasetId(TestCaseDataset testCaseDataset) {
+        return ofNullable(testCaseDataset.datasetId()).or(() -> dataSetId).filter(not(String::isBlank));
     }
 
     public void endScenarioExecution(ScenarioExecutionCampaign scenarioExecutionCampaign) throws UnsupportedOperationException {
@@ -247,8 +247,8 @@ public class CampaignExecution {
                 ScenarioExecutionCampaign::scenarioId,
                 Function.identity(),
                 BinaryOperator.maxBy(Comparator.comparing(s -> s.execution().time())),
-                    LinkedHashMap::new // Keep the insertion order
-                ))
+                LinkedHashMap::new // Keep the insertion order
+            ))
             .values()
             .stream()
             .toList();

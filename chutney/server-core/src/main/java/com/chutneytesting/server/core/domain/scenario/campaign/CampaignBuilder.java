@@ -86,7 +86,7 @@ public class CampaignBuilder {
         this.id = campaign.id;
         this.title = campaign.title;
         this.description = campaign.description;
-        this.campaignScenarios = campaign.campaignScenarios;
+        this.campaignScenarios = campaign.scenarios;
         this.environment = campaign.executionEnvironment();
         this.parallelRun = campaign.parallelRun;
         this.retryAuto = campaign.retryAuto;

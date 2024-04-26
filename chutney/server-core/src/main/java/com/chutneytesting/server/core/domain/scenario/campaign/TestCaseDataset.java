@@ -23,7 +23,7 @@ import static java.util.function.Predicate.not;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import java.util.Objects;
 
-public record CampaignTestcaseToExecute(TestCase testcase, String datasetId) {
+public record TestCaseDataset(TestCase testcase, String datasetId) {
 
     @Override
     public String datasetId() {
@@ -34,7 +34,7 @@ public record CampaignTestcaseToExecute(TestCase testcase, String datasetId) {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CampaignTestcaseToExecute that = (CampaignTestcaseToExecute) o;
+        TestCaseDataset that = (TestCaseDataset) o;
         return Objects.equals(testcase.id(), that.testcase.id()) &&
             Objects.equals(datasetId(), that.datasetId());
     }

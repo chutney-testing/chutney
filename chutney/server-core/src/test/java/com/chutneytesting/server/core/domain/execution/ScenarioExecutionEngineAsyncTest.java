@@ -17,17 +17,18 @@
 
 package com.chutneytesting.server.core.domain.execution;
 
+import static java.time.LocalDateTime.now;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.timeout;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
@@ -46,7 +47,6 @@ import io.reactivex.rxjava3.observers.TestObserver;
 import io.reactivex.rxjava3.plugins.RxJavaPlugins;
 import io.reactivex.rxjava3.schedulers.TestScheduler;
 import java.time.Instant;
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -113,7 +113,8 @@ public class ScenarioExecutionEngineAsyncTest {
         );
 
         // When
-        ExecutionRequest request = new ExecutionRequest(testCase, "Exec env", "Exec user");
+        DataSet dataset = DataSet.builder().withId("DATASET").withName("...").build();
+        ExecutionRequest request = new ExecutionRequest(testCase, "Exec env", "Exec user", dataset);
         sut.execute(request);
 
         // Then
@@ -123,6 +124,7 @@ public class ScenarioExecutionEngineAsyncTest {
         verify(executionHistoryRepository).store(eq(scenarioId), argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().environment()).isEqualTo("Exec env");
         assertThat(argumentCaptor.getValue().user()).isEqualTo("Exec user");
+        assertThat(argumentCaptor.getValue().datasetId()).hasValue(dataset.id);
 
         // Wait for background computation
         verify(executionStateRepository, timeout(250)).notifyExecutionStart(scenarioId);
@@ -255,16 +257,18 @@ public class ScenarioExecutionEngineAsyncTest {
             om
         );
         TestCase testCase = emptyTestCase();
-        ExecutionRequest executionRequest = new ExecutionRequest(testCase, "env", "userId");
+        DataSet dataset = DataSet.builder().withId("DATASET").withName("...").build();
+        ExecutionRequest executionRequest = new ExecutionRequest(testCase, "env", "userId", dataset);
 
         ExecutionHistory.Execution expected = ImmutableExecutionHistory.Execution.builder()
             .executionId(1L)
-            .time(LocalDateTime.now())
+            .time(now())
             .duration(0L)
             .status(ServerReportStatus.NOT_EXECUTED)
             .testCaseTitle(executionRequest.testCase.metadata().title())
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
+            .datasetId(executionRequest.dataset.id)
             .report("")
             .scenarioId("1234")
             .build();
@@ -361,7 +365,7 @@ public class ScenarioExecutionEngineAsyncTest {
 
     private ExecutionHistory.Execution stubHistoryExecution(String scenarioId, long executionId) {
         final ImmutableExecutionHistory.Execution storedExecution = ImmutableExecutionHistory.Execution.builder()
-            .time(LocalDateTime.now())
+            .time(now())
             .status(ServerReportStatus.SUCCESS)
             .executionId(executionId)
             .duration(666L)

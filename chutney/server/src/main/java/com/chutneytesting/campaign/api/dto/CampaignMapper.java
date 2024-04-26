@@ -32,8 +32,7 @@ public class CampaignMapper {
             campaign.id,
             campaign.title,
             campaign.description,
-            campaign.campaignScenarios.stream().map(Campaign.CampaignScenario::scenarioId).toList(),
-            campaign.campaignScenarios.stream().map(CampaignMapper::toDto).toList(),
+            campaign.scenarios.stream().map(CampaignMapper::toDto).toList(),
             emptyList(),
             campaign.executionEnvironment(),
             campaign.parallelRun,
@@ -47,8 +46,7 @@ public class CampaignMapper {
             campaign.id,
             campaign.title,
             campaign.description,
-            campaign.campaignScenarios.stream().map(Campaign.CampaignScenario::scenarioId).toList(),
-            campaign.campaignScenarios.stream().map(CampaignMapper::toDto).toList(),
+            campaign.scenarios.stream().map(CampaignMapper::toDto).toList(),
             reportToDto(campaignExecutions),
             campaign.executionEnvironment(),
             campaign.parallelRun,
@@ -86,9 +84,8 @@ public class CampaignMapper {
     }
 
     private static List<Campaign.CampaignScenario> campaignScenariosFromDto(CampaignDto dto) {
-        if (ofNullable(dto.getScenarios()).filter(not(List::isEmpty)).isPresent()) {
-            return dto.getScenarios().stream().map(sc -> new Campaign.CampaignScenario(sc.scenarioId(), sc.datasetId())).toList();
-        }
-        return dto.getScenarioIds().stream().map(sid -> new Campaign.CampaignScenario(sid, null)).toList();
+        return ofNullable(dto.getScenarios()).filter(not(List::isEmpty))
+            .map(list -> list.stream().map(sc -> new Campaign.CampaignScenario(sc.scenarioId(), sc.datasetId())).toList())
+            .orElse(emptyList());
     }
 }
