@@ -19,11 +19,12 @@ package com.chutneytesting;
 import static com.chutneytesting.ServerConfigurationValues.SCHEDULED_CAMPAIGNS_EXECUTOR_POOL_SIZE_SPRING_VALUE;
 import static com.chutneytesting.ServerConfigurationValues.SCHEDULED_PURGE_MAX_CAMPAIGN_EXECUTIONS_SPRING_VALUE;
 import static com.chutneytesting.ServerConfigurationValues.SCHEDULED_PURGE_MAX_SCENARIO_EXECUTIONS_SPRING_VALUE;
+import static com.chutneytesting.execution.domain.purge.PurgeServiceImpl.ONE_DAY_MILLIS;
 
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.execution.api.schedule.ScheduleCampaign;
-import com.chutneytesting.execution.domain.PurgeServiceImpl;
+import com.chutneytesting.execution.domain.purge.PurgeServiceImpl;
 import com.chutneytesting.execution.domain.schedule.CampaignScheduler;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.history.PurgeService;
@@ -121,7 +122,9 @@ public class SchedulingConfiguration implements AsyncConfigurer {
             campaignRepository,
             campaignExecutionRepository,
             maxScenarioExecutionsConfig,
-            maxCampaignExecutionsConfig
+            ONE_DAY_MILLIS,
+            maxCampaignExecutionsConfig,
+            ONE_DAY_MILLIS
         );
     }
 }

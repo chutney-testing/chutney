@@ -1,21 +1,24 @@
 /*
- * Copyright 2017-2023 Enedis
+ *  Copyright 2017-2023 Enedis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *
  */
 
-package com.chutneytesting.execution.domain;
+package com.chutneytesting.execution.domain.purge;
 
+import static com.chutneytesting.execution.domain.purge.PurgeExecutionsFilters.isExecutionDateBeforeNowMinusOffset;
+import static com.chutneytesting.execution.domain.purge.PurgeExecutionsFilters.isScenarioExecutionLinkedWithCampaignExecution;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
@@ -34,6 +37,7 @@ import com.chutneytesting.server.core.domain.scenario.TestCaseMetadata;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -50,28 +54,55 @@ import org.slf4j.LoggerFactory;
 
 public class PurgeServiceImpl implements PurgeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PurgeServiceImpl.class);
+    public static final int ONE_DAY_MILLIS = Long.valueOf(Duration.ofDays(1).toMillis()).intValue();
     private final PurgeExecutionService<Campaign, Long, CampaignExecution> campaignPurgeService;
     private final PurgeExecutionService<TestCaseMetadata, String, ExecutionSummary> scenarioPurgeService;
+
+    PurgeServiceImpl(
+        TestCaseRepository testCaseRepository,
+        ExecutionHistoryRepository executionsRepository,
+        CampaignRepository campaignRepository,
+        CampaignExecutionRepository campaignExecutionRepository,
+        int maxScenarioExecutionsConfiguration,
+        int maxCampaignExecutionsConfiguration
+    ) {
+        this(testCaseRepository,
+            executionsRepository,
+            campaignRepository,
+            campaignExecutionRepository,
+            maxScenarioExecutionsConfiguration,
+            0,
+            maxCampaignExecutionsConfiguration,
+            0);
+    }
 
     public PurgeServiceImpl(
         TestCaseRepository testCaseRepository,
         ExecutionHistoryRepository executionsRepository,
         CampaignRepository campaignRepository,
         CampaignExecutionRepository campaignExecutionRepository,
-        Integer maxScenarioExecutionsConfiguration,
-        Integer maxCampaignExecutionsConfiguration
+        int maxScenarioExecutionsConfiguration,
+        int beforeNowMinusOffsetScenarioExecutionsConfiguration,
+        int maxCampaignExecutionsConfiguration,
+        int beforeNowMinusOffsetCampaignExecutionsConfiguration
     ) {
-        Integer maxScenarioExecutions = validateConfigurationLimit(maxScenarioExecutionsConfiguration, "maxScenarioExecutions");
-        Integer maxCampaignExecutions = validateConfigurationLimit(maxCampaignExecutionsConfiguration, "maxCampaignExecutions");
+        int maxScenarioExecutions = checkPositiveOrDefault(maxScenarioExecutionsConfiguration, "maxScenarioExecutions", 10);
+        int maxCampaignExecutions = checkPositiveOrDefault(maxCampaignExecutionsConfiguration, "maxCampaignExecutions", 10);
+        int scenarioBeforeHoursTimeExecutions = checkPositiveOrDefault(beforeNowMinusOffsetScenarioExecutionsConfiguration, "beforeNowMinusOffsetScenarioExecutions", ONE_DAY_MILLIS);
+        int campaignsBeforeHoursTimeExecutions = checkPositiveOrDefault(beforeNowMinusOffsetCampaignExecutionsConfiguration, "beforeNowMinusOffsetCampaignExecutions", ONE_DAY_MILLIS);
 
-        this.scenarioPurgeService = buildScenarioService(testCaseRepository, executionsRepository, maxScenarioExecutions);
-        this.campaignPurgeService = buildCampaignService(campaignRepository, campaignExecutionRepository, maxCampaignExecutions);
+        this.scenarioPurgeService = buildScenarioService(testCaseRepository, executionsRepository, maxScenarioExecutions, scenarioBeforeHoursTimeExecutions);
+        this.campaignPurgeService = buildCampaignService(campaignRepository, campaignExecutionRepository, maxCampaignExecutions, campaignsBeforeHoursTimeExecutions);
     }
 
-    private static Integer validateConfigurationLimit(Integer configurationLimit, String configName) {
-        if (configurationLimit <= 0) {
-            LOGGER.warn("Purge configuration limit must be positive. Defaulting {} to {}", configName, 10);
-            return 10;
+    private static int checkPositiveOrDefault(
+        int configurationLimit,
+        String configName,
+        int defaultValue
+    ) {
+        if (configurationLimit < 0) {
+            LOGGER.warn("Purge configuration limit must be positive. Defaulting {} to {}", configName, defaultValue);
+            return defaultValue;
         }
         return configurationLimit;
     }
@@ -79,14 +110,15 @@ public class PurgeServiceImpl implements PurgeService {
     private static PurgeExecutionService<TestCaseMetadata, String, ExecutionSummary> buildScenarioService(
         TestCaseRepository testCaseRepository,
         ExecutionHistoryRepository executionsRepository,
-        Integer maxScenarioExecutions
+        int maxScenarioExecutions,
+        int beforeHoursTimeExecutions
     ) {
         return new PurgeExecutionService<>(
             maxScenarioExecutions,
             testCaseRepository::findAll,
             TestCaseMetadata::id,
             executionsRepository::getExecutions,
-            es -> es.campaignReport().isEmpty(),
+            isScenarioExecutionLinkedWithCampaignExecution.and(isExecutionDateBeforeNowMinusOffset(ExecutionSummary::time, beforeHoursTimeExecutions)),
             ExecutionSummary::executionId,
             ExecutionSummary::time,
             ExecutionSummary::status,
@@ -95,13 +127,18 @@ public class PurgeServiceImpl implements PurgeService {
         );
     }
 
-    private PurgeExecutionService<Campaign, Long, CampaignExecution> buildCampaignService(CampaignRepository campaignRepository, CampaignExecutionRepository campaignExecutionRepository, Integer maxCampaignExecutions) {
+    private PurgeExecutionService<Campaign, Long, CampaignExecution> buildCampaignService(
+        CampaignRepository campaignRepository,
+        CampaignExecutionRepository campaignExecutionRepository,
+        int maxCampaignExecutions,
+        int beforeHoursTimeExecutions
+    ) {
         return new PurgeExecutionService<>(
             maxCampaignExecutions,
             campaignRepository::findAll,
             campaign -> campaign.id,
             campaignExecutionRepository::getExecutionHistory,
-            cer -> true,
+            isExecutionDateBeforeNowMinusOffset(cer -> cer.startDate, beforeHoursTimeExecutions),
             cer -> cer.executionId,
             cer -> cer.startDate,
             CampaignExecution::getStatus,
@@ -219,6 +256,7 @@ public class PurgeServiceImpl implements PurgeService {
         /**
          * Purge executions.
          * <p> Find all base objects ids and map them to executions.</p>
+         * <p> Keep only executions before last 24 hours.</p>
          * <p>For each group of executions, filter then group them by environment.</p>
          * <p>For each group of executions by environment,</p>
          * <p>permits a specific handle via {@link #handleExecutionsForOneEnvironment(List)}</p>
