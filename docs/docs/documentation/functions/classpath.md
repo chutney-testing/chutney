@@ -18,7 +18,7 @@
 
 !!! note "String resourcePath(String name)"
 
-    See [Path.toString()](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/nio/file/Path.html#toString()){:target="_blank"} for further details
+    See [Path.toString()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/nio/file/Path.html#toString()){:target="_blank"} for further details
 
     **Returns** :
 
@@ -34,7 +34,7 @@
 
     Finds all the resources with the given name. A resource is some data (images, audio, text, etc) that can be accessed by class code in a way that is independent of the location of the code.
 
-    See [ClassLoader.getResources()](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/lang/ClassLoader.html#getResources(java.lang.String)){:target="_blank"} for further details
+    See [ClassLoader.getResources()](https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/ClassLoader.html#getResources(java.lang.String)){:target="_blank"} for further details
 
     **Returns** :
 

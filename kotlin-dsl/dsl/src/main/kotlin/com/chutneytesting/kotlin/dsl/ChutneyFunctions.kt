@@ -115,6 +115,15 @@ fun timeUnit(unit: String, elEval: Boolean = true): String {
     return chutneyFunction("timeUnit", elEval, unit.elString())
 }
 
+fun zoneRules(zoneId: String, elEval: Boolean = true): String {
+    require(zoneId.isNotBlank()) { "zoneId cannot be blank" }
+    return chutneyFunction("zoneRules", elEval, zoneId.elString())
+}
+
+fun systemZoneRules(elEval: Boolean = true): String {
+    return chutneyFunction("systemZoneRules", elEval)
+}
+
 fun str_replace(inputELExpr: String, regExp: String, replacement: String = "", elEval: Boolean = true): String {
     require(inputELExpr.isNotBlank()) { "inputELExpr cannot be empty" }
     require(regExp.isNotBlank()) { "regExp cannot be empty" }

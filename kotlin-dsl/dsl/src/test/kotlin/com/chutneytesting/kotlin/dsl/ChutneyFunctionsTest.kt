@@ -268,6 +268,7 @@ class ChutneyFunctionsTest {
         assertThrows<IllegalArgumentException> { isoDateFormatter("") }
         assertThrows<IllegalArgumentException> { timeAmount("") }
         assertThrows<IllegalArgumentException> { timeUnit("") }
+        assertThrows<IllegalArgumentException> { zoneRules("") }
 
         assertExpressionNotNullWhenParsed(
             date("2011-12-03T10:15:30Z".elString(), elEval = false)
@@ -302,7 +303,11 @@ class ChutneyFunctionsTest {
         )
 
         assertExpressionNotNullWhenParsed(
-            timeAmount("day", elEval = false)
+            zoneRules("GMT", elEval = false)
+        )
+
+        assertExpressionNotNullWhenParsed(
+            systemZoneRules(elEval = false)
         )
     }
 

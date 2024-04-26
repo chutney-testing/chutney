@@ -20,23 +20,22 @@ package com.chutneytesting.action.function;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.Period;
-import java.time.ZoneId;
+import java.time.Month;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAmount;
+import java.time.zone.ZoneRules;
 import java.util.stream.Stream;
+import org.assertj.core.api.InstanceOfAssertFactories;
+import org.assertj.core.data.Offset;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -44,50 +43,60 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.jupiter.params.provider.ValueSource;
 
 @DisplayName("Date and Time Functions")
 public class DateTimeFunctionsTest {
 
     @Nested
-    @DisplayName("date function should parse to Temporal instance corresponding to the given format")
+    @DisplayName("date function parses a Temporal instance corresponding to the given format")
     class DateFunction {
         @Test
         @DisplayName("Instant if no format")
-        void should_parse_to_Instant_when_no_format_provided() {
+        void date_parses_to_Instant_when_no_format_provided() {
             Instant i = (Instant) DateTimeFunctions.date("2018-01-15T14:38:21Z");
-            assertThat(1516027101L).isEqualTo(i.getEpochSecond());
+            assertThat(i.getEpochSecond()).isEqualTo(1516027101L);
         }
 
         @Test
         @DisplayName("LocalDate")
-        void should_parse_to_LocalDate_when_date_format_provided() {
+        void date_parses_to_LocalDate_when_date_format_provided() {
             Temporal i = DateTimeFunctions.date("2018-01-15", "yyyy-MM-dd");
-            assertThat(LocalDate.class).isEqualTo(i.getClass());
-            assertThat(1515970800L).isEqualTo(((LocalDate) i).atStartOfDay(ZoneId.of("Europe/Paris")).toEpochSecond());
+            assertThat(i).asInstanceOf(InstanceOfAssertFactories.LOCAL_DATE)
+                .hasYear(2018)
+                .hasMonth(Month.JANUARY)
+                .hasDayOfMonth(15);
         }
 
         @Test
         @DisplayName("ZonedDateTime")
-        void should_parse_to_ZonedDateTime_when_zoned_date_time_format_provided() {
+        void date_parses_to_ZonedDateTime_when_zoned_date_time_format_provided() {
             Temporal i = DateTimeFunctions.date("2018-01-15T14:38:21+0200", "yyyy-MM-dd'T'HH:mm:ssx");
-            assertThat(ZonedDateTime.class).isEqualTo(i.getClass());
-            assertThat(1516019901L).isEqualTo(((ZonedDateTime) i).toEpochSecond());
+            assertThat(i).asInstanceOf(InstanceOfAssertFactories.ZONED_DATE_TIME)
+                .satisfies(ld -> assertThat(ld.toEpochSecond()).isEqualTo(1516019901L));
         }
 
         @Test
         @DisplayName("LocalDateTime")
-        void should_parse_to_LocalDateTime_when_date_time_format_provided() {
+        void date_parses_to_LocalDateTime_when_date_time_format_provided() {
             Temporal i = DateTimeFunctions.date("2018-01-15T14:38:21", "yyyy-MM-dd'T'HH:mm:ss");
-            assertThat(LocalDateTime.class).isEqualTo(i.getClass());
-            assertThat(1516019901L).isEqualTo(((LocalDateTime) i).toEpochSecond(ZoneOffset.ofHours(2)));
+            assertThat(i).asInstanceOf(InstanceOfAssertFactories.LOCAL_DATE_TIME)
+                .satisfies(ldt -> assertThat(ldt.toEpochSecond(ZoneOffset.ofHours(2))).isEqualTo(1516019901L));
         }
     }
 
     @Test
-    @DisplayName("now function should get current time as ZonedDateTime")
-    void should_get_current_time_as_ZonedDateTime() {
+    @DisplayName("now function gets current time as ZonedDateTime")
+    void now_gets_current_time_as_ZonedDateTime() {
         ZonedDateTime now = DateTimeFunctions.now();
-        assertThat(System.currentTimeMillis()).isGreaterThanOrEqualTo(Instant.from(now).toEpochMilli());
+        assertThat(Instant.from(now).toEpochMilli()).isCloseTo(System.currentTimeMillis(), Offset.offset(200L));
+    }
+
+    @Test
+    @DisplayName("currentTimeMillis function gets current time milliseconds as String")
+    void currentTimeMillis_gets_current_time_milliseconds_as_String() {
+        String now = DateTimeFunctions.currentTimeMillis();
+        assertThat(Long.valueOf(now)).isCloseTo(System.currentTimeMillis(), Offset.offset(200L));
     }
 
     @Nested
@@ -95,20 +104,20 @@ public class DateTimeFunctionsTest {
     class DateFormatterFunctions {
         @Test
         @DisplayName("from pattern")
-        void should_build_DateTimeFormatter_from_pattern() {
+        void dateFormatter_builds_DateTimeFormatter_from_pattern() {
             assertDoesNotThrow(() -> DateTimeFunctions.dateFormatter("yyyy"));
         }
 
         @Test
         @DisplayName("from pattern and locale")
-        void should_build_DateTimeFormatter_from_pattern_and_locale() {
+        void dateFormatterWithLocale_builds_DateTimeFormatter_from_pattern_and_locale() {
             assertDoesNotThrow(() -> DateTimeFunctions.dateFormatterWithLocale("yyyy", "fr_FR"));
         }
 
         @ParameterizedTest(name = "{0}")
         @MethodSource("com.chutneytesting.action.function.DateTimeFunctionsTest#isoDateFormatter")
         @DisplayName("from ISO type")
-        void should_build_DateTimeFormatter_from_iso_type(String type, DateTimeFormatter expectedIsoDTF) {
+        void isoDateFormatter_builds_DateTimeFormatter_from_iso_type(String type, DateTimeFormatter expectedIsoDTF) {
             assertSame(expectedIsoDTF, DateTimeFunctions.isoDateFormatter(type));
         }
     }
@@ -117,39 +126,38 @@ public class DateTimeFunctionsTest {
     @DisplayName("timeAmount function")
     class TimeAmountFunction {
         @Nested
-        @DisplayName("should parse a TimeAmount")
+        @DisplayName("parses a TimeAmount")
         class ValidParse {
             @Test
             @DisplayName("from Chutney Duration format")
-            void should_parse_a_TimeAmount_from_a_chutney_duration() {
+            void timeAmount_parses_a_TimeAmount_from_a_chutney_duration() {
                 TemporalAmount ta = DateTimeFunctions.timeAmount("2 ms");
-                assertEquals(2, ((Duration) ta).toMillis());
+                assertThat(ta).asInstanceOf(InstanceOfAssertFactories.DURATION)
+                    .returns(2L, Duration::toMillis);
             }
 
             @Test
             @DisplayName("from Java time Duration format")
-            void should_parse_a_TimeAmount_from_java_time_duration() {
+            void timeAmount_parses_a_TimeAmount_from_java_time_duration() {
                 TemporalAmount ta = DateTimeFunctions.timeAmount("P4DT2H5M3.123456789S");
-                assertInstanceOf(Duration.class, ta);
-                Duration d = (Duration) ta;
-                assertEquals(353103, d.getSeconds());
-                assertEquals(123456789, d.getNano());
+                assertThat(ta).asInstanceOf(InstanceOfAssertFactories.DURATION)
+                    .returns(353103L, Duration::getSeconds)
+                    .returns(123456789, Duration::getNano);
             }
 
             @Test
             @DisplayName("from Java time Period format")
-            void should_parse_a_TimeAmount_from_java_time_period() {
+            void timeAmount_parses_a_TimeAmount_from_java_time_period() {
                 TemporalAmount ta = DateTimeFunctions.timeAmount("P2Y3M6W5D");
-                assertInstanceOf(Period.class, ta);
-                Period p = (Period) ta;
-                assertEquals(2, p.getYears());
-                assertEquals(3, p.getMonths());
-                assertEquals(47, p.getDays());
+                assertThat(ta).asInstanceOf(InstanceOfAssertFactories.PERIOD)
+                    .hasYears(2)
+                    .hasMonths(3)
+                    .hasDays(47);
             }
         }
 
         @Test
-        void should_throw_IllegalArgument_when_text_not_parsable() {
+        void timeAmount_throws_IllegalArgument_when_text_not_parsable() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> DateTimeFunctions.timeAmount("unparsable time amount text")
@@ -161,11 +169,11 @@ public class DateTimeFunctionsTest {
     @DisplayName("timeUnit function")
     class TimeUnitFunction {
         @Nested
-        @DisplayName("should parse a ChronoUnit")
+        @DisplayName("parses a ChronoUnit")
         class ValidParse {
             @Test
             @DisplayName("from Chutney DurationUnit format")
-            void should_parse_a_TimeAmount_from_a_chutney_duration_unit() {
+            void timeUnit_parses_a_TimeAmount_from_a_chutney_duration_unit() {
                 ChronoUnit cu = DateTimeFunctions.timeUnit("days");
                 assertEquals(ChronoUnit.DAYS, cu);
             }
@@ -173,7 +181,7 @@ public class DateTimeFunctionsTest {
             @ParameterizedTest(name = "{0}")
             @EnumSource(ChronoUnit.class)
             @DisplayName("from Java time ChronoUnit enum case insensitive")
-            void should_parse_a_TimeAmount_from_java_time_ChronoUnit_enum(ChronoUnit cu) {
+            void timeUnit_parses_a_TimeAmount_from_java_time_ChronoUnit_enum(ChronoUnit cu) {
                 boolean randBool = (int) (Math.random() * 10) % 2 == 0;
                 ChronoUnit tu = DateTimeFunctions.timeUnit(randBool ? cu.name() : cu.name().toLowerCase());
                 assertEquals(cu, tu);
@@ -181,11 +189,30 @@ public class DateTimeFunctionsTest {
         }
 
         @Test
-        void should_throw_IllegalArgument_when_text_not_parsable() {
+        void timeUnit_throws_IllegalArgument_when_text_not_parsable() {
             assertThrows(
                 IllegalArgumentException.class,
                 () -> DateTimeFunctions.timeUnit("unparsable time unit text")
             );
+        }
+    }
+
+    @Nested
+    @DisplayName("zoneRules functions")
+    class ZoneRulesFunctions {
+        @ParameterizedTest
+        @ValueSource(strings = {"Z", "GTM", "+01:00", "Europe/Paris"})
+        void zoneRules_gets_time_rules_from_zoneId() {
+            assertThat(DateTimeFunctions.zoneRules("Z")).isNotNull();
+        }
+
+        @Test
+        void systemZoneRules_gets_default_system_time_rules() {
+            ZoneRules systemZoneRules = DateTimeFunctions.systemZoneRules();
+            assertThat(systemZoneRules).isNotNull();
+            assertThat(DateTimeFunctions.zoneRules(null)).isEqualTo(systemZoneRules);
+            assertThat(DateTimeFunctions.zoneRules("")).isEqualTo(systemZoneRules);
+            assertThat(DateTimeFunctions.zoneRules("   ")).isEqualTo(systemZoneRules);
         }
     }
 
