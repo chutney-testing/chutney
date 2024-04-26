@@ -44,9 +44,9 @@ class PurgeExecutionsFiltersTest {
     @MethodSource("isExecutionBeforeGivenMilliseconds")
     void process_execution_predicate_before_given_milliseconds(
         LocalDateTime executionDate,
-        int beforeMillisecondsConfig,
+        int nowOffsetMillis,
         Boolean expectedTestResult,
-        int sleepConfig,
+        int sleep,
         Boolean expectedTestResultAfterSleep
     ) throws InterruptedException {
         // Given
@@ -62,14 +62,14 @@ class PurgeExecutionsFiltersTest {
             .build();
 
         // When
-        Predicate<ExecutionSummary> sut = PurgeExecutionsFilters.isExecutionDateBeforeGivenTime(
+        Predicate<ExecutionSummary> sut = PurgeExecutionsFilters.isExecutionDateBeforeNowMinusOffset(
             ExecutionSummary::time,
-            beforeMillisecondsConfig
+            nowOffsetMillis
         );
 
         // Then
         assertThat(sut.test(execution)).isEqualTo(expectedTestResult);
-        Thread.sleep(sleepConfig);
+        Thread.sleep(sleep);
         assertThat(sut.test(execution)).isEqualTo(expectedTestResultAfterSleep);
     }
 }

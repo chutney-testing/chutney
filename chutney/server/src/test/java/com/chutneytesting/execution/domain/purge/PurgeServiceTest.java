@@ -17,6 +17,7 @@
 
 package com.chutneytesting.execution.domain.purge;
 
+import static com.chutneytesting.execution.domain.purge.PurgeServiceImpl.ONE_DAY_MILLIS;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.FAILURE;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static java.time.LocalDateTime.now;
@@ -65,7 +66,7 @@ public class PurgeServiceTest {
                     // Given
                     // Two scenario's executions independents of any campaigns' execution
                     // And a configuration limit set to 2 for scenarios' executions
-                    Integer maxScenarioExecutionsConfiguration = 2;
+                    int maxScenarioExecutionsConfiguration = 2;
                     String scenarioId = "1";
 
                     TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
@@ -92,7 +93,7 @@ public class PurgeServiceTest {
                     // Given
                     // Three scenario's executions independents of any campaigns' execution
                     // And a configuration limit set to 2 for scenarios' executions
-                    Integer maxScenarioExecutionsConfiguration = 2;
+                    int maxScenarioExecutionsConfiguration = 2;
                     String scenarioId = "1";
                     Long oldestScenarioExecutionId = 1L;
 
@@ -127,7 +128,7 @@ public class PurgeServiceTest {
                     // Given
                     // Two scenario's executions independents of any campaigns' execution
                     // And a configuration limit set to 1 for scenarios' executions
-                    Integer maxScenarioExecutionsConfiguration = 1;
+                    int maxScenarioExecutionsConfiguration = 1;
                     String scenarioId = "1";
 
                     TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
@@ -154,7 +155,7 @@ public class PurgeServiceTest {
                     // Given
                     // Three scenario's executions independents of any campaigns' execution on two different environments
                     // And a configuration limit set to 1 for scenarios' executions
-                    Integer maxScenarioExecutionsConfiguration = 1;
+                    int maxScenarioExecutionsConfiguration = 1;
                     LocalDateTime now = now();
                     String scenarioId = "1";
                     Long oldestScenarioExecutionId = 1L;
@@ -190,7 +191,7 @@ public class PurgeServiceTest {
                 // Given
                 // Two scenarios and three scenario's executions independents of any campaigns' execution
                 // And a configuration limit set to 1 for scenarios' executions
-                Integer maxScenarioExecutionsConfiguration = 1;
+                int maxScenarioExecutionsConfiguration = 1;
                 LocalDateTime now = now();
                 String scenarioId1 = "1";
                 String scenarioId2 = "2";
@@ -236,8 +237,8 @@ public class PurgeServiceTest {
                     // Three campaign's executions with only one scenario's execution each
                     // And a configuration limit set to 10 for scenarios' executions
                     // And a configuration limit set to 2 for campaigns' executions
-                    Integer maxScenarioExecutionsConfiguration = 10;
-                    Integer maxCampaignExecutionsConfiguration = 2;
+                    int maxScenarioExecutionsConfiguration = 10;
+                    int maxCampaignExecutionsConfiguration = 2;
                     String scenarioId = "1";
                     Long campaignId = 1L;
                     Long oldestCampaignExecutionId = 1L;
@@ -293,8 +294,8 @@ public class PurgeServiceTest {
                     // Three campaign's executions with one without environment with only one scenario's execution each
                     // And a configuration limit set to 10 for scenarios' executions
                     // And a configuration limit set to 1 for campaigns' executions
-                    Integer maxScenarioExecutionsConfiguration = 10;
-                    Integer maxCampaignExecutionsConfiguration = 1;
+                    int maxScenarioExecutionsConfiguration = 10;
+                    int maxCampaignExecutionsConfiguration = 1;
                     String scenarioId = "1";
                     Long campaignId = 1L;
                     Long oldestCampaignExecutionId = 1L;
@@ -354,8 +355,8 @@ public class PurgeServiceTest {
                     // Three campaign's executions with only one scenario's execution each on two different environments
                     // And a configuration limit set to 10 for scenarios' executions
                     // And a configuration limit set to 1 for campaigns' executions
-                    Integer maxScenarioExecutionsConfiguration = 10;
-                    Integer maxCampaignExecutionsConfiguration = 1;
+                    int maxScenarioExecutionsConfiguration = 10;
+                    int maxCampaignExecutionsConfiguration = 1;
                     String scenarioId = "1";
                     Long campaignId = 1L;
                     Long oldestCampaignExecutionId = 1L;
@@ -416,8 +417,8 @@ public class PurgeServiceTest {
                 // Two campaigns with three campaign's executions each with only one scenario's execution each
                 // And a configuration limit set to 10 for scenarios' executions
                 // And a configuration limit set to 2 for campaigns' executions
-                Integer maxScenarioExecutionsConfiguration = 10;
-                Integer maxCampaignExecutionsConfiguration = 2;
+                int maxScenarioExecutionsConfiguration = 10;
+                int maxCampaignExecutionsConfiguration = 2;
                 String scenarioId = "1";
                 Long campaignId1 = 1L;
                 Long campaignId2 = 2L;
@@ -499,7 +500,7 @@ public class PurgeServiceTest {
                 // Four scenario's executions independents of any campaigns' execution
                 // The last twos are in failure
                 // And a configuration limit set to 1 for scenarios' executions
-                Integer maxScenarioExecutionsConfiguration = 1;
+                int maxScenarioExecutionsConfiguration = 1;
                 String scenarioId = "1";
                 Long lastSuccessScenarioExecutionId = 2L;
 
@@ -538,8 +539,8 @@ public class PurgeServiceTest {
                 // The last two are in failure
                 // And a configuration limit set to 10 for scenarios' executions
                 // And a configuration limit set to 1 for campaigns' executions
-                Integer maxScenarioExecutionsConfiguration = 10;
-                Integer maxCampaignExecutionsConfiguration = 1;
+                int maxScenarioExecutionsConfiguration = 10;
+                int maxCampaignExecutionsConfiguration = 1;
                 String scenarioId = "1";
                 Long campaignId = 1L;
                 Long lastSuccessCampaignExecutionId = 2L;
@@ -606,8 +607,8 @@ public class PurgeServiceTest {
             // Two manual scenario's executions older than the others
             // And a configuration limit set to 1 for scenarios' executions
             // And a configuration limit set to 1 for campaigns' executions
-            Integer maxScenarioExecutionsConfiguration = 1;
-            Integer maxCampaignExecutionsConfiguration = 1;
+            int maxScenarioExecutionsConfiguration = 1;
+            int maxCampaignExecutionsConfiguration = 1;
             String scenarioId = "1";
             Long campaignId = 1L;
             Long oldestScenarioExecutionId = 1L;
@@ -668,8 +669,8 @@ public class PurgeServiceTest {
             // Second campaign has two executions, which frame the first campaign second execution
             // And a configuration limit set to 100 for scenarios' executions
             // And a configuration limit set to 1 for campaigns' executions
-            Integer maxScenarioExecutionsConfiguration = 100;
-            Integer maxCampaignExecutionsConfiguration = 1;
+            int maxScenarioExecutionsConfiguration = 100;
+            int maxCampaignExecutionsConfiguration = 1;
             String scenarioId = "1";
             Long campaignWithManualReplaysId = 1L;
             Long campaignId = 2L;
@@ -749,8 +750,7 @@ public class PurgeServiceTest {
                 // Two scenario's executions independents of any campaigns' execution
                 //  a configuration limit set to 2 for scenarios' executions
                 // And a configuration max date set to yesterday
-                Integer maxScenarioExecutionsConfiguration = 2;
-                Integer scenarioBeforeTimeExecutionsConfiguration = 86400000;
+                int maxScenarioExecutionsConfiguration = 2;
                 String scenarioId = "1";
                 LocalDateTime now = now();
 
@@ -772,7 +772,7 @@ public class PurgeServiceTest {
                     mock(CampaignRepository.class),
                     mock(CampaignExecutionRepository.class),
                     maxScenarioExecutionsConfiguration,
-                    scenarioBeforeTimeExecutionsConfiguration,
+                    ONE_DAY_MILLIS,
                     100,
                     0);
                 PurgeReport report = sut.purge();
@@ -787,8 +787,7 @@ public class PurgeServiceTest {
                 // Given
                 // Three scenario's executions independents of any campaigns' execution
                 // And a configuration limit set to 1 for scenarios' executions
-                Integer maxScenarioExecutionsConfiguration = 1;
-                Integer scenarioBeforeTimeExecutionsConfiguration = 86400000;
+                int maxScenarioExecutionsConfiguration = 1;
                 String scenarioId = "1";
 
                 TestCaseRepository testCaseRepository = mock(TestCaseRepository.class);
@@ -811,7 +810,7 @@ public class PurgeServiceTest {
                     mock(CampaignRepository.class),
                     mock(CampaignExecutionRepository.class),
                     maxScenarioExecutionsConfiguration,
-                    scenarioBeforeTimeExecutionsConfiguration,
+                    ONE_DAY_MILLIS,
                     100,
                     0);
                 PurgeReport report = sut.purge();
@@ -834,9 +833,8 @@ public class PurgeServiceTest {
                 // And a configuration limit set to 10 for scenarios' executions
                 // And a configuration limit set to 1 for campaigns' executions
                 // And a configuration max date set to one day
-                Integer maxScenarioExecutionsConfiguration = 10;
-                Integer maxCampaignExecutionsConfiguration = 1;
-                Integer campaignsBeforeTimeExecutionsConfiguration = 86400000;
+                int maxScenarioExecutionsConfiguration = 10;
+                int maxCampaignExecutionsConfiguration = 1;
                 String scenarioId = "1";
                 Long campaignId = 1L;
                 LocalDateTime now = now();
@@ -880,7 +878,7 @@ public class PurgeServiceTest {
                     maxScenarioExecutionsConfiguration,
                     0,
                     maxCampaignExecutionsConfiguration,
-                    campaignsBeforeTimeExecutionsConfiguration);
+                    ONE_DAY_MILLIS);
                 PurgeReport report = sut.purge();
 
                 // Then
@@ -899,9 +897,8 @@ public class PurgeServiceTest {
                 // And a configuration limit set to 10 for scenarios' executions
                 // And a configuration limit set to 1 for campaigns' executions
                 // And a configuration max date set to one day
-                Integer maxScenarioExecutionsConfiguration = 10;
-                Integer maxCampaignExecutionsConfiguration = 1;
-                Integer campaignsBeforeTimeExecutionsConfiguration = 86400000;
+                int maxScenarioExecutionsConfiguration = 10;
+                int maxCampaignExecutionsConfiguration = 1;
                 String scenarioId = "1";
                 Long campaignId = 1L;
                 LocalDateTime now = now();
@@ -946,7 +943,7 @@ public class PurgeServiceTest {
                     maxScenarioExecutionsConfiguration,
                     0,
                     maxCampaignExecutionsConfiguration,
-                    campaignsBeforeTimeExecutionsConfiguration);
+                    ONE_DAY_MILLIS);
                 PurgeReport report = sut.purge();
 
                 // Then
@@ -966,8 +963,8 @@ public class PurgeServiceTest {
         @Test
         void purge_executions() {
             // Given
-            Integer maxScenarioExecutionsConfiguration = 5;
-            Integer maxCampaignExecutionsConfiguration = 3;
+            int maxScenarioExecutionsConfiguration = 5;
+            int maxCampaignExecutionsConfiguration = 3;
             String scenarioId1 = "1";
             String scenarioId2 = "2";
             String env1 = "dev";

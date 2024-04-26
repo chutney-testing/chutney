@@ -17,7 +17,7 @@
 
 package com.chutneytesting.execution.domain.purge;
 
-import static com.chutneytesting.execution.domain.purge.PurgeExecutionsFilters.isExecutionDateBeforeGivenTime;
+import static com.chutneytesting.execution.domain.purge.PurgeExecutionsFilters.isExecutionDateBeforeNowMinusOffset;
 import static com.chutneytesting.execution.domain.purge.PurgeExecutionsFilters.isScenarioExecutionLinkedWithCampaignExecution;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static java.util.Collections.emptyList;
@@ -37,6 +37,7 @@ import com.chutneytesting.server.core.domain.scenario.TestCaseMetadata;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.Collections;
@@ -53,6 +54,7 @@ import org.slf4j.LoggerFactory;
 
 public class PurgeServiceImpl implements PurgeService {
     private static final Logger LOGGER = LoggerFactory.getLogger(PurgeServiceImpl.class);
+    public static final int ONE_DAY_MILLIS = Long.valueOf(Duration.ofDays(1).toMillis()).intValue();
     private final PurgeExecutionService<Campaign, Long, CampaignExecution> campaignPurgeService;
     private final PurgeExecutionService<TestCaseMetadata, String, ExecutionSummary> scenarioPurgeService;
 
@@ -80,35 +82,27 @@ public class PurgeServiceImpl implements PurgeService {
         CampaignRepository campaignRepository,
         CampaignExecutionRepository campaignExecutionRepository,
         int maxScenarioExecutionsConfiguration,
-        int scenarioBeforeMillisecondsTimeExecutionsConfiguration,
+        int beforeNowMinusOffsetScenarioExecutionsConfiguration,
         int maxCampaignExecutionsConfiguration,
-        int campaignsBeforeMillisecondsTimeExecutionsConfiguration
+        int beforeNowMinusOffsetCampaignExecutionsConfiguration
     ) {
-        int maxScenarioExecutions = validateConfigurationLimit(true, maxScenarioExecutionsConfiguration, "maxScenarioExecutions", 10);
-        int maxCampaignExecutions = validateConfigurationLimit(true, maxCampaignExecutionsConfiguration, "maxCampaignExecutions", 10);
-        int scenarioBeforeHoursTimeExecutions = validateConfigurationLimit(false, scenarioBeforeMillisecondsTimeExecutionsConfiguration, "scenarioBeforeMillisecondsTimeExecutions", 86400000);
-        int campaignsBeforeHoursTimeExecutions = validateConfigurationLimit(false, campaignsBeforeMillisecondsTimeExecutionsConfiguration, "campaignsBeforeMillisecondsTimeExecutions", 86400000);
+        int maxScenarioExecutions = checkPositiveOrDefault(maxScenarioExecutionsConfiguration, "maxScenarioExecutions", 10);
+        int maxCampaignExecutions = checkPositiveOrDefault(maxCampaignExecutionsConfiguration, "maxCampaignExecutions", 10);
+        int scenarioBeforeHoursTimeExecutions = checkPositiveOrDefault(beforeNowMinusOffsetScenarioExecutionsConfiguration, "beforeNowMinusOffsetScenarioExecutions", ONE_DAY_MILLIS);
+        int campaignsBeforeHoursTimeExecutions = checkPositiveOrDefault(beforeNowMinusOffsetCampaignExecutionsConfiguration, "beforeNowMinusOffsetCampaignExecutions", ONE_DAY_MILLIS);
 
         this.scenarioPurgeService = buildScenarioService(testCaseRepository, executionsRepository, maxScenarioExecutions, scenarioBeforeHoursTimeExecutions);
         this.campaignPurgeService = buildCampaignService(campaignRepository, campaignExecutionRepository, maxCampaignExecutions, campaignsBeforeHoursTimeExecutions);
     }
 
-    private static int validateConfigurationLimit(
-        boolean strictlyPositive,
+    private static int checkPositiveOrDefault(
         int configurationLimit,
         String configName,
         int defaultValue
     ) {
-        if (strictlyPositive) {
-            if (configurationLimit <= 0) {
-                LOGGER.warn("Purge configuration limit must be strictly positive. Defaulting {} to {}", configName, defaultValue);
-                return defaultValue;
-            }
-        } else {
-            if (configurationLimit < 0) {
-                LOGGER.warn("Purge configuration limit must be positive. Defaulting {} to {}", configName, defaultValue);
-                return defaultValue;
-            }
+        if (configurationLimit < 0) {
+            LOGGER.warn("Purge configuration limit must be positive. Defaulting {} to {}", configName, defaultValue);
+            return defaultValue;
         }
         return configurationLimit;
     }
@@ -124,7 +118,7 @@ public class PurgeServiceImpl implements PurgeService {
             testCaseRepository::findAll,
             TestCaseMetadata::id,
             executionsRepository::getExecutions,
-            isScenarioExecutionLinkedWithCampaignExecution.and(isExecutionDateBeforeGivenTime(ExecutionSummary::time, beforeHoursTimeExecutions)),
+            isScenarioExecutionLinkedWithCampaignExecution.and(isExecutionDateBeforeNowMinusOffset(ExecutionSummary::time, beforeHoursTimeExecutions)),
             ExecutionSummary::executionId,
             ExecutionSummary::time,
             ExecutionSummary::status,
@@ -144,7 +138,7 @@ public class PurgeServiceImpl implements PurgeService {
             campaignRepository::findAll,
             campaign -> campaign.id,
             campaignExecutionRepository::getExecutionHistory,
-            isExecutionDateBeforeGivenTime(cer -> cer.startDate, beforeHoursTimeExecutions),
+            isExecutionDateBeforeNowMinusOffset(cer -> cer.startDate, beforeHoursTimeExecutions),
             cer -> cer.executionId,
             cer -> cer.startDate,
             CampaignExecution::getStatus,
