@@ -16,8 +16,8 @@
 
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Observable, Subject, Subscription, interval } from 'rxjs';
-import { catchError, debounceTime, map, mergeMap, takeWhile } from 'rxjs/operators';
+import { interval, Observable, Subject, Subscription } from 'rxjs';
+import { catchError, debounceTime, mergeMap, takeWhile, tap } from 'rxjs/operators';
 
 import {
     distinct,
@@ -81,63 +81,150 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.initJiraPlugin();
-        this.searchSub$.pipe(
-            debounceTime(400)
-            // distinctUntilChanged()
-        ).subscribe((inputValue) => {
-            this.scenarioService.search(this.fullTextFilter).subscribe((res) => {
-                    if (this.fullTextFilter) {
-                        this.localFilter(res);
-                    } else {
-                        this.localFilter(this.scenarios);
-                    }
+        this.onKeywordSearch();
+        this.fetchAndUpdateScenario()
+            .subscribe(res => {
+                if (this.atLeastOneScenarioIsRunning(res)) {
+                    this.subscribeForScenarios()
                 }
-            );
-        });
+            })
 
-        this.fetchAndUpdateScenario().pipe(map(scenarios => {
-            if (this.atLeastOneScenarioIsRunning(scenarios)) {
-                this.subscribeForScenarios()
-            };
-        })).subscribe()
     }
 
-    private subscribeForScenarios() {
-        interval(3000)
-        .pipe(
-            mergeMap(() => this.fetchAndUpdateScenario()),
-            takeWhile(t => this.atLeastOneScenarioIsRunning(t)))
-        .subscribe()
+    toggleDropDown(dropDown: AngularMultiSelect, event) {
+        event.stopPropagation();
+        dropDown.toggleDropdown(event);
     }
 
     ngOnDestroy(): void {
         this.urlParams?.unsubscribe();
     }
 
-    private fetchAndUpdateScenario(): Observable<Array<ScenarioIndex>> {
-        return this.getScenarios()
-        .pipe(
-            map(r => {
-                this.scenarios = r || [];
-                this.applyDefaultState();
-                this.applySavedState();
-                this.applyUriState();
-                this.applyFilters();
-                return r
-            }),
-            catchError(err => {
-                return [];
-            }));
+    createNewScenario() {
+        this.router.navigateByUrl('/scenario/raw-edition');
     }
 
-    private atLeastOneScenarioIsRunning(scenarios: Array<ScenarioIndex>) : boolean {
+    // Ordering //
+    sortBy(property) {
+        if (this.orderBy === property) {
+            this.reverseOrder = !this.reverseOrder;
+        }
+
+        this.orderBy = property;
+        this.applyFilters();
+    }
+
+    sortScenarios(property, reverseOrder) {
+        this.viewedScenarios = sortByAndOrder(
+            this.viewedScenarios,
+            this.getKeyExtractorBy(property),
+            reverseOrder
+        );
+    }
+
+    // Filtering //
+    updateTextFilter(text: string) {
+        this.textFilter = text;
+        this.applyFilters();
+    }
+
+    updateFullTextFilter(text: string) {
+        this.fullTextFilter = text;
+        this.applyFilters();
+    }
+
+    applyFilters() {
+        if (this.fullTextFilter) {
+            this.searchSub$.next(this.fullTextFilter);
+        } else {
+            this.localFilter(this.scenarios);
+        }
+    }
+
+    onItemSelect() {
+        this.stateService.changeTags(this.getSelectedTags());
+        this.applyFilters();
+    }
+
+    OnItemDeSelect() {
+        this.stateService.changeTags(this.getSelectedTags());
+        this.applyFilters();
+    }
+
+    OnItemDeSelectAll() {
+        this.selectedTags = newInstance([]);
+        this.stateService.changeTags(this.getSelectedTags());
+        this.applyFilters();
+    }
+
+    // Jira link //
+    initJiraPlugin() {
+        this.jiraPluginConfigurationService.getUrl()
+            .subscribe((url) => {
+                if (url !== '') {
+                    this.jiraUrl = url;
+                    this.jiraLinkService.findScenarios()
+                        .subscribe(
+                            (result) => {
+                                this.jiraMap = result;
+                            }
+                        );
+                }
+            });
+    }
+
+    getJiraLink(id: string) {
+        return this.jiraUrl + '/browse/' + this.jiraMap.get(id);
+    }
+
+
+    private onKeywordSearch() {
+        this.searchSub$.pipe(
+            debounceTime(400),
+            mergeMap(keyword => this.scenarioService.search(keyword))
+        ).subscribe(scenarios => this.localFilter(scenarios));
+    }
+
+    private subscribeForScenarios() {
+        interval(3000)
+            .pipe(
+                mergeMap(() => this.fetchAndUpdateScenario()),
+                takeWhile(t => this.atLeastOneScenarioIsRunning(t)))
+            .subscribe()
+    }
+
+    private fetchAndUpdateScenario(): Observable<Array<ScenarioIndex>> {
+        return this.getScenarios()
+            .pipe(
+                tap(scenarios => {
+                    if (!this.scenarios.length) {
+                        this.scenarios = scenarios;
+                    } else {
+                        this.updateRunningScenarioStatus(scenarios);
+                    }
+                    this.applyDefaultState();
+                    this.applySavedState();
+                    this.applyUriState();
+                }),
+                catchError(err => [])
+            );
+    }
+
+    private updateRunningScenarioStatus(scenarios: Array<ScenarioIndex>) {
+        this.scenarios.filter(scenario => scenario.status === ExecutionStatus.RUNNING)
+            .forEach(scenario => {
+                scenario.status = scenarios.find(updatedScenario => updatedScenario.id === scenario.id).status;
+            });
+    }
+
+    private atLeastOneScenarioIsRunning(scenarios: Array<ScenarioIndex>): boolean {
         return scenarios.filter(scenario => scenario.status === ExecutionStatus.RUNNING).length > 0
     }
 
     private initFilters() {
         const allTagsInScenario: string[] = this.findAllTags();
         this.tags = this.getTagsForComboModel(allTagsInScenario);
-        this.status = [...new Set(this.scenarios.map(scenario => scenario.status))].map(status => this.toSelectOption(status,  this.translateService.instant(ExecutionStatus.toString(status))));
+        this.status = [...new Set(this.scenarios.map(scenario => scenario.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
     }
 
     private toSelectOption(id: string, label: string = id) {
@@ -170,55 +257,31 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     private applyUriState() {
         this.urlParams = this.route.queryParams
-            .pipe(map((params: Array<any>) => {
-                    if (params['text']) {
-                        this.textFilter = params['text'];
-                    } else {
-                        this.textFilter = '';
-                    }
-                    if (params['orderBy']) {
-                        this.orderBy = params['orderBy'];
-                    }
-                    if (params['status']) {
-                        this.selectedStatus = this.status.filter((status) => params['status'].split(',').includes(status.text));
-                    }
-                    if (params['reverseOrder']) {
-                        this.reverseOrder = params['reverseOrder'] === 'true';
-                    }
-                    if (params['tags']) {
-                        const uriTag = params['tags'].split(',');
-                        if (uriTag != null) {
+            .pipe(
+                tap({
+                    next: (params: Array<any>) => {
+                        this.textFilter = params['text'] || '';
+                        if (params['orderBy']) {
+                            this.orderBy = params['orderBy'];
+                        }
+                        if (params['status']) {
+                            this.selectedStatus = this.status.filter((status) => params['status'].split(',').includes(status.itemName));
+                        }
+                        if (params['reverseOrder']) {
+                            this.reverseOrder = params['reverseOrder'] === 'true';
+                        }
+                        if (params['tags']) {
+                            const uriTag = params['tags'].split(',');
                             this.selectedTags = this.getTagsForComboModel(uriTag);
                         }
-                    }
-                    this.applyFilters();
-                    this.urlParams?.unsubscribe()
-                },
-                (error) => console.log(error)))
+                        this.applyFilters();
+                        this.urlParams?.unsubscribe()
+                    },
+                    error: (error) => console.log(error)
+                })
+            )
             .subscribe();
 
-    }
-
-    createNewScenario() {
-            this.router.navigateByUrl('/scenario/raw-edition');
-    }
-
-    // Ordering //
-    sortBy(property) {
-        if (this.orderBy === property) {
-            this.reverseOrder = !this.reverseOrder;
-        }
-
-        this.orderBy = property;
-        this.applyFilters();
-    }
-
-    sortScenarios(property, reverseOrder) {
-        this.viewedScenarios = sortByAndOrder(
-            this.viewedScenarios,
-            this.getKeyExtractorBy(property),
-            reverseOrder
-        );
     }
 
     private getKeyExtractorBy(property: string) {
@@ -230,26 +293,6 @@ export class ScenariosComponent implements OnInit, OnDestroy {
             return i => i[property] == null ? now - 1491841324 /*2017-04-10T16:22:04*/ : now - Date.parse(i[property]);
         } else {
             return i => i[property] == null ? '' : i[property];
-        }
-    }
-
-    // Filtering //
-
-    updateTextFilter(text: string) {
-        this.textFilter = text;
-        this.applyFilters();
-    }
-
-    updateFullTextFilter(text: string) {
-        this.fullTextFilter = text;
-        this.applyFilters();
-    }
-
-    applyFilters() {
-        if (this.fullTextFilter) {
-            this.searchSub$.next(this.fullTextFilter);
-        } else {
-            this.localFilter(this.scenarios);
         }
     }
 
@@ -267,26 +310,6 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         this.applyFiltersToRoute();
     }
 
-    // Jira link //
-    initJiraPlugin() {
-        this.jiraPluginConfigurationService.getUrl()
-            .subscribe((url) => {
-                if (url !== '') {
-                    this.jiraUrl = url;
-                    this.jiraLinkService.findScenarios()
-                        .subscribe(
-                            (result) => {
-                                this.jiraMap = result;
-                            }
-                        );
-                }
-            });
-    }
-
-    getJiraLink(id: string) {
-        return this.jiraUrl + '/browse/' + this.jiraMap.get(id);
-    }
-
     private filterOnAttributes() {
         const input = this.viewedScenarios;
 
@@ -299,13 +322,14 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     private scenarioStatusPresent(statusFilter: any[], scenario: ScenarioIndex): boolean {
         if (statusFilter.length > 0) {
-            return intersection(statusFilter.map((status)=>status.id), [scenario.status]).length > 0;
+            return intersection(statusFilter.map((status) => status.id), [scenario.status]).length > 0;
         } else {
             return true;
         }
     }
 
     private applyFiltersToRoute(): void {
+        console.log('navigate...')
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: {
@@ -319,28 +343,13 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     }
 
     private tagPresent(tags: String[], scenario: ScenarioIndex): boolean {
-        if(tags.length > 0) {
+        if (tags.length > 0) {
             return intersection(tags, scenario.tags).length > 0;
         } else {
             return true;
         }
     }
 
-    onItemSelect() {
-        this.stateService.changeTags(this.getSelectedTags());
-        this.applyFilters();
-    }
-
-    OnItemDeSelect() {
-        this.stateService.changeTags(this.getSelectedTags());
-        this.applyFilters();
-    }
-
-    OnItemDeSelectAll() {
-        this.selectedTags = newInstance([]);
-        this.stateService.changeTags(this.getSelectedTags());
-        this.applyFilters();
-    }
 
     private getSelectedTags() {
         return this.selectedTags.map((i) => i.text);
