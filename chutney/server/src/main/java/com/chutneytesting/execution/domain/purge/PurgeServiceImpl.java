@@ -141,7 +141,7 @@ public class PurgeServiceImpl implements PurgeService {
             isExecutionDateBeforeNowMinusOffset(cer -> cer.startDate, beforeHoursTimeExecutions),
             cer -> cer.executionId,
             cer -> cer.startDate,
-            CampaignExecution::getStatus,
+            CampaignExecution::status,
             cer -> cer.executionEnvironment,
             campaignExecutionRepository::deleteExecutions
         ) {

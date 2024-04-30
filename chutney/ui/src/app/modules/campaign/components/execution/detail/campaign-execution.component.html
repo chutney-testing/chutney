@@ -87,15 +87,21 @@
                         <span *ngIf="orderBy == 'status' && reverseOrder" class="fa fa-caret-down"></span>
                         <span *ngIf="orderBy == 'status' && !reverseOrder" class="fa fa-caret-up"></span>
                     </th>
-                    <th scope="col" class="filter w45" (click)="sortBy('scenarioName')">{{ 'campaigns.execution.scenarios.item.header.title' | translate }}
+                    <th scope="col" class="w45" (click)="sortBy('scenarioName')">{{ 'campaigns.execution.scenarios.item.header.title' | translate }}
                         <span *ngIf="orderBy == 'scenarioName' && reverseOrder" class="fa fa-caret-down"></span>
                         <span *ngIf="orderBy == 'scenarioName' && !reverseOrder" class="fa fa-caret-up"></span>
                     </th>
-                    <th scope="col" class="filter" (click)="sortBy('error')">{{ 'campaigns.execution.scenarios.item.header.error' | translate }}
+                    <th scope="col" (click)="sortBy('error')">{{ 'campaigns.execution.scenarios.item.header.error' | translate }}
                         <span *ngIf="orderBy == 'error' && reverseOrder" class="fa fa-caret-down"></span>
                         <span *ngIf="orderBy == 'error' && !reverseOrder" class="fa fa-caret-up"></span>
                     </th>
-                    <th scope="col" class="filter w8 text-center" (click)="sortBy('duration')">{{ 'campaigns.execution.scenarios.item.header.duration' | translate }}
+                    <th scope="col" class="w8 text-center">
+                        {{ 'campaigns.execution.scenarios.item.header.tags' | translate }}
+                    </th>
+                    <th scope="col" class="w8 text-center">
+                        {{ 'campaigns.execution.scenarios.item.header.dataset' | translate }}
+                    </th>
+                    <th scope="col" class="w8 text-center" (click)="sortBy('duration')">{{ 'campaigns.execution.scenarios.item.header.duration' | translate }}
                         <span *ngIf="orderBy == 'duration' && reverseOrder" class="fa fa-caret-down"></span>
                         <span *ngIf="orderBy == 'duration' && !reverseOrder" class="fa fa-caret-up"></span>
                     </th>
@@ -130,6 +136,22 @@
                     </td>
                     <td class="align-middle">
                         <span><small (click)="showMore[i]=!showMore[i]">{{ (!showMore[i] && scenarioReportOutline.error.length > 100) ? (scenarioReportOutline.error | slice:0:100) + " ..." : (scenarioReportOutline.error) }}</small></span>
+                    </td>
+                    <td class="text-center align-middle text-nowrap">
+                        <ng-container *ngIf="scenarioReportOutline.tags.length <= 3">
+                            <span *ngFor="let tag of scenarioReportOutline.tags" class="badge bg-primary">{{tag}}</span>
+                        </ng-container>
+                        <ng-container *ngIf="scenarioReportOutline.tags.length > 3">
+                            <span *ngFor="let tag of scenarioReportOutline.tags | slice:0:2" class="badge bg-primary">{{tag}}</span>
+                            <button type="button" class="badge bg-primary"
+                                    ngbPopover="{{scenarioReportOutline.tags}}" placement="left"
+                                    triggers="mouseenter:mouseleave" container="body">
+                                ...
+                            </button>
+                        </ng-container>
+                    </td>
+                    <td class="text-center align-middle text-nowrap">
+                        <span><small>{{ scenarioReportOutline.datasetId }}</small></span>
                     </td>
                     <td class="text-center align-middle text-nowrap">
                         <span><small>{{ scenarioReportOutline.duration | duration:'short' }}</small></span>

@@ -124,7 +124,7 @@ public class CampaignExecutionEntity {
                 scenarioExecutionCampaigns = campaign.campaignScenarios().stream()
                     .map(cs ->
                         scenarioExecutions.stream()
-                            .filter(se -> se.scenarioId().equals(cs.scenarioId()))
+                            .filter(se -> se.scenarioId().equals(cs.scenarioId()) && ofNullable(se.datasetId()).equals(ofNullable(cs.datasetId())))
                             .findFirst()
                             .map(se -> new ScenarioExecutionCampaign(se.scenarioId(), se.scenarioTitle(), se.toDomain()))
                             .orElseGet(() -> blankScenarioExecutionReport(cs, scenarioTitleSupplier)))

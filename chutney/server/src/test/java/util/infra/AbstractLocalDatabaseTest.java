@@ -33,6 +33,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.stream.IntStream;
 import javax.sql.DataSource;
 import liquibase.Liquibase;
 import liquibase.database.jvm.JdbcConnection;
@@ -125,6 +126,12 @@ public abstract class AbstractLocalDatabaseTest {
 
     protected List<Campaign.CampaignScenario> scenariosIds(ScenarioEntity... scenarioEntities) {
         return Arrays.stream(scenarioEntities).map(ScenarioEntity::getId).map(id -> new Campaign.CampaignScenario(id.toString(), null)).toList();
+    }
+
+    protected List<Campaign.CampaignScenario> scenariosIds(List<ScenarioEntity> scenarioEntities, List<String> datasetIds) {
+        return IntStream.range(0, scenarioEntities.size())
+            .mapToObj(idx -> new Campaign.CampaignScenario(scenarioEntities.get(idx).getId().toString(), datasetIds.get(idx)))
+            .toList();
     }
 
     protected Set<String> defaultScenarioTags() {

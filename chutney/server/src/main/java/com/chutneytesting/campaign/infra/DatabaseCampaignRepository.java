@@ -131,6 +131,7 @@ public class DatabaseCampaignRepository implements CampaignRepository {
 
         return campaignScenarioJpaRepository.findAllByScenarioId(scenarioId).stream()
             .map(CampaignScenarioEntity::campaign)
+            .distinct()
             .map(CampaignEntity::toDomain)
             .toList();
     }

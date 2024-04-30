@@ -183,10 +183,6 @@ public class CampaignExecution {
         }
     }
 
-    public ServerReportStatus getStatus() {
-        return status;
-    }
-
     public List<ScenarioExecutionCampaign> scenarioExecutionReports() {
         if (findStatus(scenarioExecutions).isFinal()) {
             scenarioExecutions.sort(ScenarioExecutionCampaign.executionIdComparator());
@@ -244,7 +240,7 @@ public class CampaignExecution {
         return scenarioExecutionReports.stream()
             .filter(Objects::nonNull)
             .collect(Collectors.toMap(
-                ScenarioExecutionCampaign::scenarioId,
+                Function.identity(),
                 Function.identity(),
                 BinaryOperator.maxBy(Comparator.comparing(s -> s.execution().time())),
                 LinkedHashMap::new // Keep the insertion order
