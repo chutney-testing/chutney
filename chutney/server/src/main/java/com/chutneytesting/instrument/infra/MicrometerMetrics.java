@@ -28,6 +28,7 @@ import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import io.micrometer.core.instrument.Counter;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Timer;
@@ -70,7 +71,7 @@ class MicrometerMetrics implements ChutneyMetrics {
     @Override
     public void onCampaignExecutionEnded(Campaign campaign, CampaignExecution campaignExecution) {
         final String campaignId = campaign.id.toString();
-        final Map<ServerReportStatus, Long> campaignCountByStatus = campaignExecution.scenarioExecutionReports().stream().collect(groupingBy(s -> s.execution.status(), counting()));
+        final Map<ServerReportStatus, Long> campaignCountByStatus = campaignExecution.scenarioExecutionReports().stream().collect(groupingBy(ScenarioExecutionCampaign::status, counting()));
         final ServerReportStatus status = campaignExecution.status();
         final long campaignDuration = campaignExecution.getDuration();
 

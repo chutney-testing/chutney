@@ -1042,4 +1042,11 @@
         <comment>Remove DATASET_VERSION column</comment>
         <dropColumn tableName="CAMPAIGN_EXECUTIONS" columnName="DATASET_VERSION"></dropColumn>
     </changeSet>
+
+    <changeSet id="add-campaign-scenarios-dataset" author="ICG">
+        <comment>Add Campaign Scenarios dataset </comment>
+        <addColumn tableName="CAMPAIGN_SCENARIOS">
+            <column name="DATASET_ID" type="VARCHAR(64)"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

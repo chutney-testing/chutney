@@ -25,6 +25,8 @@ data class Campaign(
     val parallelRun: Boolean = false,
     val retryAuto: Boolean = false,
     val datasetId: String? = null,
-    val scenarioIds: List<Int> = emptyList(),
+    val scenarios: List<CampaignScenario> = emptyList(),
     val tags: List<String> = emptyList()
-)
+) {
+    data class CampaignScenario(val scenarioId: Int, val datasetId: String? = null)
+}

@@ -123,7 +123,7 @@ public class CampaignEntity implements Serializable {
             id,
             title,
             description,
-            campaignScenarios.stream().map(CampaignScenarioEntity::scenarioId).toList(),
+            campaignScenarios.stream().map(e -> new Campaign.CampaignScenario(e.scenarioId(), e.datasetId())).toList(),
             environment,
             parallelRun,
             retryAuto,

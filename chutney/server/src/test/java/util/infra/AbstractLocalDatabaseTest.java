@@ -24,6 +24,7 @@ import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
 import com.chutneytesting.scenario.infra.jpa.ScenarioEntity;
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
+import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import jakarta.persistence.EntityManager;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -106,7 +107,7 @@ public abstract class AbstractLocalDatabaseTest {
         return transactionTemplate.execute(ts -> {
             for (int i = 0; i < scenarioEntities.length; i++) {
                 ScenarioEntity scenarioEntity = scenarioEntities[i];
-                campaignScenarioEntities.add(new CampaignScenarioEntity(campaign, scenarioEntity.getId().toString(), i));
+                campaignScenarioEntities.add(new CampaignScenarioEntity(campaign, scenarioEntity.getId().toString(), null, i));
             }
             campaign.campaignScenarios().addAll(campaignScenarioEntities);
             entityManager.persist(campaign);
@@ -122,8 +123,8 @@ public abstract class AbstractLocalDatabaseTest {
         });
     }
 
-    protected List<String> scenariosIds(ScenarioEntity... scenarioEntities) {
-        return Arrays.stream(scenarioEntities).map(ScenarioEntity::getId).map(String::valueOf).toList();
+    protected List<Campaign.CampaignScenario> scenariosIds(ScenarioEntity... scenarioEntities) {
+        return Arrays.stream(scenarioEntities).map(ScenarioEntity::getId).map(id -> new Campaign.CampaignScenario(id.toString(), null)).toList();
     }
 
     protected Set<String> defaultScenarioTags() {

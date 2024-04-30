@@ -1198,7 +1198,7 @@ public class PurgeServiceTest {
             })
             .toList();
 
-        ExecutionHistory.ExecutionSummary firsScenarioExecution = scenarioExecutionsForCampaign.get(0).execution;
+        ExecutionHistory.ExecutionSummary firsScenarioExecution = scenarioExecutionsForCampaign.get(0).execution();
         return new CampaignExecution(
             campaignExecutionId,
             campaignId,

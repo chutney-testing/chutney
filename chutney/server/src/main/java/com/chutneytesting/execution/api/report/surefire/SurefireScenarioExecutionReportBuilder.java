@@ -47,10 +47,10 @@ public class SurefireScenarioExecutionReportBuilder {
 
     Testsuite create(ScenarioExecutionCampaign scenarioExecutionReport) {
         Testsuite testsuite = objectFactory.createTestsuite();
-        testsuite.setName(scenarioExecutionReport.scenarioId + "_" + scenarioExecutionReport.scenarioName);
-        testsuite.setTime(toSurefireDuration(scenarioExecutionReport.execution.duration()));
+        testsuite.setName(scenarioExecutionReport.scenarioId() + "_" + scenarioExecutionReport.scenarioName());
+        testsuite.setTime(toSurefireDuration(scenarioExecutionReport.execution().duration()));
 
-        String rawReport = executionHistoryRepository.getExecution(scenarioExecutionReport.scenarioId, scenarioExecutionReport.execution.executionId()).report();
+        String rawReport = executionHistoryRepository.getExecution(scenarioExecutionReport.scenarioId(), scenarioExecutionReport.execution().executionId()).report();
         ScenarioExecutionReport executionReport = parse(rawReport);
 
         populateTestsuite(testsuite, executionReport);

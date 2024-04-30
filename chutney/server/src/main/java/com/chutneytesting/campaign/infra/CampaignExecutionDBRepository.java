@@ -122,7 +122,7 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
         );
         Iterable<ScenarioExecutionEntity> scenarioExecutions =
             scenarioExecutionJpaRepository.findAllById(campaignExecution.scenarioExecutionReports().stream()
-                .map(serc -> serc.execution.executionId())
+                .map(serc -> serc.execution().executionId())
                 .toList());
         execution.updateFromDomain(campaignExecution, scenarioExecutions);
         campaignExecutionJpaRepository.save(execution);

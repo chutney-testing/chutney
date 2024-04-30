@@ -20,11 +20,11 @@ import static com.chutneytesting.server.core.domain.execution.report.ServerRepor
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
+import static java.util.function.Predicate.not;
 
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
-import com.chutneytesting.server.core.domain.scenario.TestCase;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -69,7 +69,7 @@ public class CampaignExecution {
         this.campaignName = campaignName;
         this.startDate = now();
         this.status = RUNNING;
-        this.dataSetId = ofNullable(dataSetId);
+        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank));
         this.userId = userId;
     }
 
@@ -89,7 +89,7 @@ public class CampaignExecution {
         this.status = findStatus(scenarioExecutions);
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
-        this.dataSetId = ofNullable(dataSetId);
+        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank));
         this.userId = userId;
     }
 
@@ -110,7 +110,7 @@ public class CampaignExecution {
         this.campaignName = campaignName;
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
-        this.dataSetId = dataSetId;
+        this.dataSetId = dataSetId.filter(not(String::isBlank));
         this.userId = userId;
 
         if (scenarioExecutions == null) {
@@ -124,44 +124,52 @@ public class CampaignExecution {
         }
     }
 
-    public void initExecution(List<TestCase> testCases, String executionEnvironment, String userId) {
-        testCases.forEach(testCase ->
+    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment, String userId) {
+        testCaseDatasets.forEach(testCase ->
             this.scenarioExecutions.add(
                 new ScenarioExecutionCampaign(
-                    testCase.id(),
-                    testCase.metadata().title(),
+                    testCase.testcase().id(),
+                    testCase.testcase().metadata().title(),
                     ImmutableExecutionHistory.ExecutionSummary.builder()
                         .executionId(-1L)
-                        .testCaseTitle(testCase.metadata().title())
+                        .testCaseTitle(testCase.testcase().metadata().title())
                         .time(now())
                         .status(ServerReportStatus.NOT_EXECUTED)
                         .duration(0)
                         .environment(executionEnvironment)
-                        .datasetId(dataSetId)
+                        .datasetId(selectDatasetId(testCase))
                         .user(userId)
-                        .scenarioId(testCase.id())
+                        .scenarioId(testCase.testcase().id())
                         .build())));
     }
 
-    public void startScenarioExecution(TestCase testCase, String executionEnvironment, String userId) throws UnsupportedOperationException {
+    public void startScenarioExecution(TestCaseDataset testCaseDataset, String executionEnvironment, String userId) throws UnsupportedOperationException {
         OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
-            .filter(i -> this.scenarioExecutions.get(i).scenarioId.equals(testCase.id()))
+            .filter(i -> {
+                var se = this.scenarioExecutions.get(i);
+                return se.scenarioId().equals(testCaseDataset.testcase().id()) &&
+                    se.execution().datasetId().equals(selectDatasetId(testCaseDataset));
+            })
             .findFirst();
         this.scenarioExecutions.set(indexOpt.getAsInt(),
             new ScenarioExecutionCampaign(
-                testCase.id(),
-                testCase.metadata().title(),
+                testCaseDataset.testcase().id(),
+                testCaseDataset.testcase().metadata().title(),
                 ImmutableExecutionHistory.ExecutionSummary.builder()
                     .executionId(-1L)
-                    .testCaseTitle(testCase.metadata().title())
+                    .testCaseTitle(testCaseDataset.testcase().metadata().title())
                     .time(now())
                     .status(RUNNING)
                     .duration(0)
                     .environment(executionEnvironment)
-                    .datasetId(dataSetId)
+                    .datasetId(selectDatasetId(testCaseDataset))
                     .user(userId)
-                    .scenarioId(testCase.id())
+                    .scenarioId(testCaseDataset.testcase().id())
                     .build()));
+    }
+
+    private Optional<String> selectDatasetId(TestCaseDataset testCaseDataset) {
+        return ofNullable(testCaseDataset.datasetId()).or(() -> dataSetId).filter(not(String::isBlank));
     }
 
     public void endScenarioExecution(ScenarioExecutionCampaign scenarioExecutionCampaign) throws UnsupportedOperationException {
@@ -192,7 +200,7 @@ public class CampaignExecution {
 
     public long getDuration() {
         Optional<LocalDateTime> latestExecutionEndDate = scenarioExecutions.stream()
-            .map(report -> report.execution.time().plus(report.execution.duration(), ChronoUnit.MILLIS))
+            .map(report -> report.execution().time().plus(report.execution().duration(), ChronoUnit.MILLIS))
             .max(LocalDateTime::compareTo);
 
         return latestExecutionEndDate
@@ -203,7 +211,7 @@ public class CampaignExecution {
     private LocalDateTime findStartDate(List<ScenarioExecutionCampaign> scenarioExecutionReports) {
         return scenarioExecutionReports.stream()
             .filter(Objects::nonNull)
-            .map(report -> report.execution)
+            .map(ScenarioExecutionCampaign::execution)
             .filter(Objects::nonNull)
             .map(ExecutionHistory.ExecutionProperties::time)
             .filter(Objects::nonNull)
@@ -222,7 +230,7 @@ public class CampaignExecution {
         List<ScenarioExecutionCampaign> filteredReports = filterRetry(scenarioExecutionReports);
 
         ServerReportStatus foundStatus = filteredReports.stream()
-            .map(report -> report.execution)
+            .map(ScenarioExecutionCampaign::execution)
             .filter(Objects::nonNull)
             .map(ExecutionHistory.ExecutionProperties::status)
             .collect(Collectors.collectingAndThen(Collectors.toList(), ServerReportStatus::worst));
@@ -236,11 +244,11 @@ public class CampaignExecution {
         return scenarioExecutionReports.stream()
             .filter(Objects::nonNull)
             .collect(Collectors.toMap(
-                s -> s.scenarioId,
+                ScenarioExecutionCampaign::scenarioId,
                 Function.identity(),
-                BinaryOperator.maxBy(Comparator.comparing(s -> s.execution.time())),
-                    LinkedHashMap::new // Keep the insertion order
-                ))
+                BinaryOperator.maxBy(Comparator.comparing(s -> s.execution().time())),
+                LinkedHashMap::new // Keep the insertion order
+            ))
             .values()
             .stream()
             .toList();
@@ -259,6 +267,12 @@ public class CampaignExecution {
             .setStatus(status)
             .setScenarioExecutionReport(filterRetry(scenarioExecutions))
             .build();
+    }
+
+    public List<ScenarioExecutionCampaign> failedScenarioExecutions() {
+        return scenarioExecutionReports().stream()
+            .filter(s -> !ServerReportStatus.SUCCESS.equals(s.execution().status()))
+            .toList();
     }
 
     @Override

@@ -145,8 +145,8 @@ class CampaignServiceTest {
         assertThat(executionsReports).hasSize(1);
         assertThat(executionsReports.get(0).status()).isEqualTo(RUNNING);
         assertThat(executionsReports.get(0).scenarioExecutionReports()).hasSize(2);
-        assertThat(executionsReports.get(0).scenarioExecutionReports().get(0).scenarioId).isEqualTo("scenario 1");
-        assertThat(executionsReports.get(0).scenarioExecutionReports().get(1).scenarioId).isEqualTo("scenario 2");
+        assertThat(executionsReports.get(0).scenarioExecutionReports().get(0).scenarioId()).isEqualTo("scenario 1");
+        assertThat(executionsReports.get(0).scenarioExecutionReports().get(1).scenarioId()).isEqualTo("scenario 2");
 
     }
 

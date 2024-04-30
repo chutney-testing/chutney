@@ -20,14 +20,10 @@ import static com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper.
 
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper;
-import com.chutneytesting.campaign.domain.CampaignRepository;
-import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.execution.api.report.surefire.SurefireCampaignExecutionReportBuilder;
 import com.chutneytesting.execution.api.report.surefire.SurefireScenarioExecutionReportBuilder;
 import com.chutneytesting.execution.domain.campaign.CampaignExecutionEngine;
 import com.chutneytesting.security.infra.SpringUserService;
-import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
-import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
@@ -56,23 +52,17 @@ public class CampaignExecutionUiController {
 
     private final CampaignExecutionEngine campaignExecutionEngine;
     private final SurefireCampaignExecutionReportBuilder surefireCampaignExecutionReportBuilder;
-    private final CampaignRepository campaignRepository;
     private final SpringUserService userService;
-    private final CampaignService campaignService;
     private final CampaignExecutionApiMapper campaignExecutionApiMapper;
 
     public CampaignExecutionUiController(
         CampaignExecutionEngine campaignExecutionEngine,
         SurefireScenarioExecutionReportBuilder surefireScenarioExecutionReportBuilder,
-        CampaignRepository campaignRepository,
         SpringUserService userService,
-        CampaignService campaignService,
         CampaignExecutionApiMapper campaignExecutionApiMapper) {
         this.campaignExecutionEngine = campaignExecutionEngine;
         this.surefireCampaignExecutionReportBuilder = new SurefireCampaignExecutionReportBuilder(surefireScenarioExecutionReportBuilder);
-        this.campaignRepository = campaignRepository;
         this.userService = userService;
-        this.campaignService = campaignService;
         this.campaignExecutionApiMapper = campaignExecutionApiMapper;
     }
 
@@ -103,12 +93,8 @@ public class CampaignExecutionUiController {
     @PreAuthorize("hasAuthority('CAMPAIGN_EXECUTE')")
     @PostMapping(path = {"/replay/{campaignExecutionId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignExecutionReportDto replayFailedScenario(@PathVariable("campaignExecutionId") Long campaignExecutionId) {
-        CampaignExecution campaignExecution = campaignService.findByExecutionId(campaignExecutionId);
         String userId = userService.currentUser().getId();
-        List<String> failedIds = campaignExecution.scenarioExecutionReports().stream().filter(s -> !ServerReportStatus.SUCCESS.equals(s.execution.status())).map(s -> s.scenarioId).collect(Collectors.toList());
-        Campaign campaign = campaignRepository.findById(campaignExecution.campaignId);
-        campaign.executionEnvironment(campaignExecution.executionEnvironment);
-        CampaignExecution newExecution = campaignExecutionEngine.executeScenarioInCampaign(failedIds, campaign, userId);
+        CampaignExecution newExecution = campaignExecutionEngine.replayCampaignExecution(campaignExecutionId, userId);
         return toDto(newExecution);
     }
 

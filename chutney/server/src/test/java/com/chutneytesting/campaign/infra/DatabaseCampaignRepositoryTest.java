@@ -16,6 +16,7 @@
 
 package com.chutneytesting.campaign.infra;
 
+import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.chutneytesting.campaign.domain.CampaignRepository;
@@ -66,12 +67,12 @@ public class DatabaseCampaignRepositoryTest {
             ScenarioEntity s1 = givenScenario();
             ScenarioEntity s2 = givenScenario();
 
-            List<String> scenarioIds = scenariosIds(s1, s2);
+            List<Campaign.CampaignScenario> scenarioIds = scenariosIds(s1, s2);
             Campaign campaign = new Campaign(null, "test", "lol", scenarioIds, "env", false, false, null, null);
             campaign = sut.createOrUpdate(campaign);
 
             Campaign selected = sut.findById(campaign.id);
-            assertThat(selected.scenarioIds).containsExactlyElementsOf(scenarioIds);
+            assertThat(selected.scenarios).containsExactlyElementsOf(scenarioIds);
         }
 
         @Test
@@ -93,16 +94,16 @@ public class DatabaseCampaignRepositoryTest {
             ScenarioEntity s3 = givenScenario();
             ScenarioEntity s4 = givenScenario();
 
-            List<String> scenarioIds = scenariosIds(s4, s2, s3, s1);
+            List<Campaign.CampaignScenario> scenarioIds = scenariosIds(s4, s2, s3, s1);
             Campaign campaign = new Campaign(null, "test", "lol", scenarioIds, "env", false, false, null, null);
             campaign = sut.createOrUpdate(campaign);
 
             Campaign selected = sut.findById(campaign.id);
-            assertThat(selected.scenarioIds).containsExactlyElementsOf(scenarioIds);
+            assertThat(selected.scenarios).containsExactlyElementsOf(scenarioIds);
 
             List<Campaign> campaigns = sut.findByName("test");
             assertThat(campaigns).hasSize(1);
-            assertThat(campaigns.get(0).scenarioIds).containsExactlyElementsOf(scenarioIds);
+            assertThat(campaigns.get(0).scenarios).containsExactlyElementsOf(scenarioIds);
         }
 
         @Test
@@ -110,13 +111,13 @@ public class DatabaseCampaignRepositoryTest {
             ScenarioEntity s1 = givenScenario();
             ScenarioEntity s2 = givenScenario();
 
-            List<String> scenarioIds = scenariosIds(s1, s2);
+            List<Campaign.CampaignScenario> scenarioIds = scenariosIds(s1, s2);
             Campaign campaign = new Campaign(null, "campaignName", "lol", scenarioIds, "env", false, false, null, null);
             campaign = sut.createOrUpdate(campaign);
 
             List<Campaign> selected = sut.findByName(campaign.title);
             assertThat(selected).hasSize(1);
-            assertThat(selected.get(0).scenarioIds).containsExactlyElementsOf(scenarioIds);
+            assertThat(selected.get(0).scenarios).containsExactlyElementsOf(scenarioIds);
         }
 
         @Test
@@ -124,7 +125,7 @@ public class DatabaseCampaignRepositoryTest {
             // Given
             ScenarioEntity s1 = givenScenario();
             ScenarioEntity s2 = givenScenario();
-            List<String> scenarioIds = scenariosIds(s1, s2);
+            List<Campaign.CampaignScenario> scenarioIds = scenariosIds(s1, s2);
             Campaign unsavedCampaign = new Campaign(12345L, "campaignName", "lol", scenarioIds, "env", false, false, null, null);
 
             //When
@@ -137,7 +138,7 @@ public class DatabaseCampaignRepositoryTest {
             assertThat(savedCampaign.executionEnvironment()).isEqualTo(unsavedCampaign.executionEnvironment());
             assertThat(savedCampaign.parallelRun).isFalse();
             assertThat(savedCampaign.retryAuto).isFalse();
-            assertThat(savedCampaign.scenarioIds).containsExactlyElementsOf(scenarioIds);
+            assertThat(savedCampaign.scenarios).containsExactlyElementsOf(scenarioIds);
 
         }
 
@@ -146,7 +147,7 @@ public class DatabaseCampaignRepositoryTest {
             // Given
             ScenarioEntity s1 = givenScenario();
             ScenarioEntity s2 = givenScenario();
-            List<String> scenarioIds = scenariosIds(s1, s2);
+            List<Campaign.CampaignScenario> scenarioIds = scenariosIds(s1, s2);
             Campaign unsavedCampaign = new Campaign(null, "campaignName", "lol", scenarioIds, "env", false, false, null, null);
             Campaign savedCampaign = sut.createOrUpdate(unsavedCampaign);
             assertThat(savedCampaign.title).isEqualTo(unsavedCampaign.title);
@@ -154,26 +155,28 @@ public class DatabaseCampaignRepositoryTest {
             assertThat(savedCampaign.executionEnvironment()).isEqualTo(unsavedCampaign.executionEnvironment());
             assertThat(savedCampaign.parallelRun).isFalse();
             assertThat(savedCampaign.retryAuto).isFalse();
-            assertThat(savedCampaign.scenarioIds).containsExactlyElementsOf(scenarioIds);
+            assertThat(savedCampaign.scenarios).containsExactlyElementsOf(scenarioIds);
 
             String newTitle = "new title";
             String newDescription = "new description";
             ScenarioEntity s3 = givenScenario();
-            List<String> newScenarios = scenariosIds(s3);
+            List<Campaign.CampaignScenario> newScenarios = singletonList(new Campaign.CampaignScenario(s3.getId().toString(), "datasetId"));
             String newEnvironment = "newEnv";
-            Campaign updatedCampaign = new Campaign(savedCampaign.id, newTitle, newDescription, newScenarios, newEnvironment, true, true, null, null);
+            Campaign newUnsavedCampaign = new Campaign(savedCampaign.id, newTitle, newDescription, newScenarios, newEnvironment, true, true, null, null);
 
             // When
-            Campaign selected = sut.createOrUpdate(updatedCampaign);
+            Campaign updatedCampaign = sut.createOrUpdate(newUnsavedCampaign);
 
             // Then
-            assertThat(selected.id).isEqualTo(savedCampaign.id);
-            assertThat(selected.title).isEqualTo(newTitle);
-            assertThat(selected.description).isEqualTo(newDescription);
-            assertThat(selected.executionEnvironment()).isEqualTo(newEnvironment);
-            assertThat(selected.parallelRun).isTrue();
-            assertThat(selected.retryAuto).isTrue();
-            assertThat(selected.scenarioIds).containsExactlyElementsOf(newScenarios);
+            assertThat(updatedCampaign).satisfies(c -> {
+                assertThat(c.id).isEqualTo(savedCampaign.id);
+                assertThat(c.title).isEqualTo(newTitle);
+                assertThat(c.description).isEqualTo(newDescription);
+                assertThat(c.executionEnvironment()).isEqualTo(newEnvironment);
+                assertThat(c.parallelRun).isTrue();
+                assertThat(c.retryAuto).isTrue();
+                assertThat(c.scenarios).containsExactlyElementsOf(newScenarios);
+            });
         }
 
         @Test

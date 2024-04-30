@@ -32,7 +32,7 @@ class ChutneyCampaignDslTest {
             .hasFieldOrPropertyWithValue("parallelRun", false)
             .hasFieldOrPropertyWithValue("retryAuto", false)
             .hasFieldOrPropertyWithValue("datasetId", null)
-            .hasFieldOrPropertyWithValue("scenarioIds", emptyList<Long>())
-            .hasFieldOrPropertyWithValue("tags", emptyList<String>())
+            .hasFieldOrPropertyWithValue("scenarios", emptyList<Any>())
+            .hasFieldOrPropertyWithValue("tags", emptyList<Any>())
     }
 }

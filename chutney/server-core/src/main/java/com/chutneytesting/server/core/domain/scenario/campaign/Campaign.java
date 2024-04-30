@@ -24,7 +24,7 @@ public class Campaign {
     public final Long id;
     public final String title;
     public final String description;
-    public final List<String> scenarioIds;
+    public final List<CampaignScenario> scenarios;
     public final boolean parallelRun;
     public final boolean retryAuto;
     public final String externalDatasetId;
@@ -35,7 +35,7 @@ public class Campaign {
     public Campaign(Long id,
                     String title,
                     String description,
-                    List<String> scenarioIds,
+                    List<CampaignScenario> scenarios,
                     String environment,
                     boolean parallelRun,
                     boolean retryAuto,
@@ -44,7 +44,7 @@ public class Campaign {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.scenarioIds = initListNullOrEmpty(scenarioIds);
+        this.scenarios = initListNullOrEmpty(scenarios);
         this.parallelRun = parallelRun;
         this.retryAuto = retryAuto;
         this.environment = environment;
@@ -68,7 +68,7 @@ public class Campaign {
         return id.equals(campaign.id) &&
             title.equals(campaign.title) &&
             description.equals(campaign.description) &&
-            scenarioIds.equals(campaign.scenarioIds) &&
+            scenarios.equals(campaign.scenarios) &&
             parallelRun == campaign.parallelRun &&
             retryAuto == campaign.retryAuto &&
             environment.equals(campaign.environment) &&
@@ -81,5 +81,11 @@ public class Campaign {
             return list;
         }
         return new ArrayList<>();
+    }
+
+    public record CampaignScenario(String scenarioId, String datasetId) {
+        public CampaignScenario(String scenarioId) {
+            this(scenarioId, null);
+        }
     }
 }

@@ -16,6 +16,7 @@
 
 package com.chutneytesting.campaign.api;
 
+import static com.chutneytesting.campaign.api.CampaignController.BASE_URL;
 import static com.chutneytesting.campaign.api.dto.CampaignMapper.fromDto;
 import static com.chutneytesting.campaign.api.dto.CampaignMapper.toDto;
 import static com.chutneytesting.campaign.api.dto.CampaignMapper.toDtoWithoutReport;
@@ -51,9 +52,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/ui/campaign/v1")
+@RequestMapping(BASE_URL)
 @CrossOrigin(origins = "*")
 public class CampaignController {
+
+    public static final String BASE_URL = "/api/ui/campaign/v1";
 
     private final TestCaseRepositoryAggregator repositoryAggregator;
     private final CampaignRepository campaignRepository;
@@ -107,7 +110,7 @@ public class CampaignController {
         CampaignExecution campaignExecution = campaignExecutionRepository.getCampaignExecutionById(campaignExecutionId);
 
         List<ExecutionHistory.Execution> executions = campaignExecution.scenarioExecutionReports().stream()
-            .map(ser -> executionHistoryRepository.getExecution(ser.scenarioId, ser.execution.executionId()))
+            .map(ser -> executionHistoryRepository.getExecution(ser.scenarioId(), ser.execution().executionId()))
             .toList();
 
         return CampaignExecutionReportMapper.fullExecutionToDto(campaignExecution, executions);

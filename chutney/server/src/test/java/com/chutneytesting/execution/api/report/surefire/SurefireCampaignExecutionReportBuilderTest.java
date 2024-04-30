@@ -78,7 +78,7 @@ public class SurefireCampaignExecutionReportBuilderTest {
             .build();
 
         ScenarioExecutionCampaign scenarioExecutionReportOK = new ScenarioExecutionCampaign("123", "test ♥ Scenario Title ok", success_execution.summary());
-        when(executionHistoryRepository.getExecution(scenarioExecutionReportOK.scenarioId, success_report.executionId)).thenReturn(success_execution);
+        when(executionHistoryRepository.getExecution(scenarioExecutionReportOK.scenarioId(), success_report.executionId)).thenReturn(success_execution);
 
         // And a failure scenario execution
         StepExecutionReportCore failureStepReport =
@@ -102,7 +102,7 @@ public class SurefireCampaignExecutionReportBuilderTest {
             .build();
 
         ScenarioExecutionCampaign scenarioExecutionReportKO = new ScenarioExecutionCampaign("123", "test Scenario Title ko", failure_execution.summary());
-        when(executionHistoryRepository.getExecution(scenarioExecutionReportKO.scenarioId, failure_report.executionId)).thenReturn(failure_execution);
+        when(executionHistoryRepository.getExecution(scenarioExecutionReportKO.scenarioId(), failure_report.executionId)).thenReturn(failure_execution);
 
         // And a campaign report with previous scenario executions
         CampaignExecution campaignExecution1 = new CampaignExecution(1L, 1L, Arrays.asList(scenarioExecutionReportOK, scenarioExecutionReportKO), "test Campaign Title", false, "", null, "");

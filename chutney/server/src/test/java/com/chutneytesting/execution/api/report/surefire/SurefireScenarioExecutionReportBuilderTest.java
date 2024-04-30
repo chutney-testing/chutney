@@ -69,7 +69,7 @@ public class SurefireScenarioExecutionReportBuilderTest {
             .build();
 
         ScenarioExecutionCampaign scenarioExecutionCampaign = new ScenarioExecutionCampaign("123", "test1", execution.summary());
-        when(executionHistoryRepository.getExecution(scenarioExecutionCampaign.scenarioId, report.executionId)).thenReturn(execution);
+        when(executionHistoryRepository.getExecution(scenarioExecutionCampaign.scenarioId(), report.executionId)).thenReturn(execution);
 
         // When
         Testsuite testsuite = sut.create(scenarioExecutionCampaign);
@@ -123,7 +123,7 @@ public class SurefireScenarioExecutionReportBuilderTest {
             .build();
 
         ScenarioExecutionCampaign scenarioExecutionCampaign = new ScenarioExecutionCampaign("123", "test2", execution.summary());
-        when(executionHistoryRepository.getExecution(scenarioExecutionCampaign.scenarioId, report.executionId)).thenReturn(execution);
+        when(executionHistoryRepository.getExecution(scenarioExecutionCampaign.scenarioId(), report.executionId)).thenReturn(execution);
 
         // When
         Testsuite testsuite = sut.create(scenarioExecutionCampaign);

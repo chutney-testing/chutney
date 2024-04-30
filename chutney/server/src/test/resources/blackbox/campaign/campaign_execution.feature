@@ -62,8 +62,7 @@ Feature:  Campaign execution
                 {
                     "title":"campaign",
                     "description":"",
-                    "scenarioIds":[ "${#scenario1Id}", "${#scenario2Id}" ],
-                    "computedParameters":{},
+                    "scenarios":[ {"scenarioId": "${#scenario1Id}"}, {"scenarioId": "${#scenario2Id}", "datasetId": null} ],
                     "environment":"DEFAULT",
                     "parallelRun": false,
                     "retryAuto": false,
@@ -102,7 +101,22 @@ Feature:  Campaign execution
                 With mode equals
 
     Scenario: Execution by campaign name with 1 scenario
-        Given a campaign with name "campaignName" is stored
+        Given a dataset with name "CAMPAIGN_DS"
+            Do http-put Post dataset to chutney instance
+                On CHUTNEY_LOCAL
+                With uri /api/v1/datasets
+                With headers
+                | Content-Type | application/json;charset=UTF-8 |
+                With body
+                """
+                {
+                    "id":"CAMPAIGN_DS",
+                    "name":"CAMPAIGN_DS"
+                }
+                """
+                Take datasetId ${#jsonPath(#body, '$.id')}
+                Validate httpStatusCode_200 ${#status == 200}
+        And a campaign with name "campaignName" is stored
             Do http-post Post campaign to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/campaign/v1
@@ -113,8 +127,7 @@ Feature:  Campaign execution
                 {
                     "title":"campaignName",
                     "description":"",
-                    "scenarioIds":[ "${#scenario1Id}" ],
-                    "computedParameters":{},
+                    "scenarios":[ {"scenarioId": "${#scenario1Id}", "datasetId": "${#datasetId}"} ],
                     "environment":"DEFAULT",
                     "parallelRun": false,
                     "retryAuto": false,
@@ -128,10 +141,11 @@ Feature:  Campaign execution
                 On CHUTNEY_LOCAL
                 With uri /api/ui/campaign/execution/v1/campaignName/DEFAULT
                 Take report ${#json(#body, "$[0]")}
+                Take executionId ${#json(#body, "$[0].executionId").toString()}
                 Validate httpStatusCode_200 ${#status == 200}
         Then the execution reports are returned
             Do compare Check execution id not empty
-                With actual ${#json(#report, "$.executionId").toString()}
+                With actual ${#executionId}
                 With expected 0
                 With mode greater than
             Do compare Check status is SUCCESS
@@ -149,7 +163,7 @@ Feature:  Campaign execution
                 Take campaign ${#body}
             Do compare Assert execution is present
                 With actual ${#json(#campaign, "$.campaignExecutionReports[0].executionId").toString()}
-                With expected ${#json(#report, "$.executionId").toString()}
+                With expected ${#executionId}
                 With mode equals
 
     Scenario: Execution for surefire of a campaign with 1 scenario
@@ -164,7 +178,7 @@ Feature:  Campaign execution
                 {
                     "title":"campaignSurefire",
                     "description":"",
-                    "scenarioIds":[ "${#scenario1Id}" ],
+                    "scenarios":[ {"scenarioId": "${#scenario1Id}"} ],
                     "dataSet":{},
                     "environment":"DEFAULT",
                     "parallelRun": false,

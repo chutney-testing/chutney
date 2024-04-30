@@ -20,7 +20,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { DragulaService } from 'ng2-dragula';
 
-import { Campaign, JiraScenario, KeyValue, ScenarioIndex, TestCase } from '@model';
+import { Campaign, CampaignScenario, JiraScenario, KeyValue, ScenarioIndex, TestCase } from '@model';
 import {
     CampaignService,
     EnvironmentService,
@@ -334,7 +334,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
 
         this.campaign.title = formValue['title'];
         this.campaign.description = formValue['description'];
-        this.campaign.scenarioIds = formValue['scenarioIds'];
+        this.campaign.scenarios = formValue['scenarioIds']?.map(id => new CampaignScenario(id));
         this.campaign.environment = this.selectedEnvironment;
         this.campaign.parallelRun = formValue['parallelRun'];
         this.campaign.retryAuto = formValue['retryAuto'];
@@ -354,9 +354,9 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
 
     setCampaignScenarios() {
         this.scenariosToAdd = [];
-        if (this.campaign.scenarioIds) {
-            for (const idScenario of this.campaign.scenarioIds) {
-                const scenarioFound = this.scenarios.find((x) => x.id === idScenario);
+        if (this.campaign.scenarios) {
+            for (const campaignScenario of this.campaign.scenarios) {
+                const scenarioFound = this.scenarios.find((x) => x.id === campaignScenario.scenarioId);
                 if (!this.scenariosToAdd.some((s) => s.id === scenarioFound.id)) {
                     this.scenariosToAdd.push(scenarioFound);
                 }
@@ -365,10 +365,10 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
     }
 
     setCampaignScenariosIdsToAdd(scenariosToAdd: Array<ScenarioIndex>) {
-        this.campaign.scenarioIds = [];
+        this.campaign.scenarios = [];
         for (const scenario of scenariosToAdd) {
-            if (!this.campaign.scenarioIds.some((s) => s === scenario.id)) {
-                this.campaign.scenarioIds.push(scenario.id);
+            if (!this.campaign.scenarios.some((s) => s.scenarioId === scenario.id)) {
+                this.campaign.scenarios.push(new CampaignScenario(scenario.id));
             }
         }
     }
