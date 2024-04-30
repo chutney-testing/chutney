@@ -16,6 +16,7 @@
 
 package com.chutneytesting.campaign.infra;
 
+import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -186,7 +187,7 @@ public class DatabaseCampaignRepositoryTest {
             ScenarioEntity s2 = givenScenario();
             ScenarioEntity s3 = givenScenario();
             ScenarioEntity s4 = givenScenario();
-            Campaign campaign1 = new Campaign(null, "campaignTestName1", "campaignDesc1", scenariosIds(s1, s2), "env", false, false, null, null);
+            Campaign campaign1 = new Campaign(null, "campaignTestName1", "campaignDesc1", scenariosIds(List.of(s1, s2, s1), asList("ds1", null, "ds2")), "env", false, false, null, null);
             Campaign campaign2 = new Campaign(null, "campaignTestName2", "campaignDesc2", scenariosIds(s2, s1), "env", false, false, null, null);
             Campaign campaign3 = new Campaign(null, "campaignTestName3", "campaignDesc3", scenariosIds(s1, s3), "env", false, false, null, null);
             Campaign campaign4 = new Campaign(null, "campaignTestName4", "campaignDesc4", scenariosIds(s3, s4), "env", false, false, null, null);

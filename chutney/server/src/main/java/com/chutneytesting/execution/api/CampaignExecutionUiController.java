@@ -71,7 +71,7 @@ public class CampaignExecutionUiController {
     @GetMapping(path = {"/{campaignName}/lastExecution", "/{campaignName}/{env}/lastExecution"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignExecutionReportSummaryDto getLastCampaignExecution(@PathVariable("campaignId") Long campaignId) {
         CampaignExecution lastCampaignExecution = campaignExecutionEngine.getLastCampaignExecution(campaignId);
-        return campaignExecutionApiMapper.toCompaignExecutionReportSummaryDto(lastCampaignExecution);
+        return campaignExecutionApiMapper.toCampaignExecutionReportSummaryDto(lastCampaignExecution);
     }
 
 

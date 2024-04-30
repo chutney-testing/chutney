@@ -16,10 +16,14 @@
 
 package com.chutneytesting.campaign.api.dto;
 
+import static java.util.Collections.emptySet;
+
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ScenarioExecutionReportOutlineDto {
@@ -37,6 +41,10 @@ public class ScenarioExecutionReportOutlineDto {
 
     public String getScenarioId() {
         return scenarioId;
+    }
+
+    public Optional<String> getDatasetId() {
+        return execution.datasetId();
     }
 
     public Long getExecutionId() {
@@ -65,6 +73,10 @@ public class ScenarioExecutionReportOutlineDto {
 
     public String getError() {
         return execution.error().orElse("");
+    }
+
+    public Set<String> getTags() {
+        return execution.tags().orElse(emptySet());
     }
 
     ExecutionHistory.ExecutionSummary getExecution() {

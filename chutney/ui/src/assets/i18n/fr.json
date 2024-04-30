@@ -220,6 +220,8 @@
                         "state": "Statut",
                         "title": "Titre",
                         "error": "Rapport",
+                        "tags": "Tags",
+                        "dataset": "Dataset",
                         "duration": "Durée",
                         "jiraStatus": "Statut Jira"
                     },

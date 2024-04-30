@@ -33,6 +33,7 @@ import com.chutneytesting.WebConfiguration;
 import com.chutneytesting.campaign.api.dto.CampaignDto;
 import com.chutneytesting.campaign.api.dto.CampaignDto.CampaignScenarioDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
+import com.chutneytesting.campaign.api.dto.ScenarioExecutionReportOutlineDto;
 import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.campaign.infra.FakeCampaignRepository;
 import com.chutneytesting.scenario.api.raw.dto.ImmutableTestCaseIndexDto;
@@ -40,10 +41,12 @@ import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
+import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -428,7 +431,14 @@ public class CampaignControllerTest {
         }
 
         private CampaignExecutionReportDto[] reports() throws IOException {
-            return om.readValue(content(), CampaignExecutionReportDto[].class);
+            return om.readValue(content(), CampaignExecutionReportDtoTest[].class);
+        }
+    }
+
+    @JsonIgnoreProperties("scenarioExecutionReports")
+    static class CampaignExecutionReportDtoTest extends CampaignExecutionReportDto {
+        public CampaignExecutionReportDtoTest(Long executionId, List<ScenarioExecutionReportOutlineDto> scenarioExecutionReports, String campaignName, LocalDateTime startDate, ServerReportStatus status, boolean partialExecution, String executionEnvironment, String userId, Long duration) {
+            super(executionId, scenarioExecutionReports, campaignName, startDate, status, partialExecution, executionEnvironment, userId, duration);
         }
     }
 }
