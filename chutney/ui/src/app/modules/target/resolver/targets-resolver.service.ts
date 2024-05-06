@@ -14,24 +14,15 @@
  * limitations under the License.
  */
 
-import { Injectable } from '@angular/core';
-import {
-    Router, Resolve,
-    RouterStateSnapshot,
-    ActivatedRouteSnapshot
-} from '@angular/router';
-import { Observable, of } from 'rxjs';
+import { ActivatedRouteSnapshot, ResolveFn } from '@angular/router';
+import { of } from 'rxjs';
 import { Target, TargetFilter } from '@model';
+import { inject } from '@angular/core';
 import { EnvironmentService } from '@core/services';
 
-@Injectable()
-export class TargetsResolver implements Resolve<Target[]> {
-
-    constructor(private environmentService: EnvironmentService) {
-    }
-
-    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Target[]> {
+export const targetsResolver: ResolveFn<Target[]> =
+    (route: ActivatedRouteSnapshot) => {
         const name = route.params['name'];
-        return name === 'new' ? of([]) : this.environmentService.getTargets(new TargetFilter(name, null));
-    }
-}
+        return name === 'new' ? of([]) : inject(EnvironmentService).getTargets(new TargetFilter(name, null));
+
+    };

@@ -14,18 +14,10 @@
  * limitations under the License.
  */
 
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
+import { ResolveFn } from '@angular/router';
 import { EnvironmentService } from '@core/services';
 
-@Injectable()
-export class EnvironmentsNamesResolver implements Resolve<string[]> {
 
-    constructor(private environmentService: EnvironmentService) {
-    }
-
-    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<string[]> {
-        return this.environmentService.names();
-    }
-}
+export const environmentsNamesResolver: ResolveFn<string[]> =
+    () => inject(EnvironmentService).names();

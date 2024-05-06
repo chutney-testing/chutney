@@ -19,8 +19,8 @@ import { Routes } from '@angular/router';
 import { Authorization } from '@model';
 import { TargetsComponent } from '@modules/target/list/targets.component';
 import { TargetComponent } from '@modules/target/details/target.component';
-import { TargetsResolver } from '@modules/target/resolver/targets-resolver.service';
-import { EnvironmentsNamesResolver } from '@core/services/environments-names.resolver';
+import { targetsResolver } from '@modules/target/resolver/targets-resolver.service';
+import { environmentsNamesResolver } from '@core/services/environments-names.resolver';
 
 export const targetsRoutes: Routes = [
     {
@@ -30,8 +30,9 @@ export const targetsRoutes: Routes = [
     },
     {
         path: ':name',
+        title: 'target details',
         component: TargetComponent,
-        resolve: {targets: TargetsResolver, environmentsNames: EnvironmentsNamesResolver},
+        resolve: {targets: targetsResolver, environmentsNames: environmentsNamesResolver},
         data: { 'authorizations': [ Authorization.ADMIN_ACCESS ] }
     }
 ];

@@ -23,9 +23,8 @@ import { Authorization } from '@model';
 import { ParentComponent } from '@core/components/parent/parent.component';
 import { ChutneyMainHeaderComponent } from '@shared/components/layout/header/chutney-main-header.component';
 import { ChutneyLeftMenuComponent } from '@shared/components/layout/left-menu/chutney-left-menu.component';
-import { FeatureName } from '@core/feature/feature.model';
 import { FeaturesGuard } from '@core/guards/features.guard';
-import { FeaturesResolver } from '@core/feature/features.resolver';
+import { featuresResolver } from '@core/feature/features.resolver';
 
 export const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
@@ -33,7 +32,7 @@ export const appRoutes: Routes = [
     {
         path: '', component: ParentComponent,
         canActivate: [AuthGuard],
-        resolve: {'features': FeaturesResolver},
+        resolve: {'features': () => featuresResolver},
         children: [
             {path: '', component: ChutneyMainHeaderComponent, outlet: 'header'},
             {path: '', component: ChutneyLeftMenuComponent, outlet: 'left-side-bar'},
@@ -58,6 +57,7 @@ export const appRoutes: Routes = [
             },
             {
                 path: 'dataset',
+                title: 'dataset',
                 loadChildren: () => import('./modules/dataset/dataset.module').then(m => m.DatasetModule),
                 canActivate: [AuthGuard, FeaturesGuard], // add requiredAuthorizations
                 data: {
@@ -125,7 +125,7 @@ export const appRoutes: Routes = [
 ];
 
 @NgModule({
-    imports: [RouterModule.forRoot(appRoutes, {useHash: true, enableTracing: false, relativeLinkResolution: 'legacy'})],
+    imports: [RouterModule.forRoot(appRoutes, { useHash: true, enableTracing: false })],
     exports: [RouterModule]
 })
 export class AppRoutingModule {

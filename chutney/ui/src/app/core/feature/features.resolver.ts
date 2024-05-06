@@ -14,21 +14,10 @@
  * limitations under the License.
  */
 
-import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, Resolve, RouterStateSnapshot } from '@angular/router';
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
 import { Feature } from '@core/feature/feature.model';
 import { FeatureService } from '@core/feature/feature.service';
+import { ResolveFn } from '@angular/router';
 
-@Injectable({
-    providedIn: 'root'
-})
-export class FeaturesResolver implements Resolve<Feature[]> {
 
-    constructor(private featureService: FeatureService) {
-    }
-
-    resolve(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<Feature[]> {
-        return this.featureService.loadFeatures();
-    }
-}
+export const featuresResolver: ResolveFn<Feature[]> = () => inject(FeatureService).loadFeatures();

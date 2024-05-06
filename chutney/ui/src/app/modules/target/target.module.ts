@@ -24,12 +24,11 @@ import { SharedModule } from '@shared/shared.module';
 import { AtomsModule } from '../../atoms/atoms.module';
 import { MoleculesModule } from '../../molecules/molecules.module';
 
-import {FileSaverModule} from 'ngx-filesaver';
+import { FileSaverModule } from 'ngx-filesaver';
 import { targetsRoutes } from '@modules/target/targets.routes';
 import { TargetsComponent } from '@modules/target/list/targets.component';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TargetComponent } from './details/target.component';
-import { TargetsResolver } from '@modules/target/resolver/targets-resolver.service';
 import { CoreModule } from '@core/core.module';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 
@@ -52,7 +51,6 @@ import { TooltipModule } from 'ngx-bootstrap/tooltip';
         TargetsComponent,
         TargetComponent
     ],
-    providers: [TargetsResolver]
 })
 export class TargetModule {
 }

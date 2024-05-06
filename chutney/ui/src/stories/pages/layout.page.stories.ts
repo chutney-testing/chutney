@@ -56,7 +56,6 @@ export default {
                 RouterModule.forRoot(routes, {
                     useHash: true,
                     enableTracing: false,
-                    relativeLinkResolution: 'legacy'
                 }), TranslateModule, TranslateTestingModule],
             providers: [
                 {provide: LoginService, useValue: mockLoginService},
