@@ -65,7 +65,7 @@
     "sb": "^6.5.15",
     "stream": "0.0.2",
     "web-app-manifest-loader": "^0.1.1",
-    "zone.js": "~0.11.5"
+    "zone.js": "~0.13.3"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~15.2.11",
