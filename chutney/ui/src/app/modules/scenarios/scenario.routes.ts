@@ -17,7 +17,7 @@
 import { Routes } from '@angular/router';
 import { ScenariosComponent } from './components/search-list/scenarios.component';
 import { RawEditionComponent } from './components/edition/raw/raw-edition.component';
-import { AuthGuard, CanDeactivateGuard } from '@core/guards';
+import { authGuard, canDeactivateGuard } from '@core/guards';
 import { Authorization } from '@model';
 import {
     ScenarioExecutionsHistoryComponent
@@ -25,8 +25,6 @@ import {
 import {
     ScenarioExecutionMenuComponent
 } from '@modules/scenarios/components/execution/sub/right-side-bar/scenario-execution-menu.component';
-import { FeaturesGuard } from '@core/guards/features.guard';
-import { FeatureName } from '@core/feature/feature.model';
 import { ReportPreviewComponent } from './components/execution/preview/report-preview.component';
 
 export const scenarioRoute: Routes = [
@@ -34,12 +32,12 @@ export const scenarioRoute: Routes = [
     {
         path: '',
         component: ScenariosComponent,
-        canActivate: [AuthGuard],
+        canActivate: [authGuard],
         data: {'authorizations': [Authorization.SCENARIO_READ]}
     },
     {
         path: ':id/executions',
-        canActivate: [AuthGuard],
+        canActivate: [authGuard],
         data: {'authorizations': [Authorization.SCENARIO_READ]},
         children: [
             {
@@ -56,21 +54,21 @@ export const scenarioRoute: Routes = [
     {
         path: ':id/raw-edition',
         component: RawEditionComponent,
-        canDeactivate: [CanDeactivateGuard],
-        canActivate: [AuthGuard],
+        canDeactivate: [canDeactivateGuard],
+        canActivate: [authGuard],
         data: {'authorizations': [Authorization.SCENARIO_WRITE]}
     },
     {
         path: 'raw-edition',
         component: RawEditionComponent,
-        canDeactivate: [CanDeactivateGuard],
-        canActivate: [AuthGuard],
+        canDeactivate: [canDeactivateGuard],
+        canActivate: [authGuard],
         data: {'authorizations': [Authorization.SCENARIO_WRITE]}
     },
     {
         path: 'report-preview',
         component: ReportPreviewComponent,
-        canActivate: [AuthGuard],
+        canActivate: [authGuard],
         data: {'authorizations': [Authorization.ADMIN_ACCESS]}
     }
 ];
