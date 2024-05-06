@@ -154,7 +154,6 @@
       }
     }
   },
-  "defaultProject": "chutney",
   "cli": {
     "analytics": false
   }
