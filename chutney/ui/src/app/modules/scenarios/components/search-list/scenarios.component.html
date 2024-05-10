@@ -1,183 +1,211 @@
 <div *hasAuthorization="[Authorization.SCENARIO_WRITE]"
-     class="create-scenario-wrapper"
->
-    <div class="create-scenario bg-primary">
-        <button type="button" class="btn btn-xs" title="{{ 'scenarios.search.create.form' | translate }}"
-                (click)="createNewScenario()">
-            <span class="fa fa-pencil-alt fa-2x"></span>
-        </button>
-    </div>
+  class="create-scenario-wrapper"
+  >
+  <div class="create-scenario bg-primary">
+    <button type="button" class="btn btn-xs" title="{{ 'scenarios.search.create.form' | translate }}"
+      (click)="createNewScenario()">
+      <span class="fa fa-pencil-alt fa-2x"></span>
+    </button>
+  </div>
 </div>
 <div class="header-scenario">
-    <div class="row">
-        <div class="col-2"></div>
-        <div class="col-4">
-            <chutney-forms-search-field [id]="'scenario-search'"
-                                        [placeholder]="'scenarios.search.placeholder' | translate"
-                                        [searchInput]="textFilter"
-                                        (searchInputEvent)="updateTextFilter($event)"></chutney-forms-search-field>
-        </div>
-        <div class="col-2">
-            <button type="button" class="btn btn-outline-primary"
-                    (click)="fullTextSearch = !fullTextSearch">
+  <div class="row">
+    <div class="col-2"></div>
+    <div class="col-4">
+      <chutney-forms-search-field [id]="'scenario-search'"
+        [placeholder]="'scenarios.search.placeholder' | translate"
+        [searchInput]="textFilter"
+      (searchInputEvent)="updateTextFilter($event)"></chutney-forms-search-field>
+    </div>
+    <div class="col-2">
+      <button type="button" class="btn btn-outline-primary"
+        (click)="fullTextSearch = !fullTextSearch">
             <span  class="fa" [ngClass]="{'fa-plus' : !fullTextSearch,
                               'fa-minus' : fullTextSearch}"></span>
-            </button>
-        </div>
+      </button>
     </div>
-    <div  *ngIf="fullTextSearch" class="row my-2">
-        <div class="col-2"></div>
-        <div class="col-4">
-            <chutney-forms-search-field [id]="'scenario-search-fulltext'"
-                                        [placeholder]="'scenarios.search.placeholder-fulltext' | translate"
-                                        [searchInput]="fullTextFilter"
-                                        (searchInputEvent)="updateFullTextFilter($event)"></chutney-forms-search-field>
-        </div>
+  </div>
+  @if (fullTextSearch) {
+    <div  class="row my-2">
+      <div class="col-2"></div>
+      <div class="col-4">
+        <chutney-forms-search-field [id]="'scenario-search-fulltext'"
+          [placeholder]="'scenarios.search.placeholder-fulltext' | translate"
+          [searchInput]="fullTextFilter"
+        (searchInputEvent)="updateFullTextFilter($event)"></chutney-forms-search-field>
+      </div>
     </div>
+  }
 </div>
 
 <div class="w-100 h-100">
-    <span class="ms-3">{{viewedScenarios.length}} / {{scenarios.length}}</span>
-    <div class="table-responsive mb-3 mx-3 h-100">
-        <table class="table table-sm table-striped table-hover">
-            <thead>
-                <tr class="headers-labels">
-                    <th class="filter w3" scope="col" (click)="sortBy('id')">ID
-                        <span *ngIf="orderBy == 'id' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'id' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
-                    <th class="filter w11" scope="col" (click)="toggleDropDown(statusDropdown, $event)">
-                        <span>{{ 'scenarios.list.header.status'  | translate  }}</span>
+  <span class="ms-3">{{viewedScenarios.length}} / {{scenarios.length}}</span>
+  <div class="table-responsive mb-3 mx-3 h-100">
+    <table class="table table-sm table-striped table-hover">
+      <thead>
+        <tr class="headers-labels">
+          <th class="filter w3" scope="col" (click)="sortBy('id')">ID
+            @if (orderBy == 'id' && reverseOrder) {
+              <span class="fa fa-caret-down"></span>
+            }
+            @if (orderBy == 'id' && !reverseOrder) {
+              <span class="fa fa-caret-up"></span>
+            }
+          </th>
+          <th class="filter w11" scope="col" (click)="toggleDropDown(statusDropdown, $event)">
+            <span>{{ 'scenarios.list.header.status'  | translate  }}</span>
                             <i class="ms-2 fa" [ngClass]="{
                                 'fa-chevron-up': statusDropdown.isDropdownOpen,
                                 'fa-chevron-down': !statusDropdown.isDropdownOpen}"></i>
-                    </th>
-                    <th class="filter w10" scope="col" (click)="sortBy('lastExecution')">{{ 'scenarios.list.header.execLast'  | translate  }}
-                        <span *ngIf="orderBy == 'lastExecution' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'lastExecution' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
+          </th>
+          <th class="filter w10" scope="col" (click)="sortBy('lastExecution')">{{ 'scenarios.list.header.execLast'  | translate  }}
+            @if (orderBy == 'lastExecution' && reverseOrder) {
+              <span class="fa fa-caret-down"></span>
+            }
+            @if (orderBy == 'lastExecution' && !reverseOrder) {
+              <span class="fa fa-caret-up"></span>
+            }
+          </th>
 
-                    <th class="filter w40" scope="col" (click)="sortBy('title')">{{ 'scenarios.list.header.title'  | translate  }}
-                        <span *ngIf="orderBy == 'title' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'title' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
-                    <th scope="col" class="w1">&nbsp;</th>
-                    <th scope="col" class="w1">&nbsp;</th>
-                    <th class="filter w12" scope="col" (click)="toggleDropDown(tagsDropdown, $event)">
-                        <span>{{ 'scenarios.list.header.tags'  | translate  }}</span>
+          <th class="filter w40" scope="col" (click)="sortBy('title')">{{ 'scenarios.list.header.title'  | translate  }}
+            @if (orderBy == 'title' && reverseOrder) {
+              <span class="fa fa-caret-down"></span>
+            }
+            @if (orderBy == 'title' && !reverseOrder) {
+              <span class="fa fa-caret-up"></span>
+            }
+          </th>
+          <th scope="col" class="w1">&nbsp;</th>
+          <th scope="col" class="w1">&nbsp;</th>
+          <th class="filter w12" scope="col" (click)="toggleDropDown(tagsDropdown, $event)">
+            <span>{{ 'scenarios.list.header.tags'  | translate  }}</span>
                             <i class="ms-2 fa" [ngClass]="{
                                 'fa-chevron-up': tagsDropdown.isDropdownOpen,
                                 'fa-chevron-down': !tagsDropdown.isDropdownOpen}"></i>
-                    </th>
-                    <th class="filter w10" scope="col" (click)="sortBy('updateDate')">{{ 'scenarios.list.header.update'  | translate  }}
-                        <span *ngIf="orderBy == 'updateDate' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'updateDate' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
-                    <th class="filter w10" scope="col" (click)="sortBy('creationDate')">{{ 'scenarios.list.header.creation'  | translate  }}
-                        <span *ngIf="orderBy == 'creationDate' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'creationDate' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
-                    <th class="w6" scope="col">
-                    </th>
-                </tr>
-                <tr class="headers-filters">
-                    <th></th>
-                    <th>
-                        <ng-multiselect-dropdown #statusDropdown
-                            [settings]="dropdownSettings"
-                            [placeholder]="'global.actions.select' | translate"
-                            [data]="status"
-                            [(ngModel)]="selectedStatus"
-                            (onSelect)="applyFilters()"
-                            (onDeSelect)="applyFilters()"
-                            (onDeSelectAll)="applyFilters()" >
-                        </ng-multiselect-dropdown>
-                    </th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                    <th>
-                        <ng-multiselect-dropdown #tagsDropdown
-                                [settings]="dropdownSettings"
-                                [placeholder]="'global.actions.select' | translate"
-                                [data]="tags"
-                                [(ngModel)]="selectedTags"
-                                (onSelect)="onItemSelect()"
-                                (onDeSelect)="OnItemDeSelect()"
-                                (onDeSelectAll)="OnItemDeSelectAll()">
-                        </ng-multiselect-dropdown>
-                    </th>
-                    <th></th>
-                    <th></th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let scenario of viewedScenarios" class="align-baseline">
-
-                <td class="text-center text-nowrap">
-                    <span>{{scenario.id}}</span>
-                </td>
-
-                <td scope="row" class="text-center">
-                    <chutney-execution-badge [status]="scenario.status"></chutney-execution-badge>
-                </td>
-
-                <td scope="row" class="text-center">
-                    {{ scenario.lastExecution != null ? (scenario.lastExecution | amLocale:'fr' | amTimeAgo) : "" }}
-                </td>
-
-                <td [routerLink]="['/scenario', scenario.id, 'executions']" (click)="$event.stopPropagation()" class="scenario-title cursor-pointer">{{scenario.title}}</td>
-
-                <td>
-                    <a *ngIf="jiraMap.has(scenario.id)" role="button" class="btn btn-sm btn-link me-0"
-                        target="_blank" href="{{getJiraLink(scenario.id)}}" rel="noopener noreferrer"
-                        ngbPopover="{{jiraMap.get(scenario.id)}}" placement="left" (click)="$event.stopPropagation()"
-                        triggers="mouseenter:mouseleave">
-                        <span class="fab fa-jira" aria-hidden="true">
-                        </span>
-                    </a>
-                </td>
-                <td>
-                    <button type="button" class="btn btn-sm btn-link me-0"
-                            ngbPopover="{{scenario.description}}" placement="left"
-                            triggers="mouseenter:mouseleave">
-                        <span class="fa fa-info-circle" aria-hidden="true"></span>
-                    </button>
-                </td>
-
-                <td class="text-center">
-                    <span *ngIf="scenario.tags.length <= 3">
-                        <span *ngFor="let tag of scenario.tags"
-                              class="chutney-tag chutney-tag-selected">{{tag}}</span>
-                    </span>
-                    <span *ngIf="scenario.tags.length > 3">
-                        <span *ngFor="let tag of scenario.tags | slice:0:2"
-                              class="chutney-tag chutney-tag-selected">{{tag}}</span>
-                        <button type="button" class="chutney-tag chutney-tag-selected"
-                                ngbPopover="{{scenario.tags}}" placement="left"
-                                triggers="mouseenter:mouseleave">
-                            ...
-                        </button>
-                    </span>
-                </td>
-                <td scope="row" class="text-center">
-                    {{ scenario.updateDate | amLocale:'fr' | amTimeAgo }}
-                </td>
-                <td scope="row" class="text-center">
-                    {{ scenario.creationDate | amLocale:'fr' | amTimeAgo }}
-                </td>
-                <td >
-                    <button type="button" class="btn bnt-xs" [routerLink]="['/scenario', scenario.id, 'executions']" [queryParams]="{open: 'last', active: 'last'}" (click)="$event.stopPropagation()" >
-                        <span  class="fa fa-eye"></span>
-                    </button>
-                    <button type="button" class="btn bnt-xs"  routerLink="{{'/scenario/' + scenario.id + '/raw-edition'}}" (click)="$event.stopPropagation()">
-                        <span  class="fa fa-edit"></span>
-                    </button>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+          </th>
+          <th class="filter w10" scope="col" (click)="sortBy('updateDate')">{{ 'scenarios.list.header.update'  | translate  }}
+            @if (orderBy == 'updateDate' && reverseOrder) {
+              <span class="fa fa-caret-down"></span>
+            }
+            @if (orderBy == 'updateDate' && !reverseOrder) {
+              <span class="fa fa-caret-up"></span>
+            }
+          </th>
+          <th class="filter w10" scope="col" (click)="sortBy('creationDate')">{{ 'scenarios.list.header.creation'  | translate  }}
+            @if (orderBy == 'creationDate' && reverseOrder) {
+              <span class="fa fa-caret-down"></span>
+            }
+            @if (orderBy == 'creationDate' && !reverseOrder) {
+              <span class="fa fa-caret-up"></span>
+            }
+          </th>
+          <th class="w6" scope="col">
+          </th>
+        </tr>
+        <tr class="headers-filters">
+          <th></th>
+          <th>
+            <ng-multiselect-dropdown #statusDropdown
+              [settings]="dropdownSettings"
+              [placeholder]="'global.actions.select' | translate"
+              [data]="status"
+              [(ngModel)]="selectedStatus"
+              (onSelect)="applyFilters()"
+              (onDeSelect)="applyFilters()"
+              (onDeSelectAll)="applyFilters()" >
+            </ng-multiselect-dropdown>
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th></th>
+          <th>
+            <ng-multiselect-dropdown #tagsDropdown
+              [settings]="dropdownSettings"
+              [placeholder]="'global.actions.select' | translate"
+              [data]="tags"
+              [(ngModel)]="selectedTags"
+              (onSelect)="onItemSelect()"
+              (onDeSelect)="OnItemDeSelect()"
+              (onDeSelectAll)="OnItemDeSelectAll()">
+            </ng-multiselect-dropdown>
+          </th>
+          <th></th>
+          <th></th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (scenario of viewedScenarios; track scenario) {
+          <tr class="align-baseline">
+            <td class="text-center text-nowrap">
+              <span>{{scenario.id}}</span>
+            </td>
+            <td scope="row" class="text-center">
+              <chutney-execution-badge [status]="scenario.status"></chutney-execution-badge>
+            </td>
+            <td scope="row" class="text-center">
+              {{ scenario.lastExecution != null ? (scenario.lastExecution | amLocale:'fr' | amTimeAgo) : "" }}
+            </td>
+            <td [routerLink]="['/scenario', scenario.id, 'executions']" (click)="$event.stopPropagation()" class="scenario-title cursor-pointer">{{scenario.title}}</td>
+            <td>
+              @if (jiraMap.has(scenario.id)) {
+                <a role="button" class="btn btn-sm btn-link me-0"
+                  target="_blank" href="{{getJiraLink(scenario.id)}}" rel="noopener noreferrer"
+                  ngbPopover="{{jiraMap.get(scenario.id)}}" placement="left" (click)="$event.stopPropagation()"
+                  triggers="mouseenter:mouseleave">
+                  <span class="fab fa-jira" aria-hidden="true">
+                  </span>
+                </a>
+              }
+            </td>
+            <td>
+              <button type="button" class="btn btn-sm btn-link me-0"
+                ngbPopover="{{scenario.description}}" placement="left"
+                triggers="mouseenter:mouseleave">
+                <span class="fa fa-info-circle" aria-hidden="true"></span>
+              </button>
+            </td>
+            <td class="text-center">
+              @if (scenario.tags.length <= 3) {
+                <span>
+                  @for (tag of scenario.tags; track tag) {
+                    <span
+                    class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                  }
+                </span>
+              }
+              @if (scenario.tags.length > 3) {
+                <span>
+                  @for (tag of scenario.tags | slice:0:2; track tag) {
+                    <span
+                    class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                  }
+                  <button type="button" class="chutney-tag chutney-tag-selected"
+                    ngbPopover="{{scenario.tags}}" placement="left"
+                    triggers="mouseenter:mouseleave">
+                    ...
+                  </button>
+                </span>
+              }
+            </td>
+            <td scope="row" class="text-center">
+              {{ scenario.updateDate | amLocale:'fr' | amTimeAgo }}
+            </td>
+            <td scope="row" class="text-center">
+              {{ scenario.creationDate | amLocale:'fr' | amTimeAgo }}
+            </td>
+            <td >
+              <button type="button" class="btn bnt-xs" [routerLink]="['/scenario', scenario.id, 'executions']" [queryParams]="{open: 'last', active: 'last'}" (click)="$event.stopPropagation()" >
+                <span  class="fa fa-eye"></span>
+              </button>
+              <button type="button" class="btn bnt-xs"  routerLink="{{'/scenario/' + scenario.id + '/raw-edition'}}" (click)="$event.stopPropagation()">
+                <span  class="fa fa-edit"></span>
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </div>

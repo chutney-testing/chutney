@@ -1,78 +1,92 @@
-<div *ngIf="message" class="alert alert-info" role="alert">
+@if (message) {
+  <div class="alert alert-info" role="alert">
     {{ message }}
-</div>
+  </div>
+}
 <fieldset class="border p-2 mt-4">
-    <legend class="px-3 fw-bold fieldset-legend">
-        <span class="legend-title">{{ 'admin.agents.graph.agents.title' | translate }}</span>
-    </legend>
+  <legend class="px-3 fw-bold fieldset-legend">
+    <span class="legend-title">{{ 'admin.agents.graph.agents.title' | translate }}</span>
+  </legend>
 
-    <table class="table table-striped">
-        <thead class="text">
+  <table class="table table-striped">
+    <thead class="text">
+      <tr>
+        <th scope="col">{{ 'admin.agents.graph.agents.name' | translate }}</th>
+        <th scope="col">{{ 'admin.agents.graph.agents.url' | translate }}</th>
+        <th scope="col">{{ 'admin.agents.graph.agents.reach' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (agent of agentNodes; track agent) {
         <tr>
-            <th scope="col">{{ 'admin.agents.graph.agents.name' | translate }}</th>
-            <th scope="col">{{ 'admin.agents.graph.agents.url' | translate }}</th>
-            <th scope="col">{{ 'admin.agents.graph.agents.reach' | translate }}</th>
+          <td>
+            {{ agent.info.name }}
+          </td>
+          <td>
+            {{ agent.info.host }} : {{ agent.info.port }}
+          </td>
+          <td>
+            @if (agent.reachableAgents.length > 0) {
+              @for (agentReachable of agent.reachableAgents; track agentReachable) {
+                <p>
+                  {{ agentReachable }}
+                </p>
+              }
+            }
+            @if (agent.reachableAgents.length == 0) {
+              <span>{{ 'admin.agents.graph.agents.noreach' | translate }}</span>
+            }
+          </td>
         </tr>
-        </thead>
-        <tbody>
-            <tr *ngFor="let agent of agentNodes">
-                <td>
-                    {{ agent.info.name }}
-                </td>
-                <td>
-                    {{ agent.info.host }} : {{ agent.info.port }}
-                </td>
-                <td>
-                    <ng-container *ngIf="agent.reachableAgents.length > 0">
-                        <p *ngFor="let agentReachable of agent.reachableAgents">
-                            {{ agentReachable }}
-                        </p>
-                    </ng-container>
-                    <span *ngIf="agent.reachableAgents.length == 0">{{ 'admin.agents.graph.agents.noreach' | translate }}</span>
-                </td>
-            </tr>
-        </tbody>
-    </table>
+      }
+    </tbody>
+  </table>
 </fieldset>
 
 <fieldset class="border p-2 mt-4">
-    <legend class="px-3 fw-bold fieldset-legend">
-        <span class="legend-title">{{ 'admin.agents.graph.targets.title' | translate }}</span>
-    </legend>
-    <input name="search" type="text" class="form-control mb-2" placeholder="{{ 'admin.agents.graph.targets.search' | translate }}" [(ngModel)]="targetFilter"/>
-    <table class="table">
-        <thead>
-        <tr>
-            <th scope="col">{{ 'admin.agents.graph.targets.environment' | translate }}</th>
-            <th scope="col">{{ 'admin.agents.graph.targets.name' | translate }}</th>
-            <th scope="col">{{ 'admin.agents.graph.targets.url' | translate }}</th>
-            <th scope="col">{{ 'admin.agents.graph.targets.reachable' | translate }}</th>
-        </tr>
-        </thead>
-        <tbody>
-        <ng-container *ngFor="let environment of environments">
-            <tr *ngFor="let target of environment.targets | searchTextPipe: targetFilter:['name']"
-                [ngClass]="{'table-danger':!targetReachByAgent.has(target.name)}">
-                <td>
-                    {{ environment.name }}
-                </td>
-                <td class="text-break">
-                    {{ target.name }}
-                </td>
-                <td>
-                    {{ target.url }}
-                </td>
-                <td>
-                    <ng-container *ngIf="targetReachByAgent.has(target.name)">
-                        <p *ngFor="let agentReachable of targetReachByAgent.get(target.name)">
-                            {{ agentReachable }}
-                        </p>
-                    </ng-container>
-                    <span *ngIf="!targetReachByAgent.has(target.name)">{{ 'admin.agents.graph.targets.unreachable' | translate }}</span>
-                </td>
-            </tr>
-        </ng-container>
-        </tbody>
-    </table>
+  <legend class="px-3 fw-bold fieldset-legend">
+    <span class="legend-title">{{ 'admin.agents.graph.targets.title' | translate }}</span>
+  </legend>
+  <input name="search" type="text" class="form-control mb-2" placeholder="{{ 'admin.agents.graph.targets.search' | translate }}" [(ngModel)]="targetFilter"/>
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col">{{ 'admin.agents.graph.targets.environment' | translate }}</th>
+        <th scope="col">{{ 'admin.agents.graph.targets.name' | translate }}</th>
+        <th scope="col">{{ 'admin.agents.graph.targets.url' | translate }}</th>
+        <th scope="col">{{ 'admin.agents.graph.targets.reachable' | translate }}</th>
+      </tr>
+    </thead>
+    <tbody>
+      @for (environment of environments; track environment) {
+        @for (target of environment.targets | searchTextPipe: targetFilter:['name']; track target) {
+          <tr
+            [ngClass]="{'table-danger':!targetReachByAgent.has(target.name)}">
+            <td>
+              {{ environment.name }}
+            </td>
+            <td class="text-break">
+              {{ target.name }}
+            </td>
+            <td>
+              {{ target.url }}
+            </td>
+            <td>
+              @if (targetReachByAgent.has(target.name)) {
+                @for (agentReachable of targetReachByAgent.get(target.name); track agentReachable) {
+                  <p>
+                    {{ agentReachable }}
+                  </p>
+                }
+              }
+              @if (!targetReachByAgent.has(target.name)) {
+                <span>{{ 'admin.agents.graph.targets.unreachable' | translate }}</span>
+              }
+            </td>
+          </tr>
+        }
+      }
+    </tbody>
+  </table>
 
 </fieldset>

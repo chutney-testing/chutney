@@ -1,121 +1,139 @@
 <div class="scheduling-campaign-container  min-vh-100 ">
-    <div class="w-100">
-        <div class="d-flex flex-md-row justify-content-between">
-            <div>
-                <h4>{{ 'campaigns.scheduling.title' | translate }}</h4>
+  <div class="w-100">
+    <div class="d-flex flex-md-row justify-content-between">
+      <div>
+        <h4>{{ 'campaigns.scheduling.title' | translate }}</h4>
+      </div>
+      <div>
+        <button type="button" class="btn btn-sm btn-outline-secondary" [routerLink]="['/campaign']">
+          <span class="fa fa-arrow-left"
+          aria-hidden="true"></span> {{ 'campaigns.scheduling.back' | translate }}
+        </button>
+      </div>
+    </div>
+    @if (errorMessage) {
+      <div class="w-100">
+        <p class="text-danger">{{ errorMessage }}</p>
+      </div>
+    }
+
+    <form [formGroup]="form" autocomplete="off" class="w-100">
+      <div class="row row-cols-lg-auto my-3">
+        <div class="col">
+          <label for="calendar"
+          class="form-label">{{ 'campaigns.scheduling.schedulingDate' | translate }}</label>
+          <div class="input-group">
+            <input id="calendar" class="form-control" placeholder="yyyy-mm-dd"
+              name="dp" formControlName="date" ngbDatepicker #d="ngbDatepicker">
+            <button class="btn btn-success bi bi-calendar-event" (click)="d.toggle()"
+            type="button"></button>
+          </div>
+
+          @if (submitted && f['date'].errors) {
+            <div class="error-message">
+              {{ 'campaigns.scheduling.required.date' | translate }}
             </div>
-            <div>
-                <button type="button" class="btn btn-sm btn-outline-secondary" [routerLink]="['/campaign']">
-                    <span class="fa fa-arrow-left"
-                          aria-hidden="true"></span> {{ 'campaigns.scheduling.back' | translate }}
+          }
+        </div>
+        <div class="col">
+          <label for="time" class="form-label">{{ 'campaigns.scheduling.required.time' | translate }}</label>
+          <ngb-timepicker id="time" formControlName="time"></ngb-timepicker>
+          @if (submitted && f['time'].errors) {
+            <div class="error-message">
+              {{ 'campaigns.scheduling.required.time' | translate }}
+            </div>
+          }
+        </div>
+        <div class="col">
+          <label for="frequency" class="form-label">{{ 'campaigns.scheduling.frequency' | translate }}</label>
+          <select id="frequency" class="form-select col-8" formControlName="frequency">
+            @for (freq of frequencies; track freq) {
+              <option [ngValue]="freq">{{ freq }}</option>
+            }
+          </select>
+        </div>
+      </div>
+      @if (campaigns.length > 0) {
+        <div class="row row-cols-lg-auto my-3">
+          <div class="col-lg-2">
+            <ng-multiselect-dropdown
+              [settings]="dropdownSettings"
+              [placeholder]="'campaigns.scheduling.campaign' | translate"
+              [data]="campaigns"
+              formControlName="selectedCampaigns">
+            </ng-multiselect-dropdown>
+            @if (submitted && f.selectedCampaigns.errors?.required) {
+              <div class="error-message">
+                {{ 'campaigns.scheduling.required.campaign' | translate }}
+              </div>
+            }
+          </div>
+          <div class="col">
+            <ul class="list-group list-group-horizontal" [dragula]="'selectedCampaigns'"
+              [(dragulaModel)]="form.get('selectedCampaigns').value">
+              @for (campaign of form.get('selectedCampaigns').value; track campaign; let i = $index) {
+                <li
+                  [attr.data-id]="i" class="chutney-tag chutney-tag-selected lh-base fs-6">
+                  <span>{{ campaign.title }}</span>
+                  <i class="ms-2 fa-xs fa-solid fa-xmark" (click)="unselectCampaign(campaign)"></i>
+                </li>
+              }
+            </ul>
+          </div>
+        </div>
+      }
+
+      <button type="submit" [disabled]="submitted && form.invalid" class="btn btn-success  my-2"
+        (click)="create()">
+        <span class="fa fa-floppy-disk"></span>&nbsp;
+        <span>{{ 'global.actions.record' | translate }}</span>
+      </button>
+    </form>
+  </div>
+  <div class="row w-100">
+    @if (scheduledCampaigns.length == 0) {
+      {{ 'campaigns.scheduling.nothing' | translate }}
+    }
+    @if (scheduledCampaigns.length > 0) {
+      <div class="table-responsive">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th class="w5">{{ 'campaigns.scheduling.scheduling' | translate }}</th>
+              <th class="w65"> {{ 'campaigns.scheduling.campaign' | translate }}</th>
+              <th class="w15">{{ 'campaigns.scheduling.schedulingDate' | translate }}</th>
+              <th class="w10">{{ 'campaigns.scheduling.frequency' | translate }}</th>
+              <th class="w5"></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (scheduledCampaign of scheduledCampaigns; track scheduledCampaign) {
+              <tr>
+                <td>#{{ scheduledCampaign.id }}</td>
+                <td>
+                  @for (title of scheduledCampaign.campaignsTitle; track title; let i = $index) {
+                    <div>
+                      <span>{{ (i + 1) }} - {{ title }}</span>
+                    </div>
+                  }
+                </td>
+                <td>{{ scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm' }}</td>
+                <td>@if (scheduledCampaign.frequency !==undefined) {
+                  <span
+                  >{{ scheduledCampaign.frequency }}</span>
+                }
+              </td>
+              <td>
+                <button type="button" class="btn btn-outline-danger btn-sm float-end"
+                  (click)="delete(scheduledCampaign.id)">
+                  <span class="fa fa-trash"></span>
                 </button>
-            </div>
-        </div>
-        <div class="w-100" *ngIf="errorMessage">
-            <p class="text-danger">{{ errorMessage }}</p>
-        </div>
-
-        <form [formGroup]="form" autocomplete="off" class="w-100">
-            <div class="row row-cols-lg-auto my-3">
-                <div class="col">
-                    <label for="calendar"
-                           class="form-label">{{ 'campaigns.scheduling.schedulingDate' | translate }}</label>
-                    <div class="input-group">
-                        <input id="calendar" class="form-control" placeholder="yyyy-mm-dd"
-                               name="dp" formControlName="date" ngbDatepicker #d="ngbDatepicker">
-                        <button class="btn btn-success bi bi-calendar-event" (click)="d.toggle()"
-                                type="button"></button>
-                    </div>
-
-                    <div class="error-message" *ngIf="submitted && f['date'].errors">
-                        {{ 'campaigns.scheduling.required.date' | translate }}
-                    </div>
-                </div>
-                <div class="col">
-                    <label for="time" class="form-label">{{ 'campaigns.scheduling.required.time' | translate }}</label>
-                    <ngb-timepicker id="time" formControlName="time"></ngb-timepicker>
-                    <div class="error-message" *ngIf="submitted && f['time'].errors">
-                        {{ 'campaigns.scheduling.required.time' | translate }}
-                    </div>
-                </div>
-                <div class="col">
-                    <label for="frequency" class="form-label">{{ 'campaigns.scheduling.frequency' | translate }}</label>
-                    <select id="frequency" class="form-select col-8" formControlName="frequency">
-                        <option *ngFor="let freq of frequencies" [ngValue]="freq">{{ freq }}</option>
-                    </select>
-                </div>
-            </div>
-            <div class="row row-cols-lg-auto my-3" *ngIf="campaigns.length > 0">
-                <div class="col-lg-2">
-                    <ng-multiselect-dropdown
-                                             [settings]="dropdownSettings"
-                                             [placeholder]="'campaigns.scheduling.campaign' | translate"
-                                             [data]="campaigns"
-                                             formControlName="selectedCampaigns">
-                    </ng-multiselect-dropdown>
-                    <div class="error-message" *ngIf="submitted && f.selectedCampaigns.errors?.required">
-                        {{ 'campaigns.scheduling.required.campaign' | translate }}
-                    </div>
-                </div>
-                <div class="col">
-                    <ul class="list-group list-group-horizontal" [dragula]="'selectedCampaigns'"
-                        [(dragulaModel)]="form.get('selectedCampaigns').value">
-                        <li *ngFor="let campaign of form.get('selectedCampaigns').value; let i = index"
-                            [attr.data-id]="i" class="chutney-tag chutney-tag-selected lh-base fs-6">
-                            <span>{{ campaign.title }}</span>
-                            <i class="ms-2 fa-xs fa-solid fa-xmark" (click)="unselectCampaign(campaign)"></i>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-
-            <button type="submit" [disabled]="submitted && form.invalid" class="btn btn-success  my-2"
-                    (click)="create()">
-                <span class="fa fa-floppy-disk"></span>&nbsp;
-                <span>{{ 'global.actions.record' | translate }}</span>
-            </button>
-        </form>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
-    <div class="row w-100">
-        <ng-container *ngIf="scheduledCampaigns.length == 0">
-            {{ 'campaigns.scheduling.nothing' | translate }}
-        </ng-container>
-        <ng-container *ngIf="scheduledCampaigns.length > 0">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead>
-                    <tr>
-                        <th class="w5">{{ 'campaigns.scheduling.scheduling' | translate }}</th>
-                        <th class="w65"> {{ 'campaigns.scheduling.campaign' | translate }}</th>
-                        <th class="w15">{{ 'campaigns.scheduling.schedulingDate' | translate }}</th>
-                        <th class="w10">{{ 'campaigns.scheduling.frequency' | translate }}</th>
-                        <th class="w5"></th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr *ngFor="let scheduledCampaign of scheduledCampaigns">
-                        <td>#{{ scheduledCampaign.id }}</td>
-                        <td>
-                            <div *ngFor="let title of scheduledCampaign.campaignsTitle; let i = index">
-                                <span>{{ (i + 1) }} - {{ title }}</span>
-                            </div>
-                        </td>
-
-                        <td>{{ scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm' }}</td>
-                        <td><span
-                            *ngIf="scheduledCampaign.frequency !==undefined">{{ scheduledCampaign.frequency }}</span>
-                        </td>
-                        <td>
-                            <button type="button" class="btn btn-outline-danger btn-sm float-end"
-                                    (click)="delete(scheduledCampaign.id)">
-                                <span class="fa fa-trash"></span>
-                            </button>
-                        </td>
-                    </tr>
-
-                    </tbody>
-                </table>
-            </div>
-        </ng-container>
-    </div>
+  }
+</div>
 </div>

@@ -1,48 +1,51 @@
 <chutney-scenario-execution-menu></chutney-scenario-execution-menu>
-<div *ngIf="error" class="alert alert-dismissible alert-danger mt-4">
+@if (error) {
+  <div class="alert alert-dismissible alert-danger mt-4">
     <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="error = null"></button>
     {{ error }}
-</div>
-<div *ngIf="scenario">
+  </div>
+}
+@if (scenario) {
+  <div>
     <h5 [innerHTML]="scenario.title | linkify"></h5>
     <h6 [innerHTML]="scenario.description | linkify"></h6>
     <div class="mb-2">
-        <chutney-scenario-campaigns [idScenario]="scenario.id"></chutney-scenario-campaigns>
-        <span>{{'scenarios.execution.history.default-dataset' | translate}} : {{scenario.defaultDataset}}</span>
+      <chutney-scenario-campaigns [idScenario]="scenario.id"></chutney-scenario-campaigns>
+      <span>{{'scenarios.execution.history.default-dataset' | translate}} : {{scenario.defaultDataset}}</span>
     </div>
-
     <ul ngbNav #nav="ngbNav" [activeId]="getActiveTab()" (navChange)="onTabChange($event)" class="executions-tabs nav-tabs sticky-top">
-        <li [ngbNavItem]="'0'" [destroyOnHide]="false">
-            <a ngbNavLink>
-                {{'scenarios.execution.history.title' | translate}}
-            </a>
-            <ng-template ngbNavContent>
-                <chutney-scenario-executions [executions]="executions"
-                                             [(filters)]="executionsFilters"
-                                             (onExecutionSelect)="openReport($event)"></chutney-scenario-executions>
-            </ng-template>
+      <li [ngbNavItem]="'0'" [destroyOnHide]="false">
+        <a ngbNavLink>
+          {{'scenarios.execution.history.title' | translate}}
+        </a>
+        <ng-template ngbNavContent>
+          <chutney-scenario-executions [executions]="executions"
+            [(filters)]="executionsFilters"
+          (onExecutionSelect)="openReport($event)"></chutney-scenario-executions>
+        </ng-template>
+      </li>
+      @for (exec of tabs; track exec) {
+        <li [ngbNavItem]="exec.executionId.toString()" [destroyOnHide]="false">
+          <a ngbNavLink>
+            <small><strong>#{{exec.executionId}} </strong> <small>({{ exec.time | amCalendar}})</small></small>
+            <button type="button" class="btn btn-sm ms-1 close-tab" (click)="closeReport($event, exec.executionId)">
+              <i class="fa-regular fa-x fa-xs fw-light" ></i>
+            </button>
+          </a>
+          <ng-template ngbNavContent>
+            <!-- 40px - 1.5rem explanation : calculation between execution header and app_main_inner heights -->
+            <chutney-scenario-execution [scenario]="scenario"
+              [execution]="exec"
+              [stickyTop]="'40px - 1.5rem'"
+              [stickyTopElementSelector]="'.executions-tabs'"
+              (onExecutionStatusUpdate)="updateExecutionStatus(exec.executionId, $event)">
+            </chutney-scenario-execution>
+          </ng-template>
         </li>
-
-        <li *ngFor="let exec of tabs" [ngbNavItem]="exec.executionId.toString()" [destroyOnHide]="false">
-            <a ngbNavLink>
-                <small><strong>#{{exec.executionId}} </strong> <small>({{ exec.time | amCalendar}})</small></small>
-                <button type="button" class="btn btn-sm ms-1 close-tab" (click)="closeReport($event, exec.executionId)">
-                    <i class="fa-regular fa-x fa-xs fw-light" ></i>
-                </button>
-            </a>
-            <ng-template ngbNavContent>
-                <!-- 40px - 1.5rem explanation : calculation between execution header and app_main_inner heights -->
-                <chutney-scenario-execution [scenario]="scenario"
-                                            [execution]="exec"
-                                            [stickyTop]="'40px - 1.5rem'"
-                                            [stickyTopElementSelector]="'.executions-tabs'"
-                                            (onExecutionStatusUpdate)="updateExecutionStatus(exec.executionId, $event)">
-
-                </chutney-scenario-execution>
-            </ng-template>
-        </li>
+      }
     </ul>
     <div [ngbNavOutlet]="nav" class="mt-2">
     </div>
-</div>
+  </div>
+}
 

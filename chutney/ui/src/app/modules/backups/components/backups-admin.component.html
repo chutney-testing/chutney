@@ -1,59 +1,66 @@
 <div class="container-fluid">
-    <div class="row">
-        <form class="w-100" *ngIf="backupForm">
-            <table class="table table-striped table-hover">
-                <thead>
-                <tr>
-                    <th scope="col" class="text-center" width="100px"></th>
-                    <th scope="col" class="text-center">{{ 'admin.backups.table.time.title' | translate }}</th>
-                    <th scope="col" class="text-center"
-                    *ngFor="let backupable of backupables"
-                    >{{ 'admin.backups.table.'+backupable+'.title' | translate }}</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr class="bg-light">
-                    <td class="text-center align-middle">
-                        <button type="button" class="btn btn-sm btn-primary"
-                                title="{{ 'global.actions.add' | translate }}"
-                                (click)="launchBackup()"
-                                [disabled]="!isOneBackupSelected()">
-                            <span class="fa fa-plus" aria-hidden="true"></span>
-                        </button>
-                    </td>
-                    <td></td>
-                    <td scope="row" class="text-center align-middle"
-                    *ngFor="let backupableControl of backupForm.controls"
-                    [formGroup]="asFormGroup(backupableControl)">
-                        <input type="checkbox" formControlName="selected"/>
-                    </td>
-                </tr>
-                <tr *ngFor="let backup of backups">
-                    <td scope="row" class="text-center align-middle">
-                        <button type="button" class="btn btn-sm btn-danger"
-                                title="{{ 'global.actions.delete' | translate }}"
-                                (click)="deleteBackup(backup)">
-                            <span class="fa fa-trash"></span>
-                        </button>
-
-                        <button type="button" class="btn btn-sm btn-primary ms-2"
-                                title="Download"
-                                (click)="download(backup)">
-                            <span class="fa fa-download"></span>
-                        </button>
-                    </td>
-
-                    <td scope="row" class="text-center align-middle">
-                        {{ backup.time | date: 'medium' }}
-                    </td>
-
-                    <td scope="row" class="text-center align-middle"
-                    *ngFor="let backupable of backupables">
-                        <span *ngIf="backup.backupables.includes(backupable)" class="fa fa-check-square" aria-hidden="true"></span>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
-        </form>
-    </div>
+  <div class="row">
+    @if (backupForm) {
+      <form class="w-100">
+        <table class="table table-striped table-hover">
+          <thead>
+            <tr>
+              <th scope="col" class="text-center" width="100px"></th>
+              <th scope="col" class="text-center">{{ 'admin.backups.table.time.title' | translate }}</th>
+              @for (backupable of backupables; track backupable) {
+                <th scope="col" class="text-center"
+                >{{ 'admin.backups.table.'+backupable+'.title' | translate }}</th>
+              }
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="bg-light">
+              <td class="text-center align-middle">
+                <button type="button" class="btn btn-sm btn-primary"
+                  title="{{ 'global.actions.add' | translate }}"
+                  (click)="launchBackup()"
+                  [disabled]="!isOneBackupSelected()">
+                  <span class="fa fa-plus" aria-hidden="true"></span>
+                </button>
+              </td>
+              <td></td>
+              @for (backupableControl of backupForm.controls; track backupableControl) {
+                <td scope="row" class="text-center align-middle"
+                  [formGroup]="asFormGroup(backupableControl)">
+                  <input type="checkbox" formControlName="selected"/>
+                </td>
+              }
+            </tr>
+            @for (backup of backups; track backup) {
+              <tr>
+                <td scope="row" class="text-center align-middle">
+                  <button type="button" class="btn btn-sm btn-danger"
+                    title="{{ 'global.actions.delete' | translate }}"
+                    (click)="deleteBackup(backup)">
+                    <span class="fa fa-trash"></span>
+                  </button>
+                  <button type="button" class="btn btn-sm btn-primary ms-2"
+                    title="Download"
+                    (click)="download(backup)">
+                    <span class="fa fa-download"></span>
+                  </button>
+                </td>
+                <td scope="row" class="text-center align-middle">
+                  {{ backup.time | date: 'medium' }}
+                </td>
+                @for (backupable of backupables; track backupable) {
+                  <td scope="row" class="text-center align-middle"
+                    >
+                    @if (backup.backupables.includes(backupable)) {
+                      <span class="fa fa-check-square" aria-hidden="true"></span>
+                    }
+                  </td>
+                }
+              </tr>
+            }
+          </tbody>
+        </table>
+      </form>
+    }
+  </div>
 </div>

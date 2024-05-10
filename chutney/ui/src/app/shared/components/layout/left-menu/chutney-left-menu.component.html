@@ -1,26 +1,28 @@
 <div class="app-sidebar">
-    <div class="app-sidebar-content">
-        <div class="app-sidebar-scroll">
-            <ng-scrollbar>
-                <div class="sidebar-menu">
-                    <div class="menu-list">
-                        <ng-container *ngFor="let item of  menuItems">
-                            <ng-container *ngIf="canViewMenuGroup(item)">
-                                <div class="menu-header">{{item.label}}</div>
-                                <ng-container *ngFor="let subItem of item.children">
-                                    <div class="menu-item nav-item" *ngIf="canViewMenuItem(subItem)"
-                                    placement="right" container="body" [disableTooltip]="!layoutOptions.toggleSidebar" ngbTooltip="{{subItem.label | translate}}">
-                                        <a [routerLink]="subItem.link" routerLinkActive="active-item" class="menu-link">
-                                            <i class="menu-icon" [ngClass]="subItem.iconClass"></i>
-                                            <span class="menu-title">{{subItem.label | translate}}</span>
-                                        </a>
-                                    </div>
-                                </ng-container>
-                            </ng-container>
-                        </ng-container>
+  <div class="app-sidebar-content">
+    <div class="app-sidebar-scroll">
+      <ng-scrollbar>
+        <div class="sidebar-menu">
+          <div class="menu-list">
+            @for (item of  menuItems; track item) {
+              @if (canViewMenuGroup(item)) {
+                <div class="menu-header">{{item.label}}</div>
+                @for (subItem of item.children; track subItem) {
+                  @if (canViewMenuItem(subItem)) {
+                    <div class="menu-item nav-item"
+                      placement="right" container="body" [disableTooltip]="!layoutOptions.toggleSidebar" ngbTooltip="{{subItem.label | translate}}">
+                      <a [routerLink]="subItem.link" routerLinkActive="active-item" class="menu-link">
+                        <i class="menu-icon" [ngClass]="subItem.iconClass"></i>
+                        <span class="menu-title">{{subItem.label | translate}}</span>
+                      </a>
                     </div>
-                </div>
-            </ng-scrollbar>
+                  }
+                }
+              }
+            }
+          </div>
         </div>
+      </ng-scrollbar>
     </div>
+  </div>
 </div>

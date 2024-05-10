@@ -1,16 +1,20 @@
-<button *ngIf="type === 'trash-button'" type="button" class="btn {{btnSizeClass ? 'btn-' + btnSizeClass : ''}} btn-{{btnColor ? btnColor : 'danger'}} trash-btn"
-        (click)="openModal(template)"
-        [attr.disabled]="disabledBoolean(disabled)"
-        ngbTooltip="{{title | translate}}"
-        placement="top" container="body">
+@if (type === 'trash-button') {
+  <button type="button" class="btn {{btnSizeClass ? 'btn-' + btnSizeClass : ''}} btn-{{btnColor ? btnColor : 'danger'}} trash-btn"
+    (click)="openModal(template)"
+    [attr.disabled]="disabledBoolean(disabled)"
+    ngbTooltip="{{title | translate}}"
+    placement="top" container="body">
     <span class="fa {{btnClassIcon}}"></span>
-</button>
-<chutney-link *ngIf="type === 'link'" [model]="label" (click)="openModal(template)">
-</chutney-link>
+  </button>
+}
+@if (type === 'link') {
+  <chutney-link [model]="label" (click)="openModal(template)">
+  </chutney-link>
+}
 <ng-template #template>
-    <div class="modal-body text-center">
-        <p>{{dialogMessage  | translate }}</p>
-        <button type="button" class="btn btn-default" (click)="confirm()">{{'global.confirm.yes' | translate}}</button>
-        <button id="no-btn" type="button" class="btn btn-primary" (click)="decline()">{{'global.confirm.no' | translate}}</button>
-    </div>
+  <div class="modal-body text-center">
+    <p>{{dialogMessage  | translate }}</p>
+    <button type="button" class="btn btn-default" (click)="confirm()">{{'global.confirm.yes' | translate}}</button>
+    <button id="no-btn" type="button" class="btn btn-primary" (click)="decline()">{{'global.confirm.no' | translate}}</button>
+  </div>
 </ng-template>
