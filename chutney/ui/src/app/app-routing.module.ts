@@ -23,8 +23,8 @@ import { ParentComponent } from '@core/components/parent/parent.component';
 import { ChutneyMainHeaderComponent } from '@shared/components/layout/header/chutney-main-header.component';
 import { ChutneyLeftMenuComponent } from '@shared/components/layout/left-menu/chutney-left-menu.component';
 import { featuresGuard } from '@core/guards/features.guard';
-import { featuresResolver } from '@core/feature/features.resolver';
 import { authGuard } from '@core/guards';
+import { featuresResolver } from '@core/feature/features.resolver';
 
 export const appRoutes: Routes = [
     {path: 'login', component: LoginComponent},
