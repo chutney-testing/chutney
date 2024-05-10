@@ -78,12 +78,12 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
             "proxyConfig": "proxy.conf.json",
-              "ssl": true,
-              "buildTarget": "chutney:build"
+            "ssl": true,
+            "buildTarget": "chutney:build"
           },
           "configurations": {
             "production": {
-              "buildTarget": "chutney:build:production"
+            "buildTarget": "chutney:build:production"
             },
             "development": {
               "buildTarget": "chutney:build:development"
