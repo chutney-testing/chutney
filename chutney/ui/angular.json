@@ -77,16 +77,16 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "chutney:build",
-              "proxyConfig": "proxy.conf.json",
-              "ssl": true
+            "proxyConfig": "proxy.conf.json",
+              "ssl": true,
+              "buildTarget": "chutney:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "chutney:build:production"
+              "buildTarget": "chutney:build:production"
             },
             "development": {
-              "browserTarget": "chutney:build:development"
+              "buildTarget": "chutney:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -94,7 +94,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "chutney:build"
+            "buildTarget": "chutney:build"
           }
         },
         "test": {
