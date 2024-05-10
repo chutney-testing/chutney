@@ -15,7 +15,6 @@
  */
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { SharedModule } from '@shared/shared.module';
 
@@ -37,6 +36,7 @@ import {
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureService } from '@core/feature/feature.service';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { RouterModule } from '@angular/router';
 
 describe('DatasetEditionComponent', () => {
 
@@ -50,7 +50,7 @@ describe('DatasetEditionComponent', () => {
         TestBed.resetTestingModule();
         TestBed.configureTestingModule({
             imports: [
-                RouterTestingModule,
+                RouterModule.forRoot([]),
                 TranslateModule.forRoot(),
                 MoleculesModule,
                 SharedModule,
