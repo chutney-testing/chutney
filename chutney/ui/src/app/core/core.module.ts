@@ -23,6 +23,7 @@ import { LoginComponent } from './components/login/login.component';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { ParentComponent } from './components/parent/parent.component';
+import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
 
 @NgModule({
     declarations: [
@@ -36,6 +37,9 @@ import { ParentComponent } from './components/parent/parent.component';
         RouterModule,
         SharedModule,
         TranslateModule
+    ],
+    providers: [
+        {provide: DROPDOWN_SETTINGS, useClass: DropdownSettings}
     ]
 
 })

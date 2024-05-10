@@ -14,8 +14,8 @@
                 <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(statusDropdown, $event)">
                     <span>{{'scenarios.execution.history.status' | translate}}</span>
                     <i class="ms-2 fa" [ngClass]="{
-                    'fa-chevron-up': statusDropdown.isActive,
-                    'fa-chevron-down': !statusDropdown.isActive}"></i>
+                    'fa-chevron-up': statusDropdown.isDropdownOpen,
+                    'fa-chevron-down': !statusDropdown.isDropdownOpen}"></i>
                 </div>
             </th>
             <th scope="col">{{'scenarios.execution.history.error' | translate}}</th>
@@ -24,8 +24,8 @@
                 <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(tagsDropdown, $event)">
                     <span>{{ 'scenarios.execution.history.tags'  | translate  }}</span>
                         <i class="ms-2 fa" [ngClass]="{
-                            'fa-chevron-up': tagsDropdown.isActive,
-                            'fa-chevron-down': !tagsDropdown.isActive}"></i>
+                            'fa-chevron-up': tagsDropdown.isDropdownOpen,
+                            'fa-chevron-down': !tagsDropdown.isDropdownOpen}"></i>
                 </div>
             </th>
             <th scope="col">{{'scenarios.execution.history.scenarioId' | translate}}</th>
@@ -33,24 +33,24 @@
                 <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(envsDropdown, $event)">
                     <span>{{'scenarios.execution.history.env' | translate}}</span>
                     <i class="ms-2 fa" [ngClass]="{
-                    'fa-chevron-up': envsDropdown.isActive,
-                    'fa-chevron-down': !envsDropdown.isActive}"></i>
+                    'fa-chevron-up': envsDropdown.isDropdownOpen,
+                    'fa-chevron-down': !envsDropdown.isDropdownOpen}"></i>
                 </div>
             </th>
             <th scope="col">
                 <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(campsDropdown, $event)">
                     <span> {{'scenarios.execution.history.campaign' | translate}}</span>
                     <i class="ms-2 fa" [ngClass]="{
-                    'fa-chevron-up': campsDropdown.isActive,
-                    'fa-chevron-down': !campsDropdown.isActive}"></i>
+                    'fa-chevron-up': campsDropdown.isDropdownOpen,
+                    'fa-chevron-down': !campsDropdown.isDropdownOpen}"></i>
                 </div>
             </th>
             <th scope="col">
                 <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(executorsDropdown, $event)">
                     <span>{{'scenarios.execution.history.executor' | translate}}</span>
                     <i class="ms-2 fa" [ngClass]="{
-                    'fa-chevron-up': executorsDropdown.isActive,
-                    'fa-chevron-down': !executorsDropdown.isActive}"></i>
+                    'fa-chevron-up': executorsDropdown.isDropdownOpen,
+                    'fa-chevron-down': !executorsDropdown.isDropdownOpen}"></i>
                 </div>
             </th>
         </tr>
@@ -64,42 +64,42 @@
                 </div>
             </th>
             <th>
-                <angular2-multiselect [data]="status"
-                                      [settings]="selectSettings"
-                                      formControlName="status"
+                <ng-multiselect-dropdown [settings]="selectSettings"
+                                         [data]="status"
+                                         [formControl]="getFormControl('status')"
                                       #statusDropdown>
-                </angular2-multiselect>
+                </ng-multiselect-dropdown>
             </th>
             <th class="w20"></th>
             <th></th>
             <th>
-                <angular2-multiselect #tagsDropdown
-                        [data]="tags"
-                        [settings]="selectSettings"
-                        formControlName="tags">
-                </angular2-multiselect>
+                <ng-multiselect-dropdown #tagsDropdown
+                                         [settings]="selectSettings"
+                                         [data]="tags"
+                                         [formControl]="getFormControl('tags')">
+                </ng-multiselect-dropdown>
             </th>
             <th></th>
             <th>
-                <angular2-multiselect [data]="environments"
-                                      [settings]="selectSettings"
-                                      formControlName="environments"
+                <ng-multiselect-dropdown [settings]="selectSettings"
+                                         [data]="environments"
+                                         [formControl]="getFormControl('environments')"
                                       #envsDropdown>
-                </angular2-multiselect>
+                </ng-multiselect-dropdown>
             </th>
             <th>
-                <angular2-multiselect [data]="campaigns"
-                                      [settings]="selectSettings"
-                                      formControlName="campaigns"
+                <ng-multiselect-dropdown [settings]="selectSettings"
+                                         [data]="campaigns"
+                                         [formControl]="getFormControl('campaigns')"
                                       #campsDropdown>
-                </angular2-multiselect>
+                </ng-multiselect-dropdown>
             </th>
             <th>
-                <angular2-multiselect [data]="executors"
-                                      [settings]="selectSettings"
-                                      formControlName="executors"
+                <ng-multiselect-dropdown [settings]="selectSettings"
+                                         [data]="executors"
+                                         [formControl]="getFormControl('executors')"
                                       #executorsDropdown>
-                </angular2-multiselect>
+                </ng-multiselect-dropdown>
             </th>
         </tr>
         </thead>

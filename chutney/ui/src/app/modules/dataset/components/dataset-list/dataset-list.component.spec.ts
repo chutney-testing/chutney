@@ -26,10 +26,11 @@ import { MomentModule } from 'ngx-moment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { DatasetListComponent } from './dataset-list.component';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { DataSetService } from '@core/services';
 import { of } from 'rxjs';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
 
 describe('DatasetListComponent', () => {
 
@@ -47,7 +48,7 @@ describe('DatasetListComponent', () => {
         SharedModule,
         MomentModule,
         NgbModule,
-        AngularMultiSelectModule,
+          NgMultiSelectDropDownModule.forRoot(),
         FormsModule,
         ReactiveFormsModule,
       ],
@@ -55,7 +56,8 @@ describe('DatasetListComponent', () => {
         DatasetListComponent
       ],
       providers: [
-        { provide: DataSetService, useValue: dataSetService }
+        { provide: DataSetService, useValue: dataSetService },
+        {provide: DROPDOWN_SETTINGS, useClass: DropdownSettings}
       ]
     }).compileComponents();
   }));

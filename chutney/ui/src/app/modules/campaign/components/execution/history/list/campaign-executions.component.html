@@ -22,8 +22,8 @@
                             (click)="toggleDropDown(statusDropdown, $event)">
                             <span>{{ 'campaigns.execution.history.header.status' | translate }}</span>
                             <i class="ms-2 fa" [ngClass]="{
-                                'fa-chevron-up': statusDropdown.isActive,
-                                'fa-chevron-down': !statusDropdown.isActive}"></i>
+                                'fa-chevron-up': statusDropdown?.isDropdownOpen,
+                                'fa-chevron-down': !statusDropdown?.isDropdownOpen}"></i>
                         </div>
                     </th>
                     <th scope="col">
@@ -31,8 +31,8 @@
                             (click)="toggleDropDown(envsDropdown, $event)">
                             <span>{{ 'campaigns.execution.history.header.env' | translate }}</span>
                             <i class="ms-2 fa" [ngClass]="{
-                                'fa-chevron-up': envsDropdown.isActive,
-                                'fa-chevron-down': !envsDropdown.isActive}"></i>
+                                'fa-chevron-up': envsDropdown?.isDropdownOpen,
+                                'fa-chevron-down': !envsDropdown?.isDropdownOpen}"></i>
                         </div>
                     </th>
                     <th scope="col">
@@ -40,8 +40,8 @@
                             (click)="toggleDropDown(executorsDropdown, $event)">
                             <span>{{ 'campaigns.execution.history.header.executor' | translate }}</span>
                             <i class="ms-2 fa" [ngClass]="{
-                                'fa-chevron-up': executorsDropdown.isActive,
-                                'fa-chevron-down': !executorsDropdown.isActive}"></i>
+                                'fa-chevron-up': executorsDropdown?.isDropdownOpen,
+                                'fa-chevron-down': !executorsDropdown?.isDropdownOpen}"></i>
                         </div>
                     </th>
                 </tr>
@@ -56,22 +56,25 @@
                         </div>
                     </th>
                     <th>
-                        <angular2-multiselect #statusDropdown formControlName="status"
-                            [data]="status"
-                            [settings]="selectSettings">
-                        </angular2-multiselect>
+                        <ng-multiselect-dropdown #statusDropdown
+                            [formControl]="getFormControl('status')"
+                            [settings]="dropdownSettings"
+                            [data]="status">
+                        </ng-multiselect-dropdown>
                     </th>
                     <th>
-                        <angular2-multiselect #envsDropdown formControlName="environments"
-                            [data]="environments"
-                            [settings]="selectSettings">
-                        </angular2-multiselect>
+                        <ng-multiselect-dropdown #envsDropdown
+                            [formControl]="getFormControl('environments')"
+                            [settings]="dropdownSettings"
+                            [data]="environments">
+                        </ng-multiselect-dropdown>
                     </th>
                     <th>
-                        <angular2-multiselect #executorsDropdown formControlName="executors"
-                            [data]="executors"
-                            [settings]="selectSettings">
-                        </angular2-multiselect>
+                        <ng-multiselect-dropdown #executorsDropdown
+                            [formControl]="getFormControl('executors')"
+                            [settings]="dropdownSettings"
+                            [data]="executors">
+                        </ng-multiselect-dropdown>
                     </th>
                 </tr>
             </thead>

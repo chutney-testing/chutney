@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject, Subscription } from 'rxjs';
 import { debounceTime, map } from 'rxjs/operators';
@@ -32,7 +32,8 @@ import { JiraPluginConfigurationService, JiraPluginService, ScenarioService } fr
 import { Authorization, ScenarioIndex } from '@model';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { TranslateService } from '@ngx-translate/core';
-import { AngularMultiSelect } from 'angular2-multiselect-dropdown';
+import { IDropdownSettings, MultiSelectComponent } from 'ng-multiselect-dropdown';
+import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 
 @Component({
     selector: 'chutney-scenarios',
@@ -49,11 +50,10 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     viewedScenarios: Array<ScenarioIndex> = [];
     textFilter: string;
     fullTextFilter: string;
-    settings = {};
     tags = [];
     selectedTags = [];
     fullTextSearch = false;
-    status: { id: string, itemName: string }[] = [];
+    status: { id: string, text: string }[] = [];
     selectedStatus= [];
     // Jira
     jiraMap: Map<string, string> = new Map();
@@ -73,7 +73,8 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         private jiraPluginConfigurationService: JiraPluginConfigurationService,
         private stateService: StateService,
         private readonly route: ActivatedRoute,
-        private translateService: TranslateService
+        private translateService: TranslateService,
+        @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings
     ) {
     }
 
@@ -102,14 +103,6 @@ export class ScenariosComponent implements OnInit, OnDestroy {
                 this.applyFilters();
             })
             .catch(err => console.log(err));
-
-
-        this.settings = {
-            text: '',
-            enableCheckAll: false,
-            enableSearchFilter: true,
-            autoPosition: false
-        };
     }
 
     ngOnDestroy(): void {
@@ -125,10 +118,10 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     }
 
     private toSelectOption(id: string, label: string = id) {
-        return {id: id, itemName: label };
+        return {id: id, text: label };
     }
 
-    toggleDropDown(dropDown: AngularMultiSelect, event) {
+    toggleDropDown(dropDown: MultiSelectComponent, event) {
         event.stopPropagation();
         dropDown.toggleDropdown(event);
     }
@@ -169,7 +162,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
                         this.orderBy = params['orderBy'];
                     }
                     if (params['status']) {
-                        this.selectedStatus = this.status.filter((status) => params['status'].split(',').includes(status.itemName));
+                        this.selectedStatus = this.status.filter((status) => params['status'].split(',').includes(status.text));
                     }
                     if (params['reverseOrder']) {
                         this.reverseOrder = params['reverseOrder'] === 'true';
@@ -300,7 +293,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
             queryParams: {
                 text: this.textFilter,
                 orderBy: this.orderBy,
-                status:this.selectedStatus.map((status) => status.itemName).join(','),
+                status:this.selectedStatus.map((status) => status.text).join(','),
                 reverseOrder: this.reverseOrder,
                 tags: this.getSelectedTags().toString()
             }
@@ -332,14 +325,14 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     }
 
     private getSelectedTags() {
-        return this.selectedTags.map((i) => i.itemName);
+        return this.selectedTags.map((i) => i.text);
     }
 
     private getTagsForComboModel(tags: String[]) {
         let index = 0;
         return tags.map((t) => {
             index++;
-            return {'id': index, 'itemName': t};
+            return {'id': index, 'text': t};
         });
     }
 }

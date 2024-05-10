@@ -26,8 +26,10 @@ import { MoleculesModule } from '../../molecules/molecules.module';
 import { DatabaseAdminComponent } from './components/database-admin.component';
 import { DateFormatPipe, MomentModule } from 'ngx-moment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
-import { DatabaseAdminExecutionReportListComponent } from './components/resultReportList/database-admin-report-list.component';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
+import {
+    DatabaseAdminExecutionReportListComponent
+} from './components/resultReportList/database-admin-report-list.component';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 @NgModule({
   imports: [
@@ -40,7 +42,7 @@ import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
     NgbModule,
     FormsModule,
     ReactiveFormsModule,
-    AngularMultiSelectModule,
+    NgMultiSelectDropDownModule.forRoot(),
   ],
   declarations: [DatabaseAdminComponent, DatabaseAdminExecutionReportListComponent],
   providers: [DateFormatPipe]

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, Inject, OnInit } from '@angular/core';
 import { Campaign } from '@core/model';
 import { CampaignService } from '@core/services';
 import { CampaignScheduling } from '@core/model/campaign/campaign-scheduling.model';
@@ -24,8 +24,8 @@ import { NgbDatepickerConfig, NgbDateStruct, NgbTimepickerConfig } from '@ng-boo
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { NgbTime } from '@ng-bootstrap/ng-bootstrap/timepicker/ngb-time';
 import { FREQUENCY } from '@core/model/campaign/FREQUENCY';
-import { DragulaService } from "ng2-dragula";
-import { AngularMultiSelect } from 'angular2-multiselect-dropdown';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 
 @Component({
     selector: 'chutney-campaign-scheduling',
@@ -40,19 +40,17 @@ export class CampaignSchedulingComponent implements OnInit {
     submitted: boolean;
     frequencies = Object.values(FREQUENCY);
     campaigns: Array<Campaign> = [];
-    settings = {};
-
-    public selectedMoment = new Date();
 
     model: NgbDateStruct;
 
     constructor(private campaignSchedulingService: CampaignSchedulingService,
                 private campaignService: CampaignService,
-                private dragulaService: DragulaService,
                 private formBuilder: FormBuilder,
                 private configTime: NgbTimepickerConfig,
-                private configDate: NgbDatepickerConfig
+                private configDate: NgbDatepickerConfig,
+                @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings
     ) {
+        dropdownSettings.textField = 'title'
         this.configTime.spinners = false;
         const currentDate = new Date();
         this.configDate.minDate = {
@@ -81,15 +79,6 @@ export class CampaignSchedulingComponent implements OnInit {
             time: ['', Validators.required],
             frequency: ['']
         });
-
-        this.settings = {
-            text: '',
-            enableCheckAll: false,
-            enableSearchFilter: true,
-            autoPosition: false,
-            showCheckbox: false,
-            labelKey: 'title'
-        };
     }
 
     create() {
@@ -138,11 +127,6 @@ export class CampaignSchedulingComponent implements OnInit {
     unselectCampaign(campaign: Campaign) {
         const selectedCampaigns = this.form.get('selectedCampaigns').value.filter( (c: Campaign) => c !== campaign);
         this.form.get('selectedCampaigns').setValue([...selectedCampaigns]);
-    }
-
-    toggleDropDown(dropDown: AngularMultiSelect, event) {
-        event.stopPropagation();
-        dropDown.toggleDropdown(event);
     }
 
     private loadSchedulingCampaign() {

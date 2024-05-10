@@ -15,15 +15,15 @@
     </div>
     <div class="mt-3 w-25">
         <div class="border rounded">
-            <angular2-multiselect [data]="itemList"
-                                  [settings]="settings"
+            <ng-multiselect-dropdown [settings]="dropdownSettings"
+                                     [data]="itemList"
                                   (onSelect)="onItemSelect($event)"
                                   (onDeSelect)="onItemDeSelect($event)"
                                   (onDeSelectAll)="onItemDeSelectAll()"
                                   [(ngModel)]="selectedItem"
                                   (ngModelChange)="applyFiltersToRoute()"
             >
-            </angular2-multiselect>
+            </ng-multiselect-dropdown>
         </div>
     </div>
 

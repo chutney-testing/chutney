@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { DragulaService } from 'ng2-dragula';
 
-import { Campaign, CampaignScenario, JiraScenario, KeyValue, ScenarioIndex, TestCase } from '@model';
+import { Campaign, CampaignScenario, JiraScenario, ScenarioIndex } from '@model';
 import {
     CampaignService,
     EnvironmentService,
@@ -30,7 +30,9 @@ import {
 } from '@core/services';
 import { distinct, flatMap, newInstance } from '@shared/tools/array-utils';
 import { isNotEmpty } from '@shared';
-import { TranslateService } from '@ngx-translate/core';
+import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 
 @Component({
     selector: 'chutney-campaign-edition',
@@ -57,10 +59,8 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
     environments: Array<string>;
     selectedEnvironment: string;
 
-    itemList = [];
-    jiraItemList = [];
-    settings = {};
-    jirasettings = {};
+    itemList: ListItem[] = [];
+    jiraItemList: ListItem[] = [];
     selectedTags: string[] = [];
     jiraSelectedTags: string[] = [];
     datasetId: string;
@@ -80,7 +80,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private dragulaService: DragulaService,
         private environmentService: EnvironmentService,
-        private translate: TranslateService,
+        @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings
     ) {
         this.campaignForm = this.formBuilder.group({
             title: ['', Validators.required],
@@ -97,36 +97,18 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
-        this.initMultiSelectSettings();
         this.submitted = false;
         this.loadEnvironment();
         this.loadAllScenarios();
     }
 
-    private initMultiSelectSettings() {
-        this.translate.get('campaigns.edition.selectTag').subscribe((res: string) => {
-            this.settings = {
-                text: res,
-                enableCheckAll: false,
-                autoPosition: false
-            };
-        });
-        this.translate.get('campaigns.edition.selectJiraTag').subscribe((res: string) => {
-            this.jirasettings = {
-                text: res,
-                enableCheckAll: false,
-                autoPosition: false
-            };
-        });
-    }
-
     onItemSelect(item: any) {
-        this.selectedTags.push(item.itemName);
+        this.selectedTags.push(item.text);
         this.selectedTags = newInstance(this.selectedTags);
     }
 
     OnItemDeSelect(item: any) {
-        this.selectedTags.splice(this.selectedTags.indexOf(item.itemName), 1);
+        this.selectedTags.splice(this.selectedTags.indexOf(item.text), 1);
         this.selectedTags = newInstance(this.selectedTags);
     }
 
@@ -135,13 +117,13 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
     }
 
     onJiraItemSelect(item: any) {
-        this.jiraSelectedTags.push(item.itemName);
+        this.jiraSelectedTags.push(item.text);
         this.jiraSelectedTags = newInstance(this.jiraSelectedTags);
         this.jiraFilter();
     }
 
     OnJiraItemDeSelect(item: any) {
-        this.jiraSelectedTags.splice(this.jiraSelectedTags.indexOf(item.itemName), 1);
+        this.jiraSelectedTags.splice(this.jiraSelectedTags.indexOf(item.text), 1);
         this.jiraSelectedTags = newInstance(this.jiraSelectedTags);
         this.jiraFilter();
     }
@@ -156,7 +138,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         this.dragulaService.destroy(this.DRAGGABLE);
     }
 
-    load(id) {
+    load(id: number) {
         if (id != null) {
             this.campaignService.find(id).subscribe({
                 next: (campaignFound) => {
@@ -197,7 +179,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         const allTagsInScenario: string[] = distinct(flatMap(this.scenarios, (sc) => sc.tags)).sort();
 
         allTagsInScenario.forEach((currentValue, index) => {
-            this.itemList.push({'id': index, 'itemName': currentValue});
+            this.itemList.push({id: index, text: currentValue});
         });
     }
 
@@ -275,7 +257,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
                         let index = 0;
                         this.jiraScenarios.forEach((currentValue) => {
                             if (isNotEmpty(currentValue.executionStatus)) {
-                                this.jiraItemList.push({'id': index, 'itemName': currentValue.executionStatus});
+                                this.jiraItemList.push({'id': index, 'text': currentValue.executionStatus});
                                 index++;
                             }
                         });

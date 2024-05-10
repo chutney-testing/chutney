@@ -14,18 +14,29 @@
  * limitations under the License.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import {
+    Component,
+    EventEmitter,
+    Inject,
+    Input,
+    OnChanges,
+    OnDestroy,
+    Output,
+    SimpleChanges,
+    ViewChild
+} from '@angular/core';
 import { CampaignExecutionReport, CampaignReport } from '@model';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Params } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { debounceTime, map, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DateFormatPipe } from 'ngx-moment';
-import { AngularMultiSelect } from 'angular2-multiselect-dropdown';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { TranslateService } from '@ngx-translate/core';
+import { IDropdownSettings, MultiSelectComponent } from 'ng-multiselect-dropdown';
+import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 
 @Component({
     selector: 'chutney-campaign-executions',
@@ -45,30 +56,21 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     private filters$: Subscription;
     filteredExecutions: CampaignReport[] = [];
 
-    status: { id: string, itemName: string }[] = [];
-    @ViewChild('statusDropdown', {static: false}) statusDropdown: AngularMultiSelect;
+    status: { id: string, text: string }[] = [];
+    @ViewChild('statusDropdown', {static: false}) statusDropdown: MultiSelectComponent;
 
-    environments: { id: string, itemName: string }[] = [];
-    @ViewChild('envsDropdown', {static: false}) envsDropdown: AngularMultiSelect;
+    environments: { id: string, text: string }[] = [];
+    @ViewChild('envsDropdown', {static: false}) envsDropdown: MultiSelectComponent;
 
-    executors: { id: string, itemName: string }[] = [];
-    @ViewChild('executorsDropdown', {static: false}) executorsDropdown: AngularMultiSelect;
-
-    selectSettings = {
-        text: '',
-        enableCheckAll: false,
-        enableSearchFilter: true,
-        autoPosition: false,
-        classes: 'dropdown-list1'
-    };
+    executors: { id: string, text: string }[] = [];
+    @ViewChild('executorsDropdown', {static: false}) executorsDropdown: MultiSelectComponent;
 
     private readonly iso_Date_Delimiter = '-';
 
-    constructor(private route: ActivatedRoute,
-                private router: Router,
-                private formBuilder: FormBuilder,
+    constructor(private formBuilder: FormBuilder,
                 private datePipe: DateFormatPipe,
-                private translateService: TranslateService) {
+                private translateService: TranslateService,
+                @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings) {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -81,7 +83,7 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
         this.filters$.unsubscribe();
     }
 
-    toggleDropDown(dropDown: AngularMultiSelect, event) {
+    toggleDropDown(dropDown: MultiSelectComponent, event) {
         event.stopPropagation();
         dropDown.toggleDropdown(event);
     }
@@ -99,8 +101,13 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
         this.onExecutionSelect.emit({execution, focus});
     }
 
+    getFormControl(name: string): FormControl {
+        return this.filtersForm.get(name) as FormControl;
+    }
+
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.report.status))].map(status => this.toSelectOption(status,  this.translateService.instant(ExecutionStatus.toString(status))));
+        //this.status = [{id: '1', text: 'hello'}];
         this.environments = [...new Set(this.executions.map(exec => exec.report.executionEnvironment))].map(env => this.toSelectOption(env));
         this.executors = [...new Set(this.executions.map(exec => exec.report.user))].map(user => this.toSelectOption(user));
     }
@@ -144,7 +151,7 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     }
 
     private toSelectOption(id: string, label: string = id) {
-        return {id: id, itemName: label };
+        return {id: id, text: label };
     }
 
     private toQueryParams(filters: any): Params {

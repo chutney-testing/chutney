@@ -25,14 +25,18 @@ import { MomentModule } from 'ngx-moment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { DatasetEditionComponent } from './dataset-edition.component';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { DataSetService } from '@core/services';
 import { of } from 'rxjs';
 import { DatasetListComponent } from '@modules/dataset/components/dataset-list/dataset-list.component';
-import { FormsKeyValueComponent } from '@modules/dataset/components/dataset-edition/forms-key-value/forms-key-value.component';
-import { FormsDataGridComponent } from '@modules/dataset/components/dataset-edition/forms-data-grid/forms-data-grid.component';
+import {
+    FormsKeyValueComponent
+} from '@modules/dataset/components/dataset-edition/forms-key-value/forms-key-value.component';
+import {
+    FormsDataGridComponent
+} from '@modules/dataset/components/dataset-edition/forms-data-grid/forms-data-grid.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureService } from '@core/feature/feature.service';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 describe('DatasetEditionComponent', () => {
 
@@ -52,7 +56,7 @@ describe('DatasetEditionComponent', () => {
                 SharedModule,
                 MomentModule,
                 NgbModule,
-                AngularMultiSelectModule,
+                NgMultiSelectDropDownModule.forRoot(), // todo remove
                 FormsModule,
                 ReactiveFormsModule
             ],

@@ -479,6 +479,9 @@
             "at": "at",
             "key": "Key",
             "value": "Value"
+        },
+        "msg": {
+            "empty": "No data available"
         }
     },
     "metrics": {

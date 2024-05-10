@@ -22,7 +22,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { MomentModule } from 'ngx-moment';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { NgClickOutsideModule } from 'ng-click-outside2';
 
 import { AtomsModule } from '../atoms/atoms.module';
 import { SharedModule } from '@shared/shared.module';
@@ -42,14 +41,12 @@ import { AsciiDoctorComponent } from './asciidoctor/asciidoctor.component';
 import { ToastInfoComponent } from './toast/toast-info/toast-info';
 import { ImportFileComponent } from './forms/import-file/import-file.component';
 import { ImportButtonComponent } from './forms/import-button/import-button.component';
-import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
     imports: [
         AtomsModule,
-        NgClickOutsideModule,
         CommonModule,
         FormsModule,
         MomentModule,

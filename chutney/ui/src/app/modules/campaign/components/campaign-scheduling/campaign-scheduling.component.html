@@ -1,26 +1,28 @@
 <div class="scheduling-campaign-container  min-vh-100 ">
     <div class="w-100">
-        <div class ="d-flex flex-md-row justify-content-between">
+        <div class="d-flex flex-md-row justify-content-between">
             <div>
                 <h4>{{ 'campaigns.scheduling.title' | translate }}</h4>
             </div>
             <div>
                 <button type="button" class="btn btn-sm btn-outline-secondary" [routerLink]="['/campaign']">
-                    <span class="fa fa-arrow-left" aria-hidden="true"></span> {{ 'campaigns.scheduling.back' | translate }}
+                    <span class="fa fa-arrow-left"
+                          aria-hidden="true"></span> {{ 'campaigns.scheduling.back' | translate }}
                 </button>
             </div>
         </div>
         <div class="w-100" *ngIf="errorMessage">
-            <p class="text-danger">{{ errorMessage}}</p>
+            <p class="text-danger">{{ errorMessage }}</p>
         </div>
 
         <form [formGroup]="form" autocomplete="off" class="w-100">
             <div class="row row-cols-lg-auto my-3">
                 <div class="col">
-                    <label for="calendar" class="form-label">{{ 'campaigns.scheduling.schedulingDate' | translate }}</label>
+                    <label for="calendar"
+                           class="form-label">{{ 'campaigns.scheduling.schedulingDate' | translate }}</label>
                     <div class="input-group">
                         <input id="calendar" class="form-control" placeholder="yyyy-mm-dd"
-                            name="dp" formControlName="date" ngbDatepicker #d="ngbDatepicker">
+                               name="dp" formControlName="date" ngbDatepicker #d="ngbDatepicker">
                         <button class="btn btn-success bi bi-calendar-event" (click)="d.toggle()"
                                 type="button"></button>
                     </div>
@@ -39,26 +41,27 @@
                 <div class="col">
                     <label for="frequency" class="form-label">{{ 'campaigns.scheduling.frequency' | translate }}</label>
                     <select id="frequency" class="form-select col-8" formControlName="frequency">
-                        <option *ngFor="let freq of frequencies" [ngValue]="freq">{{freq}}</option>
+                        <option *ngFor="let freq of frequencies" [ngValue]="freq">{{ freq }}</option>
                     </select>
                 </div>
             </div>
             <div class="row row-cols-lg-auto my-3" *ngIf="campaigns.length > 0">
-                <div class="col">
-                    <button type="button" class="btn btn-outline-primary px-1" (click)="toggleDropDown(campaignsDropdown,$event)">
-                        <span class="fa fa-angle-down"></span><span class="ms-1">{{ 'campaigns.scheduling.campaign' | translate }}</span></button>
-                    <angular2-multiselect #campaignsDropdown 
-                            [data]="campaigns"
-                            formControlName="selectedCampaigns"
-                            [settings]="settings">
-                    </angular2-multiselect>
+                <div class="col-lg-2">
+                    <ng-multiselect-dropdown
+                                             [settings]="dropdownSettings"
+                                             [placeholder]="'campaigns.scheduling.campaign' | translate"
+                                             [data]="campaigns"
+                                             formControlName="selectedCampaigns">
+                    </ng-multiselect-dropdown>
                     <div class="error-message" *ngIf="submitted && f.selectedCampaigns.errors?.required">
                         {{ 'campaigns.scheduling.required.campaign' | translate }}
                     </div>
                 </div>
                 <div class="col">
-                    <ul class="list-group list-group-horizontal" [dragula]="'selectedCampaigns'" [(dragulaModel)]="form.get('selectedCampaigns').value">
-                        <li *ngFor="let campaign of form.get('selectedCampaigns').value; let i = index" [attr.data-id]="i" class="chutney-tag chutney-tag-selected lh-base fs-6">
+                    <ul class="list-group list-group-horizontal" [dragula]="'selectedCampaigns'"
+                        [(dragulaModel)]="form.get('selectedCampaigns').value">
+                        <li *ngFor="let campaign of form.get('selectedCampaigns').value; let i = index"
+                            [attr.data-id]="i" class="chutney-tag chutney-tag-selected lh-base fs-6">
                             <span>{{ campaign.title }}</span>
                             <i class="ms-2 fa-xs fa-solid fa-xmark" (click)="unselectCampaign(campaign)"></i>
                         </li>
@@ -66,7 +69,8 @@
                 </div>
             </div>
 
-            <button type="submit" [disabled]="submitted && form.invalid" class="btn btn-success  my-2" (click)="create()">
+            <button type="submit" [disabled]="submitted && form.invalid" class="btn btn-success  my-2"
+                    (click)="create()">
                 <span class="fa fa-floppy-disk"></span>&nbsp;
                 <span>{{ 'global.actions.record' | translate }}</span>
             </button>
@@ -90,16 +94,16 @@
                     </thead>
                     <tbody>
                     <tr *ngFor="let scheduledCampaign of scheduledCampaigns">
-                        <td>#{{scheduledCampaign.id}}</td>
+                        <td>#{{ scheduledCampaign.id }}</td>
                         <td>
-                            <div *ngFor="let title of scheduledCampaign.campaignsTitle; let i = index" >
-                                <span>{{ (i+1) }} - {{ title }}</span>
+                            <div *ngFor="let title of scheduledCampaign.campaignsTitle; let i = index">
+                                <span>{{ (i + 1) }} - {{ title }}</span>
                             </div>
                         </td>
 
-                        <td>{{scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm'}}</td>
+                        <td>{{ scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm' }}</td>
                         <td><span
-                            *ngIf="scheduledCampaign.frequency !==undefined">{{scheduledCampaign.frequency}}</span>
+                            *ngIf="scheduledCampaign.frequency !==undefined">{{ scheduledCampaign.frequency }}</span>
                         </td>
                         <td>
                             <button type="button" class="btn btn-outline-danger btn-sm float-end"
@@ -108,7 +112,7 @@
                             </button>
                         </td>
                     </tr>
-                    
+
                     </tbody>
                 </table>
             </div>

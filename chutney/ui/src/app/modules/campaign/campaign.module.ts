@@ -22,8 +22,7 @@ import { DateFormatPipe, MomentModule } from 'ngx-moment';
 
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
-import { NgChartsModule } from 'ng2-charts';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { DragulaModule } from 'ng2-dragula';
 
 import { SharedModule } from '@shared/shared.module';
@@ -33,9 +32,13 @@ import { CampaignListComponent } from './components/campaign-list/campaign-list.
 import { CampaignSchedulingComponent } from './components/campaign-scheduling/campaign-scheduling.component';
 import { CampaignEditionComponent } from './components/create-campaign/campaign-edition.component';
 import { CampaignExecutionComponent } from './components/execution/detail/campaign-execution.component';
-import { CampaignExecutionsHistoryComponent } from './components/execution/history/campaign-executions-history.component';
+import {
+    CampaignExecutionsHistoryComponent
+} from './components/execution/history/campaign-executions-history.component';
 import { CampaignExecutionsComponent } from './components/execution/history/list/campaign-executions.component';
-import { CampaignExecutionMenuComponent } from './components/execution/sub/right-side-bar/campaign-execution-menu.component';
+import {
+    CampaignExecutionMenuComponent
+} from './components/execution/sub/right-side-bar/campaign-execution-menu.component';
 
 const ROUTES = [
     ...CampaignRoute
@@ -52,8 +55,7 @@ const ROUTES = [
         MomentModule,
         TranslateModule,
         DragulaModule,
-        AngularMultiSelectModule,
-        NgChartsModule,
+        NgMultiSelectDropDownModule.forRoot(),
         MoleculesModule
     ],
     declarations: [

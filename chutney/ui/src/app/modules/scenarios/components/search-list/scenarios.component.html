@@ -3,7 +3,7 @@
 >
     <div class="create-scenario bg-primary">
         <button type="button" class="btn btn-xs" title="{{ 'scenarios.search.create.form' | translate }}"
-                (click)="createNewScenario(false)">
+                (click)="createNewScenario()">
             <span class="fa fa-pencil-alt fa-2x"></span>
         </button>
     </div>
@@ -36,9 +36,9 @@
     </div>
 </div>
 
-<div class="row w-100">
+<div class="w-100 h-100">
     <span class="ms-3">{{viewedScenarios.length}} / {{scenarios.length}}</span>
-    <div class="table-responsive mb-3 mx-3">
+    <div class="table-responsive mb-3 mx-3 h-100">
         <table class="table table-sm table-striped table-hover">
             <thead>
                 <tr class="headers-labels">
@@ -46,11 +46,11 @@
                         <span *ngIf="orderBy == 'id' && reverseOrder" class="fa fa-caret-down"></span>
                         <span *ngIf="orderBy == 'id' && !reverseOrder" class="fa fa-caret-up"></span>
                     </th>
-                    <th class="filter w3" scope="col" (click)="toggleDropDown(statusDropdown, $event)">
+                    <th class="filter w11" scope="col" (click)="toggleDropDown(statusDropdown, $event)">
                         <span>{{ 'scenarios.list.header.status'  | translate  }}</span>
                             <i class="ms-2 fa" [ngClass]="{
-                                'fa-chevron-up': statusDropdown.isActive,
-                                'fa-chevron-down': !statusDropdown.isActive}"></i>
+                                'fa-chevron-up': statusDropdown.isDropdownOpen,
+                                'fa-chevron-down': !statusDropdown.isDropdownOpen}"></i>
                     </th>
                     <th class="filter w10" scope="col" (click)="sortBy('lastExecution')">{{ 'scenarios.list.header.execLast'  | translate  }}
                         <span *ngIf="orderBy == 'lastExecution' && reverseOrder" class="fa fa-caret-down"></span>
@@ -66,8 +66,8 @@
                     <th class="filter w12" scope="col" (click)="toggleDropDown(tagsDropdown, $event)">
                         <span>{{ 'scenarios.list.header.tags'  | translate  }}</span>
                             <i class="ms-2 fa" [ngClass]="{
-                                'fa-chevron-up': tagsDropdown.isActive,
-                                'fa-chevron-down': !tagsDropdown.isActive}"></i>
+                                'fa-chevron-up': tagsDropdown.isDropdownOpen,
+                                'fa-chevron-down': !tagsDropdown.isDropdownOpen}"></i>
                     </th>
                     <th class="filter w10" scope="col" (click)="sortBy('updateDate')">{{ 'scenarios.list.header.update'  | translate  }}
                         <span *ngIf="orderBy == 'updateDate' && reverseOrder" class="fa fa-caret-down"></span>
@@ -83,28 +83,30 @@
                 <tr class="headers-filters">
                     <th></th>
                     <th>
-                        <angular2-multiselect #statusDropdown 
+                        <ng-multiselect-dropdown #statusDropdown
+                            [settings]="dropdownSettings"
+                            [placeholder]="'global.actions.select' | translate"
                             [data]="status"
                             [(ngModel)]="selectedStatus"
-                            [settings]="settings"
-                            (onSelect)="applyFilters()" 
+                            (onSelect)="applyFilters()"
                             (onDeSelect)="applyFilters()"
                             (onDeSelectAll)="applyFilters()" >
-                        </angular2-multiselect>
+                        </ng-multiselect-dropdown>
                     </th>
                     <th></th>
                     <th></th>
                     <th></th>
                     <th></th>
                     <th>
-                        <angular2-multiselect #tagsDropdown
+                        <ng-multiselect-dropdown #tagsDropdown
+                                [settings]="dropdownSettings"
+                                [placeholder]="'global.actions.select' | translate"
                                 [data]="tags"
                                 [(ngModel)]="selectedTags"
-                                [settings]="settings"
                                 (onSelect)="onItemSelect()"
                                 (onDeSelect)="OnItemDeSelect()"
                                 (onDeSelectAll)="OnItemDeSelectAll()">
-                        </angular2-multiselect>
+                        </ng-multiselect-dropdown>
                     </th>
                     <th></th>
                     <th></th>

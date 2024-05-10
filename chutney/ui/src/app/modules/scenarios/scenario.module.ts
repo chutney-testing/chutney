@@ -23,21 +23,16 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DateFormatPipe, MomentModule } from 'ngx-moment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { FileSaverModule } from 'ngx-filesaver';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { TranslateModule } from '@ngx-translate/core';
-import {
-    PERFECT_SCROLLBAR_CONFIG,
-    PerfectScrollbarConfigInterface,
-    PerfectScrollbarModule
-} from 'ngx-perfect-scrollbar';
 import { MonacoEditorModule } from 'ngx-monaco-editor-v2';
-import { ForModule} from '@rx-angular/template/for'
 // Internal common
 import { SharedModule } from '@shared/shared.module';
 // Internal
 import { scenarioRoute } from './scenario.routes';
 import { ScenariosComponent } from './components/search-list/scenarios.component';
-import { ScenarioExecutionsHistoryComponent } from './components/execution/history/scenario-executions-history.component';
+import {
+    ScenarioExecutionsHistoryComponent
+} from './components/execution/history/scenario-executions-history.component';
 import { MoleculesModule } from '../../molecules/molecules.module';
 import { RawEditionComponent } from './components/edition/raw/raw-edition.component';
 import { DragulaModule } from 'ng2-dragula';
@@ -55,13 +50,13 @@ import {
     ScenarioExecutionMenuComponent
 } from '@modules/scenarios/components/execution/sub/right-side-bar/scenario-execution-menu.component';
 import { ReportPreviewComponent } from './components/execution/preview/report-preview.component';
+import { RxFor } from '@rx-angular/template/for';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+
 const ROUTES = [
     ...scenarioRoute
 ];
 
-const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
-    wheelPropagation: true
-};
 
 @NgModule({
     imports: [
@@ -73,16 +68,15 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         FormsModule,
         // External libs
         NgbModule,
-        AngularMultiSelectModule,
+        NgMultiSelectDropDownModule.forRoot(),
         TranslateModule,
-        PerfectScrollbarModule,
         DragulaModule,
         FileSaverModule,
         MonacoEditorModule,
-        ForModule,
         // Internal common
         SharedModule,
-        MoleculesModule
+        MoleculesModule,
+        RxFor
     ],
     declarations: [
         ScenariosComponent,
@@ -97,10 +91,6 @@ const DEFAULT_PERFECT_SCROLLBAR_CONFIG: PerfectScrollbarConfigInterface = {
         ReportPreviewComponent
     ],
     providers: [
-        {
-            provide: PERFECT_SCROLLBAR_CONFIG,
-            useValue: DEFAULT_PERFECT_SCROLLBAR_CONFIG
-        },
         DateFormatPipe,
         ScenarioExecutionService
     ]
