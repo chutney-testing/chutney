@@ -39,6 +39,9 @@ on:
       github-token:
           description: "GITHUB_TOKEN secret"
           required: false
+      codecov-token:
+          description: "CODECOV_TOKEN secret"
+          required: false
 
     outputs:
       PROJECT_VERSION:
@@ -99,6 +102,7 @@ jobs:
         with:
           goals: ${{steps.chutney-goals.outputs.CHUTNEY_GOALS}}
           cache-artifacts: ${{ inputs.cache-artifacts }}
+          codecov-token: ${{ secrets.codecov-token }}
 
       - name: Install api-insecure
         shell: bash

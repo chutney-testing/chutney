@@ -7,6 +7,9 @@ inputs:
   cache-artifacts:
     default: ""
     description: "path of artifacts to be cached"
+  codecov-token:
+    default: ""
+    description: "CODECOV_TOKEN secret"
 runs:
   using: "composite"
   steps:
@@ -40,7 +43,10 @@ runs:
 
     - name: Codecov
       if: ${{ ! contains(inputs.goals, '-DskipTests') }}
-      uses: codecov/codecov-action@v3
+      uses: codecov/codecov-action@v4
+      with:
+        token: ${{ inputs.codecov-token }}
+        slug: chutney-testing/chutney
 
     - name: Temporarily cache jar artifacts
       if: inputs.cache-artifacts != ''

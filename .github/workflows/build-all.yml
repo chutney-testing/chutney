@@ -11,3 +11,5 @@ jobs:
     uses: ./.github/workflows/build-all-template.yml
     with:
       skipTests: ${{ startsWith(github.head_ref, 'release/') }}
+    secrets:
+      codecov-token: ${{secrets.CODECOV_TOKEN}}
