@@ -70,7 +70,7 @@ const ROUTES = [
         NgbModule,
         NgMultiSelectDropDownModule.forRoot(),
         TranslateModule,
-        DragulaModule,
+        DragulaModule.forRoot(),
         FileSaverModule,
         MonacoEditorModule,
         // Internal common

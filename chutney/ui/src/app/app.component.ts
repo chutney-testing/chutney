@@ -18,7 +18,7 @@ import { Component, } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
-import * as moment from 'moment';
+import moment from 'moment';
 
 @Component({
     selector: 'chutney-main',

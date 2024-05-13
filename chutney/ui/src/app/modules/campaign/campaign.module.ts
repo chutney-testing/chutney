@@ -54,7 +54,7 @@ const ROUTES = [
         NgbModule,
         MomentModule,
         TranslateModule,
-        DragulaModule,
+        DragulaModule.forRoot(),
         NgMultiSelectDropDownModule.forRoot(),
         MoleculesModule
     ],

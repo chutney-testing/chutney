@@ -52,7 +52,20 @@
             "scripts": [
                 "node_modules/@asciidoctor/core/dist/browser/asciidoctor.min.js",
                 "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ]
+            ],
+              "allowedCommonJsDependencies": [
+                  "raf",
+                  "rgbcolor",
+                  "moment",
+                  "jspdf-autotable",
+                  "jszip",
+                  "ace-builds",
+                  "hjson",
+                  "core-js",
+                  "dragula",
+                  "file-saver"
+
+              ]
           },
           "configurations": {
             "production": {

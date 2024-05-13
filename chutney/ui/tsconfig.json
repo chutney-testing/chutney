@@ -42,9 +42,6 @@
         ],
         "os": [
           "node_modules/os-browserify/main.js"
-        ],
-        "dragula": [
-          "../node_modules/dragula/dist/dragula.min.js"
         ]
       },
       "useDefineForClassFields": false
