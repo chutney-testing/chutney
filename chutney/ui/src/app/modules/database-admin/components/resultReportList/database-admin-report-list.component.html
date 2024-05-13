@@ -11,46 +11,31 @@
           </div>
         </th>
         <th scope="col">
-          <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(statusDropdown, $event)">
+          <div class="cursor-pointer d-flex justify-content-center">
             <span>{{'scenarios.execution.history.status' | translate}}</span>
-                    <i class="ms-2 fa" [ngClass]="{
-                    'fa-chevron-up': statusDropdown.isDropdownOpen,
-                    'fa-chevron-down': !statusDropdown.isDropdownOpen}"></i>
           </div>
         </th>
         <th scope="col">{{'scenarios.execution.history.error' | translate}}</th>
         <th scope="col">{{'scenarios.execution.history.info' | translate}}</th>
         <th scope="col">
-          <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(tagsDropdown, $event)">
+          <div class="cursor-pointer d-flex justify-content-center">
             <span>{{ 'scenarios.execution.history.tags'  | translate  }}</span>
-                        <i class="ms-2 fa" [ngClass]="{
-                            'fa-chevron-up': tagsDropdown.isDropdownOpen,
-                            'fa-chevron-down': !tagsDropdown.isDropdownOpen}"></i>
           </div>
         </th>
         <th scope="col">{{'scenarios.execution.history.scenarioId' | translate}}</th>
         <th scope="col">
-          <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(envsDropdown, $event)">
+          <div class="cursor-pointer d-flex justify-content-center">
             <span>{{'scenarios.execution.history.env' | translate}}</span>
-                    <i class="ms-2 fa" [ngClass]="{
-                    'fa-chevron-up': envsDropdown.isDropdownOpen,
-                    'fa-chevron-down': !envsDropdown.isDropdownOpen}"></i>
           </div>
         </th>
         <th scope="col">
-          <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(campsDropdown, $event)">
+          <div class="cursor-pointer d-flex justify-content-center">
             <span> {{'scenarios.execution.history.campaign' | translate}}</span>
-                    <i class="ms-2 fa" [ngClass]="{
-                    'fa-chevron-up': campsDropdown.isDropdownOpen,
-                    'fa-chevron-down': !campsDropdown.isDropdownOpen}"></i>
           </div>
         </th>
         <th scope="col">
-          <div class="cursor-pointer d-flex justify-content-center" (click)="toggleDropDown(executorsDropdown, $event)">
+          <div class="cursor-pointer d-flex justify-content-center">
             <span>{{'scenarios.execution.history.executor' | translate}}</span>
-                    <i class="ms-2 fa" [ngClass]="{
-                    'fa-chevron-up': executorsDropdown.isDropdownOpen,
-                    'fa-chevron-down': !executorsDropdown.isDropdownOpen}"></i>
           </div>
         </th>
       </tr>

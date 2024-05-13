@@ -14,17 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    Component,
-    EventEmitter,
-    Inject,
-    Input,
-    OnChanges,
-    OnDestroy,
-    Output,
-    SimpleChanges,
-    ViewChild
-} from '@angular/core';
+import { Component, EventEmitter, Inject, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { CampaignExecutionReport, CampaignReport } from '@model';
 import { Params } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
@@ -35,7 +25,7 @@ import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DateFormatPipe } from 'ngx-moment';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { TranslateService } from '@ngx-translate/core';
-import { IDropdownSettings, MultiSelectComponent } from 'ng-multiselect-dropdown';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 
 @Component({
@@ -57,13 +47,10 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     filteredExecutions: CampaignReport[] = [];
 
     status: { id: string, text: string }[] = [];
-    @ViewChild('statusDropdown', {static: false}) statusDropdown: MultiSelectComponent;
 
     environments: { id: string, text: string }[] = [];
-    @ViewChild('envsDropdown', {static: false}) envsDropdown: MultiSelectComponent;
 
     executors: { id: string, text: string }[] = [];
-    @ViewChild('executorsDropdown', {static: false}) executorsDropdown: MultiSelectComponent;
 
     private readonly iso_Date_Delimiter = '-';
 
@@ -81,11 +68,6 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
 
     ngOnDestroy(): void {
         this.filters$.unsubscribe();
-    }
-
-    toggleDropDown(dropDown: MultiSelectComponent, event) {
-        event.stopPropagation();
-        dropDown.toggleDropdown(event);
     }
 
     getDateFilterValue() {

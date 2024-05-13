@@ -4,6 +4,7 @@ $base-color: var(--bs-primary) !important;
         .selected-item {
             border: 1px solid $base-color;
             background: $base-color;
+            margin-bottom: 2px;
         }
     }
 }

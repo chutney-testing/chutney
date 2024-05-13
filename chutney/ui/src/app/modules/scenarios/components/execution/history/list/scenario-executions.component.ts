@@ -14,9 +14,9 @@
  * limitations under the License.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { Execution } from '@model';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Params, Router } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { debounceTime, map, tap } from 'rxjs/operators';
@@ -25,7 +25,6 @@ import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DateFormatPipe } from 'ngx-moment';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { TranslateService } from '@ngx-translate/core';
-import { MultiSelectComponent } from 'ng-multiselect-dropdown';
 
 @Component({
     selector: 'chutney-scenario-executions',
@@ -53,20 +52,13 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     private filters$: Subscription;
 
     private readonly iso_Date_Delimiter = '-';
-    @ViewChild('statusDropdown', {static: false}) statusDropdown: MultiSelectComponent;
-
-    @ViewChild('envsDropdown', {static: false}) envsDropdown: MultiSelectComponent;
-    @ViewChild('executorsDropdown', {static: false}) executorsDropdown: MultiSelectComponent;
-    @ViewChild('campsDropdown', {static: false}) campsDropdown: MultiSelectComponent;
-    @ViewChild('tagsDropdown', {static: false}) tagsDropdown: MultiSelectComponent;
 
     @Input() executions: Execution[] = [];
     @Output() onExecutionSelect = new EventEmitter<{ execution: Execution, focus: boolean }>();
     @Input() filters: Params;
     @Output() filtersChange = new EventEmitter<Params>();
 
-    constructor(private route: ActivatedRoute,
-                private router: Router,
+    constructor(private router: Router,
                 private formBuilder: FormBuilder,
                 private datePipe: DateFormatPipe,
                 private translateService: TranslateService) {
@@ -76,11 +68,6 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
         this.initFiltersOptions();
         this.applyFilters();
         this.onFiltersChange();
-    }
-
-    toggleDropDown(dropDown: MultiSelectComponent, event) {
-        event.stopPropagation();
-        dropDown.toggleDropdown(event);
     }
 
     getDateFilterValue() {

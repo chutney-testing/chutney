@@ -87,11 +87,6 @@ export class DatabaseAdminExecutionReportListComponent
         this.onFiltersChange();
     }
 
-    toggleDropDown(dropDown: MultiSelectComponent, event) {
-        event.stopPropagation();
-        dropDown.toggleDropdown(event);
-    }
-
     getDateFilterValue() {
         let date: NgbDateStruct = this.filtersForm.value.date;
         return new Date(date.year, date.month - 1, date.day);

@@ -52,11 +52,8 @@
               <span class="fa fa-caret-up"></span>
             }
           </th>
-          <th class="filter w11" scope="col" (click)="toggleDropDown(statusDropdown, $event)">
+          <th class="filter w11" scope="col">
             <span>{{ 'scenarios.list.header.status'  | translate  }}</span>
-                            <i class="ms-2 fa" [ngClass]="{
-                                'fa-chevron-up': statusDropdown.isDropdownOpen,
-                                'fa-chevron-down': !statusDropdown.isDropdownOpen}"></i>
           </th>
           <th class="filter w10" scope="col" (click)="sortBy('lastExecution')">{{ 'scenarios.list.header.execLast'  | translate  }}
             @if (orderBy == 'lastExecution' && reverseOrder) {
@@ -77,11 +74,8 @@
           </th>
           <th scope="col" class="w1">&nbsp;</th>
           <th scope="col" class="w1">&nbsp;</th>
-          <th class="filter w12" scope="col" (click)="toggleDropDown(tagsDropdown, $event)">
+          <th class="filter w12" scope="col">
             <span>{{ 'scenarios.list.header.tags'  | translate  }}</span>
-                            <i class="ms-2 fa" [ngClass]="{
-                                'fa-chevron-up': tagsDropdown.isDropdownOpen,
-                                'fa-chevron-down': !tagsDropdown.isDropdownOpen}"></i>
           </th>
           <th class="filter w10" scope="col" (click)="sortBy('updateDate')">{{ 'scenarios.list.header.update'  | translate  }}
             @if (orderBy == 'updateDate' && reverseOrder) {
@@ -105,7 +99,7 @@
         <tr class="headers-filters">
           <th></th>
           <th>
-            <ng-multiselect-dropdown #statusDropdown
+            <ng-multiselect-dropdown
               [settings]="dropdownSettings"
               [placeholder]="'global.actions.select' | translate"
               [data]="status"
@@ -120,7 +114,7 @@
           <th></th>
           <th></th>
           <th>
-            <ng-multiselect-dropdown #tagsDropdown
+            <ng-multiselect-dropdown
               [settings]="dropdownSettings"
               [placeholder]="'global.actions.select' | translate"
               [data]="tags"

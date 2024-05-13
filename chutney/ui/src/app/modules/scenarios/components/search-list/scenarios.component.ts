@@ -32,7 +32,7 @@ import { JiraPluginConfigurationService, JiraPluginService, ScenarioService } fr
 import { Authorization, ScenarioIndex } from '@model';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { TranslateService } from '@ngx-translate/core';
-import { IDropdownSettings, MultiSelectComponent } from 'ng-multiselect-dropdown';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 
 @Component({
@@ -119,11 +119,6 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     private toSelectOption(id: string, label: string = id) {
         return {id: id, text: label };
-    }
-
-    toggleDropDown(dropDown: MultiSelectComponent, event) {
-        event.stopPropagation();
-        dropDown.toggleDropdown(event);
     }
 
     private async getScenarios() {
