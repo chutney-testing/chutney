@@ -91,11 +91,6 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     }
 
-    toggleDropDown(dropDown: AngularMultiSelect, event) {
-        event.stopPropagation();
-        dropDown.toggleDropdown(event);
-    }
-
     ngOnDestroy(): void {
         this.urlParams?.unsubscribe();
     }
@@ -232,11 +227,10 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     }
 
     private getScenarios(): Observable<Array<ScenarioIndex>> {
-        return this.scenarioService.findScenarios();
+        return this.fullTextFilter ? this.scenarioService.search(this.fullTextFilter) : this.scenarioService.findScenarios();
     }
 
     private applyDefaultState() {
-        this.viewedScenarios = this.scenarios;
         this.initFilters();
     }
 
@@ -265,7 +259,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
                             this.orderBy = params['orderBy'];
                         }
                         if (params['status']) {
-                            this.selectedStatus = this.status.filter((status) => params['status'].split(',').includes(status.itemName));
+                            this.selectedStatus = this.status.filter((status) => params['status'].split(',').includes(status.text));
                         }
                         if (params['reverseOrder']) {
                             this.reverseOrder = params['reverseOrder'] === 'true';
@@ -329,7 +323,6 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     }
 
     private applyFiltersToRoute(): void {
-        console.log('navigate...')
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: {

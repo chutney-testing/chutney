@@ -154,7 +154,7 @@
           <tbody>
             @for (report of lastCampaignReports; track $index) {
               <tr class="small_text">
-                <td class="w25 text-nowrap">{{ report.startDate | amDateFormat: 'DD MMM. YYYY HH:mm' }}</td>
+                <td class="w25 text-nowrap"> {{ toIsoDate(report.startDate) | amDateFormat: 'DD MMM. YYYY HH:mm' }}</td>
                 <td class="ps-0 w60">
                   <a
                     [routerLink]="['/campaign', campaignIdFromName(report.campaignName), 'executions']"

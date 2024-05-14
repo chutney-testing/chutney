@@ -19,8 +19,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { Router } from '@angular/router';
 import { Subscription, timer } from 'rxjs';
 
-import { Campaign, CampaignExecutionReport, SelectableTags, CampaignScheduling, Authorization } from '@model';
-import { CampaignService, JiraPluginConfigurationService, JiraPluginService, CampaignSchedulingService } from '@core/services';
+import { Authorization, Campaign, CampaignExecutionReport, CampaignScheduling, SelectableTags } from '@model';
+import {
+    CampaignSchedulingService,
+    CampaignService,
+    JiraPluginConfigurationService,
+    JiraPluginService
+} from '@core/services';
 import { StateService } from '@shared/state/state.service';
 import { distinct, filterOnTextContent, flatMap, intersection } from '@shared/tools/array-utils';
 import { FREQUENCY } from '@core/model/campaign/FREQUENCY';
@@ -278,5 +283,9 @@ export class CampaignListComponent implements OnInit, OnDestroy {
     campaignIdFromName(campaignName: string) {
         return this.campaigns.filter((c) => c.title === campaignName)
             .map((c) => c.id)[0];
+    }
+
+    toIsoDate(date: string) {
+        return new Date(date);
     }
 }
