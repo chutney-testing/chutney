@@ -16,10 +16,8 @@ import org.testcontainers.utility.DockerImageName
 @Testcontainers
 class JmsScenarioTest {
 
-    private var activemqAddress: String = ""
-    private var hostJmsPort = 61616
     private var containerJmsPort = 61616
-    private var environment: ChutneyEnvironment = ChutneyEnvironment("default value")
+    private var environment: ChutneyEnvironment = ChutneyEnvironment("empty")
 
 
     @Container
@@ -28,8 +26,8 @@ class JmsScenarioTest {
 
     @BeforeEach
     fun setUp() {
-        activemqAddress = activemqContainer.host
-        hostJmsPort = activemqContainer.getMappedPort(containerJmsPort)
+        val activemqAddress = activemqContainer.host
+        val hostJmsPort = activemqContainer.getMappedPort(containerJmsPort)
         environment = Environment(name = "local", description = "local environment") {
             Target {
                 Name(ACTIVEMQ_TARGET_NAME)
