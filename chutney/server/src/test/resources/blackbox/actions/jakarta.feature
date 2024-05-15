@@ -80,8 +80,10 @@ Feature: jakarta Task test
 
     Scenario: jakarta sender then clean then send and listen it on embedded broker
         Given a jakarta endpoint
+            Do success A fee port
+                Take jmsBrokerPort ${#freeSystemPort()}
             Do jakarta-broker-start
-                With config-uri tcp://localhost:61616
+                With config-uri tcp://localhost:${#jmsBrokerPort}
         And an associated target
             Do http-post Create environment and target
                 On CHUTNEY_LOCAL
@@ -96,7 +98,7 @@ Feature: jakarta Task test
                     "targets": [
                         {
                             "name": "test_jakarta",
-                            "url": "tcp://localhost:61616",
+                            "url": "tcp://localhost:${#jmsBrokerPort}",
                             "properties": [
                                 {
                                     "key": "java.naming.factory.initial",
