@@ -46,7 +46,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
     campaign = new Campaign();
     submitted: boolean;
     scenarios: Array<ScenarioIndex> = [];
-    scenariosToAdd: Array<ScenarioIndex> = [];
+    scenariosToAdd: Array<{"scenarioId": ScenarioIndex, "datasetId": string}> = [];
     errorMessage: any;
     scenariosFilter: string;
     subscription = new Subscription();
@@ -339,31 +339,28 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         if (this.campaign.scenarios) {
             for (const campaignScenario of this.campaign.scenarios) {
                 const scenarioFound = this.scenarios.find((x) => x.id === campaignScenario.scenarioId);
-                if (!this.scenariosToAdd.some((s) => s.id === scenarioFound.id)) {
-                    this.scenariosToAdd.push(scenarioFound);
+                if (!this.scenariosToAdd.some((s) => s.scenarioId.id === scenarioFound.id && s.datasetId === campaignScenario.datasetId)) {
+                    this.scenariosToAdd.push({scenarioId: scenarioFound, datasetId: campaignScenario.datasetId});
                 }
             }
         }
     }
 
-    setCampaignScenariosIdsToAdd(scenariosToAdd: Array<ScenarioIndex>) {
+    setCampaignScenariosIdsToAdd(scenariosToAdd: Array<{scenarioId: ScenarioIndex, datasetId: string}>) {
         this.campaign.scenarios = [];
         for (const scenario of scenariosToAdd) {
-            if (!this.campaign.scenarios.some((s) => s.scenarioId === scenario.id)) {
-                this.campaign.scenarios.push(new CampaignScenario(scenario.id));
+            if (!this.campaign.scenarios.some((s) => s.scenarioId === scenario.scenarioId.id && s.datasetId === scenario.datasetId)) {
+                this.campaign.scenarios.push(new CampaignScenario(scenario.scenarioId.id, scenario.datasetId));
             }
         }
     }
 
     addScenario(scenario: ScenarioIndex) {
-        if (!this.scenariosToAdd.some((s) => s.id === scenario.id)) {
-            this.scenariosToAdd.push(scenario);
-            this.refreshForPipe();
-        }
+        this.scenariosToAdd.push({scenarioId: scenario, datasetId: null});
+        this.refreshForPipe();
     }
 
-    removeScenario(scenario: ScenarioIndex) {
-        const index = this.scenariosToAdd.indexOf(scenario);
+    removeScenario(index: number) {
         this.scenariosToAdd.splice(index, 1);
         this.refreshForPipe();
     }
@@ -404,6 +401,13 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
 
     selectDataset(datasetId: string) {
         this.datasetId = datasetId;
+    }
+
+    selectDatasetScenario(datasetId: string, index: number) {
+        const scenarioSelected = this.scenariosToAdd[index]
+        scenarioSelected.datasetId = datasetId;
+        this.scenariosToAdd[index] = scenarioSelected
+        this.refreshForPipe();
     }
 
     private updateJiraLink(campaignId: number) {

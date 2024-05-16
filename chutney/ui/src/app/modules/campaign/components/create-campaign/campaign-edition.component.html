@@ -102,34 +102,41 @@
         <div class="table-responsive">
           <table class="table table-striped table-hover">
             <tbody dragula="DRAGGABLE" [(dragulaModel)]="scenariosToAdd">
-              @for (scenario of scenariosToAdd; track scenario) {
+              @for (scenario of scenariosToAdd; track scenario; let index = $index) {
                 <tr class="cursor">
                   <td>
                     <button type="button" class="btn btn-outline-primary btn-sm"
-                      (click)="removeScenario(scenario)">
+                      (click)="removeScenario(index)">
                       <span class="fa fa-arrow-circle-right"></span>
                     </button>
                   </td>
-                  <td class="text-nowrap">{{scenario?.id}}</td>
-                  <td class="scenario-title-cell">{{scenario?.title}}</td>
+                  <td class="text-nowrap">{{scenario?.scenarioId.id}}</td>
+                  <td class="scenario-title-cell">{{scenario?.scenarioId.title}}</td>
                   <td class="p-0">
                     @if (jiraMap.has(scenario.id)) {
                       <span
-                        [ngClass]="getJiraLastExecutionStatusClass(scenario.id)" class="badge">
-                        {{getJiraLastExecutionStatus(scenario.id)}}
+                        [ngClass]="getJiraLastExecutionStatusClass(scenario.scenarioId.id)" class="badge">
+                        {{getJiraLastExecutionStatus(scenario.scenarioId.id)}}
                       </span>
                     }
                   </td>
                   <td class="p-0">
                     @if (jiraMap.has(scenario.id)) {
                       <a  role="button" class="btn btn-sm btn-link me-0"
-                        target="_blank" href="{{getJiraLink(scenario.id)}}" rel="noopener noreferrer"
-                        ngbPopover="{{jiraMap.get(scenario.id)}}" placement="left" (click)="$event.stopPropagation()"
+                        target="_blank" href="{{getJiraLink(scenario.scenarioId.id)}}" rel="noopener noreferrer"
+                        ngbPopover="{{jiraMap.get(scenario.scenarioId.id)}}" placement="left" (click)="$event.stopPropagation()"
                         triggers="mouseenter:mouseleave">
                         <span class="fab fa-jira" aria-hidden="true">
                         </span>
                       </a>
                     }
+                  </td>
+                  <td class="pe-5 d-flex">
+                    <span class="pe-2 fa fa-table d-flex align-items-center"></span>
+                    <chutney-dataset-selection
+                        [selectedDatasetId]="scenario?.datasetId"
+                        (selectionEvent)="selectDatasetScenario($event, index)">
+                    </chutney-dataset-selection>
                   </td>
                   <td class="p-0">
                     <button type="button" class="btn btn-link me-0"
