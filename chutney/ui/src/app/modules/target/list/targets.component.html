@@ -6,7 +6,7 @@
 
 <div class="d-flex flex-row justify-content-between mb-2">
   <div>
-    @for (env of environments; track env) {
+    @for (env of environments; track env.name) {
       <button type="button"
         class="btn btn-sm me-2 rounded btn-outline-info shadow-none"
                 [ngClass]="{
@@ -49,7 +49,7 @@
           <td class="small">
             <ul ngbNav #nav="ngbNav" class="nav-pills" [activeId]="activeEnvironmentTab(targetName)"
               [destroyOnHide]="false">
-              @for (env of environments; track env) {
+              @for (env of environments; track env.name) {
                 <li class="me-1" [ngbNavItem]="env.name"
                   [disabled]="!exist(targetName, env)">
                   <a ngbNavLink class="target-environment border p-1"
@@ -72,7 +72,7 @@
                           <div class="collapse" id="{{targetName}}-props">
                             <table class="table table-sm table-borderless mb-0 props">
                               <tbody>
-                                @for (entry of findTarget(targetName, env)?.properties; track entry) {
+                                @for (entry of findTarget(targetName, env)?.properties; track $index) {
                                   <tr>
                                     <td>
                                       <ngb-highlight [result]="entry.key"

@@ -130,7 +130,7 @@
         </tr>
       </thead>
       <tbody>
-        @for (scenario of viewedScenarios; track scenario) {
+        @for (scenario of viewedScenarios; track scenario.id) {
           <tr class="align-baseline">
             <td class="text-center text-nowrap">
               <span>{{scenario.id}}</span>
@@ -163,7 +163,7 @@
             <td class="text-center">
               @if (scenario.tags.length <= 3) {
                 <span>
-                  @for (tag of scenario.tags; track tag) {
+                  @for (tag of scenario.tags; track $index) {
                     <span
                     class="chutney-tag chutney-tag-selected">{{tag}}</span>
                   }

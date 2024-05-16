@@ -16,7 +16,7 @@
     {{'global.actions.cancel' | translate}}
   </button>
   <ul id="selected-files">
-    @for (file of selectedFiles; track file) {
+    @for (file of selectedFiles; track file.name) {
       <li>
         {{ file.name }}
       </li>

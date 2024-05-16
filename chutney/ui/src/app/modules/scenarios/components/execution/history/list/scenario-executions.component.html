@@ -98,7 +98,7 @@
           </tr>
         </thead>
         <tbody class="small">
-          @for (execution of filteredExecutions; track execution) {
+          @for (execution of filteredExecutions; track execution.executionId) {
             <tr
               (click)="openReport(execution, !$event.ctrlKey)" class="cursor-pointer">
               <td>
@@ -136,7 +136,7 @@
               <td class="text-center">
                 @if (execution.tags && execution.tags.length <= 3) {
                   <span>
-                    @for (tag of execution.tags; track tag) {
+                    @for (tag of execution.tags; track $index) {
                       <span
                       class="chutney-tag chutney-tag-selected">{{tag}}</span>
                     }

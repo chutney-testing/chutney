@@ -39,7 +39,7 @@
         </td>
       </tr>
     }
-    @for (env of editableEnvironments; track env; let i = $index) {
+    @for (env of editableEnvironments; track env.name; let i = $index) {
       <tr>
         <td class="align-middle">
           @if (editing(i)) {

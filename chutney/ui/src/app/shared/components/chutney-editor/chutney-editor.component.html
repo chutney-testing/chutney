@@ -10,7 +10,7 @@
   <div class="small me-3">
     <label for="theme" class="form-control-label m-0 me-2">{{ 'scenarios.edition.form.content.editor.theme' | translate }}</label>
     <select class="form-select" id="theme" (change)="changeTheme($event)" name="editorTheme">
-      @for (theme of themes; track theme) {
+      @for (theme of themes; track $index) {
         <option [value]="theme"
         [selected]="theme === currentTheme">{{theme}}</option>
       }

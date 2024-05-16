@@ -3,7 +3,7 @@
   <div>
     {{ 'menu.principal.campaigns' | translate }} :
     <ng-container *hasAuthorization="[Authorization.CAMPAIGN_READ]">
-      @for (campaign of campaignsForScenario; track campaign) {
+      @for (campaign of campaignsForScenario; track $index) {
         <a [routerLink]="['/campaign', campaign.id,'executions']"
           title="{{ 'campaigns.list.item.title.link.title' | translate }} {{campaign.title}}">
           {{campaign.title}}
@@ -12,7 +12,7 @@
       }
     </ng-container>
     <ng-container *hasAuthorization="{not: true, authorizations: [Authorization.CAMPAIGN_READ]}">
-      @for (campaign of campaignsForScenario; track campaign) {
+      @for (campaign of campaignsForScenario; track $index) {
         <span>{{campaign.title}}</span> &nbsp;
       }
     </ng-container>

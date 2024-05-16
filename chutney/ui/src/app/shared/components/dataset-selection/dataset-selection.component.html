@@ -1,6 +1,6 @@
 <select class="form-select dataset-combo" (change)="changingValue($event)">
   <option value=""></option>
-  @for (dataset of datasets; track dataset) {
+  @for (dataset of datasets; track $index) {
     <option [selected]="dataset.id === selectedDatasetId"
       [title]="dataset.description" [value]="dataset.id">
       {{ dataset.name }}

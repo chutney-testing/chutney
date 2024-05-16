@@ -1,7 +1,7 @@
 @if (errors.length > 0) {
   <div class="alert alert-dismissible alert-danger mt-4">
     <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errors = []"></button>
-    @for (err of errors; track err) {
+    @for (err of errors; track $index) {
       {{ err }}<br />
     }
   </div>
@@ -143,7 +143,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (scenarioReportOutline of report.report.scenarioExecutionReports; track scenarioReportOutline; let i = $index) {
+          @for (scenarioReportOutline of report.report.scenarioExecutionReports; track $index; let i = $index) {
             <tr>
               <td class="fw-bold text-center align-middle text-nowrap">
                 <span>{{ scenarioReportOutline.scenarioId }}</span>
@@ -214,7 +214,7 @@
                     <select class="custom-select mt-1"
                       (change)="selectedUpdateStatus(scenarioReportOutline.scenarioId, $event)"
                       style="width: 120px">
-                      @for (enum of xrayStatuses(); track enum) {
+                      @for (enum of xrayStatuses(); track $index) {
                         <option
                           [selected]="scenarioStatus(scenarioReportOutline.scenarioId) === enum">
                           {{ enum }}

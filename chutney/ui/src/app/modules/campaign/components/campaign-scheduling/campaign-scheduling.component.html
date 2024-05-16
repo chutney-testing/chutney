@@ -47,7 +47,7 @@
         <div class="col">
           <label for="frequency" class="form-label">{{ 'campaigns.scheduling.frequency' | translate }}</label>
           <select id="frequency" class="form-select col-8" formControlName="frequency">
-            @for (freq of frequencies; track freq) {
+            @for (freq of frequencies; track $index) {
               <option [ngValue]="freq">{{ freq }}</option>
             }
           </select>
@@ -71,7 +71,7 @@
           <div class="col">
             <ul class="list-group list-group-horizontal" [dragula]="'selectedCampaigns'"
               [(dragulaModel)]="form.get('selectedCampaigns').value">
-              @for (campaign of form.get('selectedCampaigns').value; track campaign; let i = $index) {
+              @for (campaign of form.get('selectedCampaigns').value; track campaign.id; let i = $index) {
                 <li
                   [attr.data-id]="i" class="chutney-tag chutney-tag-selected lh-base fs-6">
                   <span>{{ campaign.title }}</span>
@@ -107,7 +107,7 @@
             </tr>
           </thead>
           <tbody>
-            @for (scheduledCampaign of scheduledCampaigns; track scheduledCampaign) {
+            @for (scheduledCampaign of scheduledCampaigns; track scheduledCampaign.id) {
               <tr>
                 <td>#{{ scheduledCampaign.id }}</td>
                 <td>

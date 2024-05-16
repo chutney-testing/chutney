@@ -51,7 +51,7 @@
       <div class="table-responsive">
         <table class="table table-sm table-striped table-hover align-baseline">
           <tbody>
-            @for (campaign of (viewedCampaigns | searchTextPipe : campaignFilter:campaignFilterAttributes); track campaign) {
+            @for (campaign of (viewedCampaigns | searchTextPipe : campaignFilter:campaignFilterAttributes); track campaign.id) {
               <tr>
                 <td class="small_text w93 align-middle">
                   <a [routerLink]="['/campaign', campaign.id, 'executions']"
@@ -124,7 +124,7 @@
       <div class="table-responsive">
         <table class="table table-sm table-striped">
           <tbody>
-            @for (scheduledCampaign of scheduledCampaigns; track scheduledCampaign) {
+            @for (scheduledCampaign of scheduledCampaigns; track scheduledCampaign.id) {
               <tr>
                 <td class="w80">#{{scheduledCampaign.campaignId}}
                   @if (isFrequencyCampaign(scheduledCampaign)) {
@@ -152,7 +152,7 @@
       <div class="table-responsive">
         <table class="table table-sm table-striped">
           <tbody>
-            @for (report of lastCampaignReports; track report) {
+            @for (report of lastCampaignReports; track $index) {
               <tr class="small_text">
                 <td class="w25 text-nowrap">{{ report.startDate | amDateFormat: 'DD MMM. YYYY HH:mm' }}</td>
                 <td class="ps-0 w60">

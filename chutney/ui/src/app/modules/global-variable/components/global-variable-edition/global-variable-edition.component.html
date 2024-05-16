@@ -9,7 +9,7 @@
     </div>
     <div class="box2">
       <select class="form-select" [(ngModel)]="currentFileName" (ngModelChange)="updateFileContent($event)">
-        @for (fileName of fileNames; track fileName) {
+        @for (fileName of fileNames; track $index) {
           <option [value]="fileName">{{fileName}}</option>
         }
       </select>

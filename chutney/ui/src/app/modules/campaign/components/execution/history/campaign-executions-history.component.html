@@ -2,7 +2,7 @@
 @if (errors.length > 0) {
   <div class="alert alert-dismissible alert-danger mt-4">
     <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errors = []"></button>
-    @for (err of errors; track err) {
+    @for (err of errors; track $index) {
       {{ err }}<br />
     }
   </div>
@@ -23,7 +23,7 @@
           </chutney-campaign-executions>
         </ng-template>
       </li>
-      @for (exec of tabs; track exec) {
+      @for (exec of tabs; track exec.report.executionId) {
         <li [ngbNavItem]="exec.report.executionId.toString()" [destroyOnHide]="false">
           <a ngbNavLink>
             <small><strong>#{{ exec.report.executionId }}</strong> ({{ exec.report.startDate | amCalendar}})</small>

@@ -24,7 +24,7 @@
           (onExecutionSelect)="openReport($event)"></chutney-scenario-executions>
         </ng-template>
       </li>
-      @for (exec of tabs; track exec) {
+      @for (exec of tabs; track exec.executionId) {
         <li [ngbNavItem]="exec.executionId.toString()" [destroyOnHide]="false">
           <a ngbNavLink>
             <small><strong>#{{exec.executionId}} </strong> <small>({{ exec.time | amCalendar}})</small></small>

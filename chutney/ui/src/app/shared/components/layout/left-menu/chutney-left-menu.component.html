@@ -4,10 +4,10 @@
       <ng-scrollbar>
         <div class="sidebar-menu">
           <div class="menu-list">
-            @for (item of  menuItems; track item) {
+            @for (item of  menuItems; track $index) {
               @if (canViewMenuGroup(item)) {
                 <div class="menu-header">{{item.label}}</div>
-                @for (subItem of item.children; track subItem) {
+                @for (subItem of item.children; track subItem.label) {
                   @if (canViewMenuItem(subItem)) {
                     <div class="menu-item nav-item"
                       placement="right" container="body" [disableTooltip]="!layoutOptions.toggleSidebar" ngbTooltip="{{subItem.label | translate}}">

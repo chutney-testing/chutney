@@ -6,7 +6,7 @@
 
 <div class="d-flex flex-row justify-content-between mb-2">
   <div>
-    @for (env of environments; track env) {
+    @for (env of environments; track $index) {
       <button type="button"
         class="btn btn-sm me-2 rounded btn-outline-info shadow-none"
                 [ngClass]="{
@@ -51,7 +51,7 @@
               <ul ngbNav #nav="ngbNav" class="nav-pills small" [activeId]="activeEnvironmentTab()"
                 [destroyOnHide]="false">
                 <!--DIFF [disabled]="!exist(variableKey, env)"-->
-                @for (env of environments; track env) {
+                @for (env of environments; track $index) {
                   <li class="me-1" [ngbNavItem]="env.name">
                     <a ngbNavLink class="environment border p-1 text-info border-info">
                       <strong>{{env.name}}</strong></a>
@@ -101,7 +101,7 @@
         <ul ngbNav #nav="ngbNav" class="nav-pills small"
           [destroyOnHide]="false" formArrayName="values">
           <!--DIFF [disabled]="!exist(variableKey, env)"-->
-          @for (variableForm of valuesArrayForm().controls; track variableForm; let i = $index) {
+          @for (variableForm of valuesArrayForm().controls; track $index; let i = $index) {
             <li class="me-1"
               [ngbNavItem]="variableForm.value.env"
               [formGroupName]="i">

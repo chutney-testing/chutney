@@ -70,7 +70,7 @@
           </tr>
         </thead>
         <tbody>
-          @for (execution of filteredExecutions; track execution) {
+          @for (execution of filteredExecutions; track execution.report.executionId) {
             <tr (click)="openReport(execution, !$event.ctrlKey)"
               class="cursor-pointer">
               <td class="text-center align-middle">

@@ -58,8 +58,8 @@
       </tr>
     </thead>
     <tbody>
-      @for (environment of environments; track environment) {
-        @for (target of environment.targets | searchTextPipe: targetFilter:['name']; track target) {
+      @for (environment of environments; track environment.name) {
+        @for (target of environment.targets | searchTextPipe: targetFilter:['name']; track target.name) {
           <tr
             [ngClass]="{'table-danger':!targetReachByAgent.has(target.name)}">
             <td>

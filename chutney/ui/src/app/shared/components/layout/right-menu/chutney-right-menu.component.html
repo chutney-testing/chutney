@@ -1,7 +1,7 @@
 <div class="middle-sidebar chutney-nav-menu d-flex justify-content-center sticky-top">
   <div class="nav">
     @if (menuItems?.length) {
-      @for (item of menuItems; track item) {
+      @for (item of menuItems; track $index) {
         <ng-container
           [ngTemplateOutlet]="!!item.options && item.options.length > 1 ? dropDownItem : simpleItem"
           [ngTemplateOutletContext]="{item:item}">
@@ -16,7 +16,7 @@
         <i [ngClass]="item.iconClass"></i>
       </a>
       <div ngbDropdownMenu aria-labelledby="executeDropdown" class="dropdown-menu">
-        @for (option of item.options; track option) {
+        @for (option of item.options; track $index) {
           <a class="cursor-pointer" ngbDropdownItem
           (click)="item.click(option.id)">{{ option.label }}</a>
         }
