@@ -144,7 +144,8 @@ public class CampaignExecutionEntity {
             ofNullable(partial).orElse(false),
             environment,
             datasetId,
-            userId);
+            userId,
+            campaign.tags());
     }
 
     private ScenarioExecutionCampaign blankScenarioExecutionReport(CampaignScenarioEntity campaignScenarioEntity, Function<String, String> titleSupplier) {

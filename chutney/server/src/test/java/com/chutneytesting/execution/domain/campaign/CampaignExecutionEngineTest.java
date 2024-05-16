@@ -179,6 +179,7 @@ public class CampaignExecutionEngineTest {
         assertThat(campaignExecution.scenarioExecutionReports()).hasSize(1);
         assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().executionId()).isEqualTo(secondScenarioExecutionId);
         assertThat(campaignExecution.partialExecution).isTrue();
+        assertThat(campaignExecution.tags).containsExactly("TAG");
         verify(campaignExecutionRepository).saveCampaignExecution(campaign.id, campaignExecution);
     }
 
@@ -269,7 +270,7 @@ public class CampaignExecutionEngineTest {
         String env = "env";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L, "", false, env, null, "");
+        CampaignExecution mockReport = new CampaignExecution(1L, "", false, env, null, "", List.of());
         when(campaignExecutionRepository.currentExecutions(1L)).thenReturn(List.of(mockReport));
 
         // When
@@ -283,7 +284,7 @@ public class CampaignExecutionEngineTest {
         String otherEnv = "otherEnv";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L, "", false, otherEnv, null, "");
+        CampaignExecution mockReport = new CampaignExecution(1L, "", false, otherEnv, null, "", List.of());
         when(campaignExecutionRepository.currentExecutions(anyLong())).thenReturn(List.of(mockReport));
 
         // When
@@ -314,7 +315,7 @@ public class CampaignExecutionEngineTest {
     public void should_return_last_existing_campaign_execution_for_existing_campaign() {
         // Given
         Campaign campaign = createCampaign();
-        CampaignExecution campaignExecution = new CampaignExecution(123L, campaign.id, emptyList(), "", false, campaign.executionEnvironment(), null, "");
+        CampaignExecution campaignExecution = new CampaignExecution(123L, campaign.id, emptyList(), "", false, campaign.executionEnvironment(), null, "", List.of());
 
 
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
@@ -379,10 +380,10 @@ public class CampaignExecutionEngineTest {
     @Test
     public void should_retrieve_current_campaign_execution_on_a_given_env() {
         String env = "env";
-        CampaignExecution report = new CampaignExecution(1L, 33L, emptyList(), "", false, env, null, "");
+        CampaignExecution report = new CampaignExecution(1L, 33L, emptyList(), "", false, env, null, "", List.of());
         String otherEnv = "otherEnv";
-        CampaignExecution report2 = new CampaignExecution(2L, 33L, emptyList(), "", false, otherEnv, null, "");
-        CampaignExecution report3 = new CampaignExecution(3L, 42L, emptyList(), "", false, otherEnv, null, "");
+        CampaignExecution report2 = new CampaignExecution(2L, 33L, emptyList(), "", false, otherEnv, null, "", List.of());
+        CampaignExecution report3 = new CampaignExecution(3L, 42L, emptyList(), "", false, otherEnv, null, "", List.of());
         when(campaignExecutionRepository.currentExecutions(33L)).thenReturn(List.of(report, report2));
         when(campaignExecutionRepository.currentExecutions(42L)).thenReturn(List.of(report3));
 
@@ -556,6 +557,6 @@ public class CampaignExecutionEngineTest {
 
     private Campaign createCampaign(TestCase firstTestCase, TestCase secondtTestCase, boolean parallelRun, boolean retryAuto) {
         var scenarios = Lists.list(firstTestCase.id(), secondtTestCase.id()).stream().map(id -> new Campaign.CampaignScenario(id, null)).toList();
-        return new Campaign(1L, "campaign1", null, scenarios, "env", parallelRun, retryAuto, null, null);
+        return new Campaign(1L, "campaign1", null, scenarios, "env", parallelRun, retryAuto, null, List.of("TAG"));
     }
 }

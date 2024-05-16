@@ -56,7 +56,8 @@ public class ExecutionRequest {
     private Set<String> tags() {
         return Streams.concat(
                 ofNullable(testCase).map(tc -> tc.metadata().tags().stream()).orElse(Stream.empty()),
-                ofNullable(dataset).stream().flatMap(ds -> ofNullable(ds.tags).stream().flatMap(Collection::stream))
+                ofNullable(dataset).stream().flatMap(ds -> ofNullable(ds.tags).stream().flatMap(Collection::stream)),
+                ofNullable(campaignExecution).stream().flatMap(ce -> ofNullable(ce.tags).stream().flatMap(Collection::stream))
             )
             .collect(toUnmodifiableSet());
     }

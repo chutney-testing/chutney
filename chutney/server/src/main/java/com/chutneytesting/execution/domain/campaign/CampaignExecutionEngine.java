@@ -164,7 +164,8 @@ public class CampaignExecutionEngine {
             !failedExecutions.isEmpty(),
             campaign.executionEnvironment(),
             isNotBlank(campaign.externalDatasetId) ? campaign.externalDatasetId : null,
-            userId
+            userId,
+            campaign.tags
         );
 
         campaignExecutionRepository.startExecution(campaign.id, campaignExecution);
@@ -211,7 +212,7 @@ public class CampaignExecutionEngine {
             .map(Optional::get)
             .toList();
 
-        campaignExecution.initExecution(testCaseDatasets, campaign.executionEnvironment(), campaignExecution.userId);
+        campaignExecution.initExecution(testCaseDatasets, campaign.executionEnvironment(), campaignExecution.userId, campaign.tags);
         try {
             if (campaign.parallelRun) {
                 Collection<Callable<Object>> toExecute = Lists.newArrayList();
@@ -238,7 +239,7 @@ public class CampaignExecutionEngine {
             // Is stop requested ?
             if (!currentCampaignExecutionsStopRequests.get(campaignExecution.executionId)) {
                 // Init scenario execution in campaign report
-                campaignExecution.startScenarioExecution(testCaseDataset, campaign.executionEnvironment(), campaignExecution.userId);
+                campaignExecution.startScenarioExecution(testCaseDataset, campaign.executionEnvironment(), campaignExecution.userId, campaign.tags);
                 // Execute scenario
                 scenarioExecution = executeScenario(campaign, testCaseDataset, campaignExecution);
                 // Retry one time if failed

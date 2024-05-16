@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -54,13 +55,15 @@ public class CampaignExecution {
     private ServerReportStatus status;
     private final List<ScenarioExecutionCampaign> scenarioExecutions;
     public final Long campaignId;
+    public final List<String> tags;
 
     public CampaignExecution(Long executionId,
                              String campaignName,
                              boolean partialExecution,
                              String executionEnvironment,
                              String dataSetId,
-                             String userId) {
+                             String userId,
+                             List<String> tags) {
         this.executionId = executionId;
         this.campaignId = null;
         this.partialExecution = partialExecution;
@@ -71,6 +74,7 @@ public class CampaignExecution {
         this.status = RUNNING;
         this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank));
         this.userId = userId;
+        this.tags = tags;
     }
 
     public CampaignExecution(Long executionId,
@@ -80,7 +84,8 @@ public class CampaignExecution {
                              boolean partialExecution,
                              String executionEnvironment,
                              String dataSetId,
-                             String userId) {
+                             String userId,
+                             List<String> tags) {
         this.executionId = executionId;
         this.campaignId = campaignId;
         this.campaignName = campaignName;
@@ -91,6 +96,7 @@ public class CampaignExecution {
         this.executionEnvironment = executionEnvironment;
         this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank));
         this.userId = userId;
+        this.tags = tags;
     }
 
     CampaignExecution(
@@ -103,7 +109,8 @@ public class CampaignExecution {
         Optional<String> dataSetId,
         LocalDateTime startDate,
         ServerReportStatus status,
-        List<ScenarioExecutionCampaign> scenarioExecutions
+        List<ScenarioExecutionCampaign> scenarioExecutions,
+        List<String> tags
     ) {
         this.executionId = executionId;
         this.campaignId = campaignId;
@@ -112,6 +119,7 @@ public class CampaignExecution {
         this.executionEnvironment = executionEnvironment;
         this.dataSetId = dataSetId.filter(not(String::isBlank));
         this.userId = userId;
+        this.tags = tags;
 
         if (scenarioExecutions == null) {
             this.startDate = ofNullable(startDate).orElse(now());
@@ -124,7 +132,7 @@ public class CampaignExecution {
         }
     }
 
-    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment, String userId) {
+    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment, String userId, List<String> tags) {
         testCaseDatasets.forEach(testCase ->
             this.scenarioExecutions.add(
                 new ScenarioExecutionCampaign(
@@ -140,10 +148,11 @@ public class CampaignExecution {
                         .datasetId(selectDatasetId(testCase))
                         .user(userId)
                         .scenarioId(testCase.testcase().id())
+                        .tags(new HashSet<>(tags))
                         .build())));
     }
 
-    public void startScenarioExecution(TestCaseDataset testCaseDataset, String executionEnvironment, String userId) throws UnsupportedOperationException {
+    public void startScenarioExecution(TestCaseDataset testCaseDataset, String executionEnvironment, String userId, List<String> tags) throws UnsupportedOperationException {
         OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
@@ -165,6 +174,7 @@ public class CampaignExecution {
                     .datasetId(selectDatasetId(testCaseDataset))
                     .user(userId)
                     .scenarioId(testCaseDataset.testcase().id())
+                    .tags(new HashSet<>(tags))
                     .build()));
     }
 

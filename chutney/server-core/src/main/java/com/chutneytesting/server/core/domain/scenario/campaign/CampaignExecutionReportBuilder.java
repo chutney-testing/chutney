@@ -37,6 +37,7 @@ public class CampaignExecutionReportBuilder {
     private Long campaignId;
     private LocalDateTime startDate;
     private ServerReportStatus status;
+    private List<String> tags;
 
     public static CampaignExecutionReportBuilder builder() {
         return new CampaignExecutionReportBuilder();
@@ -101,6 +102,11 @@ public class CampaignExecutionReportBuilder {
         return this;
     }
 
+    public CampaignExecutionReportBuilder setTags(List<String> tags) {
+        this.tags = new ArrayList<>(tags);
+        return this;
+    }
+
     public CampaignExecution build() {
         return new CampaignExecution(
             executionId,
@@ -112,7 +118,8 @@ public class CampaignExecutionReportBuilder {
             ofNullable(dataSetId),
             startDate,
             status,
-            scenarioExecutionReports
+            scenarioExecutionReports,
+            tags
         );
     }
 }

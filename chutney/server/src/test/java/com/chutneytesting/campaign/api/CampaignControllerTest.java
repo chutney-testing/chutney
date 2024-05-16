@@ -269,10 +269,10 @@ public class CampaignControllerTest {
     public void should_retrieve_executions_and_current_execution_when_found_campaign() throws Exception {
         // Given
 
-        CampaignExecution report1 = new CampaignExecution(1L, existingCampaign.getId(), emptyList(), "...", false, "", null, "");
-        CampaignExecution report2 = new CampaignExecution(2L, existingCampaign.getId(), emptyList(), "...", false, "", null, "");
-        CampaignExecution report3 = new CampaignExecution(3L, existingCampaign.getId(), emptyList(), "...", false, "", null, "");
-        CampaignExecution report4 = new CampaignExecution(4L, existingCampaign.getId(), emptyList(), "...", false, "", null, "");
+        CampaignExecution report1 = new CampaignExecution(1L, existingCampaign.getId(), emptyList(), "...", false, "", null, "", List.of());
+        CampaignExecution report2 = new CampaignExecution(2L, existingCampaign.getId(), emptyList(), "...", false, "", null, "", List.of());
+        CampaignExecution report3 = new CampaignExecution(3L, existingCampaign.getId(), emptyList(), "...", false, "", null, "", List.of());
+        CampaignExecution report4 = new CampaignExecution(4L, existingCampaign.getId(), emptyList(), "...", false, "", null, "", List.of());
 
         repository.saveCampaignExecution(existingCampaign.getId(), report1);
         repository.saveCampaignExecution(existingCampaign.getId(), report2);
@@ -296,7 +296,7 @@ public class CampaignControllerTest {
     @Test
     public void should_retrieve_execution_when_found_campaign() throws Exception {
         // Given
-        CampaignExecution report1 = new CampaignExecution(1L, existingCampaign.getId(), emptyList(), existingCampaign.getTitle(), false, "", null, "user_2");
+        CampaignExecution report1 = new CampaignExecution(1L, existingCampaign.getId(), emptyList(), existingCampaign.getTitle(), false, "", null, "user_2", List.of());
 
         repository.saveCampaignExecution(existingCampaign.getId(), report1);
 
@@ -319,14 +319,14 @@ public class CampaignControllerTest {
         // one persisted execution and two current campaigns executions
         ExecutionHistory.ExecutionSummary execution0 = mock(ExecutionHistory.ExecutionSummary.class);
         when(execution0.time()).thenReturn(LocalDateTime.now().minusDays(1));
-        CampaignExecution campaignExecution0 = new CampaignExecution(1L, 1L, singletonList(new ScenarioExecutionCampaign("20", "...", execution0)), "title", false, "", null, "");
+        CampaignExecution campaignExecution0 = new CampaignExecution(1L, 1L, singletonList(new ScenarioExecutionCampaign("20", "...", execution0)), "title", false, "", null, "", List.of());
         CampaignDto anotherExistingCampaign = new CampaignDto(null, "title", "description", emptyList(), emptyList(), "env", false, false, null, null);
         anotherExistingCampaign = insertCampaign(anotherExistingCampaign);
         repository.saveCampaignExecution(anotherExistingCampaign.getId(), campaignExecution0);
 
-        CampaignExecution campaignExecution1 = new CampaignExecution(10L, 1L, emptyList(), existingCampaign.getTitle(), false, "", null, "");
+        CampaignExecution campaignExecution1 = new CampaignExecution(10L, 1L, emptyList(), existingCampaign.getTitle(), false, "", null, "", List.of());
         awaitDuring(100, MILLISECONDS); // Avoid reports with same startDate...
-        CampaignExecution campaignExecution2 = new CampaignExecution(5L, 2L, emptyList(), anotherExistingCampaign.getTitle(), false, "", null, "");
+        CampaignExecution campaignExecution2 = new CampaignExecution(5L, 2L, emptyList(), anotherExistingCampaign.getTitle(), false, "", null, "", List.of());
 
         repository.saveCampaignExecution(campaignExecution1.executionId, campaignExecution1);
         repository.saveCampaignExecution(campaignExecution2.executionId, campaignExecution2);

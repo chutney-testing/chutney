@@ -71,7 +71,7 @@ class CampaignExecutionTest {
             ScenarioExecutionCampaign scenarioReport_2mn = new ScenarioExecutionCampaign("3", "...", execution_2mn);
 
             // When
-            CampaignExecution campaignReport = new CampaignExecution(1L, 1L, Lists.list(execution_noTime, scenarioReport_5mn, scenarioReport_2mn), "...", false, "", null, "");
+            CampaignExecution campaignReport = new CampaignExecution(1L, 1L, Lists.list(execution_noTime, scenarioReport_5mn, scenarioReport_2mn), "...", false, "", null, "", List.of());
 
             // Then
             assertThat(campaignReport.startDate).isEqualTo(execution_5mn.time());
@@ -84,7 +84,7 @@ class CampaignExecutionTest {
             ScenarioExecutionCampaign scenarioReport2 = new ScenarioExecutionCampaign("2", "...", mock(ExecutionHistory.ExecutionSummary.class));
 
             // When
-            CampaignExecution campaignReport = new CampaignExecution(1L, 1L, Lists.list(scenarioReport1, scenarioReport2), "...", false, "", null, "");
+            CampaignExecution campaignReport = new CampaignExecution(1L, 1L, Lists.list(scenarioReport1, scenarioReport2), "...", false, "", null, "", List.of());
 
             // Then
             assertThat(campaignReport.startDate).isEqualTo(LocalDateTime.MIN);
@@ -94,7 +94,7 @@ class CampaignExecutionTest {
         void start_campaign_execution_when_no_scenario_reports() {
             // When
             LocalDateTime beforeInstanciation = LocalDateTime.now().minusSeconds(1);
-            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "");
+            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "", List.of());
             // Then
             assertThat(campaignReport.startDate).isAfter(beforeInstanciation);
             assertThat(campaignReport.status()).isEqualTo(RUNNING);
@@ -103,7 +103,7 @@ class CampaignExecutionTest {
         @Test
         void set_status_when_empty_scenario_reports() {
             // When
-            CampaignExecution campaignReport = new CampaignExecution(1L, 1L, emptyList(), "...", false, "", null, "");
+            CampaignExecution campaignReport = new CampaignExecution(1L, 1L, emptyList(), "...", false, "", null, "", List.of());
             // Then
             assertThat(campaignReport.status()).isEqualTo(SUCCESS);
         }
@@ -121,7 +121,7 @@ class CampaignExecutionTest {
             when(execution_FAILURE.status()).thenReturn(FAILURE);
             ScenarioExecutionCampaign scenarioReport_FAILURE = new ScenarioExecutionCampaign("3", "...", execution_FAILURE);
             // When
-            CampaignExecution campaignReport = new CampaignExecution(1L, 1L, Lists.list(execution_noStatus, scenarioReport_SUCCESS, scenarioReport_FAILURE), "...", false, "", null, "");
+            CampaignExecution campaignReport = new CampaignExecution(1L, 1L, Lists.list(execution_noStatus, scenarioReport_SUCCESS, scenarioReport_FAILURE), "...", false, "", null, "", List.of());
             // Then
             assertThat(campaignReport.status()).isEqualTo(FAILURE);
         }
@@ -134,12 +134,12 @@ class CampaignExecutionTest {
         @Test
         void start_scenario_execution() {
             // Given
-            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", "#55:1", "user");
+            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", "#55:1", "user", List.of());
             TestCase testCase = buildTestCase("1", "title");
             LocalDateTime beforeStartExecution = LocalDateTime.now().minusSeconds(1);
 
             // When
-            campaignReport.initExecution(singletonList(new TestCaseDataset(testCase, null)), "env", "user");
+            campaignReport.initExecution(singletonList(new TestCaseDataset(testCase, null)), "env", "user", List.of("TAG1", "TAG2"));
 
             // Then
             assertThat(campaignReport.scenarioExecutionReports()).hasSize(1);
@@ -153,11 +153,12 @@ class CampaignExecutionTest {
                     assertThat(executionSummary.environment()).isEqualTo("env");
                     assertThat(executionSummary.datasetId()).isEqualTo(campaignReport.dataSetId);
                     assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
+                    assertThat(executionSummary.tags().orElseThrow()).containsExactly("TAG1", "TAG2");
                 });
             });
 
             // When
-            campaignReport.startScenarioExecution(new TestCaseDataset(testCase, null), "env", "user");
+            campaignReport.startScenarioExecution(new TestCaseDataset(testCase, null), "env", "user", List.of("TAG1", "TAG2"));
 
             // Then
             assertThat(campaignReport.scenarioExecutionReports()).hasSize(1);
@@ -171,6 +172,7 @@ class CampaignExecutionTest {
                     assertThat(executionSummary.environment()).isEqualTo("env");
                     assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
                     assertThat(executionSummary.datasetId()).isEqualTo(campaignReport.dataSetId);
+                    assertThat(executionSummary.tags().orElseThrow()).containsExactly("TAG1", "TAG2");
                 });
             });
         }
@@ -178,11 +180,11 @@ class CampaignExecutionTest {
         @Test
         void end_scenario_execution() {
             // Given
-            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "");
+            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "", List.of());
             TestCase testCase = buildTestCase("1", "title");
             var testcaseToExecute = new TestCaseDataset(testCase, null);
-            campaignReport.initExecution(singletonList(testcaseToExecute), "env", "user");
-            campaignReport.startScenarioExecution(testcaseToExecute, "env", "user");
+            campaignReport.initExecution(singletonList(testcaseToExecute), "env", "user", List.of());
+            campaignReport.startScenarioExecution(testcaseToExecute, "env", "user", List.of());
 
             ScenarioExecutionCampaign scenarioReport_SUCCESS = buildScenarioReportFromMockedExecution(testCase.id(), null, testCase.metadata().title(), SUCCESS);
 
@@ -197,7 +199,7 @@ class CampaignExecutionTest {
         @Test
         void compute_status_from_scenarios_when_end_campaign_execution() {
             // Given
-            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "");
+            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "", List.of());
             addScenarioExecutions(campaignReport, "1", "title1", SUCCESS);
             addScenarioExecutions(campaignReport, "2", "title2", FAILURE);
 
@@ -212,7 +214,7 @@ class CampaignExecutionTest {
         @Test
         void compute_stop_final_status_when_having_not_executed_scenario() {
             // Given
-            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "");
+            CampaignExecution campaignReport = new CampaignExecution(1L, "...", false, "", null, "", List.of());
             addScenarioExecutions(campaignReport, "1", "title1", SUCCESS);
             addScenarioExecutions(campaignReport, "2", "title2", NOT_EXECUTED);
 
@@ -313,7 +315,7 @@ class CampaignExecutionTest {
 
     @Test
     void compute_failed_scenarios_executions() {
-        CampaignExecution sut = new CampaignExecution(1L, "...", false, "", null, "");
+        CampaignExecution sut = new CampaignExecution(1L, "...", false, "", null, "", List.of());
         addScenarioExecutions(sut, "1", "dataset_1", "", SUCCESS);
         addScenarioExecutions(sut, "2", "dataset_2", "", FAILURE);
         addScenarioExecutions(sut, "3", "dataset_1", "", SUCCESS);
@@ -326,7 +328,7 @@ class CampaignExecutionTest {
 
     @Test
     void compute_execution_without_retries() {
-        CampaignExecution sut = new CampaignExecution(1L, "...", false, "", null, "");
+        CampaignExecution sut = new CampaignExecution(1L, "...", false, "", null, "", List.of());
         addScenarioExecutions(sut, "1", "dataset_1", "", FAILURE);
         addScenarioExecutions(sut, "1", "dataset_2", "", FAILURE);
         var reportWithDataset1 = addScenarioExecutions(sut, "1", "dataset_1", "", SUCCESS);
@@ -350,7 +352,7 @@ class CampaignExecutionTest {
     }
 
     private CampaignExecution fakeCampaignReport(List<ScenarioExecutionCampaign> executions) {
-        return new CampaignExecution(1L, 1L, executions, "...", false, "", null, "");
+        return new CampaignExecution(1L, 1L, executions, "...", false, "", null, "", List.of());
     }
 
     private void addScenarioExecutions(CampaignExecution campaignReport, String scenarioId, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
@@ -360,8 +362,8 @@ class CampaignExecutionTest {
     private ScenarioExecutionCampaign addScenarioExecutions(CampaignExecution campaignReport, String scenarioId, String datasetId, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
         TestCase testCase = buildTestCase(scenarioId, scenarioTitle);
         var testcaseToExecute = new TestCaseDataset(testCase, datasetId);
-        campaignReport.initExecution(singletonList(testcaseToExecute), "", "");
-        campaignReport.startScenarioExecution(testcaseToExecute, "", "");
+        campaignReport.initExecution(singletonList(testcaseToExecute), "", "", List.of());
+        campaignReport.startScenarioExecution(testcaseToExecute, "", "", List.of());
 
         ScenarioExecutionCampaign scenarioReport = buildScenarioReportFromMockedExecution(scenarioId, datasetId, scenarioTitle, scenarioExecutionStatus);
 
