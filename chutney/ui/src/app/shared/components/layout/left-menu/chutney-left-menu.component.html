@@ -10,8 +10,9 @@
                 @for (subItem of item.children; track subItem.label) {
                   @if (canViewMenuItem(subItem)) {
                     <div class="menu-item nav-item"
-                      placement="right" container="body" [disableTooltip]="!layoutOptions.toggleSidebar" ngbTooltip="{{subItem.label | translate}}">
-                      <a [routerLink]="subItem.link" routerLinkActive="active-item" class="menu-link">
+                      >
+                      <a placement="right" container="body" [disableTooltip]="!layoutOptions.toggleSidebar" ngbTooltip="{{subItem.label | translate}}"
+                         [autoClose]="true" [routerLink]="subItem.link" routerLinkActive="active-item" class="menu-link">
                         <i class="menu-icon" [ngClass]="subItem.iconClass"></i>
                         <span class="menu-title">{{subItem.label | translate}}</span>
                       </a>

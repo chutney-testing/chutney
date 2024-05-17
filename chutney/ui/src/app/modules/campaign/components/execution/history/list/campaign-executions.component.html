@@ -34,7 +34,7 @@
               </div>
             </th>
           </tr>
-          <tr class="headers-filters">
+          <tr class=" small">
             <th></th>
             <th></th>
             <th>
@@ -46,21 +46,21 @@
                 </div>
               }
             </th>
-            <th>
+            <th class="fw-normal">
               <ng-multiselect-dropdown
                 [formControl]="getFormControl('status')"
                 [settings]="dropdownSettings"
                 [data]="status">
               </ng-multiselect-dropdown>
             </th>
-            <th>
+            <th class="fw-normal">
               <ng-multiselect-dropdown
                 [formControl]="getFormControl('environments')"
                 [settings]="dropdownSettings"
                 [data]="environments">
               </ng-multiselect-dropdown>
             </th>
-            <th>
+            <th class="fw-normal">
               <ng-multiselect-dropdown
                 [formControl]="getFormControl('executors')"
                 [settings]="dropdownSettings"

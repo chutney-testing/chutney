@@ -7,10 +7,7 @@
   }
   <ul ngbNav #nav="ngbNav" [activeId]="activeTabId" [destroyOnHide]="false" class="nav-tabs border-bottom border-primary pb-1">
     <li [ngbNavItem]="1" class="me-1">
-      <button ngbNavLink class="btn btn-outline-primary" data-bs-toggle="button"
-        [ngClass]="{'active':activeTabId==1}"
-        (click)="activeTabId = 1"
-      >{{'admin.database.actions.search.executions' | translate}}</button>
+      <a ngbNavLink>{{'admin.database.actions.search.executions' | translate}}</a>
       <ng-template ngbNavContent>
         <div class="row">
           <div class="col justify-content-center input-group input-group-sm">
@@ -35,10 +32,7 @@
       </ng-template>
     </li>
     <li [ngbNavItem]="2">
-      <button ngbNavLink class="btn btn-outline-primary" data-bs-toggle="button"
-        [ngClass]="{ 'active':activeTabId==2}"
-        (click)="activeTabId = 2"
-      >{{'admin.database.actions.vacuum' | translate}}</button>
+      <a ngbNavLink >{{'admin.database.actions.vacuum' | translate}}</a>
       <ng-template ngbNavContent>
         <div class="row border-bottom">
           <div class="col text-center">

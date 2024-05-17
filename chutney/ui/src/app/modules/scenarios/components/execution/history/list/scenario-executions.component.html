@@ -48,7 +48,7 @@
               </div>
             </th>
           </tr>
-          <tr class="headers-filters">
+          <tr class=" small mb-1">
             <th></th>
             <th>
               @if (filtersForm.controls.date.value) {
@@ -59,7 +59,7 @@
                 </div>
               }
             </th>
-            <th>
+            <th class="fw-normal">
               <ng-multiselect-dropdown [settings]="selectSettings"
                 [data]="status"
                 [formControl]="getFormControl('status')"
@@ -67,28 +67,28 @@
               </ng-multiselect-dropdown>
             </th>
             <th class="w40"></th>
-            <th>
+            <th class="fw-normal">
               <ng-multiselect-dropdown #tagsDropdown
                 [settings]="selectSettings"
                 [data]="tags"
                 [formControl]="getFormControl('tags')">
               </ng-multiselect-dropdown>
             </th>
-            <th>
+            <th class="fw-normal">
               <ng-multiselect-dropdown [settings]="selectSettings"
                 [data]="environments"
                 [formControl]="getFormControl('environments')"
                 #envsDropdown>
               </ng-multiselect-dropdown>
             </th>
-            <th>
+            <th class="fw-normal">
               <ng-multiselect-dropdown [settings]="selectSettings"
                 [data]="campaigns"
                 [formControl]="getFormControl('campaigns')"
                 #campsDropdown>
               </ng-multiselect-dropdown>
             </th>
-            <th>
+            <th class="fw-normal">
               <ng-multiselect-dropdown [settings]="selectSettings"
                 [data]="executors"
                 [formControl]="getFormControl('executors')"
