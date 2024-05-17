@@ -16,8 +16,8 @@
 
 import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { Subject, Subscription } from 'rxjs';
-import { debounceTime, map } from 'rxjs/operators';
+import { interval, Observable, Subject, Subscription } from 'rxjs';
+import { catchError, debounceTime, mergeMap, takeWhile, tap } from 'rxjs/operators';
 
 import {
     distinct,
@@ -66,6 +66,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     Authorization = Authorization;
 
+
     constructor(
         private router: Router,
         private scenarioService: ScenarioService,
@@ -80,104 +81,22 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     ngOnInit() {
         this.initJiraPlugin();
-        this.searchSub$.pipe(
-            debounceTime(400)
-            // distinctUntilChanged()
-        ).subscribe((inputValue) => {
-            this.scenarioService.search(this.fullTextFilter).subscribe((res) => {
-                    if (this.fullTextFilter) {
-                        this.localFilter(res);
-                    } else {
-                        this.localFilter(this.scenarios);
-                    }
+        this.onKeywordSearch();
+        this.fetchAndUpdateScenario()
+            .subscribe(res => {
+                if (this.atLeastOneScenarioIsRunning(res)) {
+                    this.subscribeForScenarios()
                 }
-            );
-        });
-
-        this.getScenarios()
-            .then(r => {
-                this.scenarios = r || [];
-                this.applyDefaultState();
-                this.applySavedState();
-                this.applyUriState();
-                this.applyFilters();
             })
-            .catch(err => console.log(err));
+
     }
 
     ngOnDestroy(): void {
-        if (this.urlParams) {
-            this.urlParams.unsubscribe();
-        }
-    }
-
-    private initFilters() {
-        const allTagsInScenario: string[] = this.findAllTags();
-        this.tags = this.getTagsForComboModel(allTagsInScenario);
-        this.status = [...new Set(this.scenarios.map(scenario => scenario.status))].map(status => this.toSelectOption(status,  this.translateService.instant(ExecutionStatus.toString(status))));
-    }
-
-    private toSelectOption(id: string, label: string = id) {
-        return {id: id, text: label };
-    }
-
-    private async getScenarios() {
-        return this.scenarioService.findScenarios().toPromise();
-    }
-
-    private applyDefaultState() {
-        this.viewedScenarios = this.scenarios;
-        this.initFilters();
-    }
-
-    private findAllTags() {
-        return distinct(flatMap(this.scenarios, (sc) => sc.tags)).sort();
-    }
-
-    private applySavedState() {
-        this.setSelectedTags();
-    }
-
-    private setSelectedTags() {
-        const savedTags = this.stateService.getTags();
-        if (savedTags != null) {
-            this.selectedTags = this.getTagsForComboModel(savedTags);
-        }
-    }
-
-    private applyUriState() {
-        this.urlParams = this.route.queryParams
-            .pipe(map((params: Array<any>) => {
-                    if (params['text']) {
-                        this.textFilter = params['text'];
-                    } else {
-                        this.textFilter = '';
-                    }
-                    if (params['orderBy']) {
-                        this.orderBy = params['orderBy'];
-                    }
-                    if (params['status']) {
-                        this.selectedStatus = this.status.filter((status) => params['status'].split(',').includes(status.text));
-                    }
-                    if (params['reverseOrder']) {
-                        this.reverseOrder = params['reverseOrder'] === 'true';
-                    }
-                    if (params['tags']) {
-                        const uriTag = params['tags'].split(',');
-                        if (uriTag != null) {
-                            this.selectedTags = this.getTagsForComboModel(uriTag);
-                        }
-                    }
-                    this.applyFilters();
-                    this.ngOnDestroy();
-                },
-                (error) => console.log(error)))
-            .subscribe();
-
+        this.urlParams?.unsubscribe();
     }
 
     createNewScenario() {
-            this.router.navigateByUrl('/scenario/raw-edition');
+        this.router.navigateByUrl('/scenario/raw-edition');
     }
 
     // Ordering //
@@ -198,20 +117,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         );
     }
 
-    private getKeyExtractorBy(property: string) {
-        if (property === 'title') {
-            return i => i[property] == null ? '' : i[property].toLowerCase();
-        }
-        if (property === 'lastExecution' || property === 'creationDate' || property === 'updateDate') {
-            const now = Date.now();
-            return i => i[property] == null ? now - 1491841324 /*2017-04-10T16:22:04*/ : now - Date.parse(i[property]);
-        } else {
-            return i => i[property] == null ? '' : i[property];
-        }
-    }
-
     // Filtering //
-
     updateTextFilter(text: string) {
         this.textFilter = text;
         this.applyFilters();
@@ -230,18 +136,20 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         }
     }
 
-    private localFilter(scenarios: Array<ScenarioIndex>) {
-        const scenariosWithJiraId = scenarios.map(sce => {
-            const jiraId = this.jiraMap.get(sce.id);
-            if (jiraId) {
-                sce.jiraId = jiraId;
-            }
-            return sce;
-        });
-        this.viewedScenarios = filterOnTextContent(scenariosWithJiraId, this.textFilter, ['title', 'id', 'jiraId', 'tags']);
-        this.viewedScenarios = this.filterOnAttributes();
-        this.sortScenarios(this.orderBy, this.reverseOrder);
-        this.applyFiltersToRoute();
+    onItemSelect() {
+        this.stateService.changeTags(this.getSelectedTags());
+        this.applyFilters();
+    }
+
+    OnItemDeSelect() {
+        this.stateService.changeTags(this.getSelectedTags());
+        this.applyFilters();
+    }
+
+    OnItemDeSelectAll() {
+        this.selectedTags = newInstance([]);
+        this.stateService.changeTags(this.getSelectedTags());
+        this.applyFilters();
     }
 
     // Jira link //
@@ -264,6 +172,138 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         return this.jiraUrl + '/browse/' + this.jiraMap.get(id);
     }
 
+
+    private onKeywordSearch() {
+        this.searchSub$.pipe(
+            debounceTime(400),
+            mergeMap(keyword => this.scenarioService.search(keyword))
+        ).subscribe(scenarios => this.localFilter(scenarios));
+    }
+
+    private subscribeForScenarios() {
+        interval(3000)
+            .pipe(
+                mergeMap(() => this.fetchAndUpdateScenario()),
+                takeWhile(t => this.atLeastOneScenarioIsRunning(t)))
+            .subscribe()
+    }
+
+    private fetchAndUpdateScenario(): Observable<Array<ScenarioIndex>> {
+        return this.getScenarios()
+            .pipe(
+                tap(scenarios => {
+                    if (!this.scenarios.length) {
+                        this.scenarios = scenarios;
+                    } else {
+                        this.updateRunningScenarioStatus(scenarios);
+                    }
+                    this.applyDefaultState();
+                    this.applySavedState();
+                    this.applyUriState();
+                }),
+                catchError(err => [])
+            );
+    }
+
+    private updateRunningScenarioStatus(scenarios: Array<ScenarioIndex>) {
+        this.scenarios.filter(scenario => scenario.status === ExecutionStatus.RUNNING)
+            .forEach(scenario => {
+                scenario.status = scenarios.find(updatedScenario => updatedScenario.id === scenario.id).status;
+            });
+    }
+
+    private atLeastOneScenarioIsRunning(scenarios: Array<ScenarioIndex>): boolean {
+        return scenarios.filter(scenario => scenario.status === ExecutionStatus.RUNNING).length > 0
+    }
+
+    private initFilters() {
+        const allTagsInScenario: string[] = this.findAllTags();
+        this.tags = this.getTagsForComboModel(allTagsInScenario);
+        this.status = [...new Set(this.scenarios.map(scenario => scenario.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
+    }
+
+    private toSelectOption(id: string, label: string = id) {
+        return {id: id, text: label };
+    }
+
+    private getScenarios(): Observable<Array<ScenarioIndex>> {
+        return this.fullTextFilter ? this.scenarioService.search(this.fullTextFilter) : this.scenarioService.findScenarios();
+    }
+
+    private applyDefaultState() {
+        this.initFilters();
+    }
+
+    private findAllTags() {
+        return distinct(flatMap(this.scenarios, (sc) => sc.tags)).sort();
+    }
+
+    private applySavedState() {
+        this.setSelectedTags();
+    }
+
+    private setSelectedTags() {
+        const savedTags = this.stateService.getTags();
+        if (savedTags != null) {
+            this.selectedTags = this.getTagsForComboModel(savedTags);
+        }
+    }
+
+    private applyUriState() {
+        this.urlParams = this.route.queryParams
+            .pipe(
+                tap({
+                    next: (params: Array<any>) => {
+                        this.textFilter = params['text'] || '';
+                        if (params['orderBy']) {
+                            this.orderBy = params['orderBy'];
+                        }
+                        if (params['status']) {
+                            this.selectedStatus = this.status.filter((status) => params['status'].split(',').includes(status.text));
+                        }
+                        if (params['reverseOrder']) {
+                            this.reverseOrder = params['reverseOrder'] === 'true';
+                        }
+                        if (params['tags']) {
+                            const uriTag = params['tags'].split(',');
+                            this.selectedTags = this.getTagsForComboModel(uriTag);
+                        }
+                        this.applyFilters();
+                        this.urlParams?.unsubscribe()
+                    },
+                    error: (error) => console.log(error)
+                })
+            )
+            .subscribe();
+
+    }
+
+    private getKeyExtractorBy(property: string) {
+        if (property === 'title') {
+            return i => i[property] == null ? '' : i[property].toLowerCase();
+        }
+        if (property === 'lastExecution' || property === 'creationDate' || property === 'updateDate') {
+            const now = Date.now();
+            return i => i[property] == null ? now - 1491841324 /*2017-04-10T16:22:04*/ : now - Date.parse(i[property]);
+        } else {
+            return i => i[property] == null ? '' : i[property];
+        }
+    }
+
+    private localFilter(scenarios: Array<ScenarioIndex>) {
+        const scenariosWithJiraId = scenarios.map(sce => {
+            const jiraId = this.jiraMap.get(sce.id);
+            if (jiraId) {
+                sce.jiraId = jiraId;
+            }
+            return sce;
+        });
+        this.viewedScenarios = filterOnTextContent(scenariosWithJiraId, this.textFilter, ['title', 'id', 'jiraId', 'tags']);
+        this.viewedScenarios = this.filterOnAttributes();
+        this.sortScenarios(this.orderBy, this.reverseOrder);
+        this.applyFiltersToRoute();
+    }
+
     private filterOnAttributes() {
         const input = this.viewedScenarios;
 
@@ -276,7 +316,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     private scenarioStatusPresent(statusFilter: any[], scenario: ScenarioIndex): boolean {
         if (statusFilter.length > 0) {
-            return intersection(statusFilter.map((status)=>status.id), [scenario.status]).length > 0;
+            return intersection(statusFilter.map((status) => status.id), [scenario.status]).length > 0;
         } else {
             return true;
         }
@@ -296,28 +336,13 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     }
 
     private tagPresent(tags: String[], scenario: ScenarioIndex): boolean {
-        if(tags.length > 0) {
+        if (tags.length > 0) {
             return intersection(tags, scenario.tags).length > 0;
         } else {
             return true;
         }
     }
 
-    onItemSelect() {
-        this.stateService.changeTags(this.getSelectedTags());
-        this.applyFilters();
-    }
-
-    OnItemDeSelect() {
-        this.stateService.changeTags(this.getSelectedTags());
-        this.applyFilters();
-    }
-
-    OnItemDeSelectAll() {
-        this.selectedTags = newInstance([]);
-        this.stateService.changeTags(this.getSelectedTags());
-        this.applyFilters();
-    }
 
     private getSelectedTags() {
         return this.selectedTags.map((i) => i.text);
