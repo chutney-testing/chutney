@@ -397,7 +397,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
             ScenarioExecutionEntity scenarioExecutionTwo = givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
 
             Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user");
+            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user", List.of());
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
             // When
@@ -408,6 +408,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
             assertThat(executions.get(0).executionId()).isEqualTo(scenarioExecutionTwo.id());
             assertThat(executions.get(0).campaignReport()).isEmpty();
             assertThat(executions.get(1).executionId()).isEqualTo(scenarioExecutionOne.id());
+            assertThat(executions.get(1).tags().orElseThrow()).containsExactly("TAG");
             assertThat(executions.get(1).campaignReport()).hasValueSatisfying(report -> {
                 assertThat(report.campaignId).isEqualTo(campaign.id());
                 assertThat(report.executionId).isEqualTo(campaignExecutionId);
@@ -425,7 +426,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
             givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
 
             Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user");
+            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user", List.of());
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
             // When
@@ -435,6 +436,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
             assertThat(executionSummary.executionId()).isEqualTo(scenarioExecutionOne.id());
             assertThat(executionSummary.tags()).hasValue(defaultScenarioTags());
             assertThat(executionSummary.campaignReport()).isPresent();
+            assertThat(executionSummary.tags().orElseThrow()).containsExactly("TAG");
             assertThat(executionSummary.campaignReport()).hasValueSatisfying(cr -> {
                 assertThat(cr.campaignId).isEqualTo(campaign.id());
                 assertThat(cr.executionId).isEqualTo(campaignExecutionId);
