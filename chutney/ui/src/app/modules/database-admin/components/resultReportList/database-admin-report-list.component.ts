@@ -14,26 +14,17 @@
  * limitations under the License.
  */
 
-import {
-    Component,
-    EventEmitter,
-    Input,
-    OnChanges,
-    OnDestroy,
-    Output,
-    SimpleChanges,
-    ViewChild,
-} from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild, } from '@angular/core';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { Params, Router } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { Execution } from '@model';
 import { NgbDate, NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { TranslateService } from '@ngx-translate/core';
-import { AngularMultiSelect } from 'angular2-multiselect-dropdown';
 import { DateFormatPipe } from 'ngx-moment';
 import { Subscription } from 'rxjs';
 import { debounceTime, map, tap } from 'rxjs/operators';
+import { MultiSelectComponent } from 'ng-multiselect-dropdown';
 
 @Component({
     selector: 'database-admin-report-list',
@@ -47,11 +38,11 @@ export class DatabaseAdminExecutionReportListComponent
     filteredExecutions: Execution[] = [];
     filtersForm: FormGroup;
 
-    status: { id: string; itemName: string }[] = [];
-    environments: { id: string; itemName: string }[] = [];
-    executors: { id: string; itemName: string }[] = [];
-    campaigns: { id: string; itemName: string }[] = [];
-    tags: { id: string; itemName: string }[] = [];
+    status: { id: string; text: string }[] = [];
+    environments: { id: string; text: string }[] = [];
+    executors: { id: string; text: string }[] = [];
+    campaigns: { id: string; text: string }[] = [];
+    tags: { id: string; text: string }[] = [];
     selectSettings = {
         text: '',
         enableCheckAll: false,
@@ -64,16 +55,16 @@ export class DatabaseAdminExecutionReportListComponent
 
     private readonly iso_Date_Delimiter = '-';
     @ViewChild('statusDropdown', { static: false })
-    statusDropdown: AngularMultiSelect;
+    statusDropdown: MultiSelectComponent;
 
     @ViewChild('envsDropdown', { static: false })
-    envsDropdown: AngularMultiSelect;
+    envsDropdown: MultiSelectComponent;
     @ViewChild('executorsDropdown', { static: false })
-    executorsDropdown: AngularMultiSelect;
+    executorsDropdown: MultiSelectComponent;
     @ViewChild('campsDropdown', { static: false })
-    campsDropdown: AngularMultiSelect;
+    campsDropdown: MultiSelectComponent;
     @ViewChild('tagsDropdown', { static: false })
-    tagsDropdown: AngularMultiSelect;
+    tagsDropdown: MultiSelectComponent;
 
     @Input() executions: Execution[] = [];
     @Output() onExecutionSelect = new EventEmitter<{
@@ -96,11 +87,6 @@ export class DatabaseAdminExecutionReportListComponent
         this.onFiltersChange();
     }
 
-    toggleDropDown(dropDown: AngularMultiSelect, event) {
-        event.stopPropagation();
-        dropDown.toggleDropdown(event);
-    }
-
     getDateFilterValue() {
         let date: NgbDateStruct = this.filtersForm.value.date;
         return new Date(date.year, date.month - 1, date.day);
@@ -115,6 +101,9 @@ export class DatabaseAdminExecutionReportListComponent
 
     openReport(execution: Execution, focus: boolean = true) {
         this.onExecutionSelect.emit({ execution, focus });
+    }
+    getFormControl(name: string): FormControl {
+        return this.filtersForm.get(name) as FormControl;
     }
 
     ngOnDestroy(): void {
@@ -213,7 +202,7 @@ export class DatabaseAdminExecutionReportListComponent
     }
 
     private toSelectOption(id: string, label: string = id) {
-        return { id: id, itemName: label };
+        return { id: id, text: label };
     }
 
     private toQueryParams(filters: any): Params {

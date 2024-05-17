@@ -52,7 +52,20 @@
             "scripts": [
                 "node_modules/@asciidoctor/core/dist/browser/asciidoctor.min.js",
                 "node_modules/bootstrap/dist/js/bootstrap.bundle.min.js"
-            ]
+            ],
+              "allowedCommonJsDependencies": [
+                  "raf",
+                  "rgbcolor",
+                  "moment",
+                  "jspdf-autotable",
+                  "jszip",
+                  "ace-builds",
+                  "hjson",
+                  "core-js",
+                  "dragula",
+                  "file-saver"
+
+              ]
           },
           "configurations": {
             "production": {
@@ -77,16 +90,16 @@
         "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "options": {
-            "browserTarget": "chutney:build",
-              "proxyConfig": "proxy.conf.json",
-              "ssl": true
+            "proxyConfig": "proxy.conf.json",
+            "ssl": true,
+            "buildTarget": "chutney:build"
           },
           "configurations": {
             "production": {
-              "browserTarget": "chutney:build:production"
+            "buildTarget": "chutney:build:production"
             },
             "development": {
-              "browserTarget": "chutney:build:development"
+              "buildTarget": "chutney:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -94,7 +107,7 @@
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n",
           "options": {
-            "browserTarget": "chutney:build"
+            "buildTarget": "chutney:build"
           }
         },
         "test": {
@@ -154,7 +167,6 @@
       }
     }
   },
-  "defaultProject": "chutney",
   "cli": {
     "analytics": false
   }

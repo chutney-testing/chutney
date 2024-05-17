@@ -15,7 +15,6 @@
  */
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { SharedModule } from '@shared/shared.module';
 
@@ -25,14 +24,19 @@ import { MomentModule } from 'ngx-moment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { DatasetEditionComponent } from './dataset-edition.component';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { DataSetService } from '@core/services';
 import { of } from 'rxjs';
 import { DatasetListComponent } from '@modules/dataset/components/dataset-list/dataset-list.component';
-import { FormsKeyValueComponent } from '@modules/dataset/components/dataset-edition/forms-key-value/forms-key-value.component';
-import { FormsDataGridComponent } from '@modules/dataset/components/dataset-edition/forms-data-grid/forms-data-grid.component';
+import {
+    FormsKeyValueComponent
+} from '@modules/dataset/components/dataset-edition/forms-key-value/forms-key-value.component';
+import {
+    FormsDataGridComponent
+} from '@modules/dataset/components/dataset-edition/forms-data-grid/forms-data-grid.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureService } from '@core/feature/feature.service';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { RouterModule } from '@angular/router';
 
 describe('DatasetEditionComponent', () => {
 
@@ -46,13 +50,13 @@ describe('DatasetEditionComponent', () => {
         TestBed.resetTestingModule();
         TestBed.configureTestingModule({
             imports: [
-                RouterTestingModule,
+                RouterModule.forRoot([]),
                 TranslateModule.forRoot(),
                 MoleculesModule,
                 SharedModule,
                 MomentModule,
                 NgbModule,
-                AngularMultiSelectModule,
+                NgMultiSelectDropDownModule.forRoot(), // todo remove
                 FormsModule,
                 ReactiveFormsModule
             ],

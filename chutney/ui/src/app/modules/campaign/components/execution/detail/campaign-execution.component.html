@@ -1,196 +1,236 @@
-<div *ngIf="errors.length > 0" class="alert alert-dismissible alert-danger mt-4">
+@if (errors.length > 0) {
+  <div class="alert alert-dismissible alert-danger mt-4">
     <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errors = []"></button>
-    <ng-container *ngFor="let err of errors">
-        {{ err }}<br />
-    </ng-container>
-</div>
-<div *ngIf="report">
-
+    @for (err of errors; track $index) {
+      {{ err }}<br />
+    }
+  </div>
+}
+@if (report) {
+  <div>
     <div class="row">
-        <div class="col m-2">
-            <span>
-                <chutney-execution-badge [status]="report.report.status" [spin]="true"></chutney-execution-badge>
-                <small class="text-muted ms-2">
-                    <ng-container *ngIf="!report.isRunning()">
-                        <strong>
-                            (
-                            <ng-container *ngIf="report.hasPassed()">
-                                {{ report.passed }} {{ 'campaigns.execution.last.ok' | translate }},
-                            </ng-container>
-                            <ng-container *ngIf="report.hasFailed()">
-                                {{ report.failed }} {{ 'campaigns.execution.last.ko' | translate }},
-                            </ng-container>
-                            <ng-container *ngIf="report.hasStopped()">
-                                {{ report.stopped }} {{ 'campaigns.execution.last.stop' | translate }},
-                            </ng-container>
-                            <ng-container *ngIf="report.hasNotExecuted()">
-                                {{ report.notexecuted }} {{ 'campaigns.execution.last.notexecuted' | translate }}
-                            </ng-container>
-                            {{ 'global.smallword.of' | translate }} {{ report.total }}
-                            )
-                        </strong>
-                        {{ 'global.time.in' | translate }} {{ report.report.duration | duration }}
-                    </ng-container>
-                    {{ 'global.time.at' | translate }} {{ report.report.startDate | amDateFormat: 'DD MMM. YYYY HH:mm' }}
-                    {{ report.report.user == '' ? '' : 'global.smallword.by' | translate }}
-                    <strong>{{ report.report.user }}</strong>
-                    {{ 'campaigns.execution.on_env' | translate }}
-                    <strong>{{ report.report.executionEnvironment }}</strong>
-                </small>
-                <small *ngIf="jiraUrl && jiraTestExecutionId" class="text-muted ms-2">
-                    (
-                    <a target="_blank" rel="noopener noreferrer" href="{{ jiraUrl +'/browse/' + jiraTestExecutionId }}">
-                        <span class="fa-brands fa-jira"></span>
-                        {{ jiraTestExecutionId }}
-                    </a>
-                    )
-                </small>
-            </span>
-            <ng-container *hasAuthorization="[Authorization.CAMPAIGN_EXECUTE]">
-                <div class="text-center" *ngIf="!report.isRunning()">
-                    <ng-container *ngIf="report.hasFailed() || report.hasStopped()">
-                        <button id="replay-btn" type="button" class="btn btn-sm btn-outline-primary w10"
-                            title="{{ 'campaigns.execution.replay' | translate }}"
-                            (click)="replay()">
-                            <span class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></span>
-                        </button>
-                    </ng-container>
-                    <ng-container>
-                        <button id="export-btn" type="button" class="btn btn-sm btn-outline-primary ms-1 w10"
-                            title="{{ 'scenarios.execution.step.actions.export' | translate }}"
-                            (click)="exportReport()">
-                            <span class="fa-solid fa-file-pdf" aria-hidden="true"></span>
-                        </button>
-                    </ng-container>
-                </div>
-                <div class="text-center" *ngIf="report.isRunning()">
-                    <button id="stop-btn" type="button" class="btn btn-sm btn-outline-primary"
-                        title="{{ 'global.actions.stop' | translate }}"
-                        (click)="stop()">
-                        <span class="fa-solid fa-stop me-2" aria-hidden="true"></span>
-                        <span class="btn-label">{{ 'global.actions.stop' | translate }}</span>
-                    </button>
-                </div>
-            </ng-container>
-        </div>
+      <div class="col m-2">
+        <span>
+          <chutney-execution-badge [status]="report.report.status" [spin]="true"></chutney-execution-badge>
+          <small class="text-muted ms-2">
+            @if (!report.isRunning()) {
+              <strong>
+                (
+                @if (report.hasPassed()) {
+                  {{ report.passed }} {{ 'campaigns.execution.last.ok' | translate }},
+                }
+                @if (report.hasFailed()) {
+                  {{ report.failed }} {{ 'campaigns.execution.last.ko' | translate }},
+                }
+                @if (report.hasStopped()) {
+                  {{ report.stopped }} {{ 'campaigns.execution.last.stop' | translate }},
+                }
+                @if (report.hasNotExecuted()) {
+                  {{ report.notexecuted }} {{ 'campaigns.execution.last.notexecuted' | translate }}
+                }
+                {{ 'global.smallword.of' | translate }} {{ report.total }}
+                )
+              </strong>
+              {{ 'global.time.in' | translate }} {{ report.report.duration | duration }}
+            }
+            {{ 'global.time.at' | translate }} {{ report.report.startDate | amDateFormat: 'DD MMM. YYYY HH:mm' }}
+            {{ report.report.user == '' ? '' : 'global.smallword.by' | translate }}
+            <strong>{{ report.report.user }}</strong>
+            {{ 'campaigns.execution.on_env' | translate }}
+            <strong>{{ report.report.executionEnvironment }}</strong>
+          </small>
+          @if (jiraUrl && jiraTestExecutionId) {
+            <small class="text-muted ms-2">
+              (
+              <a target="_blank" rel="noopener noreferrer" href="{{ jiraUrl +'/browse/' + jiraTestExecutionId }}">
+                <span class="fa-brands fa-jira"></span>
+                {{ jiraTestExecutionId }}
+              </a>
+              )
+            </small>
+          }
+        </span>
+        <ng-container *hasAuthorization="[Authorization.CAMPAIGN_EXECUTE]">
+          @if (!report.isRunning()) {
+            <div class="text-center">
+              @if (report.hasFailed() || report.hasStopped()) {
+                <button id="replay-btn" type="button" class="btn btn-sm btn-outline-primary w10"
+                  title="{{ 'campaigns.execution.replay' | translate }}"
+                  (click)="replay()">
+                  <span class="fa-solid fa-arrow-rotate-left" aria-hidden="true"></span>
+                </button>
+              }
+              <ng-container>
+                <button id="export-btn" type="button" class="btn btn-sm btn-outline-primary ms-1 w10"
+                  title="{{ 'scenarios.execution.step.actions.export' | translate }}"
+                  (click)="exportReport()">
+                  <span class="fa-solid fa-file-pdf" aria-hidden="true"></span>
+                </button>
+              </ng-container>
+            </div>
+          }
+          @if (report.isRunning()) {
+            <div class="text-center">
+              <button id="stop-btn" type="button" class="btn btn-sm btn-outline-primary"
+                title="{{ 'global.actions.stop' | translate }}"
+                (click)="stop()">
+                <span class="fa-solid fa-stop me-2" aria-hidden="true"></span>
+                <span class="btn-label">{{ 'global.actions.stop' | translate }}</span>
+              </button>
+            </div>
+          }
+        </ng-container>
+      </div>
     </div>
-
     <div class="table-responsive">
-        <table class="table table-sm table-striped table-hover">
-            <thead>
-                <tr>
-                    <th scope="col" class="filter w3 text-center" (click)="sortBy('scenarioId')">{{ 'campaigns.execution.scenarios.item.header.id' | translate }}
-                        <span *ngIf="orderBy == 'scenarioId' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'scenarioId' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
-                    <th scope="col" class="filter w5 text-center" (click)="sortBy('status')">{{ 'campaigns.execution.scenarios.item.header.state' | translate }}
-                        <span *ngIf="orderBy == 'status' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'status' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
-                    <th scope="col" class="w45" (click)="sortBy('scenarioName')">{{ 'campaigns.execution.scenarios.item.header.title' | translate }}
-                        <span *ngIf="orderBy == 'scenarioName' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'scenarioName' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
-                    <th scope="col" (click)="sortBy('error')">{{ 'campaigns.execution.scenarios.item.header.error' | translate }}
-                        <span *ngIf="orderBy == 'error' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'error' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
-                    <th scope="col" class="w8 text-center">
-                        {{ 'campaigns.execution.scenarios.item.header.tags' | translate }}
-                    </th>
-                    <th scope="col" class="w8 text-center">
-                        {{ 'campaigns.execution.scenarios.item.header.dataset' | translate }}
-                    </th>
-                    <th scope="col" class="w8 text-center" (click)="sortBy('duration')">{{ 'campaigns.execution.scenarios.item.header.duration' | translate }}
-                        <span *ngIf="orderBy == 'duration' && reverseOrder" class="fa fa-caret-down"></span>
-                        <span *ngIf="orderBy == 'duration' && !reverseOrder" class="fa fa-caret-up"></span>
-                    </th>
-                    <th *ngIf="jiraTestExecutionId" class="w2" scope="col"></th>
-                    <th *ngIf="jiraTestExecutionId" class="w12" scope="col">
-                        {{ 'campaigns.execution.scenarios.item.header.jiraStatus' | translate }}
-                    </th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr *ngFor="let scenarioReportOutline of report.report.scenarioExecutionReports; let i = index">
-                    <td class="fw-bold text-center align-middle text-nowrap">
-                        <span>{{ scenarioReportOutline.scenarioId }}</span>
-                    </td>
-                    <td class="text-center align-middle">
-                        <i class="fa-lg" [ngClass]="statusClass(scenarioReportOutline)"
-                            [ngbTooltip]="ExecutionStatus.toString(scenarioReportOutline.status) | translate"
-                            placement="right">
-                        </i>
-                    </td>
-                    <td>
-                        <ng-container *hasAuthorization="[Authorization.SCENARIO_READ]">
-                            <a [routerLink]="['/scenario', scenarioReportOutline.scenarioId, 'executions']"
-                                [queryParams]="toQueryParams(scenarioReportOutline)"
-                                title="{{ 'campaigns.execution.scenarios.item.executions.link' | translate }} {{ scenarioReportOutline.scenarioName }}">
-                                {{ scenarioReportOutline.scenarioName }}
-                            </a>
-                        </ng-container>
-                        <ng-container *hasAuthorization="{not: true, authorizations: [Authorization.SCENARIO_READ]}">
-                            {{ scenarioReportOutline.scenarioName }}
-                        </ng-container>
-                    </td>
-                    <td class="align-middle">
-                        <span><small (click)="showMore[i]=!showMore[i]">{{ (!showMore[i] && scenarioReportOutline.error.length > 100) ? (scenarioReportOutline.error | slice:0:100) + " ..." : (scenarioReportOutline.error) }}</small></span>
-                    </td>
-                    <td class="text-center align-middle text-nowrap">
-                        <ng-container *ngIf="scenarioReportOutline.tags.length <= 3">
-                            <span *ngFor="let tag of scenarioReportOutline.tags" class="badge bg-primary">{{tag}}</span>
-                        </ng-container>
-                        <ng-container *ngIf="scenarioReportOutline.tags.length > 3">
-                            <span *ngFor="let tag of scenarioReportOutline.tags | slice:0:2" class="badge bg-primary">{{tag}}</span>
-                            <button type="button" class="badge bg-primary"
-                                    ngbPopover="{{scenarioReportOutline.tags}}" placement="left"
-                                    triggers="mouseenter:mouseleave" container="body">
-                                ...
-                            </button>
-                        </ng-container>
-                    </td>
-                    <td class="text-center align-middle text-nowrap">
-                        <span><small>{{ scenarioReportOutline.datasetId }}</small></span>
-                    </td>
-                    <td class="text-center align-middle text-nowrap">
-                        <span><small>{{ scenarioReportOutline.duration | duration:'short' }}</small></span>
-                    </td>
-                    <td *ngIf="jiraTestExecutionId">
-                        <ng-container *ngIf="jiraLinkFrom(scenarioReportOutline.scenarioId) !== null">
-                            <a role="button" class="btn btn-sm btn-link m-0" target="_blank"
-                                href="{{ jiraLinkFrom(scenarioReportOutline.scenarioId) }}" rel="noopener noreferrer"
-                                ngbPopover="{{ jiraLinkFrom(scenarioReportOutline.scenarioId) }}" placement="left"
-                                (click)="$event.stopPropagation()" triggers="mouseenter:mouseleave">
-                                <span class="fab fa-jira" aria-hidden="true">
-                                </span>
-                            </a>
-                        </ng-container>
-                    </td>
-                    <td *ngIf="jiraTestExecutionId">
-                        <ng-container *ngIf="jiraLinkFrom(scenarioReportOutline.scenarioId) !== null">
-                            <chutney-confirm-dialog class="me-2 mt-1"
-                                [dialogMessage]="('campaigns.execution.update.jira' | translate)" [label]=null
-                                [title]="'global.actions.update'"
-                                [disabled]="selectedStatusByScenarioId.get(scenarioReportOutline.scenarioId) !=='PASS' && selectedStatusByScenarioId.get(scenarioReportOutline.scenarioId) !=='FAIL'"
-                                [btnSizeClass]="'sm'" [btnClassIcon]="'fa-pencil-alt'" [btnColor]="'primary'"
-                                (callbackEvent)="updateStatus(scenarioReportOutline.scenarioId)">
-                            </chutney-confirm-dialog>
-                            <select class="custom-select mt-1"
-                                (change)="selectedUpdateStatus(scenarioReportOutline.scenarioId, $event)"
-                                style="width: 120px">
-                                <option *ngFor="let enum of xrayStatuses()"
-                                    [selected]="scenarioStatus(scenarioReportOutline.scenarioId) === enum">
-                                    {{ enum }}
-                                </option>
-                                <option [selected]="scenarioStatus(scenarioReportOutline.scenarioId) === UNSUPPORTED">
-                                    {{ UNSUPPORTED }}
-                                </option>
-                            </select>
-                        </ng-container>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
+      <table class="table table-sm table-striped table-hover">
+        <thead>
+          <tr>
+            <th scope="col" class="filter w3 text-center" (click)="sortBy('scenarioId')">{{ 'campaigns.execution.scenarios.item.header.id' | translate }}
+              @if (orderBy == 'scenarioId' && reverseOrder) {
+                <span class="fa fa-caret-down"></span>
+              }
+              @if (orderBy == 'scenarioId' && !reverseOrder) {
+                <span class="fa fa-caret-up"></span>
+              }
+            </th>
+            <th scope="col" class="filter w5 text-center" (click)="sortBy('status')">{{ 'campaigns.execution.scenarios.item.header.state' | translate }}
+              @if (orderBy == 'status' && reverseOrder) {
+                <span class="fa fa-caret-down"></span>
+              }
+              @if (orderBy == 'status' && !reverseOrder) {
+                <span class="fa fa-caret-up"></span>
+              }
+            </th>
+            <th scope="col" class="filter w45" (click)="sortBy('scenarioName')">{{ 'campaigns.execution.scenarios.item.header.title' | translate }}
+              @if (orderBy == 'scenarioName' && reverseOrder) {
+                <span class="fa fa-caret-down"></span>
+              }
+              @if (orderBy == 'scenarioName' && !reverseOrder) {
+                <span class="fa fa-caret-up"></span>
+              }
+            </th>
+            <th scope="col" class="filter" (click)="sortBy('error')">{{ 'campaigns.execution.scenarios.item.header.error' | translate }}
+              @if (orderBy == 'error' && reverseOrder) {
+                <span class="fa fa-caret-down"></span>
+              }
+              @if (orderBy == 'error' && !reverseOrder) {
+                <span class="fa fa-caret-up"></span>
+              }
+            </th>
+            <th scope="col" class="w8 text-center">
+                {{ 'campaigns.execution.scenarios.item.header.tags' | translate }}
+            </th>
+            <th scope="col" class="w8 text-center">
+                {{ 'campaigns.execution.scenarios.item.header.dataset' | translate }}
+            </th>
+            <th scope="col" class="filter w8 text-center" (click)="sortBy('duration')">{{ 'campaigns.execution.scenarios.item.header.duration' | translate }}
+              @if (orderBy == 'duration' && reverseOrder) {
+                <span class="fa fa-caret-down"></span>
+              }
+              @if (orderBy == 'duration' && !reverseOrder) {
+                <span class="fa fa-caret-up"></span>
+              }
+            </th>
+            @if (jiraTestExecutionId) {
+              <th class="w2" scope="col"></th>
+            }
+            @if (jiraTestExecutionId) {
+              <th class="w12" scope="col">
+                {{ 'campaigns.execution.scenarios.item.header.jiraStatus' | translate }}
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (scenarioReportOutline of report.report.scenarioExecutionReports; track $index; let i = $index) {
+            <tr>
+              <td class="fw-bold text-center align-middle text-nowrap">
+                <span>{{ scenarioReportOutline.scenarioId }}</span>
+              </td>
+              <td class="text-center align-middle">
+                <i class="fa-lg" [ngClass]="statusClass(scenarioReportOutline)"
+                  [ngbTooltip]="ExecutionStatus.toString(scenarioReportOutline.status) | translate"
+                  placement="right">
+                </i>
+              </td>
+              <td>
+                <ng-container *hasAuthorization="[Authorization.SCENARIO_READ]">
+                  <a [routerLink]="['/scenario', scenarioReportOutline.scenarioId, 'executions']"
+                    [queryParams]="toQueryParams(scenarioReportOutline)"
+                    title="{{ 'campaigns.execution.scenarios.item.executions.link' | translate }} {{ scenarioReportOutline.scenarioName }}">
+                    {{ scenarioReportOutline.scenarioName }}
+                  </a>
+                </ng-container>
+                <ng-container *hasAuthorization="{not: true, authorizations: [Authorization.SCENARIO_READ]}">
+                  {{ scenarioReportOutline.scenarioName }}
+                </ng-container>
+              </td>
+              <td class="align-middle">
+                <span><small (click)="showMore[i]=!showMore[i]">{{ (!showMore[i] && scenarioReportOutline.error.length > 100) ? (scenarioReportOutline.error | slice:0:100) + " ..." : (scenarioReportOutline.error) }}</small></span>
+              </td>
+              <td class="text-center align-middle text-nowrap">
+                  <ng-container *ngIf="scenarioReportOutline.tags.length <= 3">
+                      <span *ngFor="let tag of scenarioReportOutline.tags" class="badge bg-primary">{{tag}}</span>
+                  </ng-container>
+                  <ng-container *ngIf="scenarioReportOutline.tags.length > 3">
+                      <span *ngFor="let tag of scenarioReportOutline.tags | slice:0:2" class="badge bg-primary">{{tag}}</span>
+                      <button type="button" class="badge bg-primary"
+                              ngbPopover="{{scenarioReportOutline.tags}}" placement="left"
+                              triggers="mouseenter:mouseleave" container="body">
+                          ...
+                      </button>
+                  </ng-container>
+              </td>
+              <td class="text-center align-middle text-nowrap">
+                  <span><small>{{ scenarioReportOutline.datasetId }}</small></span>
+              </td>
+              <td class="text-center align-middle text-nowrap">
+                <span><small>{{ scenarioReportOutline.duration | duration:'short' }}</small></span>
+              </td>
+              @if (jiraTestExecutionId) {
+                <td>
+                  @if (jiraLinkFrom(scenarioReportOutline.scenarioId) !== null) {
+                    <a role="button" class="btn btn-sm btn-link m-0" target="_blank"
+                      href="{{ jiraLinkFrom(scenarioReportOutline.scenarioId) }}" rel="noopener noreferrer"
+                      ngbPopover="{{ jiraLinkFrom(scenarioReportOutline.scenarioId) }}" placement="left"
+                      (click)="$event.stopPropagation()" triggers="mouseenter:mouseleave">
+                      <span class="fab fa-jira" aria-hidden="true">
+                      </span>
+                    </a>
+                  }
+                </td>
+              }
+              @if (jiraTestExecutionId) {
+                <td>
+                  @if (jiraLinkFrom(scenarioReportOutline.scenarioId) !== null) {
+                    <chutney-confirm-dialog class="me-2 mt-1"
+                      [dialogMessage]="('campaigns.execution.update.jira' | translate)" [label]=null
+                      [title]="'global.actions.update'"
+                      [disabled]="selectedStatusByScenarioId.get(scenarioReportOutline.scenarioId) !=='PASS' && selectedStatusByScenarioId.get(scenarioReportOutline.scenarioId) !=='FAIL'"
+                      [btnSizeClass]="'sm'" [btnClassIcon]="'fa-pencil-alt'" [btnColor]="'primary'"
+                      (callbackEvent)="updateStatus(scenarioReportOutline.scenarioId)">
+                    </chutney-confirm-dialog>
+                    <select class="custom-select mt-1"
+                      (change)="selectedUpdateStatus(scenarioReportOutline.scenarioId, $event)"
+                      style="width: 120px">
+                      @for (enum of xrayStatuses(); track $index) {
+                        <option
+                          [selected]="scenarioStatus(scenarioReportOutline.scenarioId) === enum">
+                          {{ enum }}
+                        </option>
+                      }
+                      <option [selected]="scenarioStatus(scenarioReportOutline.scenarioId) === UNSUPPORTED">
+                        {{ UNSUPPORTED }}
+                      </option>
+                    </select>
+                  }
+                </td>
+              }
+            </tr>
+          }
+        </tbody>
+      </table>
     </div>
-</div>
+  </div>
+}

@@ -1,5 +1,5 @@
 // Header Base
-@import "~bootstrap/scss/bootstrap";
+@import "bootstrap/scss/bootstrap";
 @import "../layout-variables";
 
 .app-header {
@@ -35,7 +35,7 @@
       height: $app-header-height;
       align-items: center;
       display: flex;
-    }    
+    }
   }
 }
 

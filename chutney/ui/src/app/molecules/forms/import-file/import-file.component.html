@@ -1,24 +1,26 @@
 <form enctype="multipart/form-data" (ngSubmit)="import()">
-    <div class="drop-box mb-2" id="drop-box">
-        <div class="btn-file-browser">
-            <input class="form-control-file" type="file" id="input-file-browser"
-                   [multiple]="multiple"
-                   [accept]="acceptedTypes"
-            />
-            <i class="fas fa-upload"></i>
-        </div>
+  <div class="drop-box mb-2" id="drop-box">
+    <div class="btn-file-browser">
+      <input class="form-control-file" type="file" id="input-file-browser"
+        [multiple]="multiple"
+        [accept]="acceptedTypes"
+        />
+      <i class="fas fa-upload"></i>
     </div>
-    <button type="submit" id="btn-import" class="btn btn-success">
-        <span class="fa fa-upload"></span> {{'global.actions.import' | translate}}
-    </button>
-    <button type="button" class="btn btn-secondary ms-2" (click)="cancel()"
-            title="{{'global.actions.cancel' | translate}}">
-        {{'global.actions.cancel' | translate}}
-    </button>
-    <ul id="selected-files">
-        <li *ngFor="let file of selectedFiles">
-            {{ file.name }}
-        </li>
-    </ul>
+  </div>
+  <button type="submit" id="btn-import" class="btn btn-success">
+    <span class="fa fa-upload"></span> {{'global.actions.import' | translate}}
+  </button>
+  <button type="button" class="btn btn-secondary ms-2" (click)="cancel()"
+    title="{{'global.actions.cancel' | translate}}">
+    {{'global.actions.cancel' | translate}}
+  </button>
+  <ul id="selected-files">
+    @for (file of selectedFiles; track file.name) {
+      <li>
+        {{ file.name }}
+      </li>
+    }
+  </ul>
 </form>
 

@@ -15,7 +15,6 @@
  */
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { AppComponent } from './app.component';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -24,7 +23,6 @@ describe('AppComponent', () => {
     TestBed.resetTestingModule();
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule,
         TranslateModule.forRoot()
       ],
       declarations: [

@@ -1,104 +1,122 @@
 <div class="p-3 w-100">
-    <div class="row">
-        <div class="col">
-            <chutney-forms-search-field [id]="'dataset-search'" [placeholder]="'global.actions.search' | translate" [searchInput]="dataSetFilter"
-                                        (searchInputEvent)="filterSearchChange($event)">
-            </chutney-forms-search-field>
-        </div>
-        <div class="col">
-            <button *hasAuthorization="[Authorization.DATASET_WRITE]"
-                    type="button" class="btn btn-primary" [routerLink]="['/dataset', 'edition']"
-            >
-                <span class="fa fa-plus" aria-hidden="true"></span> {{ 'global.actions.create' | translate }}
-            </button>
-        </div>
+  <div class="row">
+    <div class="col">
+      <chutney-forms-search-field [id]="'dataset-search'" [placeholder]="'global.actions.search' | translate" [searchInput]="dataSetFilter"
+        (searchInputEvent)="filterSearchChange($event)">
+      </chutney-forms-search-field>
     </div>
-    <div class="mt-3 w-25">
-        <div class="border rounded">
-            <angular2-multiselect [data]="itemList"
-                                  [settings]="settings"
-                                  (onSelect)="onItemSelect($event)"
-                                  (onDeSelect)="onItemDeSelect($event)"
-                                  (onDeSelectAll)="onItemDeSelectAll()"
-                                  [(ngModel)]="selectedItem"
-                                  (ngModelChange)="applyFiltersToRoute()"
-            >
-            </angular2-multiselect>
-        </div>
+    <div class="col">
+      <button *hasAuthorization="[Authorization.DATASET_WRITE]"
+        type="button" class="btn btn-primary" [routerLink]="['/dataset', 'edition']"
+        >
+        <span class="fa fa-plus" aria-hidden="true"></span> {{ 'global.actions.create' | translate }}
+      </button>
     </div>
+  </div>
+  <div class="mt-3 w-25">
+    <div class="border rounded">
+      <ng-multiselect-dropdown [settings]="dropdownSettings"
+        [data]="itemList"
+        (onSelect)="onItemSelect($event)"
+        (onDeSelect)="onItemDeSelect($event)"
+        (onDeSelectAll)="onItemDeSelectAll()"
+        [(ngModel)]="selectedItem"
+        (ngModelChange)="applyFiltersToRoute()"
+        >
+      </ng-multiselect-dropdown>
+    </div>
+  </div>
 
-    <div class="d-flex flex-row mt-5">
-        <div [ngClass]="preview ? 'w-75' : 'w-100'">
-            <table class="table table-sm table-striped table-hover rounded">
-                <thead>
-                <tr class="mb-1">
-                    <th scope="col" class="w10">&nbsp;</th>
-                    <th scope="col" class="w25">Name</th>
-                    <th scope="col" class="w10">Tags</th>
-                    <th scope="col" class="w40">Description</th>
-                    <th scope="col" class="w15">LastUpdated</th>
+  <div class="d-flex flex-row mt-5">
+    <div [ngClass]="preview ? 'w-75' : 'w-100'">
+      <table class="table table-sm table-striped table-hover rounded">
+        <thead>
+          <tr class="mb-1">
+            <th scope="col" class="w10">&nbsp;</th>
+            <th scope="col" class="w25">Name</th>
+            <th scope="col" class="w10">Tags</th>
+            <th scope="col" class="w40">Description</th>
+            <th scope="col" class="w15">LastUpdated</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (dataset of (datasets |  dataSetSearch : selectedTags | searchTextPipe  : dataSetFilter : ['name', 'description']); track dataset.id) {
+            <tr
+              (click)="showPreview(dataset)"
+              class="cursor-pointer">
+              <td class="align-items-center">
+                <button *hasAuthorization="[Authorization.DATASET_WRITE]"
+                  type="button" class="btn btn-primary btn-sm"
+                  [routerLink]="['/dataset', dataset.id, 'edition']">
+                  <span class="fa fa-pencil-alt"
+                  aria-hidden="true"></span> {{ 'global.actions.edit' | translate }}
+                </button>
+              </td>
+              <td class="pt-2"><span>{{dataset.name}}</span></td>
+              <td class="pt-2">
+                @if (dataset.tags.length <= 3) {
+                  <span>
+                    @for (tag of dataset.tags; track $index) {
+                      <span
+                      class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                    }
+                  </span>
+                }
+                @if (dataset.tags.length > 3) {
+                  <span>
+                    @for (tag of dataset.tags | slice:0:2; track $index) {
+                      <span
+                      class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                    }
+                    <button type="button" class="chutney-tag chutney-tag-selected"
+                      ngbPopover="{{dataset.tags}}" placement="left"
+                      triggers="mouseenter:mouseleave">
+                      ...
+                    </button>
+                  </span>
+                }
+              </td>
+              <td class="pt-2"><span>{{dataset.description}}</span></td>
+              <td class="pt-2"><span>{{dataset.lastUpdated | amDateFormat: 'YYYY-MM-DD HH:mm'}}</span></td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    @if (preview) {
+      <div class="w-25 border pt-2 ps-3 pe-2 ms-3" style="overflow-y: auto;overflow-x: auto;">
+        <button type="button" class="btn float-end border" aria-label="Close" (click)="preview = null">
+          <span class="fa fa-times"></span>
+        </button>
+        <span class="fw-bold"><u>{{preview.name}}</u></span>
+        @for (uniqueValue of preview.uniqueValues; track $index) {
+          <div>
+            <span class="fst-italic">{{uniqueValue.key}}: {{uniqueValue.value}}</span>
+          </div>
+        }
+        <div class="row mt-2">
+          <table class="table table-sm table-striped table-hover">
+            <thead>
+              <tr>
+                @for (header of preview.getMultipleValueHeader(); track $index) {
+                  <th>{{ header }}</th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (multipleValue of preview.multipleValues; track $index) {
+                <tr>
+                  @for (value of multipleValue; track $index) {
+                    <td>{{ value.value }}</td>
+                  }
                 </tr>
-                </thead>
-                <tbody>
-                <tr *ngFor="let dataset of (datasets |  dataSetSearch : selectedTags | searchTextPipe  : dataSetFilter : ['name', 'description'])"
-                    (click)="showPreview(dataset)"
-                    class="cursor-pointer">
-
-                    <td class="align-items-center">
-                        <button *hasAuthorization="[Authorization.DATASET_WRITE]"
-                                type="button" class="btn btn-primary btn-sm"
-                                [routerLink]="['/dataset', dataset.id, 'edition']">
-                            <span class="fa fa-pencil-alt"
-                                  aria-hidden="true"></span> {{ 'global.actions.edit' | translate }}
-                        </button>
-                    </td>
-                    <td class="pt-2"><span>{{dataset.name}}</span></td>
-
-                    <td class="pt-2">
-                        <span *ngIf="dataset.tags.length <= 3">
-                            <span *ngFor="let tag of dataset.tags"
-                                  class="chutney-tag chutney-tag-selected">{{tag}}</span>
-                        </span>
-                        <span *ngIf="dataset.tags.length > 3">
-                            <span *ngFor="let tag of dataset.tags | slice:0:2"
-                                  class="chutney-tag chutney-tag-selected">{{tag}}</span>
-                            <button type="button" class="chutney-tag chutney-tag-selected"
-                                    ngbPopover="{{dataset.tags}}" placement="left"
-                                    triggers="mouseenter:mouseleave">
-                                ...
-                            </button>
-                        </span>
-                    </td>
-                    <td class="pt-2"><span>{{dataset.description}}</span></td>
-                    <td class="pt-2"><span>{{dataset.lastUpdated | amDateFormat: 'YYYY-MM-DD HH:mm'}}</span></td>
-                </tr>
-                </tbody>
-            </table>
+              }
+            </tbody>
+          </table>
         </div>
-        <div *ngIf="preview" class="w-25 border pt-2 ps-3 pe-2 ms-3" style="overflow-y: auto;overflow-x: auto;">
-            <button type="button" class="btn float-end border" aria-label="Close" (click)="preview = null">
-                <span class="fa fa-times"></span>
-            </button>
-            <span class="fw-bold"><u>{{preview.name}}</u></span>
-            <div *ngFor="let uniqueValue of preview.uniqueValues">
-                <span class="fst-italic">{{uniqueValue.key}}: {{uniqueValue.value}}</span>
-            </div>
-            <div class="row mt-2">
-                <table class="table table-sm table-striped table-hover">
-                    <thead>
-                    <tr>
-                        <th *ngFor="let header of preview.getMultipleValueHeader()">{{ header }}</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr *ngFor="let multipleValue of preview.multipleValues">
-                        <td *ngFor="let value of multipleValue">{{ value.value }}</td>
-                    </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+      </div>
+    }
+  </div>
 </div>
 <div class="scrollbar scrollbar-primary">
 

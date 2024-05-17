@@ -15,7 +15,6 @@
  */
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { ScenariosComponent } from './scenarios.component';
@@ -31,10 +30,11 @@ import { ScenarioService } from '@core/services';
 
 import { JiraPluginService } from '@core/services/jira-plugin.service';
 import { JiraPluginConfigurationService } from '@core/services/jira-plugin-configuration.service';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, RouterModule } from '@angular/router';
 import { ActivatedRouteStub } from '../../../../testing/activated-route-stub';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
 
 function getScenarios(html: HTMLElement) {
     return html.querySelectorAll('.scenario-title');
@@ -64,14 +64,14 @@ describe('ScenariosComponent', () => {
         activatedRouteStub = new ActivatedRouteStub();
         TestBed.configureTestingModule({
             imports: [
-                RouterTestingModule,
+                RouterModule.forRoot([]),
                 HttpClientTestingModule,
                 TranslateModule.forRoot(),
                 MoleculesModule,
                 SharedModule,
                 MomentModule,
                 NgbModule,
-                AngularMultiSelectModule
+                NgMultiSelectDropDownModule.forRoot()
             ],
             declarations: [
                 ScenariosComponent
@@ -81,7 +81,8 @@ describe('ScenariosComponent', () => {
                 {provide: ScenarioService, useValue: scenarioService},
                 {provide: JiraPluginService, useValue: jiraPluginService},
                 {provide: JiraPluginConfigurationService, useValue: jiraPluginConfigurationService},
-                {provide: ActivatedRoute, useValue: activatedRouteStub}
+                {provide: ActivatedRoute, useValue: activatedRouteStub},
+                {provide: DROPDOWN_SETTINGS, useClass: DropdownSettings}
             ],
             schemas:[NO_ERRORS_SCHEMA],
         }).compileComponents();

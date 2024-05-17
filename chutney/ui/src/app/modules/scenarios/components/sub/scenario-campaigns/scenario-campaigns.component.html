@@ -1,18 +1,20 @@
 <!-- Campaigns related to a scenario -->
-<div *ngIf="campaignsForScenario.length > 0">
+@if (campaignsForScenario.length > 0) {
+  <div>
     {{ 'menu.principal.campaigns' | translate }} :
     <ng-container *hasAuthorization="[Authorization.CAMPAIGN_READ]">
-        <ng-container *ngFor="let campaign of campaignsForScenario">
-            <a [routerLink]="['/campaign', campaign.id,'executions']"
-               title="{{ 'campaigns.list.item.title.link.title' | translate }} {{campaign.title}}">
-                {{campaign.title}}
-            </a>
-            &nbsp;
-        </ng-container>
+      @for (campaign of campaignsForScenario; track $index) {
+        <a [routerLink]="['/campaign', campaign.id,'executions']"
+          title="{{ 'campaigns.list.item.title.link.title' | translate }} {{campaign.title}}">
+          {{campaign.title}}
+        </a>
+        &nbsp;
+      }
     </ng-container>
     <ng-container *hasAuthorization="{not: true, authorizations: [Authorization.CAMPAIGN_READ]}">
-        <ng-container *ngFor="let campaign of campaignsForScenario">
-            <span>{{campaign.title}}</span> &nbsp;
-        </ng-container>
+      @for (campaign of campaignsForScenario; track $index) {
+        <span>{{campaign.title}}</span> &nbsp;
+      }
     </ng-container>
-</div>
+  </div>
+}

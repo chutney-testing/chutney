@@ -23,8 +23,7 @@ import { LoginComponent } from './components/login/login.component';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { ParentComponent } from './components/parent/parent.component';
-import { EnvironmentsNamesResolver } from '@core/services/environments-names.resolver';
-import { EnvironmentsResolver } from '@core/services/environments.resolver';
+import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
 
 @NgModule({
     declarations: [
@@ -39,7 +38,9 @@ import { EnvironmentsResolver } from '@core/services/environments.resolver';
         SharedModule,
         TranslateModule
     ],
-    providers: [EnvironmentsNamesResolver, EnvironmentsResolver]
+    providers: [
+        {provide: DROPDOWN_SETTINGS, useClass: DropdownSettings}
+    ]
 
 })
 export class CoreModule { }

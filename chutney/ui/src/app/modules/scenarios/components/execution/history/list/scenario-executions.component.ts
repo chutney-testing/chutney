@@ -14,16 +14,15 @@
  * limitations under the License.
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
 import { Execution } from '@model';
-import { ActivatedRoute, Params, Router } from '@angular/router';
+import { Params, Router } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
 import { debounceTime, map, tap } from 'rxjs/operators';
 import { Subscription } from 'rxjs';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DateFormatPipe } from 'ngx-moment';
-import { AngularMultiSelect } from 'angular2-multiselect-dropdown';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { TranslateService } from '@ngx-translate/core';
 
@@ -37,11 +36,11 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     filteredExecutions: Execution[] = [];
     filtersForm: FormGroup;
 
-    status: { id: string, itemName: string }[] = [];
-    environments: { id: string, itemName: string }[] = [];
-    executors: { id: string, itemName: string }[] = [];
-    campaigns: { id: string, itemName: string }[] = [];
-    tags: { id: string, itemName: string }[] = [];
+    status: { id: string, text: string }[] = [];
+    environments: { id: string, text: string }[] = [];
+    executors: { id: string, text: string }[] = [];
+    campaigns: { id: string, text: string }[] = [];
+    tags: { id: string, text: string }[] = [];
     selectSettings = {
         text: '',
         enableCheckAll: false,
@@ -53,35 +52,22 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     private filters$: Subscription;
 
     private readonly iso_Date_Delimiter = '-';
-    @ViewChild('statusDropdown', {static: false}) statusDropdown: AngularMultiSelect;
-
-    @ViewChild('envsDropdown', {static: false}) envsDropdown: AngularMultiSelect;
-    @ViewChild('executorsDropdown', {static: false}) executorsDropdown: AngularMultiSelect;
-    @ViewChild('campsDropdown', {static: false}) campsDropdown: AngularMultiSelect;
-    @ViewChild('tagsDropdown', {static: false}) tagsDropdown: AngularMultiSelect;
 
     @Input() executions: Execution[] = [];
     @Output() onExecutionSelect = new EventEmitter<{ execution: Execution, focus: boolean }>();
     @Input() filters: Params;
     @Output() filtersChange = new EventEmitter<Params>();
 
-    constructor(private route: ActivatedRoute,
-                private router: Router,
+    constructor(private router: Router,
                 private formBuilder: FormBuilder,
                 private datePipe: DateFormatPipe,
                 private translateService: TranslateService) {
     }
 
-
     ngOnChanges(changes: SimpleChanges): void {
         this.initFiltersOptions();
         this.applyFilters();
         this.onFiltersChange();
-    }
-
-    toggleDropDown(dropDown: AngularMultiSelect, event) {
-        event.stopPropagation();
-        dropDown.toggleDropdown(event);
     }
 
     getDateFilterValue() {
@@ -153,7 +139,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     }
 
     private toSelectOption(id: string, label: string = id) {
-        return {id: id, itemName: label };
+        return {id: id, text: label };
     }
 
     private toQueryParams(filters: any): Params {
@@ -264,5 +250,9 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
             event.stopPropagation();
             this.router.navigate(['/campaign', execution.campaignReport.campaignId, 'executions'], {queryParams: {open: execution.campaignReport.executionId, active: execution.campaignReport.executionId}});
         }
+    }
+
+    getFormControl(name: string): FormControl {
+        return this.filtersForm.get(name) as FormControl;
     }
 }

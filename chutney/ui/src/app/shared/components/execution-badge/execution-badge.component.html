@@ -5,8 +5,10 @@
             'badge-running': status == 'RUNNING' || status == 'PAUSED',
             'badge-not-executed': status == 'NOT_EXECUTED'
       }">
-    {{ status_h }}
-    <span *ngIf="spin" [hidden]="!(status == 'RUNNING')"
-          class="fa fa-spinner fa-pulse running"
-          aria-hidden="true"></span>
+  {{ status_h }}
+  @if (spin) {
+    <span [hidden]="!(status == 'RUNNING')"
+      class="fa fa-spinner fa-pulse running"
+    aria-hidden="true"></span>
+  }
 </span>

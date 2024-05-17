@@ -20,10 +20,12 @@ import { Component, Input } from '@angular/core';
 selector: 'chutney-button',
 template: `
     <button class="{{level}}" [disabled]="disabled">
-        <span *ngIf="iconClass" class="fa {{iconClass}}"></span>
-        {{model}}
+      @if (iconClass) {
+        <span class="fa {{iconClass}}"></span>
+      }
+      {{model}}
     </button>
-`,
+    `,
 styleUrls: ['./button.component.scss']
 })
 export class ButtonComponent {

@@ -15,7 +15,6 @@
  */
 
 import { TestBed, waitForAsync } from '@angular/core/testing';
-import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TranslateModule } from '@ngx-translate/core';
 import { SharedModule } from '@shared/shared.module';
@@ -26,10 +25,12 @@ import { MomentModule } from 'ngx-moment';
 import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { DatasetListComponent } from './dataset-list.component';
-import { AngularMultiSelectModule } from 'angular2-multiselect-dropdown';
 import { DataSetService } from '@core/services';
 import { of } from 'rxjs';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
+import { RouterModule } from '@angular/router';
 
 describe('DatasetListComponent', () => {
 
@@ -40,14 +41,14 @@ describe('DatasetListComponent', () => {
 
     TestBed.configureTestingModule({
       imports: [
+        RouterModule.forRoot([]),
         HttpClientTestingModule,
-        RouterTestingModule,
         TranslateModule.forRoot(),
         MoleculesModule,
         SharedModule,
         MomentModule,
         NgbModule,
-        AngularMultiSelectModule,
+          NgMultiSelectDropDownModule.forRoot(),
         FormsModule,
         ReactiveFormsModule,
       ],
@@ -55,7 +56,8 @@ describe('DatasetListComponent', () => {
         DatasetListComponent
       ],
       providers: [
-        { provide: DataSetService, useValue: dataSetService }
+        { provide: DataSetService, useValue: dataSetService },
+        {provide: DROPDOWN_SETTINGS, useClass: DropdownSettings}
       ]
     }).compileComponents();
   }));

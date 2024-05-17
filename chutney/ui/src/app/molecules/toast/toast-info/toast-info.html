@@ -1,11 +1,13 @@
-<div *ngIf="message" class="info-toast m-2">
+@if (message) {
+  <div class="info-toast m-2">
     <div class="info-toast-header p-2">
-        <strong class="me-auto">Info</strong>
-        <button type="button" class="ms-2 mb-1 close" (click)="message = ''">
-            <span aria-hidden="true">&times;</span>
-        </button>
+      <strong class="me-auto">Info</strong>
+      <button type="button" class="ms-2 mb-1 close" (click)="message = ''">
+        <span aria-hidden="true">&times;</span>
+      </button>
     </div>
     <div class="p-2">
-        {{message}}
+      {{message}}
     </div>
-</div>
+  </div>
+}

@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, Inject, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { newInstance } from '@shared/tools';
 import { distinct, flatMap } from '@shared/tools/array-utils';
 import { DataSetService } from '@core/services';
-import { Dataset, Authorization } from '@model';
+import { Authorization, Dataset } from '@model';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { FeatureName } from '@core/feature/feature.model';
-import { FeatureService } from '@core/feature/feature.service';
+import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
+import { IDropdownSettings } from 'ng-multiselect-dropdown';
 
 @Component({
     selector: 'chutney-dataset-list',
@@ -39,7 +39,6 @@ export class DatasetListComponent implements OnInit, OnDestroy {
 
     dataSetFilter = '';
     itemList = [];
-    settings = {};
     selectedTags: string[] = [];
     selectedItem: any[];
     urlParams: Subscription;
@@ -49,7 +48,8 @@ export class DatasetListComponent implements OnInit, OnDestroy {
     constructor(
         private router: Router,
         private dataSetService: DataSetService,
-        private readonly route: ActivatedRoute
+        private readonly route: ActivatedRoute,
+        @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings
     ) {}
 
     ngOnInit(): void {
@@ -61,11 +61,6 @@ export class DatasetListComponent implements OnInit, OnDestroy {
             },
             (error) => console.log(error)
         );
-
-        this.settings = {
-            enableCheckAll: false,
-            autoPosition: false
-        };
     }
 
     ngOnDestroy(): void {
@@ -92,7 +87,7 @@ export class DatasetListComponent implements OnInit, OnDestroy {
         let index = 0;
         this.itemList = allTagsInDataset.map(t => {
             index++;
-            return { 'id': index, 'itemName': t };
+            return { 'id': index, 'text': t };
         });
     }
 
@@ -102,12 +97,12 @@ export class DatasetListComponent implements OnInit, OnDestroy {
     }
 
     onItemSelect(item: any) {
-        this.selectedTags.push(item.itemName);
+        this.selectedTags.push(item.text);
         this.selectedTags = newInstance(this.selectedTags);
     }
 
     onItemDeSelect(item: any) {
-        this.selectedTags.splice(this.selectedTags.indexOf(item.itemName), 1);
+        this.selectedTags.splice(this.selectedTags.indexOf(item.text), 1);
         this.selectedTags = newInstance(this.selectedTags);
     }
 
@@ -120,7 +115,7 @@ export class DatasetListComponent implements OnInit, OnDestroy {
             relativeTo: this.route,
             queryParams: {
                 text: this.dataSetFilter ? this.dataSetFilter : null,
-                tags: this.selectedItem?.length ? this.selectedItem.map((i) => i.itemName).toString() : null
+                tags: this.selectedItem?.length ? this.selectedItem.map((i) => i.text).toString() : null
             }
         });
     }
@@ -134,8 +129,8 @@ export class DatasetListComponent implements OnInit, OnDestroy {
                     if (params['tags']) {
                         const uriTag = params['tags'].split(',');
                         if (uriTag != null) {
-                            this.selectedItem = this.itemList.filter((tagItem) => uriTag.includes(tagItem.itemName));
-                            this.selectedTags = this.selectedItem.map((i) => i.itemName);
+                            this.selectedItem = this.itemList.filter((tagItem) => uriTag.includes(tagItem.text));
+                            this.selectedTags = this.selectedItem.map((i) => i.text);
                             this.applyFiltersToRoute();
                         }
                     }

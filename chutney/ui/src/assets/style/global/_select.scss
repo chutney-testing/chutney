@@ -1,23 +1,44 @@
-angular2-multiselect {
-    .cuppa-dropdown {
-        border: 1px solid var(--bs-light);
-        border-radius: 0.375rem;
-    }
-    .selected-list .c-list .c-token {
-        background-color: var(--bs-primary);
-        .c-label {
-            color: var(--bs-white);
+$base-color: var(--bs-primary) !important;
+.multiselect-dropdown {
+    .dropdown-btn {
+        .selected-item {
+            border: 1px solid $base-color;
+            background: $base-color;
+            margin-bottom: 2px;
         }
     }
-    .dropdown-list {
-        label {
-            color: var(--bs-primary);
-        }
-        .pure-checkbox input[type=checkbox]+label:before {
-            color: var(--bs-primary);
-            border: 1px solid var(--bs-primary);
-        }
-    }
-
 }
+
+.multiselect-item-checkbox input[type='checkbox']:focus + div:before,
+.multiselect-item-checkbox input[type='checkbox']:hover + div:before {
+    border-color: $base-color;
+}
+
+.multiselect-item-checkbox input[type='checkbox'] + div:before {
+    color: $base-color;
+    border: 2px solid $base-color;
+}
+
+.multiselect-item-checkbox input[type='checkbox'] + div:after {
+    background-color: $base-color;
+}
+
+.multiselect-item-checkbox input[type='checkbox']:checked + div:before {
+    background: $base-color;
+}
+
+@keyframes borderscale {
+    50% {
+        box-shadow: 0 0 0 2px $base-color;
+    }
+}
+
+.no-data {
+    h5 {
+        font-size: medium;
+    }
+}
+
+
+
 

@@ -25,13 +25,10 @@ import { ThumbnailPipe } from '@shared/pipes/thumbnail.pipe';
 import { MomentModule } from 'ngx-moment';
 import { AlertService } from './alert.service';
 import { ErrorInterceptor } from './error-interceptor.service';
+import { EnvironmentComboComponent, ExecutionBadgeComponent } from './components';
 import {
-    EnvironmentComboComponent,
-    ExecutionBadgeComponent
-} from './components';
-import {
-    ImplementationHostDirective,
     HasAuthorizationDirective,
+    ImplementationHostDirective,
     InputFocusDirective,
     ResizeDirective
 } from './directives';
@@ -56,12 +53,12 @@ import { StateService } from './state/state.service';
 import { ChutneyEditorComponent } from '@shared/components/chutney-editor/chutney-editor.component';
 import { HjsonParserService } from '@shared/hjson-parser/hjson-parser.service';
 
-import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChutneyMainHeaderComponent } from '@shared/components/layout/header/chutney-main-header.component';
 import { ChutneyLeftMenuComponent } from '@shared/components/layout/left-menu/chutney-left-menu.component';
 import { ChutneyRightMenuComponent } from '@shared/components/layout/right-menu/chutney-right-menu.component';
 import { DistinctPipe } from './pipes/distinct.pipe';
+import { NgScrollbarModule } from 'ngx-scrollbar';
 
 @NgModule({
     imports: [
@@ -71,7 +68,7 @@ import { DistinctPipe } from './pipes/distinct.pipe';
         ReactiveFormsModule,
         RouterModule,
         TranslateModule,
-        PerfectScrollbarModule,
+        NgScrollbarModule,
         NgbTooltipModule,
         NgbDropdownModule
     ],

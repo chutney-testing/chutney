@@ -479,6 +479,9 @@
             "at": "à",
             "key": "Clé",
             "value": "Valeur"
+        },
+        "msg": {
+            "empty": "Aucune donnée"
         }
     },
     "metrics": {

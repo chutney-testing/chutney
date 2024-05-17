@@ -1,61 +1,67 @@
 <div class="mt-3" [formGroup]="dataGridForm">
-    <div class="mb-3">
-        <button type="button" class="btn btn-info" (click)="addLine()">
-            {{ 'global.actions.add' | translate }} <span class="fa fa-grip-lines" aria-hidden="true"></span>
-        </button>
-        <button type="button" class="btn btn-info ms-2" (click)="addColumn()">
-            {{ 'global.actions.add' | translate }} <span class="fa fa-grip-lines-vertical" aria-hidden="true"></span>
-        </button>
-        <div class="float-end">
-            <button type="button" class="btn btn-info" (click)="exportMultiKeyValue()">
-                <span class="fa fa-file-csv" aria-hidden="true"></span> {{ 'global.actions.export' | translate }}
-            </button>
-            <div class="btn btn-info div-file ms-2">
-                <span class="fa fa-file-import" aria-hidden="true"></span> {{ 'global.actions.import' | translate }}
-                <input class="input-file" type="file" name="file" multiple="false"
-                       (change)="importMultiKeyValue($event.target.files)"/>
-            </div>
-        </div>
+  <div class="mb-3">
+    <button type="button" class="btn btn-info" (click)="addLine()">
+      {{ 'global.actions.add' | translate }} <span class="fa fa-grip-lines" aria-hidden="true"></span>
+    </button>
+    <button type="button" class="btn btn-info ms-2" (click)="addColumn()">
+      {{ 'global.actions.add' | translate }} <span class="fa fa-grip-lines-vertical" aria-hidden="true"></span>
+    </button>
+    <div class="float-end">
+      <button type="button" class="btn btn-info" (click)="exportMultiKeyValue()">
+        <span class="fa fa-file-csv" aria-hidden="true"></span> {{ 'global.actions.export' | translate }}
+      </button>
+      <div class="btn btn-info div-file ms-2">
+        <span class="fa fa-file-import" aria-hidden="true"></span> {{ 'global.actions.import' | translate }}
+        <input class="input-file" type="file" name="file" multiple="false"
+          (change)="importMultiKeyValue($event.target.files)"/>
+      </div>
     </div>
+  </div>
 
 
-    <div>
-        <table class="table table-sm table-striped table-hover">
-            <thead>
-            <tr>
-                <th style="width:30px">
-                </th>
-                <th class="header index-col">#</th>
-                <th class="header" scope="col" *ngFor="let header of headers.controls; let i = index;" style="min-width:250px ">
-                    <div style="text-align: center; margin-bottom: 2px;">
-                        <button tabindex="-1" type="button" class="btn btn-outline-danger delete-button-height removeBtn"
-                                (click)="removeColumn(i)"
-                                title="{{'global.actions.delete' | translate}}">
-                            <span class="fa fa-times"></span>
-                        </button>
-                    </div>
-                    <input type="text" class="form-control" id="{{i}}-header" placeholder="{{ 'global.smallword.key' | translate }}" [formControl]="header"
-                           (change)="updateHeader(i, $event.target.value)"/>
-                </th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr *ngFor="let line of dataGridForm.controls; let i = index">
-                <td style="width:30px">
-                    <button tabindex="-1" type="button" class="btn btn-outline-danger delete-button-height" (click)="removeLine(i)"
-                            title="{{'global.actions.delete' | translate}}">
-                        <span class="fa fa-times"></span>
-                    </button>
-                </td>
-                <td class="index-col">{{i+1}}</td>
-                <td [formGroupName]="i" *ngFor="let keyValue of line.controls; let j = index" style="min-width:250px">
-                    <div [formGroupName]="j">
-                        <input type="text" class="form-control" id="{{i-j}}-value"
-                               formControlName="value" placeholder="{{ 'global.smallword.value' | translate }}"/>
-                    </div>
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
+  <div>
+    <table class="table table-sm table-striped table-hover">
+      <thead>
+        <tr>
+          <th style="width:30px">
+          </th>
+          <th class="header index-col">#</th>
+          @for (header of headers.controls; track header; let i = $index) {
+            <th class="header" scope="col" style="min-width:250px ">
+              <div style="text-align: center; margin-bottom: 2px;">
+                <button tabindex="-1" type="button" class="btn btn-outline-danger delete-button-height removeBtn"
+                  (click)="removeColumn(i)"
+                  title="{{'global.actions.delete' | translate}}">
+                  <span class="fa fa-times"></span>
+                </button>
+              </div>
+              <input type="text" class="form-control" id="{{i}}-header" placeholder="{{ 'global.smallword.key' | translate }}" [formControl]="header"
+                (change)="updateHeader(i, $event.target.value)"/>
+            </th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (line of dataGridForm.controls; track line; let i = $index) {
+          <tr>
+            <td style="width:30px">
+              <button tabindex="-1" type="button" class="btn btn-outline-danger delete-button-height" (click)="removeLine(i)"
+                title="{{'global.actions.delete' | translate}}">
+                <span class="fa fa-times"></span>
+              </button>
+            </td>
+            <td class="index-col">{{i+1}}</td>
+            @for (keyValue of line.controls; track keyValue; let j = $index) {
+              <td [formGroupName]="i" style="min-width:250px">
+                <div [formGroupName]="j">
+                  <input type="text" class="form-control" id="{{i-j}}-value"
+                    formControlName="value" placeholder="{{ 'global.smallword.value' | translate }}"/>
+                </div>
+              </td>
+            }
+          </tr>
+        }
+      </tbody>
+    </table>
+  </div>
 </div>

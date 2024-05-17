@@ -14,25 +14,13 @@
  * limitations under the License.
  */
 
-import {
-    Component,
-    OnInit,
-    QueryList,
-    TemplateRef,
-    ViewChild,
-    ViewChildren
-} from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 
 import { Authorization, ScenarioIndex, TestCase } from '@model';
-import {
-    JiraPluginService,
-    LoginService,
-    ScenarioService
-} from '@core/services';
+import { JiraPluginService, LoginService, ScenarioService } from '@core/services';
 import { ActivatedRoute, Router } from '@angular/router';
 import { combineLatestWith, Observable, of, switchMap, tap } from 'rxjs';
 import { FileSaverService } from 'ngx-filesaver';
-import { NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 import { BsModalService } from 'ngx-bootstrap/modal';
 import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { EventManagerService } from '@shared';
@@ -47,13 +35,9 @@ import { EnvironmentService } from '@core/services/environment.service';
 export class ScenarioExecutionMenuComponent implements OnInit {
 
     testCaseId: string;
-    canExecute = true;
 
     environments: Array<string>;
     testCaseMetadata: ScenarioIndex;
-
-    @ViewChildren(NgbDropdown)
-    private executeDropDown: QueryList<NgbDropdown>;
 
     @ViewChild('delete_modal') deleteModal: TemplateRef<any>;
 
@@ -171,7 +155,7 @@ export class ScenarioExecutionMenuComponent implements OnInit {
                 iconClass: 'fa fa-file-code'
             }
         ];
-        
+
         this.rightMenuItems = rightMenuItems;
     }
 

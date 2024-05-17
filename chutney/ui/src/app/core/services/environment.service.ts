@@ -18,9 +18,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Environment, EnvironmentVariable, Target, TargetFilter } from '@model';
 import { environment as server } from '../../../environments/environment';
-import { HttpClient, HttpContext, HttpHeaders, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { map, tap } from 'rxjs/operators';
-import { saveAs } from 'file-saver';
 import { FileSaverService } from 'ngx-filesaver';
 
 @Injectable({
