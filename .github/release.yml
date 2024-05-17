@@ -2,19 +2,22 @@
 
 changelog:
   categories:
-    - title: '⚡ Breaking changes:'  
+    - title: '⚡ Breaking changes:'
       labels:
         - breaking
-    - title: '🚀 Implemented enhancements:'  
+    - title: '🚀 Implemented enhancements:'
       labels:
         - enhancement
-    - title: '🐛 Fixed bugs:' 
+    - title: '🐛 Fixed bugs:'
       labels:
         - bug
-    - title: '🔧 Technical enhancements:' 
+    - title: '🔧 Technical enhancements:'
       labels:
         - technical
-    - title: '👒 Dependencies:' 
+    - title: '📖 Documentation:'
+      labels:
+        - documentation
+    - title: '👒 Dependencies:'
       labels:
         - dependencies
     - title: 'to categorize manually:'
@@ -28,3 +31,4 @@ changelog:
           - technical
           - breaking
           - release
+          - documentation
