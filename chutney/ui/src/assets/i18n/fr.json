@@ -73,6 +73,7 @@
                 "status": "Statut",
                 "date": "Date",
                 "env": "Environnement",
+                "dataset": "Dataset",
                 "executor": "Utilisateur",
                 "campaign": "Campagne",
                 "tags": "Tags",

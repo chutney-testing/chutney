@@ -25,7 +25,7 @@ import { HttpClient } from '@angular/common/http';
 @Injectable()
 export class ScenarioExecutionService {
 
-    private resourceUrl = '/api/ui/scenario';
+    resourceUrl = '/api/ui/scenario';
 
     constructor(private http: HttpClient) {
     }
@@ -44,9 +44,10 @@ export class ScenarioExecutionService {
                 map((res: Execution) => Execution.deserialize(res)));
     }
 
-    executeScenarioAsync(scenarioId: string, env: string): Observable<string> {
+    executeScenarioAsync(scenarioId: string, env: string, dataset:string = null): Observable<string> {
         const envPathParam = !!env ? `/${env}` : '';
-        return this.http.post<string>(environment.backend + `${this.resourceUrl}/executionasync/v1/${scenarioId}${envPathParam}`, {});
+        const datasetPathParam = !!dataset ? `/${dataset}` : '';
+        return this.http.post<string>(environment.backend + `${this.resourceUrl}/executionasync/v1/${scenarioId}${envPathParam}${datasetPathParam}`, {});
     }
 
     observeScenarioExecution(scenarioId: string, executionId: number): Observable<ScenarioExecutionReport> {

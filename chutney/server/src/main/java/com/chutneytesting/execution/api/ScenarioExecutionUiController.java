@@ -43,6 +43,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import io.reactivex.rxjava3.core.Observable;
 import java.io.IOException;
+import java.util.Optional;
 import org.jdom2.Element;
 import org.jdom2.output.Format;
 import org.jdom2.output.XMLOutputter;
@@ -120,19 +121,19 @@ public class ScenarioExecutionUiController {
     }
 
     @PreAuthorize("hasAuthority('SCENARIO_EXECUTE')")
-    @PostMapping(path = "/api/ui/scenario/executionasync/v1/{scenarioId}/{env}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env) {
+    @PostMapping(path = {"/api/ui/scenario/executionasync/v1/{scenarioId}/{env}", "/api/ui/scenario/executionasync/v1/{scenarioId}/{env}/{dataset}"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env, @PathVariable(value = "dataset", required = false) Optional<String> dataset) {
         LOGGER.debug("execute async scenario '{}'", scenarioId);
         TestCase testCase = testCaseRepository.findExecutableById(scenarioId).orElseThrow(() -> new ScenarioNotFoundException(scenarioId));
         String userId = userService.currentUser().getId();
-        DataSet dataset = getDataSet(testCase);
-        return executionEngineAsync.execute(new ExecutionRequest(testCase, env, userId, dataset)).toString();
+        DataSet execDataset = dataset.map(datasetRepository::findById).orElseGet(() -> getDataSet(testCase));
+        return executionEngineAsync.execute(new ExecutionRequest(testCase, env, userId, execDataset)).toString();
     }
 
     @PreAuthorize("hasAuthority('SCENARIO_EXECUTE')")
     @PostMapping(path = "/api/ui/scenario/executionasync/v1/{scenarioId}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public String executeScenarioAsyncOnDefaultEnv(@PathVariable("scenarioId") String scenarioId) {
-        return executeScenarioAsyncWithExecutionParameters(scenarioId, embeddedEnvironmentApi.defaultEnvironmentName());
+        return executeScenarioAsyncWithExecutionParameters(scenarioId, embeddedEnvironmentApi.defaultEnvironmentName(), null);
     }
 
     @PreAuthorize("hasAuthority('SCENARIO_EXECUTE')")

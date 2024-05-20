@@ -34,6 +34,7 @@ import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { TranslateService } from '@ngx-translate/core';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
+import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 
 @Component({
     selector: 'chutney-scenarios',
@@ -53,7 +54,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     tags = [];
     selectedTags = [];
     fullTextSearch = false;
-    status: { id: string, text: string }[] = [];
+    status: ListItem[] = [];
     selectedStatus= [];
     // Jira
     jiraMap: Map<string, string> = new Map();

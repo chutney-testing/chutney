@@ -19,7 +19,7 @@ import { CampaignExecutionReport } from '@core/model';
 
 export class Execution {
 
-  public static NO_EXECUTION: Execution = new Execution(null, null, null, null, null, null, null, null);
+  public static NO_EXECUTION: Execution = new Execution(null, null, null, null, null, null, null, null, null);
 
   constructor(
     public duration: number,
@@ -35,6 +35,8 @@ export class Execution {
     public error?: string,
     public scenarioId?: string,
     public campaignReport?: CampaignExecutionReport,
+    public dataset?: string,
+
   ) { }
 
   static deserializeExecutions(jsonObject: any): Execution[] {
@@ -56,6 +58,7 @@ export class Execution {
       jsonObject.error,
       jsonObject.scenarioId,
       jsonObject.campaignReport,
+      jsonObject.datasetId
     );
   }
 }

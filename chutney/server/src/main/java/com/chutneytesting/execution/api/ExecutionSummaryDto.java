@@ -47,6 +47,7 @@ public interface ExecutionSummaryDto extends ExecutionProperties, Attached, With
             .executionId(executionSummary.executionId())
             .testCaseTitle(executionSummary.testCaseTitle())
             .environment(executionSummary.environment())
+            .datasetId(executionSummary.datasetId())
             .user(executionSummary.user())
             .campaignReport(executionSummary.campaignReport())
             .scenarioId(executionSummary.scenarioId())
