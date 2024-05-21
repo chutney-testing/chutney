@@ -391,13 +391,14 @@ public class DatabaseExecutionHistoryRepositoryTest {
             // Given
             ScenarioEntity scenarioEntity = givenScenario();
             CampaignEntity campaign = givenCampaign(scenarioEntity);
+            campaign.tags().add("TAG");
 
             ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
             ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
             ScenarioExecutionEntity scenarioExecutionTwo = givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
 
             Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user", List.of());
+            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user", campaign.tags());
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
             // When
@@ -408,7 +409,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
             assertThat(executions.get(0).executionId()).isEqualTo(scenarioExecutionTwo.id());
             assertThat(executions.get(0).campaignReport()).isEmpty();
             assertThat(executions.get(1).executionId()).isEqualTo(scenarioExecutionOne.id());
-            assertThat(executions.get(1).tags().orElseThrow()).containsExactly("TAG");
+            assertThat(executions.get(1).tags().orElseThrow()).containsExactly("SIMPLE", "COM_PLEX", "TAG");
             assertThat(executions.get(1).campaignReport()).hasValueSatisfying(report -> {
                 assertThat(report.campaignId).isEqualTo(campaign.id());
                 assertThat(report.executionId).isEqualTo(campaignExecutionId);
@@ -420,13 +421,14 @@ public class DatabaseExecutionHistoryRepositoryTest {
             // Given
             ScenarioEntity scenarioEntity = givenScenario();
             CampaignEntity campaign = givenCampaign(scenarioEntity);
+            campaign.tags().add("TAG");
 
             ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
             ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
             givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
 
             Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user", List.of());
+            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user", campaign.tags());
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
             // When
@@ -436,7 +438,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
             assertThat(executionSummary.executionId()).isEqualTo(scenarioExecutionOne.id());
             assertThat(executionSummary.tags()).hasValue(defaultScenarioTags());
             assertThat(executionSummary.campaignReport()).isPresent();
-            assertThat(executionSummary.tags().orElseThrow()).containsExactly("TAG");
+            assertThat(executionSummary.tags().orElseThrow()).containsExactly("SIMPLE", "COM_PLEX", "TAG");
             assertThat(executionSummary.campaignReport()).hasValueSatisfying(cr -> {
                 assertThat(cr.campaignId).isEqualTo(campaign.id());
                 assertThat(cr.executionId).isEqualTo(campaignExecutionId);
