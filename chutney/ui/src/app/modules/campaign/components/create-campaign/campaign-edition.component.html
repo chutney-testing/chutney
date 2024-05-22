@@ -179,7 +179,7 @@
         </div>
       </div>
       <!-- Right side -->
-      <div class="col-md-6 mt-5">
+      <div class="col-md-6">
         <div class="row table-responsive">
           <table class="table table-striped table-hover">
             <thead>
@@ -187,7 +187,7 @@
                 {{ 'campaigns.edition.scenarios.pick.title' | translate }}
               </th>
               <th></th>
-              </thead>
+            </thead>
             <tbody>
               @for (scenario of scenarios |  scenarioCampaignSearch : selectedTags | searchTextPipe  : scenariosFilter : ['title', 'id'] | withoutScenario:scenariosToAdd | withoutScenario:jiraScenariosToExclude; track scenario.id) {
                 <tr>
