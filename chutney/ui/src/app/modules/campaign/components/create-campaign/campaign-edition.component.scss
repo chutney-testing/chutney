@@ -96,3 +96,8 @@ fieldset legend {
     color:var(--bs-warning);
     font-size: 0.8em;
 }
+
+.dataset-combo {
+    min-width:200px;
+    display: inline-block;
+}

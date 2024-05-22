@@ -267,7 +267,8 @@
                 "testExec": "If id of a test exec: it updates test status for current test execution."
             },
             "selectTag": "Select tag",
-            "selectJiraTag": "Select jira execution status"
+            "selectJiraTag": "Select jira execution status",
+            "selectDatasetScenario": "Select dataset"
         },
         "confirm": {
             "deletion.prefix": "Are you sure you want to delete the campaign ",
