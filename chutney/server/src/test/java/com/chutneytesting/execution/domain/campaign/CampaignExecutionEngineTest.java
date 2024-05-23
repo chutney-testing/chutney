@@ -179,7 +179,6 @@ public class CampaignExecutionEngineTest {
         assertThat(campaignExecution.scenarioExecutionReports()).hasSize(1);
         assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().executionId()).isEqualTo(secondScenarioExecutionId);
         assertThat(campaignExecution.partialExecution).isTrue();
-        assertThat(campaignExecution.tags).containsExactly("TAG");
         verify(campaignExecutionRepository).saveCampaignExecution(campaign.id, campaignExecution);
     }
 
@@ -270,7 +269,7 @@ public class CampaignExecutionEngineTest {
         String env = "env";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L, "", false, env, null, "", List.of());
+        CampaignExecution mockReport = new CampaignExecution(1L, "", false, env, null, "");
         when(campaignExecutionRepository.currentExecutions(1L)).thenReturn(List.of(mockReport));
 
         // When
@@ -284,7 +283,7 @@ public class CampaignExecutionEngineTest {
         String otherEnv = "otherEnv";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L, "", false, otherEnv, null, "", List.of());
+        CampaignExecution mockReport = new CampaignExecution(1L, "", false, otherEnv, null, "");
         when(campaignExecutionRepository.currentExecutions(anyLong())).thenReturn(List.of(mockReport));
 
         // When
@@ -315,7 +314,7 @@ public class CampaignExecutionEngineTest {
     public void should_return_last_existing_campaign_execution_for_existing_campaign() {
         // Given
         Campaign campaign = createCampaign();
-        CampaignExecution campaignExecution = new CampaignExecution(123L, campaign.id, emptyList(), "", false, campaign.executionEnvironment(), null, "", List.of());
+        CampaignExecution campaignExecution = new CampaignExecution(123L, campaign.id, emptyList(), "", false, campaign.executionEnvironment(), null, "");
 
 
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
@@ -380,10 +379,10 @@ public class CampaignExecutionEngineTest {
     @Test
     public void should_retrieve_current_campaign_execution_on_a_given_env() {
         String env = "env";
-        CampaignExecution report = new CampaignExecution(1L, 33L, emptyList(), "", false, env, null, "", List.of());
+        CampaignExecution report = new CampaignExecution(1L, 33L, emptyList(), "", false, env, null, "");
         String otherEnv = "otherEnv";
-        CampaignExecution report2 = new CampaignExecution(2L, 33L, emptyList(), "", false, otherEnv, null, "", List.of());
-        CampaignExecution report3 = new CampaignExecution(3L, 42L, emptyList(), "", false, otherEnv, null, "", List.of());
+        CampaignExecution report2 = new CampaignExecution(2L, 33L, emptyList(), "", false, otherEnv, null, "");
+        CampaignExecution report3 = new CampaignExecution(3L, 42L, emptyList(), "", false, otherEnv, null, "");
         when(campaignExecutionRepository.currentExecutions(33L)).thenReturn(List.of(report, report2));
         when(campaignExecutionRepository.currentExecutions(42L)).thenReturn(List.of(report3));
 
@@ -418,7 +417,7 @@ public class CampaignExecutionEngineTest {
             .build();
 
         var campaignScenarios = singletonList(new Campaign.CampaignScenario(gwtTestCase.id(), null));
-        Campaign campaign = new Campaign(generateId(), "...", null, campaignScenarios, "...", false, false, "campaignDataSet", null);
+        Campaign campaign = new Campaign(generateId(), "...", null, campaignScenarios, "...", false, false, "campaignDataSet", List.of("TAG"));
 
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
         when(testCaseRepository.findExecutableById(gwtTestCase.id())).thenReturn(of(gwtTestCase));
@@ -436,6 +435,7 @@ public class CampaignExecutionEngineTest {
         ExecutionRequest executionRequest = argumentCaptor.getValue();
         assertThat(executionRequest.dataset).isNotNull();
         assertThat(executionRequest.dataset.name).isEqualTo("campaignDataSet");
+        assertThat(executionRequest.tags).containsExactly("TAG");
     }
 
     @Test
@@ -451,7 +451,7 @@ public class CampaignExecutionEngineTest {
             .build();
 
         var campaignScenarios = singletonList(new Campaign.CampaignScenario(gwtTestCase.id(), "scenarioInCampaignDataset"));
-        Campaign campaign = new Campaign(generateId(), "...", null, campaignScenarios, "...", false, false, "campaignDataSet", null);
+        Campaign campaign = new Campaign(generateId(), "...", null, campaignScenarios, "...", false, false, "campaignDataSet", List.of("TAG"));
 
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
         when(testCaseRepository.findExecutableById(gwtTestCase.id())).thenReturn(of(gwtTestCase));
@@ -469,6 +469,7 @@ public class CampaignExecutionEngineTest {
         ExecutionRequest executionRequest = argumentCaptor.getValue();
         assertThat(executionRequest.dataset).isNotNull();
         assertThat(executionRequest.dataset.name).isEqualTo("scenarioInCampaignDataset");
+        assertThat(executionRequest.tags).containsExactly("TAG");
     }
 
     @Test
@@ -484,7 +485,7 @@ public class CampaignExecutionEngineTest {
             .build();
 
         var campaignScenarios = singletonList(new Campaign.CampaignScenario(gwtTestCase.id(), null));
-        Campaign campaign = new Campaign(generateId(), "...", null, campaignScenarios, "...", false, false, null, null);
+        Campaign campaign = new Campaign(generateId(), "...", null, campaignScenarios, "...", false, false, null, List.of("TAG"));
 
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
         when(testCaseRepository.findExecutableById(gwtTestCase.id())).thenReturn(of(gwtTestCase));
@@ -499,6 +500,7 @@ public class CampaignExecutionEngineTest {
         verify(scenarioExecutionEngine).execute(argumentCaptor.capture());
         ExecutionRequest executionRequest = argumentCaptor.getValue();
         assertThat(executionRequest.dataset).isNull();
+        assertThat(executionRequest.tags).containsExactly("TAG");
     }
 
     private final static Random campaignIdGenerator = new Random();

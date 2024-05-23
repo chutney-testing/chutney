@@ -102,7 +102,7 @@ public class ScenarioExecutionEngineAsync {
      */
     public Long execute(ExecutionRequest executionRequest) {
         // Compile testcase for execution
-        ExecutionRequest executionRequestProcessed = new ExecutionRequest(testCasePreProcessors.apply(executionRequest), executionRequest.environment, executionRequest.userId, executionRequest.dataset, executionRequest.campaignExecution);
+        ExecutionRequest executionRequestProcessed = new ExecutionRequest(testCasePreProcessors.apply(executionRequest), executionRequest.environment, executionRequest.userId, executionRequest.dataset, executionRequest.campaignExecution, executionRequest.tags);
         // Initialize execution history
         ExecutionHistory.Execution storedExecution = storeInitialReport(executionRequestProcessed);
         // Start engine execution

@@ -47,6 +47,7 @@ import com.chutneytesting.tools.Try;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -164,8 +165,7 @@ public class CampaignExecutionEngine {
             !failedExecutions.isEmpty(),
             campaign.executionEnvironment(),
             isNotBlank(campaign.externalDatasetId) ? campaign.externalDatasetId : null,
-            userId,
-            campaign.tags
+            userId
         );
 
         campaignExecutionRepository.startExecution(campaign.id, campaignExecution);
@@ -305,7 +305,7 @@ public class CampaignExecutionEngine {
             .or(() -> ofNullable(campaign.externalDatasetId))
             .map(datasetRepository::findById)
             .orElse(null);
-        return new ExecutionRequest(testCaseDataset.testcase(), campaign.executionEnvironment(), campaignExecution.userId, dataset, campaignExecution);
+        return new ExecutionRequest(testCaseDataset.testcase(), campaign.executionEnvironment(), campaignExecution.userId, dataset, campaignExecution, new HashSet<>(campaign.tags));
     }
 
     private void verifyNotAlreadyRunning(Campaign campaign) {

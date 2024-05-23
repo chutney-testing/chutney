@@ -105,8 +105,8 @@ public class SurefireCampaignExecutionReportBuilderTest {
         when(executionHistoryRepository.getExecution(scenarioExecutionReportKO.scenarioId(), failure_report.executionId)).thenReturn(failure_execution);
 
         // And a campaign report with previous scenario executions
-        CampaignExecution campaignExecution1 = new CampaignExecution(1L, 1L, Arrays.asList(scenarioExecutionReportOK, scenarioExecutionReportKO), "test Campaign Title", false, "", null, "", List.of());
-        CampaignExecution campaignExecution2 = new CampaignExecution(1L, 1L, Arrays.asList(scenarioExecutionReportOK, scenarioExecutionReportKO), "test Campaign Title 2", false, "", null, "", List.of());
+        CampaignExecution campaignExecution1 = new CampaignExecution(1L, 1L, Arrays.asList(scenarioExecutionReportOK, scenarioExecutionReportKO), "test Campaign Title", false, "", null, "");
+        CampaignExecution campaignExecution2 = new CampaignExecution(1L, 1L, Arrays.asList(scenarioExecutionReportOK, scenarioExecutionReportKO), "test Campaign Title 2", false, "", null, "");
 
         // When we zip it
         byte[] zip = surefireCampaignExecutionReportBuilder.createReport(Lists.list(campaignExecution1, campaignExecution2));

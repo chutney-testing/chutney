@@ -1207,8 +1207,7 @@ public class PurgeServiceTest {
             partialExecution,
             campaignEnv,
             firsScenarioExecution.datasetId().orElse(null),
-            firsScenarioExecution.user(),
-            List.of("TAG")
+            firsScenarioExecution.user()
         );
     }
 }

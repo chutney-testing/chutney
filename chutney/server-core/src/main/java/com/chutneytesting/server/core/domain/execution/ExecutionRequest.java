@@ -24,6 +24,7 @@ import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.google.common.collect.Streams;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -36,28 +37,28 @@ public class ExecutionRequest {
     public final CampaignExecution campaignExecution;
     public final Set<String> tags;
 
-    public ExecutionRequest(TestCase testCase, String environment, String userId, DataSet dataset, CampaignExecution campaignExecution) {
+    public ExecutionRequest(TestCase testCase, String environment, String userId, DataSet dataset, CampaignExecution campaignExecution, Set<String> tags) {
         this.testCase = testCase;
         this.environment = environment;
         this.userId = userId;
         this.dataset = dataset;
         this.campaignExecution = campaignExecution;
-        this.tags = tags();
+        this.tags = tags(tags);
     }
 
     public ExecutionRequest(TestCase testCase, String environment, String userId, DataSet dataset) {
-        this(testCase, environment, userId, dataset, null);
+        this(testCase, environment, userId, dataset, null, Set.of());
     }
 
     public ExecutionRequest(TestCase testCase, String environment, String userId) {
-        this(testCase, environment, userId, DataSet.NO_DATASET, null);
+        this(testCase, environment, userId, DataSet.NO_DATASET, null, Set.of());
     }
 
-    private Set<String> tags() {
+    private Set<String> tags(Set<String> tags) {
         return Streams.concat(
                 ofNullable(testCase).map(tc -> tc.metadata().tags().stream()).orElse(Stream.empty()),
                 ofNullable(dataset).stream().flatMap(ds -> ofNullable(ds.tags).stream().flatMap(Collection::stream)),
-                ofNullable(campaignExecution).stream().flatMap(ce -> ofNullable(ce.tags).stream().flatMap(Collection::stream))
+                tags.stream()
             )
             .collect(toUnmodifiableSet());
     }
