@@ -40,6 +40,7 @@ import com.chutneytesting.environment.domain.Environment;
 import com.chutneytesting.environment.domain.EnvironmentRepository;
 import com.chutneytesting.environment.domain.EnvironmentService;
 import com.chutneytesting.environment.domain.Target;
+import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisher;
 import com.chutneytesting.environment.domain.exception.EnvironmentNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -67,7 +68,8 @@ public class TargetControllerTest {
     private final String targetBasePath = "/api/v2/targets";
 
     private final EnvironmentRepository environmentRepository = mock(EnvironmentRepository.class);
-    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository);
+    private final EnvironmentEventPublisher environmentEventPublisher = mock(EnvironmentEventPublisher.class);
+    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, environmentEventPublisher);
     private final EmbeddedTargetApi embeddedApplication = new EmbeddedTargetApi(environmentService);
     private final TargetController targetController = new TargetController(embeddedApplication);
 

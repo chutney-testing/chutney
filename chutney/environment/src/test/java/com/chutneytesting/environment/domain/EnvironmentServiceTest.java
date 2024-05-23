@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisher;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmentException;
 import com.chutneytesting.environment.domain.exception.InvalidEnvironmentNameException;
 import com.chutneytesting.environment.domain.exception.NoEnvironmentFoundException;
@@ -35,11 +36,13 @@ class EnvironmentServiceTest {
 
     EnvironmentService sut;
     EnvironmentRepository environmentRepository;
+    EnvironmentEventPublisher environmentEventPublisher;
 
     @BeforeEach
     public void setUp() {
         environmentRepository = mock(EnvironmentRepository.class);
-        sut = new EnvironmentService(environmentRepository);
+        environmentEventPublisher = mock(EnvironmentEventPublisher.class);
+        sut = new EnvironmentService(environmentRepository, environmentEventPublisher);
     }
 
     @Test()

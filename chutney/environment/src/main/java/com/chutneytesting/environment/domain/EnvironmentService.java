@@ -16,6 +16,8 @@
 
 package com.chutneytesting.environment.domain;
 
+import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisher;
+import com.chutneytesting.environment.domain.eventEmitter.EnvironmentRenamingEvent;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmentException;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingTargetException;
 import com.chutneytesting.environment.domain.exception.CannotDeleteEnvironmentException;
@@ -42,9 +44,11 @@ public class EnvironmentService {
 
     private final Logger logger = LoggerFactory.getLogger(EnvironmentService.class);
     private final EnvironmentRepository environmentRepository;
+    private final EnvironmentEventPublisher environmentEventPublisher;
 
-    public EnvironmentService(EnvironmentRepository environmentRepository) {
+    public EnvironmentService(EnvironmentRepository environmentRepository, EnvironmentEventPublisher environmentEventPublisher) {
         this.environmentRepository = environmentRepository;
+        this.environmentEventPublisher = environmentEventPublisher;
     }
 
     public Set<String> listEnvironmentsNames() {
@@ -89,6 +93,7 @@ public class EnvironmentService {
         createOrUpdate(newEnvironment);
         if (!newEnvironment.name.equals(environmentName)) {
             environmentRepository.delete(environmentName);
+            environmentEventPublisher.publishEventEnvironmentRenaming(environmentName, newEnvironment.name);
         }
     }
 

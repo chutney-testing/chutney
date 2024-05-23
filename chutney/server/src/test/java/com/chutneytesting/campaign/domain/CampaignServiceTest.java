@@ -39,7 +39,8 @@ class CampaignServiceTest {
     void should_return_campaign_report_by_campaign_execution_id() {
         // G
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
-        CampaignService campaignService = new CampaignService(campaignExecutionRepository);
+        CampaignRepository campaignRepository = mock(CampaignRepository.class);
+        CampaignService campaignService = new CampaignService(campaignExecutionRepository, campaignRepository);
 
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(1L)
@@ -92,6 +93,7 @@ class CampaignServiceTest {
         // Given
         Long campaignId = 1L;
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
+        CampaignRepository campaignRepository = mock(CampaignRepository.class);
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(1L)
             .testCaseTitle("")
@@ -136,7 +138,7 @@ class CampaignServiceTest {
                 .build()
         );
         when(campaignExecutionRepository.getExecutionHistory(anyLong())).thenReturn(allExecutions);
-        CampaignService sut = new CampaignService(campaignExecutionRepository);
+        CampaignService sut = new CampaignService(campaignExecutionRepository, campaignRepository);
 
         // When
         List<CampaignExecution> executionsReports = sut.findExecutionsById(campaignId);
@@ -154,7 +156,8 @@ class CampaignServiceTest {
     void should_return_campaign_report_by_campaign_execution_id_when_retry_scenario_executions_exist() {
         // G
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
-        CampaignService campaignService = new CampaignService(campaignExecutionRepository);
+        CampaignRepository campaignRepository = mock(CampaignRepository.class);
+        CampaignService campaignService = new CampaignService(campaignExecutionRepository, campaignRepository);
 
         String scenarioId = "scenario 1";
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
@@ -198,6 +201,7 @@ class CampaignServiceTest {
         // Given
         Long campaignId = 1L;
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
+        CampaignRepository campaignRepository = mock(CampaignRepository.class);
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(1L)
             .testCaseTitle("")
@@ -229,7 +233,7 @@ class CampaignServiceTest {
                 .build()
         );
         when(campaignExecutionRepository.getExecutionHistory(anyLong())).thenReturn(allExecutions);
-        CampaignService sut = new CampaignService(campaignExecutionRepository);
+        CampaignService sut = new CampaignService(campaignExecutionRepository, campaignRepository);
 
         // When
         List<CampaignExecution> executionsReports = sut.findExecutionsById(campaignId);
@@ -243,6 +247,7 @@ class CampaignServiceTest {
         // Given
         Long campaignId = 1L;
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
+        CampaignRepository campaignRepository = mock(CampaignRepository.class);
         String scenario1Id = "scenario 1";
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(1L)
@@ -320,7 +325,7 @@ class CampaignServiceTest {
                 .build()
         );
         when(campaignExecutionRepository.getExecutionHistory(anyLong())).thenReturn(allExecutions);
-        CampaignService sut = new CampaignService(campaignExecutionRepository);
+        CampaignService sut = new CampaignService(campaignExecutionRepository, campaignRepository);
 
         // When
         List<CampaignExecution> executionsReports = sut.findExecutionsById(campaignId);

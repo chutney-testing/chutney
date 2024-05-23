@@ -22,6 +22,8 @@ import com.chutneytesting.environment.api.variable.EmbeddedVariableApi;
 import com.chutneytesting.environment.domain.Environment;
 import com.chutneytesting.environment.domain.EnvironmentRepository;
 import com.chutneytesting.environment.domain.EnvironmentService;
+import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisher;
+import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisherStub;
 import com.chutneytesting.environment.infra.JsonFilesEnvironmentRepository;
 
 public class EnvironmentConfiguration {
@@ -33,8 +35,12 @@ public class EnvironmentConfiguration {
     private final EmbeddedVariableApi variableApi;
 
     public EnvironmentConfiguration(String storeFolderPath) {
+        this(storeFolderPath, new EnvironmentEventPublisherStub());
+    }
+
+    public EnvironmentConfiguration(String storeFolderPath, EnvironmentEventPublisher environmentEventPublisher) {
         this.environmentRepository = createEnvironmentRepository(storeFolderPath);
-        EnvironmentService environmentService = createEnvironmentService(environmentRepository);
+        EnvironmentService environmentService = createEnvironmentService(environmentRepository, environmentEventPublisher);
         this.environmentApi = new EmbeddedEnvironmentApi(environmentService);
         this.targetApi = new EmbeddedTargetApi(environmentService);
         this.variableApi = new EmbeddedVariableApi(environmentService);
@@ -52,8 +58,8 @@ public class EnvironmentConfiguration {
         return new JsonFilesEnvironmentRepository(storeFolderPath);
     }
 
-    private EnvironmentService createEnvironmentService(EnvironmentRepository environmentRepository) {
-        return new EnvironmentService(environmentRepository);
+    private EnvironmentService createEnvironmentService(EnvironmentRepository environmentRepository, EnvironmentEventPublisher environmentEventPublisher) {
+        return new EnvironmentService(environmentRepository, environmentEventPublisher);
     }
 
     public EmbeddedEnvironmentApi getEmbeddedEnvironmentApi() {

@@ -18,15 +18,19 @@ package com.chutneytesting.campaign.domain;
 
 import static java.util.stream.Collectors.toList;
 
+import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.List;
+import java.util.Objects;
 
 public class CampaignService {
 
     private final CampaignExecutionRepository campaignExecutionRepository;
+    private final CampaignRepository campaignRepository;
 
-    public CampaignService(CampaignExecutionRepository campaignExecutionRepository) {
+    public CampaignService(CampaignExecutionRepository campaignExecutionRepository, CampaignRepository campaignRepository) {
         this.campaignExecutionRepository = campaignExecutionRepository;
+        this.campaignRepository = campaignRepository;
     }
 
     public CampaignExecution findByExecutionId(Long campaignExecutionId) {
@@ -38,5 +42,23 @@ public class CampaignService {
         return campaignExecutionRepository.getExecutionHistory(campaignId).stream()
             .map(CampaignExecution::withoutRetries)
             .collect(toList());
+    }
+
+    public void renameEnvironmentInCampaigns(String oldName, String newName) {
+        campaignRepository.findCampaignsByEnvironment(oldName)
+            .forEach(existingCampaign -> {
+                Campaign campaign = new Campaign(
+                    existingCampaign.id,
+                    existingCampaign.title,
+                    existingCampaign.description,
+                    existingCampaign.scenarios,
+                    newName,
+                    existingCampaign.parallelRun,
+                    existingCampaign.retryAuto,
+                    existingCampaign.externalDatasetId,
+                    existingCampaign.tags
+                );
+                campaignRepository.createOrUpdate(campaign);
+            });
     }
 }

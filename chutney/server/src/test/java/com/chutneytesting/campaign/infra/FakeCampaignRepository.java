@@ -139,6 +139,12 @@ public class FakeCampaignRepository implements CampaignRepository, CampaignExecu
     }
 
     @Override
+    public List<Campaign> findCampaignsByEnvironment(String environment) {
+        // not needed in tests
+        return emptyList();
+    }
+
+    @Override
     public List<CampaignExecution> currentExecutions(Long campaignId) {
         // not needed in tests
         return emptyList();

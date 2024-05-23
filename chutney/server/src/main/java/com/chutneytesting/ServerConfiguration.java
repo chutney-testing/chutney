@@ -28,6 +28,7 @@ import static com.chutneytesting.ServerConfigurationValues.TASK_SQL_NB_LOGGED_RO
 import static com.chutneytesting.ServerConfigurationValues.TASK_SQL_NB_LOGGED_ROW_SPRING_VALUE;
 
 import com.chutneytesting.action.api.EmbeddedActionEngine;
+import com.chutneytesting.campaign.domain.CampaignEventEnvironmentRenamingListener;
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.campaign.domain.CampaignService;
@@ -233,8 +234,13 @@ public class ServerConfiguration {
     }
 
     @Bean
-    CampaignService campaignService(CampaignExecutionRepository campaignExecutionRepository) {
-        return new CampaignService(campaignExecutionRepository);
+    CampaignService campaignService(CampaignExecutionRepository campaignExecutionRepository, CampaignRepository campaignRepository) {
+        return new CampaignService(campaignExecutionRepository, campaignRepository);
+    }
+
+    @Bean
+    CampaignEventEnvironmentRenamingListener campaignEventEnvironmentRenamingListener(CampaignService campaignService) {
+        return new CampaignEventEnvironmentRenamingListener(campaignService);
     }
 
 
