@@ -27,6 +27,7 @@ import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { TranslateService } from '@ngx-translate/core';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
+import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 
 @Component({
     selector: 'chutney-campaign-executions',
@@ -46,11 +47,11 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     private filters$: Subscription;
     filteredExecutions: CampaignReport[] = [];
 
-    status: { id: string, text: string }[] = [];
+    status: ListItem[] = [];
 
-    environments: { id: string, text: string }[] = [];
+    environments: ListItem[] = [];
 
-    executors: { id: string, text: string }[] = [];
+    executors: ListItem[] = [];
 
     private readonly iso_Date_Delimiter = '-';
 

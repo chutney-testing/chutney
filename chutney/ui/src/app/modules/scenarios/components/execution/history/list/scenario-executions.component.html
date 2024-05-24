@@ -38,6 +38,11 @@
               </div>
             </th>
             <th scope="col">
+                <div class="cursor-pointer d-flex justify-content-center">
+                  <span>{{'scenarios.execution.history.dataset' | translate}}</span>
+                </div>
+            </th>
+            <th scope="col">
               <div class="cursor-pointer d-flex justify-content-center">
                 <span> {{'scenarios.execution.history.campaign' | translate}}</span>
               </div>
@@ -47,6 +52,7 @@
                 <span>{{'scenarios.execution.history.executor' | translate}}</span>
               </div>
             </th>
+            <th></th>
           </tr>
           <tr class=" small mb-1">
             <th></th>
@@ -62,8 +68,7 @@
             <th class="fw-normal">
               <ng-multiselect-dropdown [settings]="selectSettings"
                 [data]="status"
-                [formControl]="getFormControl('status')"
-                #statusDropdown>
+                [formControl]="getFormControl('status')">
               </ng-multiselect-dropdown>
             </th>
             <th class="w40"></th>
@@ -77,24 +82,28 @@
             <th class="fw-normal">
               <ng-multiselect-dropdown [settings]="selectSettings"
                 [data]="environments"
-                [formControl]="getFormControl('environments')"
-                #envsDropdown>
+                [formControl]="getFormControl('environments')">
               </ng-multiselect-dropdown>
+            </th>
+            <th class="fw-normal">
+                <ng-multiselect-dropdown [settings]="selectSettings"
+                                         [data]="datasets"
+                                         [formControl]="getFormControl('datasets')">
+                </ng-multiselect-dropdown>
             </th>
             <th class="fw-normal">
               <ng-multiselect-dropdown [settings]="selectSettings"
                 [data]="campaigns"
-                [formControl]="getFormControl('campaigns')"
-                #campsDropdown>
+                [formControl]="getFormControl('campaigns')">
               </ng-multiselect-dropdown>
             </th>
             <th class="fw-normal">
               <ng-multiselect-dropdown [settings]="selectSettings"
                 [data]="executors"
-                [formControl]="getFormControl('executors')"
-                #executorsDropdown>
+                [formControl]="getFormControl('executors')">
               </ng-multiselect-dropdown>
             </th>
+              <th></th>
           </tr>
         </thead>
         <tbody class="small">
@@ -161,6 +170,10 @@
                 [term]="filtersForm.get('keyword').value"></ngb-highlight>
               </td>
               <td>
+                  <ngb-highlight [result]="execution.dataset"
+                                 [term]="filtersForm.get('keyword').value"></ngb-highlight>
+              </td>
+              <td>
                 <a (click)="openCampaignExecution(execution, $event)" class="link">
                   <ngb-highlight [result]="execution.campaignReport?.campaignName"
                   [term]="filtersForm.get('keyword').value"></ngb-highlight>
@@ -169,11 +182,17 @@
               <td>
                 <ngb-highlight [result]="execution.user" [term]="filtersForm.get('keyword').value"></ngb-highlight>
               </td>
+                <td>
+                    <button class="btn btn-sm btn-primary me-2" (click)="replay(execution, $event)"
+                            [ngbTooltip]="'global.actions.replay' | translate" placement="left">
+                        <i  class="bi bi-repeat" ></i>
+                    </button>
+                </td>
             </tr>
           }
           @if (!filteredExecutions.length) {
             <tr>
-              <td colspan="7">{{'scenarios.execution.history.empty' | translate}}</td>
+              <td colspan="9">{{'scenarios.execution.history.empty' | translate}}</td>
             </tr>
           }
         </tbody>

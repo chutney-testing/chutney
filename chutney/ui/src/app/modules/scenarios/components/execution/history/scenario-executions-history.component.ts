@@ -17,7 +17,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { catchError, delay, switchMap, tap } from 'rxjs/operators';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Execution, GwtTestCase, TestCase } from '@model';
+import { Execution, GwtTestCase } from '@model';
 import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
 import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { EMPTY, Observable, of, Subscription, zip } from 'rxjs';
@@ -265,9 +265,9 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
         this.scenarioExecution$ = this.eventManagerService.subscribe('execute', (data) => this.executeScenario(data.env));
     }
 
-    private executeScenario(env: string) {
+    private executeScenario(env: string, dataset: string= null) {
         this.scenarioExecutionService
-            .executeScenarioAsync(this.scenarioId, env)
+            .executeScenarioAsync(this.scenarioId, env, dataset)
             .pipe(
                 delay(1000),
                 switchMap(executionId => this.findScenarioExecutionSummary(+executionId)))
@@ -292,5 +292,10 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
 
     getActiveTab() {
         return this.activeTab === this.LAST_ID ? this.executions[0]?.executionId?.toString() : this.activeTab;
+    }
+
+    replay(executionId: number) {
+        const execution = this.executions.find(exec => exec.executionId === executionId);
+        this.executeScenario(execution.environment, execution.dataset)
     }
 }

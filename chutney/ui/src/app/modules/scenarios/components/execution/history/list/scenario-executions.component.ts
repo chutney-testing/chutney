@@ -25,6 +25,7 @@ import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DateFormatPipe } from 'ngx-moment';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { TranslateService } from '@ngx-translate/core';
+import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 
 @Component({
     selector: 'chutney-scenario-executions',
@@ -36,11 +37,12 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     filteredExecutions: Execution[] = [];
     filtersForm: FormGroup;
 
-    status: { id: string, text: string }[] = [];
-    environments: { id: string, text: string }[] = [];
-    executors: { id: string, text: string }[] = [];
-    campaigns: { id: string, text: string }[] = [];
-    tags: { id: string, text: string }[] = [];
+    status: ListItem[] = [];
+    environments: ListItem[] = [];
+    datasets: ListItem[] = [];
+    executors: ListItem[] = [];
+    campaigns: ListItem[] = [];
+    tags: ListItem[] = [];
     selectSettings = {
         text: '',
         enableCheckAll: false,
@@ -57,6 +59,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     @Output() onExecutionSelect = new EventEmitter<{ execution: Execution, focus: boolean }>();
     @Input() filters: Params;
     @Output() filtersChange = new EventEmitter<Params>();
+    @Output() onReplay = new EventEmitter<number>();
 
     constructor(private router: Router,
                 private formBuilder: FormBuilder,
@@ -91,6 +94,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
         this.environments = [...new Set(this.executions.map(exec => exec.environment))].map(env => this.toSelectOption(env));
+        this.datasets = [...new Set(this.executions.map(exec => exec.dataset).filter(ds=> !!ds))].map(ds => this.toSelectOption(ds));
         this.executors = [...new Set(this.executions.map(exec => exec.user))].map(user => this.toSelectOption(user));
         this.campaigns = [...new Set(this.executions.filter(exec => !!exec.campaignReport).map(exec => exec.campaignReport.campaignName))].map(camp => this.toSelectOption(camp));
         this.tags = [...new Set(this.executions.flatMap(exec => exec.tags))].map(tag => this.toSelectOption(tag));
@@ -107,6 +111,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
             date: this.formBuilder.control(this.toNgbDate(this.filters['date'])),
             status: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['status'],  (status) => this.translateService.instant(ExecutionStatus.toString(status)))),
             environments: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['env'])),
+            datasets: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['datasets'])),
             executors: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['exec'])),
             campaigns: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['camp'])),
             tags: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['tags'])),
@@ -148,22 +153,25 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
             params['keyword'] = filters.keyword;
         }
         if (filters.status && filters.status.length) {
-            params['status'] = filters.status.map(status => status.id).toString();
+            params['status'] = filters.status.map((status: ListItem) => status.id).toString();
         }
         if (filters.date) {
             params['date'] = this.toIsoDate(filters.date);
         }
         if (filters.environments && filters.environments.length) {
-            params['env'] = filters.environments.map(env => env.id).toString();
+            params['env'] = filters.environments.map((env: ListItem) => env.id).toString();
+        }
+        if (filters.datasets && filters.datasets.length) {
+            params['datasets'] = filters.datasets.map((ds:ListItem) => ds.id).toString();
         }
         if (filters.campaigns && filters.campaigns.length) {
-            params['camp'] = filters.campaigns.map(env => env.id).toString();
+            params['camp'] = filters.campaigns.map((campaign:ListItem) => campaign.id).toString();
         }
         if (filters.executors && filters.executors.length) {
-            params['exec'] = filters.executors.map(env => env.id).toString();
+            params['exec'] = filters.executors.map((executor: ListItem) => executor.id).toString();
         }
         if (filters.tags && filters.tags.length) {
-            params['tags'] = filters.tags.map(tag => tag.id).toString();
+            params['tags'] = filters.tags.map((tag: ListItem) => tag.id).toString();
         }
         return params;
     }
@@ -232,17 +240,21 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
             envMatch = !!filters.environments.find(env => env.id === exec.environment);
         }
 
+        let datasetMatch = true;
+        if (filters.datasets && filters.datasets.length) {
+            datasetMatch = !!filters.datasets.find((ds:ListItem) => ds.id === exec.dataset);
+        }
+
         let campaignMatch = true;
         if (filters.campaigns && filters.campaigns.length) {
             campaignMatch = !!filters.campaigns.find(camp => exec.campaignReport && camp.id === exec.campaignReport.campaignName);
         }
-
         let tagMatch = true;
         if (filters.tags && filters.tags.length) {
             tagMatch = !!filters.tags.find(tag => exec.tags && exec.tags.includes(tag.id));
         }
 
-        return keywordMatch && statusMatch && dateMatch && userMatch && envMatch && campaignMatch && tagMatch;
+        return keywordMatch && statusMatch && dateMatch && userMatch && envMatch && datasetMatch && campaignMatch && tagMatch;
     }
 
     openCampaignExecution(execution: Execution, event: MouseEvent) {
@@ -254,5 +266,10 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
 
     getFormControl(name: string): FormControl {
         return this.filtersForm.get(name) as FormControl;
+    }
+
+    replay(execution: Execution, event: MouseEvent) {
+        event.stopPropagation();
+        this.onReplay.emit(execution.executionId);
     }
 }
