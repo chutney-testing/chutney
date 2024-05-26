@@ -246,8 +246,8 @@ public class DatabaseCampaignRepositoryTest {
 
             // Then
             Assertions.assertThat(scenarioCampaignNames).containsExactlyInAnyOrder(
-                campaign1.title,
-                campaign2.title
+                campaign2.title,
+                campaign3.title
             );
         }
 
