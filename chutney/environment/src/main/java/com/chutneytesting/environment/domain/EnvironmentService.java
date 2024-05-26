@@ -17,6 +17,7 @@
 package com.chutneytesting.environment.domain;
 
 import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisher;
+import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisherStub;
 import com.chutneytesting.environment.domain.eventEmitter.EnvironmentRenamingEvent;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmentException;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingTargetException;
@@ -49,6 +50,11 @@ public class EnvironmentService {
     public EnvironmentService(EnvironmentRepository environmentRepository, EnvironmentEventPublisher environmentEventPublisher) {
         this.environmentRepository = environmentRepository;
         this.environmentEventPublisher = environmentEventPublisher;
+    }
+
+    public EnvironmentService(EnvironmentRepository environmentRepository) {
+        this.environmentRepository = environmentRepository;
+        this.environmentEventPublisher = new EnvironmentEventPublisherStub();
     }
 
     public Set<String> listEnvironmentsNames() {
