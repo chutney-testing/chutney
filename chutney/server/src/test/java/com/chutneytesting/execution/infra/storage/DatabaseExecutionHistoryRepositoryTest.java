@@ -391,7 +391,6 @@ public class DatabaseExecutionHistoryRepositoryTest {
             // Given
             ScenarioEntity scenarioEntity = givenScenario();
             CampaignEntity campaign = givenCampaign(scenarioEntity);
-
             ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
             ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
             ScenarioExecutionEntity scenarioExecutionTwo = givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
@@ -419,7 +418,6 @@ public class DatabaseExecutionHistoryRepositoryTest {
             // Given
             ScenarioEntity scenarioEntity = givenScenario();
             CampaignEntity campaign = givenCampaign(scenarioEntity);
-
             ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
             ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
             givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
