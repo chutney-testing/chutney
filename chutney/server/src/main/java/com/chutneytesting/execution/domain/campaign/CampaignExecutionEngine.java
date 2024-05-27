@@ -211,7 +211,7 @@ public class CampaignExecutionEngine {
             .map(Optional::get)
             .toList();
 
-        campaignExecution.initExecution(testCaseDatasets, campaign.executionEnvironment(), campaign.tags);
+        campaignExecution.initExecution(testCaseDatasets, campaign.executionEnvironment());
         try {
             if (campaign.parallelRun) {
                 Collection<Callable<Object>> toExecute = Lists.newArrayList();

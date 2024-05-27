@@ -125,7 +125,7 @@ public class CampaignExecution {
         }
     }
 
-    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment, List<String> tags) {
+    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment) {
         testCaseDatasets.forEach(testCase ->
             this.scenarioExecutions.add(
                 new ScenarioExecutionCampaign(
@@ -141,7 +141,6 @@ public class CampaignExecution {
                         .datasetId(selectDatasetId(testCase))
                         .user(userId)
                         .scenarioId(testCase.testcase().id())
-                        .tags(new HashSet<>(tags))
                         .build())));
     }
 
