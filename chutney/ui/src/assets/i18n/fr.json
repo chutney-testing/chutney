@@ -268,7 +268,10 @@
             },
             "selectTag": "Sélectionner tag",
             "selectJiraTag": "Sélectionner statut d'execution jira",
-            "selectDatasetScenario": "Ajouter un dataset"
+            "selectDatasetScenario": "Ajouter un dataset",
+            "errors": {
+                "scenarioDatasetDuplicate": "La combinaison scenario / dataset existe déjà" 
+            }
         },
         "confirm": {
             "deletion.prefix": "Etes-vous sûr de vouloir supprimer la campagne ",

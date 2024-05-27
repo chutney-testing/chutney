@@ -34,6 +34,7 @@ import { isNotEmpty } from '@shared';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'chutney-campaign-edition',
@@ -49,11 +50,10 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
     scenarios: Array<ScenarioIndex> = [];
     scenariosToAdd: Array<{"scenarioId": ScenarioIndex, "dataset": ListItem}> = [];
     errorMessage: any;
-    scenariosFilter: string;
     subscription = new Subscription();
-    datasets: ListItem[];
+    datasets: ListItem[] = [];
     dropdownDatasetSettings: IDropdownSettings
-
+    error: boolean = false;
 
 
     private routeParamsSubscription: Subscription;
@@ -85,6 +85,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         private dragulaService: DragulaService,
         private environmentService: EnvironmentService,
         private datasetService: DataSetService,
+        private translate: TranslateService,
         @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings
     ) {
         this.campaignForm = this.formBuilder.group({
@@ -93,7 +94,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
             tags: [],
             jiratags: [],
             campaignTags: '',
-            scenarioFilter: '',
+            scenariosFilter: '',
             parallelRun: false,
             retryAuto: false,
             jiraId: '',
@@ -110,7 +111,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
                 return {"id": dataset.name, "text": dataset.name}
             });
         });
-        this.dropdownDatasetSettings = {idField: "id",textField: "text", singleSelection: true, allowSearchFilter: true, enableCheckAll: false, closeDropDownOnSelection: true}
+        this.dropdownDatasetSettings = {...this.dropdownSettings, singleSelection: true}
     }
 
     onItemSelect(item: any) {
@@ -335,12 +336,14 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         this.campaign.tags = tags.length !== 0 ? tags.split(',') : [];
 
         this.setCampaignScenariosIdsToAdd(this.scenariosToAdd);
-        if (this.campaign.id != null) {
-            this.subscribeToSaveResponse(
-                this.campaignService.update(this.campaign));
-        } else {
-            this.subscribeToSaveResponse(
-                this.campaignService.create(this.campaign));
+        if (!this.error) {
+            if (this.campaign.id != null) {
+                this.subscribeToSaveResponse(
+                    this.campaignService.update(this.campaign));
+            } else {
+                this.subscribeToSaveResponse(
+                    this.campaignService.create(this.campaign));
+            }
         }
     }
 
@@ -349,19 +352,28 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         if (this.campaign.scenarios) {
             for (const campaignScenario of this.campaign.scenarios) {
                 const scenarioFound = this.scenarios.find((x) => x.id === campaignScenario.scenarioId);
-                if (!this.scenariosToAdd.some((s) => s.scenarioId.id === scenarioFound.id && s.dataset.id === campaignScenario.datasetId)) {
-                    this.scenariosToAdd.push({scenarioId: scenarioFound, dataset: (campaignScenario.datasetId ? {id: campaignScenario.datasetId, text: campaignScenario.datasetId} : null)});
-                }
+                this.scenariosToAdd.push({scenarioId: scenarioFound, dataset: (campaignScenario.datasetId ? {id: campaignScenario.datasetId, text: campaignScenario.datasetId} : null)});
             }
         }
     }
 
     setCampaignScenariosIdsToAdd(scenariosToAdd: Array<{scenarioId: ScenarioIndex, dataset: ListItem}>) {
+        this.error = false;
         this.campaign.scenarios = [];
         for (const scenario of scenariosToAdd) {
             if (!this.campaign.scenarios.some((s) => s.scenarioId === scenario.scenarioId.id && ((scenario.dataset === null && s.datasetId == null) || (scenario.dataset !== null && s.datasetId === scenario.dataset.id)))) {
                 this.campaign.scenarios.push(new CampaignScenario(scenario.scenarioId.id, scenario.dataset ? scenario.dataset.id as string : null));
+            } else {
+                this.error = true;
+                this.translate.get('campaigns.edition.errors.scenarioDatasetDuplicate').subscribe((msg: string) => {
+                    this.errorMessage = msg
+                });
+                break;
             }
+        }
+        if (this.error) {
+            // Clear campaign.scenarios
+            this.campaign.scenarios.length = 0
         }
     }
 
@@ -370,7 +382,8 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         this.refreshForPipe();
     }
 
-    removeScenario(index: number) {
+    removeScenario(scenario: {"scenarioId": ScenarioIndex, "dataset": ListItem}) {
+        const index = this.scenariosToAdd.findIndex(scenarioElement => scenarioElement === scenario)
         this.scenariosToAdd.splice(index, 1);
         this.refreshForPipe();
     }
@@ -413,17 +426,15 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         this.datasetId = datasetId;
     }
 
-    selectDatasetScenario(dataset: ListItem, index: number) {
-        const scenarioSelected = this.scenariosToAdd[index]
+    selectDatasetScenario(dataset: ListItem, scenario: {"scenarioId": ScenarioIndex, "dataset": ListItem}) {
+        const scenarioSelected = this.scenariosToAdd.find(scenarioElement => scenarioElement === scenario)
         scenarioSelected.dataset = dataset;
-        this.scenariosToAdd[index] = scenarioSelected
         this.refreshForPipe();
     }
 
-    deselectDatasetScenario(index: number) {
-        const scenarioSelected = this.scenariosToAdd[index]
+    deselectDatasetScenario(scenario: {"scenarioId": ScenarioIndex, "dataset": ListItem}) {
+        const scenarioSelected = this.scenariosToAdd.find(scenarioElement => scenarioElement === scenario)
         scenarioSelected.dataset = null;
-        this.scenariosToAdd[index] = scenarioSelected
         this.refreshForPipe();
     }
 

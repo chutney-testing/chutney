@@ -268,7 +268,10 @@
             },
             "selectTag": "Select tag",
             "selectJiraTag": "Select jira execution status",
-            "selectDatasetScenario": "Select dataset"
+            "selectDatasetScenario": "Select dataset",
+            "errors": {
+                "scenarioDatasetDuplicate": "The combination scenario / dataset already exists"
+            }
         },
         "confirm": {
             "deletion.prefix": "Are you sure you want to delete the campaign ",

@@ -95,9 +95,9 @@
     </div>
     <div class="row row-cols-lg-auto justify-content-end">
       <div class="col">
-        <input name="search" type="text" class="form-control search-field mb-2 border" id="scenarioIds"
-               formControlName="scenarioFilter" placeholder="Filtrer scénarios"
-               [(ngModel)]="scenariosFilter"/>
+        <input name="search" type="text" class="form-control search-field mb-2 border" id="scenariosFilter"
+              placeholder="Filtrer scénarios"
+              formControlName="scenariosFilter"/>
         @if (itemList.length) {
         <ng-multiselect-dropdown [settings]="dropdownSettings"
                                  [data]="itemList"
@@ -132,11 +132,15 @@
               <th colspan="4">
                 {{ 'campaigns.edition.scenarios.title' | translate }}
               </th>
-              <th class="text-center pe-5">Dataset</th>
+              <th class="text-center pe-5">
+                @if (datasets.length > 0) {
+                  Dataset
+                }
+              </th>
               <th></th>
             </thead>
             <tbody dragula="DRAGGABLE" [(dragulaModel)]="scenariosToAdd">
-              @for (scenario of scenariosToAdd; track scenario; let index = $index) {
+              @for (scenario of scenariosToAdd; track scenario) {
                 <tr class="cursor">
                   <td class="text-nowrap">{{scenario?.scenarioId.id}}</td>
                   <td class="scenario-title-cell">{{scenario?.scenarioId.title}}</td>
@@ -160,20 +164,22 @@
                     }
                   </td>
                   <td class="pe-5">
-                    <ng-multiselect-dropdown 
-                                    [settings]="dropdownDatasetSettings" 
-                                    class="dataset-combo"
-                                    [placeholder]="'campaigns.edition.selectDatasetScenario' | translate"
-                                    [data]="datasets"
-                                    [ngModel]="scenario.dataset === null ? [] : [scenario.dataset]"
-                                    [ngModelOptions]="{standalone: true}"
-                                    (onSelect)="selectDatasetScenario($event, index)"
-                                    (onDeSelect)="deselectDatasetScenario(index)">
-                    </ng-multiselect-dropdown>
+                    @if (datasets.length > 0) {
+                      <ng-multiselect-dropdown 
+                                      [settings]="dropdownDatasetSettings" 
+                                      class="dataset-combo"
+                                      [placeholder]="'campaigns.edition.selectDatasetScenario' | translate"
+                                      [data]="datasets"
+                                      [ngModel]="scenario.dataset === null ? [] : [scenario.dataset]"
+                                      [ngModelOptions]="{standalone: true}"
+                                      (onSelect)="selectDatasetScenario($event, scenario)"
+                                      (onDeSelect)="deselectDatasetScenario(scenario)">
+                      </ng-multiselect-dropdown>
+                    }
                   </td>
                   <td class="p-0">
                     <button type="button" class="btn btn-outline-primary btn-sm me-2"
-                            (click)="removeScenario(index)">
+                            (click)="removeScenario(scenario)">
                       <span class="fa fa-arrow-circle-right"></span>
                     </button>
                   </td>
@@ -183,7 +189,7 @@
           </table>
       </div>
       <!-- Right side -->
-      <div class="col-md-6">
+      <div class="col-md-6 pe-4">
         <div class="row table-responsive">
           <table class="table table-striped table-hover">
             <thead>
@@ -193,7 +199,7 @@
               <th></th>
             </thead>
             <tbody>
-              @for (scenario of scenarios |  scenarioCampaignSearch : selectedTags | searchTextPipe  : scenariosFilter : ['title', 'id'] | withoutScenario:scenariosToAdd | withoutScenario:jiraScenariosToExclude; track scenario.id) {
+              @for (scenario of scenarios |  scenarioCampaignSearch : selectedTags | searchTextPipe  : campaignForm.controls['scenariosFilter'].value : ['title', 'id'] | withoutScenario:scenariosToAdd | withoutScenario:jiraScenariosToExclude; track scenario.id) {
                 <tr>
                   <td class="w-3">
                     <button type="button" class="btn btn-outline-success btn-sm"
