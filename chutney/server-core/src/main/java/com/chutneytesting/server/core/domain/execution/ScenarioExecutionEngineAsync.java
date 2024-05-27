@@ -168,6 +168,8 @@ public class ScenarioExecutionEngineAsync {
                     executionRequest.environment,
                     executionRequest.userId,
                     executionRequest.tags,
+                    executionRequest.dataset.constants,
+                    executionRequest.dataset.datatable,
                     report
                 );
             })
@@ -270,6 +272,8 @@ public class ScenarioExecutionEngineAsync {
             executionRequest.testCase.metadata().title(),
             executionRequest.environment, executionRequest.userId,
             executionRequest.tags,
+            executionRequest.dataset.constants,
+            executionRequest.dataset.datatable,
             report
         );
         updateHistory(execution.executionId(), executionRequest, scenarioExecutionReport);

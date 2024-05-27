@@ -21,6 +21,7 @@ import static java.util.Collections.emptySet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -32,6 +33,8 @@ public class ScenarioExecutionReport {
     public final String user;
     public final Set<String> tags;
     public final Map<String, Object> contextVariables;
+    public final Map<String, String> constants;
+    public final List<Map<String, String>> datatable;
     public final StepExecutionReportCore report;
 
     public ScenarioExecutionReport(long executionId,
@@ -39,6 +42,8 @@ public class ScenarioExecutionReport {
                                    String environment,
                                    String user,
                                    Collection<String> tags,
+                                   Map<String, String> constants,
+                                   List<Map<String, String>> datatable,
                                    StepExecutionReportCore report) {
         this.executionId = executionId;
         this.scenarioName = scenarioName;
@@ -47,6 +52,17 @@ public class ScenarioExecutionReport {
         this.tags = Optional.ofNullable(tags).map(Set::copyOf).orElse(emptySet());
         this.contextVariables = searchContextVariables(report);
         this.report = report;
+        this.constants = constants;
+        this.datatable = datatable;
+    }
+
+    public ScenarioExecutionReport(long executionId,
+                                   String scenarioName,
+                                   String environment,
+                                   String user,
+                                   Collection<String> tags,
+                                   StepExecutionReportCore report) {
+       this(executionId, scenarioName,environment,user,tags, null, null, report);
     }
 
     private Map<String, Object> searchContextVariables(StepExecutionReportCore report) {

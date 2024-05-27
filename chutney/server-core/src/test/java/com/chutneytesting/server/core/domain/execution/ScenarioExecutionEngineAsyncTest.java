@@ -49,6 +49,7 @@ import io.reactivex.rxjava3.schedulers.TestScheduler;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.tuple.Pair;
@@ -153,9 +154,10 @@ public class ScenarioExecutionEngineAsyncTest {
         );
         sut.setRetentionDelaySeconds(1);
         sut.setDebounceMilliSeconds(0);
+        DataSet dataset = DataSet.builder().withName("ds").withConstants(Map.of("A", "B")).build();
 
         // When
-        TestObserver<ScenarioExecutionReport> testObserver = sut.buildScenarioExecutionReportObservable(new ExecutionRequest(emptyTestCase(), "", ""), executionId, engineStub.getLeft()).test();
+        TestObserver<ScenarioExecutionReport> testObserver = sut.buildScenarioExecutionReportObservable(new ExecutionRequest(emptyTestCase(), "", "", dataset ), executionId, engineStub.getLeft()).test();
 
         // Then
         assertTestObserverStateWithValues(testObserver, 0, false);
@@ -166,15 +168,15 @@ public class ScenarioExecutionEngineAsyncTest {
         verify(executionHistoryRepository).update(eq(scenarioId), any());
 
         engineStub.getRight().advanceTimeBy(100, TimeUnit.MILLISECONDS); // Reach second emission
-        assertTestObserverStateAndValues(testObserver, executionId, engineStub.getMiddle(), 2);
+        assertTestObserverStateAndValues(testObserver, executionId, engineStub.getMiddle(), 2, dataset);
         verify(executionHistoryRepository, times(2)).update(eq(scenarioId), any());
 
         engineStub.getRight().advanceTimeBy(100, TimeUnit.MILLISECONDS); // Reach third emission
-        assertTestObserverStateAndValues(testObserver, executionId, engineStub.getMiddle(), 3);
+        assertTestObserverStateAndValues(testObserver, executionId, engineStub.getMiddle(), 3, dataset);
         verify(executionHistoryRepository, times(3)).update(eq(scenarioId), any());
 
         engineStub.getRight().advanceTimeBy(100, TimeUnit.MILLISECONDS); // Reach last emission
-        assertTestObserverStateAndValues(testObserver, true, executionId, engineStub.getMiddle(), 4);
+        assertTestObserverStateAndValues(testObserver, true, executionId, engineStub.getMiddle(), 4, dataset);
         verify(executionHistoryRepository, times(4)).update(eq(scenarioId), any());
 
         verify(executionStateRepository).notifyExecutionEnd(scenarioId);
@@ -216,7 +218,7 @@ public class ScenarioExecutionEngineAsyncTest {
 
         // Then
         engineStub.getRight().advanceTimeBy(500, TimeUnit.MILLISECONDS);
-        assertTestObserverStateAndValues(testObserver, true, executionId, reportsList, 4);
+        assertTestObserverStateAndValues(testObserver, true, executionId, reportsList, 4,null);
 
         testObserver.dispose();
     }
@@ -282,18 +284,23 @@ public class ScenarioExecutionEngineAsyncTest {
         assertThat(execution).isEqualTo(expected);
     }
 
-    private void assertTestObserverStateAndValues(TestObserver<ScenarioExecutionReport> testObserver, Long executionId, List<StepExecutionReportCore> reportsList, int valuesCount) {
-        assertTestObserverStateAndValues(testObserver, false, executionId, reportsList, valuesCount);
+    private void assertTestObserverStateAndValues(TestObserver<ScenarioExecutionReport> testObserver, Long executionId, List<StepExecutionReportCore> reportsList, int valuesCount,DataSet dataset) {
+        assertTestObserverStateAndValues(testObserver, false, executionId, reportsList, valuesCount, dataset);
     }
 
-    private void assertTestObserverStateAndValues(TestObserver<ScenarioExecutionReport> testObserver, boolean testObserverTerminated, Long executionId, List<StepExecutionReportCore> reportsList, int valuesCount) {
+    private void assertTestObserverStateAndValues(TestObserver<ScenarioExecutionReport> testObserver, boolean testObserverTerminated, Long executionId, List<StepExecutionReportCore> reportsList, int valuesCount, DataSet dataset) {
         assertTestObserverStateWithValues(testObserver, valuesCount, testObserverTerminated);
-        assertScenarioExecutionReport(testObserver.values().get(valuesCount - 1), executionId, reportsList.get(valuesCount - 1));
+        assertScenarioExecutionReport(testObserver.values().get(valuesCount - 1), executionId, reportsList.get(valuesCount - 1), dataset);
     }
 
-    private void assertScenarioExecutionReport(ScenarioExecutionReport actual, Long executionId, StepExecutionReportCore rootStepExecutionReportCore) {
+    private void assertScenarioExecutionReport(ScenarioExecutionReport actual, Long executionId, StepExecutionReportCore rootStepExecutionReportCore, DataSet dataSet) {
         assertThat(actual.scenarioName).isEqualTo(EMPTY_TESTCASE_NAME);
         assertThat(actual.executionId).isEqualTo(executionId);
+        Optional.ofNullable(dataSet)
+                .ifPresent(ds -> {
+                    assertThat(actual.constants).isEqualTo(dataSet.constants);
+                    assertThat(actual.datatable).isEqualTo(dataSet.datatable);
+                });
         assertThat(actual.report.name).isEqualTo(rootStepExecutionReportCore.name);
         assertThat(actual.report.status).isEqualTo(rootStepExecutionReportCore.status);
         assertThat(actual.report.steps)
