@@ -262,6 +262,8 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
             scenarioExecutionReport.environment,
             scenarioExecutionReport.user,
             scenarioExecutionReport.tags,
+            scenarioExecutionReport.constants,
+            scenarioExecutionReport.datatable,
             report);
     }
 

@@ -19,7 +19,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
-import { Execution, ScenarioExecutionReport } from '@model';
+import { Execution, KeyValue, ScenarioExecutionReport } from '@model';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable()
@@ -110,9 +110,14 @@ export class ScenarioExecutionService {
     private buildExecutionReport(jsonResponse: any): ScenarioExecutionReport {
         let report = null;
         let contextVariables;
+        let constants;
+        let datatable;
         if(jsonResponse?.report) {
-            report = JSON.parse(jsonResponse.report).report
-            contextVariables = JSON.parse(jsonResponse.report).contextVariables
+            let parse = JSON.parse(jsonResponse.report);
+            report = parse.report;
+            contextVariables = parse.contextVariables;
+            constants = Object.keys(parse.constants).map(key => new KeyValue(key,parse.constants[key]));
+            datatable = parse.datatable?.map(line => Object.keys(line).map(key => new KeyValue(key, line[key])))
         }
         return new ScenarioExecutionReport(
             jsonResponse.executionId,
@@ -124,7 +129,9 @@ export class ScenarioExecutionService {
             jsonResponse.user,
             jsonResponse.testCaseTitle,
             jsonResponse.error,
-            contextVariables
+            contextVariables,
+            constants,
+            datatable
         );
     }
 

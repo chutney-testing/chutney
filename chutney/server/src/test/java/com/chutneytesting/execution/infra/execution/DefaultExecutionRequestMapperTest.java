@@ -26,10 +26,12 @@ import com.chutneytesting.environment.api.environment.EmbeddedEnvironmentApi;
 import com.chutneytesting.environment.api.environment.dto.EnvironmentDto;
 import com.chutneytesting.environment.api.target.EmbeddedTargetApi;
 import com.chutneytesting.scenario.domain.raw.RawTestCase;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.ExecutionRequest;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
+import java.util.Map;
 import org.assertj.core.util.Files;
 import org.junit.jupiter.api.Test;
 
@@ -52,7 +54,8 @@ public class DefaultExecutionRequestMapperTest {
         RawTestCase testCase = RawTestCase.builder()
             .withScenario(Files.contentOf(new File(DefaultExecutionRequestMapperTest.class.getResource("/raw_scenarios/scenario.json").getPath()), StandardCharsets.UTF_8))
             .build();
-        ExecutionRequest request = new ExecutionRequest(testCase, envName, "");
+        DataSet dataset = DataSet.builder().withName("ds").withConstants(Map.of("A", "B")).build();
+        ExecutionRequest request = new ExecutionRequest(testCase, envName, "", dataset);
 
         // When
         ExecutionRequestDto executionRequestDto = sut.toDto(request);
@@ -64,6 +67,7 @@ public class DefaultExecutionRequestMapperTest {
         assertThat(executionRequestDto.scenario.steps.get(0).inputs).containsKey("someID");
         assertThat(executionRequestDto.environment).isNotNull();
         assertThat(executionRequestDto.environment.name()).isEqualTo(envName);
+        assertThat(executionRequestDto.dataset.constants).isEqualTo(dataset.constants);
     }
 
 }

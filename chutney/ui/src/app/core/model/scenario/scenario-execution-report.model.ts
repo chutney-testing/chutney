@@ -16,6 +16,7 @@
 
 import { StepExecutionReport } from '@core/model/scenario/step-execution-report.model';
 import { ExecutionStatus } from './execution-status';
+import { KeyValue } from '@core/model';
 
 export class ScenarioExecutionReport {
     constructor(
@@ -28,6 +29,8 @@ export class ScenarioExecutionReport {
         public user: string,
         public scenarioName?: string,
         public error?: string,
-        public contextVariables?: Map<string, Object>
+        public contextVariables?: Map<string, Object>,
+        public constants?: Array<KeyValue>,
+        public datatable?: Array<Array<KeyValue>>
     ) { }
 }

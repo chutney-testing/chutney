@@ -14,24 +14,41 @@
  * limitations under the License.
  */
 
-import { Component, EventEmitter, Input, Renderer2, OnDestroy, OnInit, Output, AfterViewInit, TemplateRef, ElementRef, AfterViewChecked, ViewChild } from '@angular/core';
+import {
+    AfterViewChecked,
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    Renderer2,
+    TemplateRef,
+    ViewChild
+} from '@angular/core';
 import { Location } from '@angular/common';
-import { Observable, Subscription, fromEvent, merge, timer } from 'rxjs';
-import { auditTime, debounceTime, delay, delayWhen, retryWhen, scan, takeWhile, throttleTime, timestamp } from 'rxjs/operators';
+import { fromEvent, merge, Observable, Subscription, timer } from 'rxjs';
+import {
+    auditTime,
+    debounceTime,
+    delay,
+    delayWhen,
+    retryWhen,
+    scan,
+    takeWhile,
+    throttleTime,
+    timestamp
+} from 'rxjs/operators';
 import { FileSaverService } from 'ngx-filesaver';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NGX_MONACO_EDITOR_CONFIG } from 'ngx-monaco-editor-v2';
 
-import {
-    Authorization,
-    Execution,
-    GwtTestCase,
-    ScenarioExecutionReport,
-    StepExecutionReport
-} from '@model';
+import { Authorization, Execution, GwtTestCase, ScenarioExecutionReport, StepExecutionReport } from '@model';
 import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
-import { StringifyPipe, PrettyPrintPipe } from '@shared/pipes';
+import { PrettyPrintPipe, StringifyPipe } from '@shared/pipes';
 import { findScrollContainer } from '@shared/tools';
 
 @Component({
@@ -70,6 +87,7 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
 
     hasContextVariables = false;
     collapseContextVariables = true;
+    collapseDataset = true;
 
     private scenarioExecutionAsyncSubscription: Subscription;
     private resizeLeftPanelSubscription: Subscription;
@@ -234,6 +252,11 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
 
     toggleContextVariables() {
         this.collapseContextVariables = !this.collapseContextVariables;
+        timer(250).subscribe(() => this.setLefPanelHeight());
+    }
+
+    toggleDatasetVariables() {
+        this.collapseDataset = !this.collapseDataset;
         timer(250).subscribe(() => this.setLefPanelHeight());
     }
 

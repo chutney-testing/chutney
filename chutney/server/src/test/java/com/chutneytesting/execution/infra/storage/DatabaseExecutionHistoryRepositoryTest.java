@@ -555,7 +555,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                     stepReport("step 1", 24L, PAUSED,
                         stepReport("step1.1", 23L, RUNNING)));
             try {
-                return objectMapper.writeValueAsString(new ScenarioExecutionReport(1L, "scenario name", "", "", null, successStepReport));
+                return objectMapper.writeValueAsString(new ScenarioExecutionReport(1L, "scenario name", "", "", null, Map.of("key", "value"), List.of(Map.of("A", "A1", "B","B1")), successStepReport));
             } catch (JsonProcessingException exception) {
                 return "";
             }
