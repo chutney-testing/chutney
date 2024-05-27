@@ -152,10 +152,6 @@ public class CampaignEntity implements Serializable {
         return version;
     }
 
-    public List<String> tags() {
-        return TagListMapper.tagsStringToList(tags);
-    }
-
     private void initCampaignScenarios() {
         if (this.campaignScenarios == null) {
             this.campaignScenarios = new ArrayList<>();

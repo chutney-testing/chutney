@@ -125,7 +125,7 @@ public class CampaignExecution {
         }
     }
 
-    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment, String userId, List<String> tags) {
+    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment, List<String> tags) {
         testCaseDatasets.forEach(testCase ->
             this.scenarioExecutions.add(
                 new ScenarioExecutionCampaign(
@@ -145,7 +145,7 @@ public class CampaignExecution {
                         .build())));
     }
 
-    public void startScenarioExecution(TestCaseDataset testCaseDataset, String executionEnvironment, String userId, List<String> tags) throws UnsupportedOperationException {
+    public void startScenarioExecution(TestCaseDataset testCaseDataset, String executionEnvironment) throws UnsupportedOperationException {
         OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
@@ -167,7 +167,7 @@ public class CampaignExecution {
                     .datasetId(selectDatasetId(testCaseDataset))
                     .user(userId)
                     .scenarioId(testCaseDataset.testcase().id())
-                    .tags(new HashSet<>(tags))
+                    .tags(this.scenarioExecutions.get(indexOpt.getAsInt()).execution().tags())
                     .build()));
     }
 

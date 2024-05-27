@@ -47,7 +47,6 @@ import com.chutneytesting.tools.Try;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -212,7 +211,7 @@ public class CampaignExecutionEngine {
             .map(Optional::get)
             .toList();
 
-        campaignExecution.initExecution(testCaseDatasets, campaign.executionEnvironment(), campaignExecution.userId, campaign.tags);
+        campaignExecution.initExecution(testCaseDatasets, campaign.executionEnvironment(), campaign.tags);
         try {
             if (campaign.parallelRun) {
                 Collection<Callable<Object>> toExecute = Lists.newArrayList();
@@ -239,7 +238,7 @@ public class CampaignExecutionEngine {
             // Is stop requested ?
             if (!currentCampaignExecutionsStopRequests.get(campaignExecution.executionId)) {
                 // Init scenario execution in campaign report
-                campaignExecution.startScenarioExecution(testCaseDataset, campaign.executionEnvironment(), campaignExecution.userId, campaign.tags);
+                campaignExecution.startScenarioExecution(testCaseDataset, campaign.executionEnvironment());
                 // Execute scenario
                 scenarioExecution = executeScenario(campaign, testCaseDataset, campaignExecution);
                 // Retry one time if failed
@@ -305,7 +304,7 @@ public class CampaignExecutionEngine {
             .or(() -> ofNullable(campaign.externalDatasetId))
             .map(datasetRepository::findById)
             .orElse(null);
-        return new ExecutionRequest(testCaseDataset.testcase(), campaign.executionEnvironment(), campaignExecution.userId, dataset, campaignExecution, new HashSet<>(campaign.tags));
+        return new ExecutionRequest(testCaseDataset.testcase(), campaign.executionEnvironment(), campaignExecution.userId, dataset, campaignExecution, campaign.tags);
     }
 
     private void verifyNotAlreadyRunning(Campaign campaign) {

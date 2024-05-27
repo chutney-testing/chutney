@@ -16,16 +16,16 @@
 
 package com.chutneytesting.server.core.domain.execution;
 
+import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toUnmodifiableSet;
 
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.google.common.collect.Streams;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Stream;
 
 public class ExecutionRequest {
@@ -35,31 +35,34 @@ public class ExecutionRequest {
     public final String userId;
     public final DataSet dataset;
     public final CampaignExecution campaignExecution;
-    public final Set<String> tags;
+    public final List<String> tags;
 
-    public ExecutionRequest(TestCase testCase, String environment, String userId, DataSet dataset, CampaignExecution campaignExecution, Set<String> tags) {
+    public ExecutionRequest(TestCase testCase, String environment, String userId, DataSet dataset, CampaignExecution campaignExecution, List<String> extraTags) {
         this.testCase = testCase;
         this.environment = environment;
         this.userId = userId;
         this.dataset = dataset;
         this.campaignExecution = campaignExecution;
-        this.tags = tags(tags);
+        this.tags = tags(extraTags);
     }
 
+    public ExecutionRequest(TestCase testCase, String environment, String userId, DataSet dataset, CampaignExecution campaignExecution) {
+        this(testCase, environment, userId, dataset, campaignExecution, emptyList());
+    }
     public ExecutionRequest(TestCase testCase, String environment, String userId, DataSet dataset) {
-        this(testCase, environment, userId, dataset, null, Set.of());
+        this(testCase, environment, userId, dataset, null, emptyList());
     }
 
     public ExecutionRequest(TestCase testCase, String environment, String userId) {
-        this(testCase, environment, userId, DataSet.NO_DATASET, null, Set.of());
+        this(testCase, environment, userId, DataSet.NO_DATASET, null, emptyList());
     }
 
-    private Set<String> tags(Set<String> tags) {
+    private List<String> tags(List<String> extraTags) {
         return Streams.concat(
                 ofNullable(testCase).map(tc -> tc.metadata().tags().stream()).orElse(Stream.empty()),
                 ofNullable(dataset).stream().flatMap(ds -> ofNullable(ds.tags).stream().flatMap(Collection::stream)),
-                tags.stream()
+                ofNullable(extraTags).map(HashSet::new).stream().flatMap(Collection::stream)
             )
-            .collect(toUnmodifiableSet());
+            .toList();
     }
 }
