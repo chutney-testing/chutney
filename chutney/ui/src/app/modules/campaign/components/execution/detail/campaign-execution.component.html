@@ -170,17 +170,27 @@
                 <span><small (click)="showMore[i]=!showMore[i]">{{ (!showMore[i] && scenarioReportOutline.error.length > 100) ? (scenarioReportOutline.error | slice:0:100) + " ..." : (scenarioReportOutline.error) }}</small></span>
               </td>
               <td class="text-center align-middle text-nowrap">
-                  <ng-container *ngIf="scenarioReportOutline.tags.length <= 3">
-                      <span *ngFor="let tag of scenarioReportOutline.tags" class="badge bg-primary">{{tag}}</span>
-                  </ng-container>
-                  <ng-container *ngIf="scenarioReportOutline.tags.length > 3">
-                      <span *ngFor="let tag of scenarioReportOutline.tags | slice:0:2" class="badge bg-primary">{{tag}}</span>
-                      <button type="button" class="badge bg-primary"
-                              ngbPopover="{{scenarioReportOutline.tags}}" placement="left"
-                              triggers="mouseenter:mouseleave" container="body">
-                          ...
+                  @if (scenarioReportOutline.tags && scenarioReportOutline.tags.length <= 3) {
+                    <span>
+                      @for (tag of scenarioReportOutline.tags; track $index) {
+                        <span
+                        class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                      }
+                    </span>
+                  }
+                  @if (scenarioReportOutline.tags && scenarioReportOutline.tags.length > 3) {
+                    <span>
+                      @for (tag of scenarioReportOutline.tags | slice:0:2; track tag) {
+                        <span
+                        class="chutney-tag chutney-tag-selected">{{tag}}</span>
+                      }
+                      <button type="button" class="chutney-tag chutney-tag-selected"
+                        ngbPopover="{{scenarioReportOutline.tags.join(' | ')}}" placement="left"
+                        triggers="mouseenter:mouseleave">
+                        ...
                       </button>
-                  </ng-container>
+                    </span>
+                  }
               </td>
               <td class="text-center align-middle text-nowrap">
                   <span><small>{{ scenarioReportOutline.datasetId }}</small></span>
