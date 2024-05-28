@@ -18,6 +18,8 @@ package com.chutneytesting.server.core.domain.execution.report;
 
 import static java.util.Collections.emptySet;
 
+import com.chutneytesting.server.core.domain.tools.Default;
+import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -37,6 +39,8 @@ public class ScenarioExecutionReport {
     public final List<Map<String, String>> datatable;
     public final StepExecutionReportCore report;
 
+    @Default
+    @JsonCreator
     public ScenarioExecutionReport(long executionId,
                                    String scenarioName,
                                    String environment,
