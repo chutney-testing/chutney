@@ -16,8 +16,11 @@
 
 package com.chutneytesting.server.core.domain.execution.report;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.Collections.emptySet;
 
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.tools.Default;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import java.util.Collection;
@@ -39,6 +42,23 @@ public class ScenarioExecutionReport {
     public final List<Map<String, String>> datatable;
     public final StepExecutionReportCore report;
 
+    public ScenarioExecutionReport(long executionId,
+                                   String scenarioName,
+                                   String environment,
+                                   String user,
+                                   Collection<String> tags,
+                                   DataSet dataSet,
+                                   StepExecutionReportCore report) {
+        this(executionId,
+            scenarioName,
+            environment,
+            user,
+            tags,
+            Optional.ofNullable(dataSet).map(ds -> ds.constants).orElse(emptyMap()),
+            Optional.ofNullable(dataSet).map(ds -> ds.datatable).orElse(emptyList()),
+            report);
+    }
+
     @Default
     @JsonCreator
     public ScenarioExecutionReport(long executionId,
@@ -57,7 +77,7 @@ public class ScenarioExecutionReport {
         this.contextVariables = searchContextVariables(report);
         this.report = report;
         this.constants = constants;
-        this.datatable = datatable;
+        this.datatable =datatable;
     }
 
     public ScenarioExecutionReport(long executionId,
@@ -66,7 +86,7 @@ public class ScenarioExecutionReport {
                                    String user,
                                    Collection<String> tags,
                                    StepExecutionReportCore report) {
-       this(executionId, scenarioName,environment,user,tags, null, null, report);
+       this(executionId, scenarioName,environment,user,tags, null, report);
     }
 
     private Map<String, Object> searchContextVariables(StepExecutionReportCore report) {
