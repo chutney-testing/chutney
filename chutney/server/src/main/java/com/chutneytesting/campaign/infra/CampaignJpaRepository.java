@@ -32,6 +32,5 @@ public interface CampaignJpaRepository extends CrudRepository<CampaignEntity, Lo
         String title,
         String description);
 
-    @Query(value = "SELECT campaign FROM CAMPAIGN campaign WHERE campaign.environment = :environment")
-    List<CampaignEntity> findCampaignsByEnvironment(String environment);
+    List<CampaignEntity> findByEnvironment(String environment);
 }

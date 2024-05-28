@@ -17,7 +17,7 @@
 
 package com.chutneytesting.campaign.domain;
 
-import com.chutneytesting.environment.domain.eventEmitter.EnvironmentRenamingEvent;
+import com.chutneytesting.environment.infra.eventEmitter.EnvironmentRenamingEvent;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +26,7 @@ import org.springframework.context.ApplicationListener;
 public class CampaignEventEnvironmentRenamingListener implements ApplicationListener<EnvironmentRenamingEvent> {
 
     private final CampaignService campaignService;
-    private final Logger logger = LoggerFactory.getLogger(CampaignEventEnvironmentRenamingListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CampaignEventEnvironmentRenamingListener.class);
 
     public CampaignEventEnvironmentRenamingListener(CampaignService campaignService) {
         this.campaignService = campaignService;
@@ -34,7 +34,7 @@ public class CampaignEventEnvironmentRenamingListener implements ApplicationList
 
     @Override
     public void onApplicationEvent(EnvironmentRenamingEvent environmentRenamingEvent) {
-        logger.debug("EnvironmentRenamingEvent received for old name {} and new name {}", environmentRenamingEvent.getOldName(), environmentRenamingEvent.getNewName());
+        LOGGER.debug("EnvironmentRenamingEvent received for old name {} and new name {}", environmentRenamingEvent.getOldName(), environmentRenamingEvent.getNewName());
         Objects.requireNonNull(environmentRenamingEvent);
         Objects.requireNonNull(environmentRenamingEvent.getOldName());
         Objects.requireNonNull(environmentRenamingEvent.getNewName());

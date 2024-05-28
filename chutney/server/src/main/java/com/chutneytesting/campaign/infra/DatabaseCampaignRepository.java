@@ -141,8 +141,7 @@ public class DatabaseCampaignRepository implements CampaignRepository {
         if (isNullOrEmpty(environment)) {
             return emptyList();
         }
-        return campaignJpaRepository.findCampaignsByEnvironment(environment).stream()
-            .distinct()
+        return campaignJpaRepository.findByEnvironment(environment).stream()
             .map(CampaignEntity::toDomain)
             .toList();
     }

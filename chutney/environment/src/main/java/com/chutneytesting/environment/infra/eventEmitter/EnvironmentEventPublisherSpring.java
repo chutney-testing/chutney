@@ -15,7 +15,7 @@
  *
  */
 
-package com.chutneytesting.environment.domain.eventEmitter;
+package com.chutneytesting.environment.infra.eventEmitter;
 
 import org.springframework.context.ApplicationEventPublisher;
 

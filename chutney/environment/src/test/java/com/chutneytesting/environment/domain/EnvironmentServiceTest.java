@@ -23,11 +23,11 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisher;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmentException;
 import com.chutneytesting.environment.domain.exception.InvalidEnvironmentNameException;
 import com.chutneytesting.environment.domain.exception.NoEnvironmentFoundException;
 import com.chutneytesting.environment.domain.exception.UnresolvedEnvironmentException;
+import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

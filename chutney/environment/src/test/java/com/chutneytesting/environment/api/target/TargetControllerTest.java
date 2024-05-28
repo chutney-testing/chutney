@@ -40,7 +40,7 @@ import com.chutneytesting.environment.domain.Environment;
 import com.chutneytesting.environment.domain.EnvironmentRepository;
 import com.chutneytesting.environment.domain.EnvironmentService;
 import com.chutneytesting.environment.domain.Target;
-import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisher;
+import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
 import com.chutneytesting.environment.domain.exception.EnvironmentNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;

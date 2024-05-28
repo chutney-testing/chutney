@@ -22,8 +22,8 @@ import com.chutneytesting.environment.api.variable.EmbeddedVariableApi;
 import com.chutneytesting.environment.domain.Environment;
 import com.chutneytesting.environment.domain.EnvironmentRepository;
 import com.chutneytesting.environment.domain.EnvironmentService;
-import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisher;
-import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisherStub;
+import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
+import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisherStub;
 import com.chutneytesting.environment.infra.JsonFilesEnvironmentRepository;
 
 public class EnvironmentConfiguration {

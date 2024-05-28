@@ -36,7 +36,6 @@ import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 

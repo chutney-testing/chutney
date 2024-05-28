@@ -17,6 +17,7 @@
 package com.chutneytesting.campaign.infra;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -226,14 +227,10 @@ public class DatabaseCampaignRepositoryTest {
         @Test
         public void should_find_campaigns_related_to_a_given_environment() {
             // Given
-            ScenarioEntity s1 = givenScenario();
-            ScenarioEntity s2 = givenScenario();
-            ScenarioEntity s3 = givenScenario();
-            ScenarioEntity s4 = givenScenario();
-            Campaign campaign1 = new Campaign(null, "campaignTestName1", "campaignDesc1", scenariosIds(List.of(s1, s2, s1), asList("ds1", null, "ds2")), "env", false, false, null, null);
-            Campaign campaign2 = new Campaign(null, "campaignTestName2", "campaignDesc2", scenariosIds(s2, s1), "env1", false, false, null, null);
-            Campaign campaign3 = new Campaign(null, "campaignTestName3", "campaignDesc3", scenariosIds(s1, s3), "env1", false, false, null, null);
-            Campaign campaign4 = new Campaign(null, "campaignTestName4", "campaignDesc4", scenariosIds(s3, s4), "env2", false, false, null, null);
+            Campaign campaign1 = new Campaign(null, "campaignTestName1", "campaignDesc1", emptyList(), "env", false, false, null, null);
+            Campaign campaign2 = new Campaign(null, "campaignTestName2", "campaignDesc2", emptyList(), "env1", false, false, null, null);
+            Campaign campaign3 = new Campaign(null, "campaignTestName3", "campaignDesc3", emptyList(), "env1", false, false, null, null);
+            Campaign campaign4 = new Campaign(null, "campaignTestName4", "campaignDesc4", emptyList(), "env2", false, false, null, null);
             sut.createOrUpdate(campaign1);
             sut.createOrUpdate(campaign2);
             sut.createOrUpdate(campaign3);

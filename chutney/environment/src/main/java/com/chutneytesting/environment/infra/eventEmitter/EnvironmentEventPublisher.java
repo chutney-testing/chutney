@@ -15,7 +15,7 @@
  *
  */
 
-package com.chutneytesting.environment.domain.eventEmitter;
+package com.chutneytesting.environment.infra.eventEmitter;
 
 public interface EnvironmentEventPublisher {
     void publishEventEnvironmentRenaming(String oldName, String newName);

@@ -16,9 +16,6 @@
 
 package com.chutneytesting.environment.domain;
 
-import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisher;
-import com.chutneytesting.environment.domain.eventEmitter.EnvironmentEventPublisherStub;
-import com.chutneytesting.environment.domain.eventEmitter.EnvironmentRenamingEvent;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmentException;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingTargetException;
 import com.chutneytesting.environment.domain.exception.CannotDeleteEnvironmentException;
@@ -29,6 +26,8 @@ import com.chutneytesting.environment.domain.exception.NoEnvironmentFoundExcepti
 import com.chutneytesting.environment.domain.exception.TargetNotFoundException;
 import com.chutneytesting.environment.domain.exception.UnresolvedEnvironmentException;
 import com.chutneytesting.environment.domain.exception.VariableAlreadyExistingException;
+import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
+import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisherStub;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
