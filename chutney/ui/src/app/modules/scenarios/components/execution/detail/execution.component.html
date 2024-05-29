@@ -108,8 +108,8 @@
             </div>
         </div>
     </div>
-    @if (execution.dataset) {
-        <div class="row ctx-var-raw mb-2">
+    @if (execution.dataset && !isRunning()) {
+        <div class="row mb-2">
             <div class="col justify-content-center">
                 <div class="hr-fa float-start align-self-center cursor-pointer" (click)="toggleDatasetVariables()">
                     <i class="fa-solid fa-sm fa-fw"
@@ -119,56 +119,52 @@
                     attr.data-content="{{'scenarios.execution.dataset.title' | translate}}: {{execution.dataset}}"
                     (click)="toggleDatasetVariables()">
                 <div [ngbCollapse]="collapseDataset" [animation]="false">
-                    <div class="row text-center">
-                        @if (scenarioExecutionReport?.constants?.length) {
-                            <div class="col-3">
-                                <table class="table table-sm table-hover table-borderless small">
-                                    <thead class="table-light">
-                                    <tr>
-                                        <th>{{'global.smallword.key' | translate }}</th>
-                                        <th>{{'global.smallword.value' | translate }}</th>
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for (uniqueValue of scenarioExecutionReport?.constants; track $index) {
-                                            <tr>
-                                                <td>{{ uniqueValue.key }}</td>
-                                                <td>{{ uniqueValue.value }}</td>
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
-                            </div>
-                        }
-                        @if (scenarioExecutionReport?.datatable.length) {
-                            <div class="col">
-                                <table class="table table-sm table-hover table-borderless small">
-                                    <thead class="table-light">
-                                    <tr>
-                                        @for (header of scenarioExecutionReport?.datatable[0]; track $index) {
-                                            <th>{{ header.key }}</th>
-                                        }
-                                    </tr>
-                                    </thead>
-                                    <tbody>
-                                        @for (multipleValue of scenarioExecutionReport?.datatable; track $index) {
-                                            <tr>
-                                                @for (value of multipleValue; track $index) {
-                                                    <td>{{ value.value }}</td>
-                                                }
-                                            </tr>
-                                        }
-                                    </tbody>
-                                </table>
+                    @if (scenarioExecutionReport?.datatable) {
+                    <div class="ctx-var mb-2">
+                        <span class="fw-bold">
+                            <i class="fa fa-th me-1"></i> Datatable
+                        </span>
+                        <span class="ms-3 action" (click)="copy(scenarioExecutionReport.datatable)">
+                            <i class="fa-sm fa-regular fa-copy"></i>
+                        </span>
+                        <span class="ms-3 action" (click)="openOffCanva(monaco, scenarioExecutionReport.datatable)">
+                            <i class="fa-sm fa-regular fa-eye"></i>
+                        </span>
+                    </div>
+                    }
+                    @if (scenarioExecutionReport?.constants) {
+                    <div>
+                        <span class="fw-bold">
+                             <i class="fa fa-list me-1"></i>
+                            {{'global.smallword.key' | translate }}/ {{'global.smallword.value' | translate }}
+                        </span>
+                        @for (uniqueValue of scenarioExecutionReport?.constants; track $index) {
+                            <div class="ctx-var">
+                                <span class="fw-bold text-wrap text-break">{{ uniqueValue.key }}</span>
+                                <span class="ms-3 action" (click)="copy(uniqueValue.value)">
+                                        <i class="fa-sm fa-regular fa-copy"></i>
+                                </span>
+                                @if (enableEditorView(uniqueValue.value)) {
+                                    <span class="ms-3 action"
+                                          (click)="openOffCanva(monaco, uniqueValue.value)">
+                                         <i class="fa-sm fa-regular fa-eye"></i>
+                                     </span>
+                                }
+                                <span>
+                                    <pre [class]="inOutCtxToggleClass(prettyPrintToggle)"><code
+                                        [innerHTML]="uniqueValue.value | stringify | prettyPrint: true | safe: 'html'"></code>
+                                    </pre>
+                                </span>
                             </div>
                         }
                     </div>
+                    }
                 </div>
             </div>
         </div>
     }
     @if (hasContextVariables && !isRunning()) {
-        <div class="row ctx-var-raw mb-2">
+        <div class="row mb-2">
             <div class="col justify-content-center">
                 <div class="hr-fa float-start align-self-center" (click)="toggleContextVariables()">
                     <i class="fa-solid fa-sm fa-fw"
@@ -176,18 +172,18 @@
                 </div>
                 <hr class="hr-text" attr.data-content="{{'scenarios.execution.contextVariables' | translate}}"
                     (click)="toggleContextVariables()">
-                <div [ngbCollapse]="collapseContextVariables" [animation]="false">
-                    <div *rxFor="let entry of scenarioExecutionReport.contextVariables | objectAsEntryList ">
-                        <div class="row copy-row">
+                <div [ngbCollapse]="collapseContextVariables" [animation]="false" >
+                    <div *rxFor="let entry of scenarioExecutionReport.contextVariables | objectAsEntryList " class="ctx-var">
+                        <div class="row">
                             <div>
                                 <span class="fw-bold text-wrap text-break">{{ entry.key }}</span>
-                                <span title="copy value" class="ms-3 copy" (click)="copy(entry)">
-                  <i class="fa-sm fa-regular fa-copy"></i>
-                </span>
+                                <span title="copy value" class="ms-3 action" (click)="copy(entry.value)">
+                                    <i class="fa-sm fa-regular fa-copy"></i>
+                                </span>
                                 @if (enableEditorView(entry)) {
-                                    <span title="read value" class="ms-3 copy" (click)="openOffCanva(monaco, entry)">
-                    <i class="fa-sm fa-regular fa-eye"></i>
-                  </span>
+                                    <span title="read value" class="ms-3 action" (click)="openOffCanva(monaco, entry.value)">
+                                        <i class="fa-sm fa-regular fa-eye"></i>
+                                    </span>
                                 }
                             </div>
                             <div class="align-self-center">
@@ -315,16 +311,16 @@
                         attr.data-content="{{'scenarios.execution.step.inputs' | translate}}">
                     <div class="inputs" [ngClass]="{'d-none': !inputsDNoneToggle}">
                         <div *rxFor="let input of step.evaluatedInputs | objectAsEntryList">
-                            <div class="row copy-row">
+                            <div class="row">
                                 <div class="pe-0">
                                     <span class="fw-bold">{{ input.key }}</span>
                                     <span title="{{'scenarios.execution.step.actions.copy' | translate}}"
-                                          class="ms-3 copy" (click)="copy(input)">
+                                          class="ms-3 copy" (click)="copy(input.value)">
                     <i class="fa-sm fa-regular fa-copy"></i>
                   </span>
                                     @if (enableEditorView(input)) {
                                         <span title="{{'scenarios.execution.step.actions.edit' | translate}}"
-                                              class="ms-3 copy" (click)="openOffCanva(monaco, input)">
+                                              class="ms-3 action" (click)="openOffCanva(monaco, input.value)">
                       <i class="fa-sm fa-regular fa-eye"></i>
                     </span>
                                     }
@@ -363,16 +359,16 @@
                     attr.data-content="{{'scenarios.execution.step.outputs' | translate}}">
                 <div class="outputs" [ngClass]="{'d-none': !outputsDNoneToggle}">
                     <div *rxFor="let output of step.stepOutputs | objectAsEntryList">
-                        <div class="row copy-row">
+                        <div class="row">
                             <div class="pe-0">
                                 <span class="fw-bold">{{ output.key }}</span>
-                                <span title="{{'scenarios.execution.step.actions.copy' | translate}}" class="ms-3 copy"
-                                      (click)="copy(output)">
+                                <span title="{{'scenarios.execution.step.actions.copy' | translate}}" class="ms-3 action"
+                                      (click)="copy(output.value)">
                   <i class="fa-sm fa-regular fa-copy"></i>
                 </span>
                                 @if (enableEditorView(output)) {
                                     <span title="{{'scenarios.execution.step.actions.edit' | translate}}"
-                                          class="ms-3 copy" (click)="openOffCanva(monaco, output)">
+                                          class="ms-3 action" (click)="openOffCanva(monaco, output.value)">
                     <i class="fa-sm fa-regular fa-eye"></i>
                   </span>
                                 }
@@ -407,9 +403,6 @@
                         <option value="xml">xml</option>
                         <option value="xml">html</option>
                         <option value="sql">sql</option>
-                        <!--ng-container *ngFor="let lang of monacoLanguages">
-                        <option [value]="lang">{{lang}}</option>
-                      </ng-container-->
                     </select>
                     <label>{{ 'scenarios.execution.step.editor.theme' | translate }}</label>
                     <select class="text-center mx-1" aria-label="Select theme" [(ngModel)]="editorTheme">
