@@ -58,7 +58,6 @@ import { ChutneyMainHeaderComponent } from '@shared/components/layout/header/chu
 import { ChutneyLeftMenuComponent } from '@shared/components/layout/left-menu/chutney-left-menu.component';
 import { ChutneyRightMenuComponent } from '@shared/components/layout/right-menu/chutney-right-menu.component';
 import { DistinctPipe } from './pipes/distinct.pipe';
-import { NgScrollbarModule } from 'ngx-scrollbar';
 
 @NgModule({
     imports: [
@@ -68,7 +67,6 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
         ReactiveFormsModule,
         RouterModule,
         TranslateModule,
-        NgScrollbarModule,
         NgbTooltipModule,
         NgbDropdownModule
     ],

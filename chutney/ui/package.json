@@ -51,7 +51,6 @@
     "ngx-moment": "^6.0.2",
     "ngx-monaco-editor-v2": "^17.0.1",
     "ngx-pagination": "^6.0.3",
-    "ngx-scrollbar": "^14.1.0",
     "ngx-toastr": "^18.0.0",
     "rxjs": "^7.8.1",
     "stream": "0.0.2",
