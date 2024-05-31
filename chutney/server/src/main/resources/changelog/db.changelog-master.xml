@@ -1049,4 +1049,12 @@
             <column name="DATASET_ID" type="VARCHAR(64)"/>
         </addColumn>
     </changeSet>
+
+    <changeSet id="fix-scenarios-dataset-null-values" author="ICG">
+        <comment>Change scenarios default dataset id from "null" to null</comment>
+        <update tableName="SCENARIO">
+            <column name="DEFAULT_DATASET_ID" value="null"/>
+            <where>DEFAULT_DATASET_ID = 'null'</where>
+        </update>
+    </changeSet>
 </databaseChangeLog>
