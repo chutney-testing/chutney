@@ -22,9 +22,8 @@ import com.chutneytesting.environment.api.variable.EmbeddedVariableApi;
 import com.chutneytesting.environment.domain.Environment;
 import com.chutneytesting.environment.domain.EnvironmentRepository;
 import com.chutneytesting.environment.domain.EnvironmentService;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisherStub;
 import com.chutneytesting.environment.infra.JsonFilesEnvironmentRepository;
+import com.chutneytesting.server.core.domain.environment.RenameEnvironmentHandler;
 
 public class EnvironmentConfiguration {
 
@@ -35,12 +34,12 @@ public class EnvironmentConfiguration {
     private final EmbeddedVariableApi variableApi;
 
     public EnvironmentConfiguration(String storeFolderPath) {
-        this(storeFolderPath, new EnvironmentEventPublisherStub());
+        this(storeFolderPath, null);
     }
 
-    public EnvironmentConfiguration(String storeFolderPath, EnvironmentEventPublisher environmentEventPublisher) {
+    public EnvironmentConfiguration(String storeFolderPath, RenameEnvironmentHandler renameEnvironmentHandler) {
         this.environmentRepository = createEnvironmentRepository(storeFolderPath);
-        EnvironmentService environmentService = createEnvironmentService(environmentRepository, environmentEventPublisher);
+        EnvironmentService environmentService = createEnvironmentService(environmentRepository, renameEnvironmentHandler);
         this.environmentApi = new EmbeddedEnvironmentApi(environmentService);
         this.targetApi = new EmbeddedTargetApi(environmentService);
         this.variableApi = new EmbeddedVariableApi(environmentService);
@@ -58,8 +57,8 @@ public class EnvironmentConfiguration {
         return new JsonFilesEnvironmentRepository(storeFolderPath);
     }
 
-    private EnvironmentService createEnvironmentService(EnvironmentRepository environmentRepository, EnvironmentEventPublisher environmentEventPublisher) {
-        return new EnvironmentService(environmentRepository, environmentEventPublisher);
+    private EnvironmentService createEnvironmentService(EnvironmentRepository environmentRepository, RenameEnvironmentHandler renameEnvironmentHandler) {
+        return new EnvironmentService(environmentRepository, renameEnvironmentHandler);
     }
 
     public EmbeddedEnvironmentApi getEmbeddedEnvironmentApi() {

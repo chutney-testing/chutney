@@ -41,7 +41,6 @@ import com.chutneytesting.environment.domain.Environment;
 import com.chutneytesting.environment.domain.EnvironmentRepository;
 import com.chutneytesting.environment.domain.EnvironmentService;
 import com.chutneytesting.environment.domain.Target;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
 import com.chutneytesting.environment.domain.exception.EnvironmentNotFoundException;
 import com.chutneytesting.environment.domain.exception.InvalidEnvironmentNameException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -69,8 +68,7 @@ public class HttpEnvironmentApiTest {
     private final String environmentBasePath = "/api/v2/environments";
 
     private final EnvironmentRepository environmentRepository = mock(EnvironmentRepository.class);
-    private final EnvironmentEventPublisher environmentEventPublisher = mock(EnvironmentEventPublisher.class);
-    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, environmentEventPublisher);
+    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, null);
     private final EnvironmentApi embeddedApplication = new EmbeddedEnvironmentApi(environmentService);
     private final HttpEnvironmentApi environmentControllerV2 = new HttpEnvironmentApi(embeddedApplication);
 

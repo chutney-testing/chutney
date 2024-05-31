@@ -40,7 +40,6 @@ import com.chutneytesting.environment.domain.Environment;
 import com.chutneytesting.environment.domain.EnvironmentRepository;
 import com.chutneytesting.environment.domain.EnvironmentService;
 import com.chutneytesting.environment.domain.Target;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
 import com.chutneytesting.environment.domain.exception.EnvironmentNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -68,8 +67,7 @@ public class TargetControllerTest {
     private final String targetBasePath = "/api/v2/targets";
 
     private final EnvironmentRepository environmentRepository = mock(EnvironmentRepository.class);
-    private final EnvironmentEventPublisher environmentEventPublisher = mock(EnvironmentEventPublisher.class);
-    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, environmentEventPublisher);
+    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, null);
     private final EmbeddedTargetApi embeddedApplication = new EmbeddedTargetApi(environmentService);
     private final TargetController targetController = new TargetController(embeddedApplication);
 
@@ -131,7 +129,7 @@ public class TargetControllerTest {
         addAvailableEnvironment("env_test", "server 1");
 
         mockMvc.perform(
-                post(targetBasePath )
+                post(targetBasePath)
                     .content("{\"name\": \"server 2\", \"url\": \"ssh://somehost:42\", \"environment\": \"env_test\"}")
                     .contentType(MediaType.APPLICATION_JSON))
             .andDo(MockMvcResultHandlers.log())

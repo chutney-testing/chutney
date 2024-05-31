@@ -19,38 +19,32 @@ package com.chutneytesting.environment;
 import com.chutneytesting.environment.api.environment.EmbeddedEnvironmentApi;
 import com.chutneytesting.environment.api.target.EmbeddedTargetApi;
 import com.chutneytesting.environment.api.variable.EnvironmentVariableApi;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisherSpring;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class EnvironmentSpringConfiguration {
 
-    public static final String CONFIGURATION_FOLDER_SPRING_VALUE = "${chutney.environment.configuration-folder:~/.chutney/conf/environment}";
+    public static final String ENVIRONMENT_CONFIGURATION_FOLDER = "${chutney.environment.configuration-folder:~/.chutney/conf/environment}";
 
-    @Bean
-    EnvironmentEventPublisher environmentEventPublisher(ApplicationEventPublisher applicationEventPublisher) {
-        return new EnvironmentEventPublisherSpring(applicationEventPublisher);
+
+    @Bean(name = "localEnvironmentConfiguration")
+    EnvironmentConfiguration environmentConfiguration(@Value(ENVIRONMENT_CONFIGURATION_FOLDER) String storeFolderPath) {
+        return new EnvironmentConfiguration(storeFolderPath);
     }
-
     @Bean
-    EmbeddedEnvironmentApi environmentEmbeddedApplication(@Value(CONFIGURATION_FOLDER_SPRING_VALUE) String storeFolderPath, EnvironmentEventPublisher environmentEventPublisher) {
-        EnvironmentConfiguration environmentConfiguration = new EnvironmentConfiguration(storeFolderPath, environmentEventPublisher);
+    EmbeddedEnvironmentApi environmentEmbeddedApplication(EnvironmentConfiguration environmentConfiguration) {
         return environmentConfiguration.getEmbeddedEnvironmentApi();
     }
 
     @Bean
-    EmbeddedTargetApi targetEmbeddedApplication(@Value(CONFIGURATION_FOLDER_SPRING_VALUE) String storeFolderPath, EnvironmentEventPublisher environmentEventPublisher) {
-        EnvironmentConfiguration environmentConfiguration = new EnvironmentConfiguration(storeFolderPath, environmentEventPublisher);
+    EmbeddedTargetApi targetEmbeddedApplication(EnvironmentConfiguration environmentConfiguration) {
         return environmentConfiguration.getEmbeddedTargetApi();
     }
 
     @Bean
-    EnvironmentVariableApi variableEmbeddedApplication(@Value(CONFIGURATION_FOLDER_SPRING_VALUE) String storeFolderPath, EnvironmentEventPublisher environmentEventPublisher) {
-        EnvironmentConfiguration environmentConfiguration = new EnvironmentConfiguration(storeFolderPath, environmentEventPublisher);
+    EnvironmentVariableApi variableEmbeddedApplication(EnvironmentConfiguration environmentConfiguration) {
         return environmentConfiguration.getEmbeddedVariableApi();
     }
 }

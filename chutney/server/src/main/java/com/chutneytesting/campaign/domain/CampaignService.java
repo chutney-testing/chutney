@@ -18,12 +18,12 @@ package com.chutneytesting.campaign.domain;
 
 import static java.util.stream.Collectors.toList;
 
+import com.chutneytesting.server.core.domain.environment.RenameEnvironmentHandler;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.List;
-import java.util.Objects;
 
-public class CampaignService {
+public class CampaignService implements RenameEnvironmentHandler {
 
     private final CampaignExecutionRepository campaignExecutionRepository;
     private final CampaignRepository campaignRepository;

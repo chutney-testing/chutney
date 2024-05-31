@@ -26,8 +26,7 @@ import com.chutneytesting.environment.domain.exception.NoEnvironmentFoundExcepti
 import com.chutneytesting.environment.domain.exception.TargetNotFoundException;
 import com.chutneytesting.environment.domain.exception.UnresolvedEnvironmentException;
 import com.chutneytesting.environment.domain.exception.VariableAlreadyExistingException;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisherStub;
+import com.chutneytesting.server.core.domain.environment.RenameEnvironmentHandler;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -44,16 +43,11 @@ public class EnvironmentService {
 
     private final Logger logger = LoggerFactory.getLogger(EnvironmentService.class);
     private final EnvironmentRepository environmentRepository;
-    private final EnvironmentEventPublisher environmentEventPublisher;
+    private final RenameEnvironmentHandler renameEnvironmentHandler;
 
-    public EnvironmentService(EnvironmentRepository environmentRepository, EnvironmentEventPublisher environmentEventPublisher) {
+    public EnvironmentService(EnvironmentRepository environmentRepository, RenameEnvironmentHandler renameEnvironmentHandler) {
         this.environmentRepository = environmentRepository;
-        this.environmentEventPublisher = environmentEventPublisher;
-    }
-
-    public EnvironmentService(EnvironmentRepository environmentRepository) {
-        this.environmentRepository = environmentRepository;
-        this.environmentEventPublisher = new EnvironmentEventPublisherStub();
+        this.renameEnvironmentHandler = renameEnvironmentHandler;
     }
 
     public Set<String> listEnvironmentsNames() {
@@ -98,7 +92,9 @@ public class EnvironmentService {
         createOrUpdate(newEnvironment);
         if (!newEnvironment.name.equals(environmentName)) {
             environmentRepository.delete(environmentName);
-            environmentEventPublisher.publishEventEnvironmentRenaming(environmentName, newEnvironment.name);
+            if (renameEnvironmentHandler != null) {
+                renameEnvironmentHandler.renameEnvironmentInCampaigns(environmentName, newEnvironment.name);
+            }
         }
     }
 

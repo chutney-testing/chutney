@@ -27,7 +27,6 @@ import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmen
 import com.chutneytesting.environment.domain.exception.InvalidEnvironmentNameException;
 import com.chutneytesting.environment.domain.exception.NoEnvironmentFoundException;
 import com.chutneytesting.environment.domain.exception.UnresolvedEnvironmentException;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -36,13 +35,11 @@ class EnvironmentServiceTest {
 
     EnvironmentService sut;
     EnvironmentRepository environmentRepository;
-    EnvironmentEventPublisher environmentEventPublisher;
 
     @BeforeEach
     public void setUp() {
         environmentRepository = mock(EnvironmentRepository.class);
-        environmentEventPublisher = mock(EnvironmentEventPublisher.class);
-        sut = new EnvironmentService(environmentRepository, environmentEventPublisher);
+        sut = new EnvironmentService(environmentRepository, null);
     }
 
     @Test()

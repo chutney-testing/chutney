@@ -26,9 +26,9 @@ import static com.chutneytesting.ServerConfigurationValues.EXECUTION_ASYNC_PUBLI
 import static com.chutneytesting.ServerConfigurationValues.SERVER_PORT_SPRING_VALUE;
 import static com.chutneytesting.ServerConfigurationValues.TASK_SQL_NB_LOGGED_ROW;
 import static com.chutneytesting.ServerConfigurationValues.TASK_SQL_NB_LOGGED_ROW_SPRING_VALUE;
+import static com.chutneytesting.environment.EnvironmentSpringConfiguration.ENVIRONMENT_CONFIGURATION_FOLDER;
 
 import com.chutneytesting.action.api.EmbeddedActionEngine;
-import com.chutneytesting.campaign.domain.CampaignEventEnvironmentRenamingListener;
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.campaign.domain.CampaignService;
@@ -36,6 +36,7 @@ import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.design.domain.editionlock.TestCaseEditions;
 import com.chutneytesting.design.domain.editionlock.TestCaseEditionsService;
 import com.chutneytesting.engine.api.execution.TestEngine;
+import com.chutneytesting.environment.EnvironmentConfiguration;
 import com.chutneytesting.execution.domain.campaign.CampaignExecutionEngine;
 import com.chutneytesting.execution.infra.execution.ExecutionRequestMapper;
 import com.chutneytesting.execution.infra.execution.ServerTestEngineJavaImpl;
@@ -80,6 +81,7 @@ import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfigura
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.ExecutorServiceAdapter;
@@ -95,7 +97,7 @@ public class ServerConfiguration {
 
     @PostConstruct
     public void logPort() throws UnknownHostException {
-      LOGGER.debug("Starting server {} on {}", InetAddress.getLocalHost().getCanonicalHostName(), port);
+        LOGGER.debug("Starting server {} on {}", InetAddress.getLocalHost().getCanonicalHostName(), port);
     }
 
     /**
@@ -238,11 +240,11 @@ public class ServerConfiguration {
         return new CampaignService(campaignExecutionRepository, campaignRepository);
     }
 
-    @Bean
-    CampaignEventEnvironmentRenamingListener campaignEventEnvironmentRenamingListener(CampaignService campaignService) {
-        return new CampaignEventEnvironmentRenamingListener(campaignService);
-    }
 
+    @Bean
+    EnvironmentConfiguration environmentConfiguration(@Value(ENVIRONMENT_CONFIGURATION_FOLDER) String storeFolderPath, CampaignService campaignService) {
+        return new EnvironmentConfiguration(storeFolderPath, campaignService);
+    }
 
     // TODO - To move in infra when it will not be used in domain (ScenarioExecutionEngineAsync)
     @Bean

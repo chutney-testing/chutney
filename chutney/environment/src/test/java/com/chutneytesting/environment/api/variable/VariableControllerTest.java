@@ -37,7 +37,6 @@ import com.chutneytesting.environment.domain.EnvironmentRepository;
 import com.chutneytesting.environment.domain.EnvironmentService;
 import com.chutneytesting.environment.domain.EnvironmentVariable;
 import com.chutneytesting.environment.domain.Target;
-import com.chutneytesting.environment.infra.eventEmitter.EnvironmentEventPublisher;
 import com.chutneytesting.environment.domain.exception.EnvironmentNotFoundException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
@@ -60,8 +59,7 @@ public class VariableControllerTest {
     private final String variablesBasePath = "/api/v2/variables";
 
     private final EnvironmentRepository environmentRepository = mock(EnvironmentRepository.class);
-    private final EnvironmentEventPublisher environmentEventPublisher = mock(EnvironmentEventPublisher.class);
-    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, environmentEventPublisher);
+    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, null);
     private final EmbeddedVariableApi embeddedApplication = new EmbeddedVariableApi(environmentService);
     private final EnvironmentVariableController targetController = new EnvironmentVariableController(embeddedApplication);
 
@@ -81,6 +79,7 @@ public class VariableControllerTest {
                 %s
             ]
         """.formatted(variableTemplate);
+
     @BeforeEach
     public void setUp() {
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();
