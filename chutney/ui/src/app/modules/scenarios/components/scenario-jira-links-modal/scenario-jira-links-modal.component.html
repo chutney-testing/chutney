@@ -1,0 +1,83 @@
+<div class="modal-header">
+    <h4 class="modal-title">{{scenario.title}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="activeModal.dismiss('Cross click')"></button>
+</div>
+<div class="modal-body" ngbAutofocus>
+
+    @if (errorMessage) {
+        <div class="alert alert-dismissible alert-danger mt-4">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errorMessage = null"></button>
+            {{ errorMessage }}
+        </div>
+      }
+
+    <form [formGroup]="jiraFormGroup">
+        <div class="row mb-2">
+            <div class="col-6">
+                <span>{{ 'menu.principal.jiraId' | translate}} :</span>
+            </div>
+            <div class="col-6">
+                <input type="text" class="form-control" formControlName="jiraId" id="jiraId" />
+            </div>
+        </div>
+        <table class="table table-sm table-striped table-hover">
+            <thead>
+                <th class="w50" scope="col">@if ( isEditable || jiraDatasetList.length ){<span>Dataset</span>}</th>
+                <th class="w45" scope="col">@if ( isEditable || jiraDatasetList.length ){ Jira id }</th>
+                <th class="w5" scope="col">
+                    @if ( isEditable ) {
+                    <button type="button" class="btn btn-sm" (click)="newEntry()"><span
+                            class="fa fa-plus"></span></button>
+                    } @else {
+                    <button type="button" class="btn btn-sm" (click)="edit()"><span
+                            class="fa fa-edit"></span></button>
+                    }
+                </th>
+            </thead>
+            <tbody>
+                @if ( isEditable ) {
+                @for (datasetJiraId of datasetForm.controls; track datasetJiraId; let i = $index) {
+                <tr [formGroup]="datasetForm" >
+                    <ng-container [formGroupName]="i">
+                        <td>
+                            <chutney-dataset-selection
+                                [selectedDatasetId]="datasetJiraId.controls['datasetId'].value"
+                                (selectionEvent)="selectDataset($event,i)">
+                            </chutney-dataset-selection>
+                            <input type="text" class="form-control" [id]="'datasetId-' + i" formControlName="datasetId" hidden >
+                        </td>
+                        <td><input type="text" class="form-control" [id]="'jiraId-' + i" formControlName="jiraId" />
+                        </td>
+                        <td>
+                            <button type="button" class="btn btn-sm" (click)="deleteEntry(i)"><span class="fa fa-trash"
+                                    style="color: red;"></span></button>
+                        </td>
+                    </ng-container>
+                </tr>
+                }
+                } @else {
+                @for (datasetJiraId of jiraDatasetList; track datasetJiraId.dataset; let i = $index) {
+                <tr>
+                    <td>{{ datasetJiraId.dataset }}</td>
+                    <td>{{ datasetJiraId.jiraId }}</td>
+                    <td>
+                        <a target="_blank" [href]="getJiraLink(datasetJiraId.jiraId)" rel="noopener noreferrer"
+                            (click)="$event.stopPropagation()" triggers="mouseenter:mouseleave">
+                            <span class="fab fa-jira" aria-hidden="true"></span>
+                        </a>
+                    </td>
+                </tr>
+                }
+                }
+            </tbody>
+        </table>
+    </form>
+
+</div>
+@if ( isEditable ) {
+<div class="modal-footer">
+    <button type="button" class="btn btn-outline-secondary"
+        (click)="activeModal.dismiss('cancel click')">Annuler</button>
+    <button type="button" class="btn btn-success" (click)="save()">Enregistrer</button>
+</div>
+}

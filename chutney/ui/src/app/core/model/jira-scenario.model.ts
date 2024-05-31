@@ -22,6 +22,21 @@ export class JiraScenario {
     }
 }
 
+export class JiraDatasetLinks {
+    constructor(
+        public dataset: string,
+        public jiraId: string) {
+    }
+}
+
+export class JiraScenarioLinks {
+    constructor(
+        public id: string,
+        public chutneyId: string,
+        public datasetLinks: Object) {
+    }
+}
+
 export class JiraTestExecutionScenarios {
     constructor(
         public id: string,

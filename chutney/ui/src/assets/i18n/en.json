@@ -14,7 +14,7 @@
             "variable": "Variable",
             "envVariable": "Variables",
             "dataset": "Dataset",
-            "jiraId": "Jira identifier",
+            "jiraId": "Scenario jira identifier",
             "roles": "Roles",
             "admin": "Admin",
             "profile": "Profile",
@@ -165,6 +165,9 @@
                 "from": "Edition from",
                 "conflicts": "Editions conflicts"
             }
+        },
+        "jira": {
+            "edit": "Edit jira links"
         }
     },
     "campaigns": {

@@ -42,32 +42,22 @@
   </div>
 </div>
 <div>
-  <form [formGroup]="pluginsForm" autocomplete="off" class="mb-0">
-    <div class="row mb-0 small">
-      <div class="col-2">
-        <div class="form-inline">
-          <label class="form-control-label fw-bold me-5" for="jiraId">{{'menu.principal.jiraId' | translate}}</label>
-          <input type="text" class="form-control form-control-sm" id="jiraId"
-            formControlName="jiraId"
-            placeholder="ex. LK-42"/>
-        </div>
+<div class="row mb-0 small">
+  <div class="col-2">
+    <span class="fw-bold me-5">{{'menu.principal.dataset' | translate}}</span>
+    <chutney-dataset-selection
+      [selectedDatasetId]="testCase.defaultDataset"
+      (selectionEvent)="selectDataset($event)">
+    </chutney-dataset-selection>
+  </div>
+  <div class="col-8">
+    @if (saveErrorMessage) {
+      <div class="alert alert-danger text-center text-white cursor-default" (click)="this.saveErrorMessage = null">
+        <strong>{{ saveErrorMessage }}</strong>
       </div>
-      <div class="col-2">
-        <span class="fw-bold me-5">{{'menu.principal.dataset' | translate}}</span>
-        <chutney-dataset-selection
-          [selectedDatasetId]="testCase.defaultDataset"
-          (selectionEvent)="selectDataset($event)">
-        </chutney-dataset-selection>
-      </div>
-      <div class="col-8">
-        @if (saveErrorMessage) {
-          <div class="alert alert-danger text-center text-white cursor-default" (click)="this.saveErrorMessage = null">
-            <strong>{{ saveErrorMessage }}</strong>
-          </div>
-        }
-      </div>
-    </div>
-  </form>
+    }
+  </div>
+</div>
 </div>
 <div>
   <chutney-error-panel [errorMessage]="errorMessage"></chutney-error-panel>
