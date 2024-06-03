@@ -108,7 +108,7 @@
             </div>
         </div>
     </div>
-    @if (execution.dataset && !isRunning()) {
+    @if (execution.dataset) {
         <div class="row mb-2">
             <div class="col justify-content-center">
                 <div class="hr-fa float-start align-self-center cursor-pointer" (click)="toggleDatasetVariables()">
@@ -124,11 +124,11 @@
                         <span class="fw-bold">
                             <i class="fa fa-th me-1"></i> Datatable
                         </span>
+                        <span class="ms-3 cursor-pointer" (click)="openOffCanva(monaco, scenarioExecutionReport.datatable)">
+                            <i class="fa-sm fa-regular fa-eye"></i>
+                        </span>
                         <span class="ms-3 action" (click)="copy(scenarioExecutionReport.datatable)">
                             <i class="fa-sm fa-regular fa-copy"></i>
-                        </span>
-                        <span class="ms-3 action" (click)="openOffCanva(monaco, scenarioExecutionReport.datatable)">
-                            <i class="fa-sm fa-regular fa-eye"></i>
                         </span>
                     </div>
                     }
@@ -312,10 +312,10 @@
                     <div class="inputs" [ngClass]="{'d-none': !inputsDNoneToggle}">
                         <div *rxFor="let input of step.evaluatedInputs | objectAsEntryList">
                             <div class="row">
-                                <div class="pe-0">
+                                <div class="pe-0 ctx-var">
                                     <span class="fw-bold">{{ input.key }}</span>
                                     <span title="{{'scenarios.execution.step.actions.copy' | translate}}"
-                                          class="ms-3 copy" (click)="copy(input.value)">
+                                          class="ms-3 action" (click)="copy(input.value)">
                     <i class="fa-sm fa-regular fa-copy"></i>
                   </span>
                                     @if (enableEditorView(input)) {
@@ -360,7 +360,7 @@
                 <div class="outputs" [ngClass]="{'d-none': !outputsDNoneToggle}">
                     <div *rxFor="let output of step.stepOutputs | objectAsEntryList">
                         <div class="row">
-                            <div class="pe-0">
+                            <div class="pe-0 ctx-var">
                                 <span class="fw-bold">{{ output.key }}</span>
                                 <span title="{{'scenarios.execution.step.actions.copy' | translate}}" class="ms-3 action"
                                       (click)="copy(output.value)">

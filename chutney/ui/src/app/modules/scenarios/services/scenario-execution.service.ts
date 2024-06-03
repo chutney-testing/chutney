@@ -116,7 +116,7 @@ export class ScenarioExecutionService {
             let parse = JSON.parse(jsonResponse.report);
             report = parse.report;
             contextVariables = parse.contextVariables;
-            constants = Object.keys(parse.constants).map(key => new KeyValue(key,parse.constants[key]));
+            constants = parse.constants &&  Object.keys(parse.constants).map(key => new KeyValue(key,parse.constants[key]));
             datatable = parse.datatable?.map(line => Object.keys(line).map(key => new KeyValue(key, line[key])))
         }
         return new ScenarioExecutionReport(
