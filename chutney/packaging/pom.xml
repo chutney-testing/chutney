@@ -97,6 +97,11 @@
                     </configuration>
                 </plugin>
                 <plugin>
+                    <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>build-helper-maven-plugin</artifactId>
+                    <version>3.5.0</version>
+                </plugin>
+                <plugin>
                     <groupId>org.springframework.boot</groupId>
                     <artifactId>spring-boot-maven-plugin</artifactId>
                     <version>${spring-boot-maven.version}</version>
@@ -106,7 +111,6 @@
                         <mainClass>${mainClass}</mainClass>
                         <finalName>${chutney.package.file}</finalName>
                         <wait>2000</wait>
-                        <jmxPort>54321</jmxPort>
                     </configuration>
                     <executions>
                         <!-- Create packaging archive -->
