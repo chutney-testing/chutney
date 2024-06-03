@@ -20,9 +20,10 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Observable, Subscription } from 'rxjs';
 import { DragulaService } from 'ng2-dragula';
 
-import { Campaign, CampaignScenario, JiraScenario, ScenarioIndex } from '@model';
+import { Campaign, CampaignScenario, Dataset, JiraScenario, ScenarioIndex } from '@model';
 import {
     CampaignService,
+    DataSetService,
     EnvironmentService,
     JiraPluginConfigurationService,
     JiraPluginService,
@@ -33,6 +34,7 @@ import { isNotEmpty } from '@shared';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'chutney-campaign-edition',
@@ -46,10 +48,12 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
     campaign = new Campaign();
     submitted: boolean;
     scenarios: Array<ScenarioIndex> = [];
-    scenariosToAdd: Array<ScenarioIndex> = [];
+    scenariosToAdd: Array<{"scenarioId": ScenarioIndex, "dataset": ListItem}> = [];
     errorMessage: any;
-    scenariosFilter: string;
     subscription = new Subscription();
+    datasets: ListItem[] = [];
+    dropdownDatasetSettings: IDropdownSettings
+    error: boolean = false;
 
 
     private routeParamsSubscription: Subscription;
@@ -80,6 +84,8 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         private route: ActivatedRoute,
         private dragulaService: DragulaService,
         private environmentService: EnvironmentService,
+        private datasetService: DataSetService,
+        private translate: TranslateService,
         @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings
     ) {
         this.campaignForm = this.formBuilder.group({
@@ -88,7 +94,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
             tags: [],
             jiratags: [],
             campaignTags: '',
-            scenarioIds: [],
+            scenariosFilter: '',
             parallelRun: false,
             retryAuto: false,
             jiraId: '',
@@ -100,6 +106,12 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         this.submitted = false;
         this.loadEnvironment();
         this.loadAllScenarios();
+        this.datasetService.findAll().subscribe((res: Array<Dataset>) => {
+            this.datasets = res.map(dataset => {
+                return {"id": dataset.name, "text": dataset.name}
+            });
+        });
+        this.dropdownDatasetSettings = {...this.dropdownSettings, singleSelection: true}
     }
 
     onItemSelect(item: any) {
@@ -316,7 +328,6 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
 
         this.campaign.title = formValue['title'];
         this.campaign.description = formValue['description'];
-        this.campaign.scenarios = formValue['scenarioIds']?.map(id => new CampaignScenario(id));
         this.campaign.environment = this.selectedEnvironment;
         this.campaign.parallelRun = formValue['parallelRun'];
         this.campaign.retryAuto = formValue['retryAuto'];
@@ -325,12 +336,14 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         this.campaign.tags = tags.length !== 0 ? tags.split(',') : [];
 
         this.setCampaignScenariosIdsToAdd(this.scenariosToAdd);
-        if (this.campaign.id != null) {
-            this.subscribeToSaveResponse(
-                this.campaignService.update(this.campaign));
-        } else {
-            this.subscribeToSaveResponse(
-                this.campaignService.create(this.campaign));
+        if (!this.error) {
+            if (this.campaign.id != null) {
+                this.subscribeToSaveResponse(
+                    this.campaignService.update(this.campaign));
+            } else {
+                this.subscribeToSaveResponse(
+                    this.campaignService.create(this.campaign));
+            }
         }
     }
 
@@ -339,31 +352,41 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         if (this.campaign.scenarios) {
             for (const campaignScenario of this.campaign.scenarios) {
                 const scenarioFound = this.scenarios.find((x) => x.id === campaignScenario.scenarioId);
-                if (!this.scenariosToAdd.some((s) => s.id === scenarioFound.id)) {
-                    this.scenariosToAdd.push(scenarioFound);
-                }
+                this.scenariosToAdd.push({scenarioId: scenarioFound, dataset: (campaignScenario.datasetId ? {id: campaignScenario.datasetId, text: campaignScenario.datasetId} : null)});
             }
         }
     }
 
-    setCampaignScenariosIdsToAdd(scenariosToAdd: Array<ScenarioIndex>) {
+    setCampaignScenariosIdsToAdd(scenariosToAdd: Array<{scenarioId: ScenarioIndex, dataset: ListItem}>) {
+        this.error = false;
         this.campaign.scenarios = [];
         for (const scenario of scenariosToAdd) {
-            if (!this.campaign.scenarios.some((s) => s.scenarioId === scenario.id)) {
-                this.campaign.scenarios.push(new CampaignScenario(scenario.id));
+            if (!this.campaign.scenarios.some((s) => s.scenarioId === scenario.scenarioId.id && ((scenario.dataset === null && s.datasetId == null) || (scenario.dataset !== null && s.datasetId === scenario.dataset.id)))) {
+                this.campaign.scenarios.push(new CampaignScenario(scenario.scenarioId.id, scenario.dataset ? scenario.dataset.id as string : null));
+            } else {
+                this.error = true;
+                this.translate.get('campaigns.edition.errors.scenarioDatasetDuplicate', {
+                    scenarioId: scenario.scenarioId.id,
+                    datasetId: scenario.dataset ? scenario.dataset.id : "NULL"
+                }).subscribe((msg: string) => {
+                    this.errorMessage = msg
+                });
+                break;
             }
+        }
+        if (this.error) {
+            // Clear campaign.scenarios
+            this.campaign.scenarios.length = 0
         }
     }
 
     addScenario(scenario: ScenarioIndex) {
-        if (!this.scenariosToAdd.some((s) => s.id === scenario.id)) {
-            this.scenariosToAdd.push(scenario);
-            this.refreshForPipe();
-        }
+        this.scenariosToAdd.push({scenarioId: scenario, dataset: null});
+        this.refreshForPipe();
     }
 
-    removeScenario(scenario: ScenarioIndex) {
-        const index = this.scenariosToAdd.indexOf(scenario);
+    removeScenario(scenario: {"scenarioId": ScenarioIndex, "dataset": ListItem}) {
+        const index = this.scenariosToAdd.findIndex(scenarioElement => scenarioElement === scenario)
         this.scenariosToAdd.splice(index, 1);
         this.refreshForPipe();
     }
@@ -404,6 +427,18 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
 
     selectDataset(datasetId: string) {
         this.datasetId = datasetId;
+    }
+
+    selectDatasetScenario(dataset: ListItem, scenario: {"scenarioId": ScenarioIndex, "dataset": ListItem}) {
+        const scenarioSelected = this.scenariosToAdd.find(scenarioElement => scenarioElement === scenario)
+        scenarioSelected.dataset = dataset;
+        this.refreshForPipe();
+    }
+
+    deselectDatasetScenario(scenario: {"scenarioId": ScenarioIndex, "dataset": ListItem}) {
+        const scenarioSelected = this.scenariosToAdd.find(scenarioElement => scenarioElement === scenario)
+        scenarioSelected.dataset = null;
+        this.refreshForPipe();
     }
 
     private updateJiraLink(campaignId: number) {

@@ -268,7 +268,11 @@
                 "testExec": "Si l'id est celui d'un test exec: cela met à jour les status des tests pour ce test exec."
             },
             "selectTag": "Sélectionner tag",
-            "selectJiraTag": "Sélectionner statut d'execution jira"
+            "selectJiraTag": "Sélectionner statut d'execution jira",
+            "selectDatasetScenario": "Ajouter un dataset",
+            "errors": {
+                "scenarioDatasetDuplicate": "La combinaison existe déjà pour le scenario {{scenarioId}} et le dataset {{datasetId}}" 
+            }
         },
         "confirm": {
             "deletion.prefix": "Etes-vous sûr de vouloir supprimer la campagne ",
