@@ -223,7 +223,10 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
 
     private HttpClient buildHttpClient() throws URISyntaxException {
         HttpHost httpHost = HttpHost.create(new URI(jiraServerConfiguration.url()));
-        HttpHost proxyHttpHost = HttpHost.create(new URI(jiraServerConfiguration.urlProxy()));
+        HttpHost proxyHttpHost = null;
+        if (!jiraServerConfiguration.urlProxy().isBlank()) {
+            proxyHttpHost = HttpHost.create(new URI(jiraServerConfiguration.urlProxy()));
+        }
 
         HttpClientBuilder httpClientBuilder = HttpClients.custom()
             .setConnectionManager(buildConnectionManager())
