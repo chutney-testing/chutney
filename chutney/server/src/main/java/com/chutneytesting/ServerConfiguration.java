@@ -29,6 +29,7 @@ import static com.chutneytesting.ServerConfigurationValues.TASK_SQL_NB_LOGGED_RO
 import static com.chutneytesting.environment.EnvironmentSpringConfiguration.ENVIRONMENT_CONFIGURATION_FOLDER;
 
 import com.chutneytesting.action.api.EmbeddedActionEngine;
+import com.chutneytesting.campaign.domain.CampaignEnvironmentUpdateHandler;
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.campaign.domain.CampaignService;
@@ -42,6 +43,7 @@ import com.chutneytesting.execution.infra.execution.ExecutionRequestMapper;
 import com.chutneytesting.execution.infra.execution.ServerTestEngineJavaImpl;
 import com.chutneytesting.jira.api.JiraXrayEmbeddedApi;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
+import com.chutneytesting.server.core.domain.environment.UpdateEnvironmentHandler;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngine;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngineAsync;
 import com.chutneytesting.server.core.domain.execution.ServerTestEngine;
@@ -81,7 +83,6 @@ import org.springframework.boot.autoconfigure.jms.activemq.ActiveMQAutoConfigura
 import org.springframework.boot.autoconfigure.liquibase.LiquibaseAutoConfiguration;
 import org.springframework.boot.autoconfigure.mongo.MongoAutoConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.Resource;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.core.task.support.ExecutorServiceAdapter;
@@ -236,14 +237,19 @@ public class ServerConfiguration {
     }
 
     @Bean
-    CampaignService campaignService(CampaignExecutionRepository campaignExecutionRepository, CampaignRepository campaignRepository) {
-        return new CampaignService(campaignExecutionRepository, campaignRepository);
+    CampaignService campaignService(CampaignExecutionRepository campaignExecutionRepository) {
+        return new CampaignService(campaignExecutionRepository);
+    }
+
+    @Bean
+    CampaignEnvironmentUpdateHandler campaignEnvironmentUpdateHandler(CampaignRepository campaignRepository) {
+        return new CampaignEnvironmentUpdateHandler(campaignRepository);
     }
 
 
     @Bean
-    EnvironmentConfiguration environmentConfiguration(@Value(ENVIRONMENT_CONFIGURATION_FOLDER) String storeFolderPath, CampaignService campaignService) {
-        return new EnvironmentConfiguration(storeFolderPath, campaignService);
+    EnvironmentConfiguration environmentConfiguration(@Value(ENVIRONMENT_CONFIGURATION_FOLDER) String storeFolderPath, List<UpdateEnvironmentHandler> updateEnvironmentHandlers) {
+        return new EnvironmentConfiguration(storeFolderPath, updateEnvironmentHandlers);
     }
 
     // TODO - To move in infra when it will not be used in domain (ScenarioExecutionEngineAsync)

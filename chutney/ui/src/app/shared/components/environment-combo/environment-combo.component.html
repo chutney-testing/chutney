@@ -1,4 +1,7 @@
 <select class="form-select env-combo ms-2" (change)="changingValue($event)">
+  @if (selectedEnvironment === null) {
+    <option></option>
+  }
   @for (env of environments; track env) {
     <option [selected]="env === selectedEnvironment">{{ env }}</option>
   }

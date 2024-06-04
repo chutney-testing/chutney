@@ -27,12 +27,13 @@ export class EnvironmentComboComponent implements OnChanges {
     @Input() defaultValue: string;
     @Output() selectionEvent = new EventEmitter();
 
-    selectedEnvironment: string;
+    selectedEnvironment: string | null;
 
     constructor() {
     }
 
     ngOnChanges() {
+        this.selectedEnvironment = null
         this.setSelectedEnvironment();
     }
 
@@ -46,8 +47,6 @@ export class EnvironmentComboComponent implements OnChanges {
             const envFound = this.environments.find(e => e === this.defaultValue);
             if (envFound) {
                 this.selectedEnvironment = envFound;
-            } else {
-                this.selectedEnvironment = this.environments[0];
             }
             this.selectionEvent.emit(this.selectedEnvironment);
         }

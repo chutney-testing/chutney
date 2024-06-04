@@ -23,7 +23,8 @@ import com.chutneytesting.environment.domain.Environment;
 import com.chutneytesting.environment.domain.EnvironmentRepository;
 import com.chutneytesting.environment.domain.EnvironmentService;
 import com.chutneytesting.environment.infra.JsonFilesEnvironmentRepository;
-import com.chutneytesting.server.core.domain.environment.RenameEnvironmentHandler;
+import com.chutneytesting.server.core.domain.environment.UpdateEnvironmentHandler;
+import java.util.List;
 
 public class EnvironmentConfiguration {
 
@@ -37,9 +38,9 @@ public class EnvironmentConfiguration {
         this(storeFolderPath, null);
     }
 
-    public EnvironmentConfiguration(String storeFolderPath, RenameEnvironmentHandler renameEnvironmentHandler) {
+    public EnvironmentConfiguration(String storeFolderPath, List<UpdateEnvironmentHandler> updateEnvironmentHandlers) {
         this.environmentRepository = createEnvironmentRepository(storeFolderPath);
-        EnvironmentService environmentService = createEnvironmentService(environmentRepository, renameEnvironmentHandler);
+        EnvironmentService environmentService = createEnvironmentService(environmentRepository, updateEnvironmentHandlers);
         this.environmentApi = new EmbeddedEnvironmentApi(environmentService);
         this.targetApi = new EmbeddedTargetApi(environmentService);
         this.variableApi = new EmbeddedVariableApi(environmentService);
@@ -57,8 +58,8 @@ public class EnvironmentConfiguration {
         return new JsonFilesEnvironmentRepository(storeFolderPath);
     }
 
-    private EnvironmentService createEnvironmentService(EnvironmentRepository environmentRepository, RenameEnvironmentHandler renameEnvironmentHandler) {
-        return new EnvironmentService(environmentRepository, renameEnvironmentHandler);
+    private EnvironmentService createEnvironmentService(EnvironmentRepository environmentRepository, List<UpdateEnvironmentHandler> updateEnvironmentHandlers) {
+        return new EnvironmentService(environmentRepository, updateEnvironmentHandlers);
     }
 
     public EmbeddedEnvironmentApi getEmbeddedEnvironmentApi() {

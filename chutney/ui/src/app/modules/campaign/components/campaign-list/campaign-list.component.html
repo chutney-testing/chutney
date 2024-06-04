@@ -125,7 +125,7 @@
         <table class="table table-sm table-striped">
           <tbody>
             @for (scheduledCampaign of scheduledCampaigns; track scheduledCampaign.id) {
-              <tr>
+              <tr [ngClass]="{'scheduled-campaign-error': scheduledCampaign.environment === null}">
                 <td class="w80">#{{scheduledCampaign.campaignId}}
                   @if (isFrequencyCampaign(scheduledCampaign)) {
                     <span data-toggle="tooltip"
@@ -141,6 +141,11 @@
                   - {{scheduledCampaign.campaignsTitle}}
                 </td>
                 <td class="text-nowrap">{{scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm'}}</td>
+                <td>
+                  @if (scheduledCampaign.environment === null) {
+                    <span class="fa fa-triangle-exclamation"></span>
+                  }
+                </td>
               </tr>
             }
           </tbody>

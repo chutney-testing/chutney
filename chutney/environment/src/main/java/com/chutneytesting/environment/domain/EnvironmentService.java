@@ -26,9 +26,10 @@ import com.chutneytesting.environment.domain.exception.NoEnvironmentFoundExcepti
 import com.chutneytesting.environment.domain.exception.TargetNotFoundException;
 import com.chutneytesting.environment.domain.exception.UnresolvedEnvironmentException;
 import com.chutneytesting.environment.domain.exception.VariableAlreadyExistingException;
-import com.chutneytesting.server.core.domain.environment.RenameEnvironmentHandler;
+import com.chutneytesting.server.core.domain.environment.UpdateEnvironmentHandler;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -43,11 +44,11 @@ public class EnvironmentService {
 
     private final Logger logger = LoggerFactory.getLogger(EnvironmentService.class);
     private final EnvironmentRepository environmentRepository;
-    private final RenameEnvironmentHandler renameEnvironmentHandler;
+    private final List<UpdateEnvironmentHandler> updateEnvironmentHandlers;
 
-    public EnvironmentService(EnvironmentRepository environmentRepository, RenameEnvironmentHandler renameEnvironmentHandler) {
+    public EnvironmentService(EnvironmentRepository environmentRepository, List<UpdateEnvironmentHandler> updateEnvironmentHandlers) {
         this.environmentRepository = environmentRepository;
-        this.renameEnvironmentHandler = renameEnvironmentHandler;
+        this.updateEnvironmentHandlers = updateEnvironmentHandlers;
     }
 
     public Set<String> listEnvironmentsNames() {
@@ -79,7 +80,14 @@ public class EnvironmentService {
     }
 
     public void deleteEnvironment(String environmentName) throws EnvironmentNotFoundException, CannotDeleteEnvironmentException {
-        environmentRepository.delete(environmentName);
+      if (environmentRepository.findByName(environmentName) == null) {
+        logger.error("Cannot delete environment with name {} : cannot delete the last env", environmentName);
+        return;
+      }
+      environmentRepository.delete(environmentName);
+      if (updateEnvironmentHandlers != null) {
+        updateEnvironmentHandlers.forEach(renameEnvironmentHandler -> renameEnvironmentHandler.deleteEnvironment(environmentName));
+      }
     }
 
     public void updateEnvironment(String environmentName, Environment newVersion) throws InvalidEnvironmentNameException, EnvironmentNotFoundException {
@@ -92,8 +100,8 @@ public class EnvironmentService {
         createOrUpdate(newEnvironment);
         if (!newEnvironment.name.equals(environmentName)) {
             environmentRepository.delete(environmentName);
-            if (renameEnvironmentHandler != null) {
-                renameEnvironmentHandler.renameEnvironmentInCampaigns(environmentName, newEnvironment.name);
+            if (updateEnvironmentHandlers != null) {
+                updateEnvironmentHandlers.forEach(renameEnvironmentHandler -> renameEnvironmentHandler.renameEnvironment(environmentName, newEnvironment.name));
             }
         }
     }

@@ -45,7 +45,7 @@ class CampaignServiceTest {
         // G
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
         CampaignRepository campaignRepository = mock(CampaignRepository.class);
-        CampaignService campaignService = new CampaignService(campaignExecutionRepository, campaignRepository);
+        CampaignService campaignService = new CampaignService(campaignExecutionRepository);
 
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(1L)
@@ -143,7 +143,7 @@ class CampaignServiceTest {
                 .build()
         );
         when(campaignExecutionRepository.getExecutionHistory(anyLong())).thenReturn(allExecutions);
-        CampaignService sut = new CampaignService(campaignExecutionRepository, campaignRepository);
+        CampaignService sut = new CampaignService(campaignExecutionRepository);
 
         // When
         List<CampaignExecution> executionsReports = sut.findExecutionsById(campaignId);
@@ -162,7 +162,7 @@ class CampaignServiceTest {
         // G
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
         CampaignRepository campaignRepository = mock(CampaignRepository.class);
-        CampaignService campaignService = new CampaignService(campaignExecutionRepository, campaignRepository);
+        CampaignService campaignService = new CampaignService(campaignExecutionRepository);
 
         String scenarioId = "scenario 1";
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
@@ -238,7 +238,7 @@ class CampaignServiceTest {
                 .build()
         );
         when(campaignExecutionRepository.getExecutionHistory(anyLong())).thenReturn(allExecutions);
-        CampaignService sut = new CampaignService(campaignExecutionRepository, campaignRepository);
+        CampaignService sut = new CampaignService(campaignExecutionRepository);
 
         // When
         List<CampaignExecution> executionsReports = sut.findExecutionsById(campaignId);
@@ -330,7 +330,7 @@ class CampaignServiceTest {
                 .build()
         );
         when(campaignExecutionRepository.getExecutionHistory(anyLong())).thenReturn(allExecutions);
-        CampaignService sut = new CampaignService(campaignExecutionRepository, campaignRepository);
+        CampaignService sut = new CampaignService(campaignExecutionRepository);
 
         // When
         List<CampaignExecution> executionsReports = sut.findExecutionsById(campaignId);
@@ -340,52 +340,5 @@ class CampaignServiceTest {
         assertThat(executionsReports.get(0).scenarioExecutionReports()).hasSize(2);
         assertThat(executionsReports.get(1).scenarioExecutionReports()).hasSize(2);
         assertThat(executionsReports.get(2).scenarioExecutionReports()).hasSize(2);
-    }
-
-    @Test
-    void should_rename_environment_in_campaign() {
-        // Given
-        CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
-        CampaignRepository campaignRepository = mock(CampaignRepository.class);
-        CampaignService sut = new CampaignService(campaignExecutionRepository, campaignRepository);
-        Campaign campaign1 = new Campaign(
-            1L,
-            "TITLE1",
-            "DESCRIPTION1",
-            List.of(),
-            "ENV",
-            false,
-            false,
-            "DATASET1",
-            List.of()
-        );
-        Campaign campaign2 = new Campaign(
-            2L,
-            "TITLE2",
-            "DESCRIPTION2",
-            List.of(),
-            "ENV",
-            false,
-            false,
-            "DATASET2",
-            List.of()
-        );
-
-        ArgumentCaptor<Campaign> argument = ArgumentCaptor.forClass(Campaign.class);
-        when(campaignRepository.findCampaignsByEnvironment("ENV")).thenReturn(List.of(campaign1, campaign2));
-        when(campaignRepository.createOrUpdate(any(Campaign.class))).thenReturn(any(Campaign.class));
-
-
-        // When
-        sut.renameEnvironmentInCampaigns("ENV", "NEW_ENV");
-
-        // Then
-        verify(campaignRepository, times(2)).createOrUpdate(argument.capture());
-        List<Campaign> campaigns = argument.getAllValues();
-        assertThat(campaigns).hasSize(2);
-        assertThat("TITLE1").isEqualTo(campaigns.get(0).title);
-        assertThat("NEW_ENV").isEqualTo(campaigns.get(0).executionEnvironment());
-        assertThat("TITLE2").isEqualTo(campaigns.get(1).title);
-        assertThat("NEW_ENV").isEqualTo(campaigns.get(1).executionEnvironment());
     }
 }

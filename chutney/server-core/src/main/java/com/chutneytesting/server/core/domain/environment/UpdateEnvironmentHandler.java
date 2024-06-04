@@ -17,7 +17,8 @@
 
 package com.chutneytesting.server.core.domain.environment;
 
-public interface RenameEnvironmentHandler {
+public interface UpdateEnvironmentHandler {
 
-    void renameEnvironmentInCampaigns(String oldName, String newName);
+    void renameEnvironment(String oldName, String newName);
+    void deleteEnvironment(String environmentName);
 }
