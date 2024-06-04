@@ -702,7 +702,7 @@
         <dropSequence sequenceName="SCENARIO_SEQ"/>
     </changeSet>
 
-    <changeSet id="migrate-sqlite-table-scenario-drop" dbms="h2,postgresql" author="ICG">
+    <changeSet id="migrate-sqlite-table-scenario-drop" author="ICG">
         <comment>Drop old Scenario table</comment>
         <dropTable tableName="SCENARIO_OLD"/>
     </changeSet>
@@ -782,7 +782,7 @@
         <dropSequence sequenceName="CAMPAIGN_SEQ"/>
     </changeSet>
 
-    <changeSet id="migrate-sqlite-table-campaign-drop" dbms="h2,postgresql" author="ICG">
+    <changeSet id="migrate-sqlite-table-campaign-drop" author="ICG">
         <comment>Drop old Campaign table</comment>
         <dropTable tableName="CAMPAIGN_OLD"/>
     </changeSet>
@@ -812,7 +812,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="migrate-sqlite-table-campaign-scenarios-drop" dbms="h2,postgresql" author="ICG">
+    <changeSet id="migrate-sqlite-table-campaign-scenarios-drop" author="ICG">
         <comment>Drop old Campaign scenarios table</comment>
         <dropTable tableName="CAMPAIGN_SCENARIOS_OLD"/>
     </changeSet>
@@ -859,7 +859,7 @@
         <dropSequence sequenceName="CAMPAIGN_PARAMETER_SEQ"/>
     </changeSet>
 
-    <changeSet id="migrate-sqlite-table-campaign-parameters-drop" dbms="h2,postgresql" author="ICG">
+    <changeSet id="migrate-sqlite-table-campaign-parameters-drop" author="ICG">
         <comment>Drop old Campaign Parameter table</comment>
         <dropTable tableName="CAMPAIGN_PARAMETER_OLD"/>
     </changeSet>
@@ -939,7 +939,7 @@
         <dropIndex tableName="SCENARIO_EXECUTION_HISTORY" indexName="IDX_SEH_SCENARIO_ID"/>
     </changeSet>
 
-    <changeSet id="migrate-sqlite-table-scenario-executions-drop" dbms="h2,postgresql" author="ICG">
+    <changeSet id="migrate-sqlite-table-scenario-executions-drop" author="ICG">
         <comment>Drop old Scenario executions table</comment>
         <dropTable tableName="SCENARIO_EXECUTION_HISTORY"/>
     </changeSet>
@@ -1002,7 +1002,7 @@
         <dropIndex tableName="CAMPAIGN_EXECUTION_HISTORY" indexName="IDX_CEH_CAMPAIGN_ID"/>
     </changeSet>
 
-    <changeSet id="migrate-sqlite-table-campaign-executions-drop" dbms="h2,postgresql" author="ICG">
+    <changeSet id="migrate-sqlite-table-campaign-executions-drop" author="ICG">
         <comment>Drop old Campaign executions table</comment>
         <dropTable tableName="CAMPAIGN_EXECUTION_HISTORY"/>
     </changeSet>
