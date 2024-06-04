@@ -14,31 +14,47 @@
  * limitations under the License.
  */
 
-import { Component, EventEmitter, Input, Renderer2, OnDestroy, OnInit, Output, AfterViewInit, TemplateRef, ElementRef, AfterViewChecked, ViewChild } from '@angular/core';
+import {
+    AfterViewChecked,
+    AfterViewInit,
+    Component,
+    ElementRef,
+    EventEmitter,
+    Input,
+    OnDestroy,
+    OnInit,
+    Output,
+    Renderer2,
+    TemplateRef,
+    ViewChild
+} from '@angular/core';
 import { Location } from '@angular/common';
-import { Observable, Subscription, fromEvent, merge, timer } from 'rxjs';
-import { auditTime, debounceTime, delay, delayWhen, retryWhen, scan, takeWhile, throttleTime, timestamp } from 'rxjs/operators';
+import { fromEvent, merge, Observable, Subscription, timer } from 'rxjs';
+import {
+    auditTime,
+    debounceTime,
+    delay,
+    delayWhen,
+    retryWhen,
+    scan,
+    takeWhile,
+    throttleTime,
+    timestamp
+} from 'rxjs/operators';
 import { FileSaverService } from 'ngx-filesaver';
 import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NGX_MONACO_EDITOR_CONFIG } from 'ngx-monaco-editor-v2';
 
-import {
-    Authorization,
-    Execution,
-    GwtTestCase,
-    ScenarioExecutionReport,
-    StepExecutionReport
-} from '@model';
+import { Authorization, Execution, GwtTestCase, ScenarioExecutionReport, StepExecutionReport } from '@model';
 import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
-import { StringifyPipe, PrettyPrintPipe } from '@shared/pipes';
+import { StringifyPipe } from '@shared/pipes';
 import { findScrollContainer } from '@shared/tools';
 
 @Component({
     selector: 'chutney-scenario-execution',
     providers: [
         Location,
-        PrettyPrintPipe,
         StringifyPipe,
         {
             provide: NGX_MONACO_EDITOR_CONFIG,
@@ -70,6 +86,7 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
 
     hasContextVariables = false;
     collapseContextVariables = true;
+    collapseDataset = true;
 
     private scenarioExecutionAsyncSubscription: Subscription;
     private resizeLeftPanelSubscription: Subscription;
@@ -87,7 +104,6 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
         private scenarioExecutionService: ScenarioExecutionService,
         private fileSaverService: FileSaverService,
         private stringify: StringifyPipe,
-        private prettyPrint: PrettyPrintPipe,
         private renderer: Renderer2,
         private offcanvasService: NgbOffcanvas,
         private elementRef: ElementRef) {
@@ -234,6 +250,11 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
 
     toggleContextVariables() {
         this.collapseContextVariables = !this.collapseContextVariables;
+        timer(250).subscribe(() => this.setLefPanelHeight());
+    }
+
+    toggleDatasetVariables() {
+        this.collapseDataset = !this.collapseDataset;
         timer(250).subscribe(() => this.setLefPanelHeight());
     }
 
@@ -396,13 +417,8 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
         }
     }
 
-    copy(e: any) {
-        var text = e.value;
-        navigator.clipboard.writeText(
-            this.prettyPrint.transform(
-                this.stringify.transform(text)
-            )
-        );
+    copy(text: any) {
+        navigator.clipboard.writeText( this.stringify.transform(text, {space: 4}));
     }
 
     private panelState = 1;
@@ -566,12 +582,12 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
         return this.stringify.transform(value).length > 200;
     }
 
-    private _theme = 'hc-black';
+    private _theme = 'vs-dark';
     get editorTheme(): string {
         return this._theme;
     }
     set editorTheme(theme: string) {
-        this._theme = (theme && theme.trim()) || 'hc-black';
+        this._theme = (theme && theme.trim()) || 'vs-dark';
         this.updateEditorOptions();
     }
 
@@ -584,20 +600,13 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
         this.updateEditorOptions();
     }
 
-    /*
-    get monacoLanguages(): Array<string> {
-        return ((window as any)?.monaco?.languages?.getLanguages().map(l => l.id)) || [];
-    }
-    */
 
     editorOptions = {theme: this.editorTheme, language: this.editorLanguage};
     code: string;
 
     openOffCanva(content: TemplateRef<any>, value: any) {
-        this.code = this.prettyPrint.transform(
-            this.stringify.transform(value.value, {space: 4})
-        );
-		const ref = this.offcanvasService.open(content, { position: 'bottom', panelClass: 'offcanvas-panel-report' });
+        this.code = this.stringify.transform(value, {space: 4});
+		this.offcanvasService.open(content, { position: 'bottom', panelClass: 'offcanvas-panel-report' });
 	}
 
     exportEditorContent() {

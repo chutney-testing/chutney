@@ -127,7 +127,7 @@
                 "execution": "Impossible d'exécuter le scénario",
                 "parse": "Impossible de parser le scénario"
             },
-            "dataset.title": "Paramètres",
+            "dataset.title": "Dataset",
             "inputs": "Entrées",
             "outputs": "Sorties",
             "contextVariables": "Variables d'éxécutions"

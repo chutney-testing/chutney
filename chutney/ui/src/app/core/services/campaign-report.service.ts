@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-import { Injectable } from "@angular/core";
-import { CampaignExecutionFullReport, ScenarioExecutionReport, StepExecutionReport } from "@core/model";
-import { ExecutionStatus } from "@core/model/scenario/execution-status";
-import { TranslateService } from "@ngx-translate/core";
-import { DurationPipe } from "@shared/pipes";
-import jsPDF from "jspdf";
-import autoTable, { CellHookData } from "jspdf-autotable";
+import { Injectable } from '@angular/core';
+import { CampaignExecutionFullReport, ScenarioExecutionReport, StepExecutionReport } from '@core/model';
+import { ExecutionStatus } from '@core/model/scenario/execution-status';
+import { TranslateService } from '@ngx-translate/core';
+import { DurationPipe } from '@shared/pipes';
+import jsPDF from 'jspdf';
+import autoTable, { CellHookData } from 'jspdf-autotable';
 
 @Injectable({
     providedIn: 'root'
@@ -118,9 +118,12 @@ export class CampaignReportService {
     private buildExecutionReport(jsonResponse: any): ScenarioExecutionReport {
         let report: StepExecutionReport;
         let contextVariables: Map<string, Object>;
+        let datasetVariables: Map<string, Object>;
         if (jsonResponse?.report) {
-            report = JSON.parse(jsonResponse.report).report;
-            contextVariables = JSON.parse(jsonResponse.report).contextVariables;
+            let parse = JSON.parse(jsonResponse.report);
+            report = parse.report;
+            contextVariables = parse.contextVariables;
+            datasetVariables = parse.datasetVariables;
         }
         return new ScenarioExecutionReport(
             jsonResponse.executionId,

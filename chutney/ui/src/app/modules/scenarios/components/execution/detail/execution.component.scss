@@ -128,17 +128,15 @@ hr {
     }
   }
 
-.ctx-var-raw {
-    .copy-row {
-        .copy {
-            visibility: hidden;
-        }
+.ctx-var {
+    .action {
+        visibility: hidden;
+    }
 
-        &:hover {
-            .copy {
-                visibility: visible;
-                cursor: pointer;
-            }
+    &:hover {
+        .action {
+            visibility: visible;
+            cursor: pointer;
         }
     }
 }

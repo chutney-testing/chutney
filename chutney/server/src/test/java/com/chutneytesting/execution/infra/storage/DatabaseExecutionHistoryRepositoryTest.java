@@ -35,6 +35,7 @@ import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionReportEntity;
 import com.chutneytesting.scenario.infra.jpa.ScenarioEntity;
 import com.chutneytesting.scenario.infra.raw.DatabaseTestCaseRepository;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.DetachedExecution;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.Execution;
@@ -554,8 +555,9 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 stepReport("root step Title", -1L, SUCCESS,
                     stepReport("step 1", 24L, PAUSED,
                         stepReport("step1.1", 23L, RUNNING)));
+            DataSet dataSet = DataSet.builder().withId("id").withName("ds").withConstants(Map.of("key", "value")).withDatatable(List.of(Map.of("A", "A1", "B","B1"))).build();
             try {
-                return objectMapper.writeValueAsString(new ScenarioExecutionReport(1L, "scenario name", "", "", null, successStepReport));
+                return objectMapper.writeValueAsString(new ScenarioExecutionReport(1L, "scenario name", "", "", null, dataSet, successStepReport));
             } catch (JsonProcessingException exception) {
                 return "";
             }
