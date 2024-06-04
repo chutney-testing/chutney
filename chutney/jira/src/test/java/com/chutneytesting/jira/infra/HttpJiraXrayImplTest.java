@@ -25,11 +25,13 @@ import static com.github.tomakehurst.wiremock.client.WireMock.postRequestedFor;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlPathMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.chutneytesting.jira.domain.JiraServerConfiguration;
 import com.chutneytesting.jira.xrayapi.Xray;
 import com.chutneytesting.jira.xrayapi.XrayInfo;
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension;
+import java.net.UnknownHostException;
 import java.util.Base64;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -48,6 +50,56 @@ public class HttpJiraXrayImplTest {
         )
         .failOnUnmatchedRequests(true)
         .build();
+
+    @Nested
+    @DisplayName("No proxy")
+    class NoProxy {
+        @Test
+        void update_xray_execution() {
+            // Given
+            JiraServerConfiguration config = new JiraServerConfiguration(
+                "http://fake-server-jira",
+                "user",
+                "password",
+                "",
+                "",
+                ""
+            );
+
+            // When/Then
+            HttpJiraXrayImpl httpJiraXray = new HttpJiraXrayImpl(config);
+            assertThatThrownBy(() ->
+                httpJiraXray.updateRequest(new Xray("test", List.of(), new XrayInfo(List.of())))
+            )
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("Unable to update test execution [test] : ")
+                .hasRootCauseExactlyInstanceOf(UnknownHostException.class);
+        }
+
+        @Test
+        void test_issue_as_test_plan() {
+            // Given
+            String issueId = "PRJ-666";
+
+            var config = new JiraServerConfiguration(
+                "http://fake-server-jira",
+                "user",
+                "password",
+                null,
+                "",
+                ""
+            );
+
+            // When/Then
+            var sut = new HttpJiraXrayImpl(config);
+            assertThatThrownBy(() ->
+                sut.isTestPlan(issueId)
+            )
+                .isExactlyInstanceOf(RuntimeException.class)
+                .hasMessage("Unable to get issue [PRJ-666] : ")
+                .hasRootCauseExactlyInstanceOf(UnknownHostException.class);
+        }
+    }
 
     @Nested
     @DisplayName("Proxy without authentication")
