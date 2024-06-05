@@ -232,7 +232,7 @@
 
 <ng-template #stepFunc let-step>
     <div [id]="step.rowId" class="d-flex flex-column" [class]="step.type">
-        <div class="step-header text-nowrap mb-1"
+        <div class="step-header text-nowrap mb-1 cursor-pointer"
              [ngClass]="{'bg-info bg-gradient bg-opacity-25': this.selectedStep == step}"
              [title]="step.name" (click)="selectStep(step)">
       <span (click)="toggleStepCollapsed(step, $event)">
