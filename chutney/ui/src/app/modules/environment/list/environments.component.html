@@ -3,6 +3,9 @@
     @if (errorMessage) {
       <chutney-error-panel [errorMessage]="errorMessage" (click)="errorMessage = null" class="cursor-pointer"></chutney-error-panel>
     }
+    @if (nameValidationMessage) {
+      <chutney-error-panel [errorMessage]="nameValidationMessage" (click)="nameValidationMessage = null" class="cursor-pointer"></chutney-error-panel>
+    }
   </div>
   <div>
     <button type="button" class="btn btn-info rounded me-2"
