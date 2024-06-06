@@ -129,7 +129,7 @@
             </thead>
             <tbody>
                 @for (scenario of viewedScenarios; track scenario.id) {
-                    <tr class="align-baseline">
+                    <tr>
                         <td class="text-center text-nowrap">
                             <span>{{scenario.id}}</span>
                         </td>
@@ -176,18 +176,20 @@
                         <td scope="row" class="text-center">
                             {{ scenario.creationDate | amLocale:'fr' | amTimeAgo }}
                         </td>
-                        <td >
-                            <button type="button" class="btn bnt-xs" [routerLink]="['/scenario', scenario.id, 'executions']" [queryParams]="{open: 'last', active: 'last'}" (click)="$event.stopPropagation()" >
-                                <span  class="fa fa-eye"></span>
-                            </button>
-                            <button type="button" class="btn bnt-xs"  routerLink="{{'/scenario/' + scenario.id + '/raw-edition'}}" (click)="$event.stopPropagation()">
-                                <span  class="fa fa-edit"></span>
-                            </button>
-                            @if ( jiraUrl !== '') {
-                                <button type="button" class="btn bnt-xs"  (click)="showScenarioJiraLinks(scenario)">
-                                    <span  class="fab fa-jira"></span>
+                        <td>
+                            <div class="float-end">
+                                <button type="button" class="btn bnt-xs pe-1" [routerLink]="['/scenario', scenario.id, 'executions']" [queryParams]="{open: 'last', active: 'last'}" (click)="$event.stopPropagation()" >
+                                    <span  class="fa fa-eye"></span>
                                 </button>
-                            }
+                                <button type="button" class="btn bnt-xs px-1"  routerLink="{{'/scenario/' + scenario.id + '/raw-edition'}}" (click)="$event.stopPropagation()">
+                                    <span  class="fa fa-edit"></span>
+                                </button>
+                                @if ( jiraUrl !== '') {
+                                    <button type="button" class="btn bnt-xs px-1"  (click)="showScenarioJiraLinks(scenario)">
+                                        <span  class="fab fa-jira"></span>
+                                    </button>
+                                }
+                            </div>
                         </td>
                     </tr>
                 }

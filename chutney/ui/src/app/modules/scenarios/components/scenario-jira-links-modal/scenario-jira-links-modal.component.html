@@ -17,13 +17,13 @@
                 <span>{{ 'menu.principal.jiraId' | translate}} :</span>
             </div>
             <div class="col-6">
-                <input type="text" class="form-control" formControlName="jiraId" id="jiraId" />
+                <input type="text" [readonly]="!isEditable" class="form-control" formControlName="jiraId" id="jiraId" />
             </div>
         </div>
         <table class="table table-sm table-striped table-hover">
             <thead>
-                <th class="w50" scope="col">@if ( isEditable || jiraDatasetList.length ){<span>Dataset</span>}</th>
-                <th class="w45" scope="col">@if ( isEditable || jiraDatasetList.length ){ Jira id }</th>
+                <th class="w50" scope="col">@if ( isEditable || jiraDatasetList.length ){ <span>Dataset</span>}</th>
+                <th class="w45" scope="col">@if ( isEditable || jiraDatasetList.length ){ <span>Jira id</span>}</th>
                 <th class="w5" scope="col">
                     @if ( isEditable ) {
                     <button type="button" class="btn btn-sm" (click)="newEntry()"><span
@@ -76,8 +76,8 @@
 </div>
 @if ( isEditable ) {
 <div class="modal-footer">
-    <button type="button" class="btn btn-outline-secondary"
-        (click)="activeModal.dismiss('cancel click')">Annuler</button>
-    <button type="button" class="btn btn-success" (click)="save()">Enregistrer</button>
+    <button type="button" class="btn btn-light"
+        (click)="activeModal.dismiss('cancel click')">{{ "global.actions.cancel" | translate }}</button>
+    <button type="button" class="btn btn-primary" (click)="save()">{{ "global.actions.save" | translate }}</button>
 </div>
 }
