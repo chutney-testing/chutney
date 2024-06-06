@@ -188,6 +188,9 @@
             },
             "actions": {
                 "create": "New campaign"
+            },
+            "error": {
+                "environment": "No environment selected"
             }
         },
         "execution": {
@@ -254,7 +257,8 @@
                 "schedule": {
                     "label": "Schedule time",
                     "pattern": "Pattern should be HH:MM"
-                }
+                },
+                "environment": "Environment is mandatory"
             },
             "scenarios": {
                 "title": "Campaign scenarios",

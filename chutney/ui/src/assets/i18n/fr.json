@@ -188,6 +188,9 @@
             },
             "actions": {
                 "create": "Nouvelle campagne"
+            },
+            "error": {
+                "environment": "Aucun environnement sélectionné"
             }
         },
         "execution": {
@@ -254,7 +257,8 @@
                 "schedule": {
                     "label": "Heure de planification",
                     "pattern": "Format doit être HH:MM"
-                }
+                },
+                "environment": "L'environnement est obligatoire"
             },
             "scenarios": {
                 "title": "Scénarios de la campagne",

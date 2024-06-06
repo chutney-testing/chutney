@@ -125,8 +125,8 @@
         <table class="table table-sm table-striped">
           <tbody>
             @for (scheduledCampaign of scheduledCampaigns; track scheduledCampaign.id) {
-              <tr [ngClass]="{'scheduled-campaign-error': scheduledCampaign.environment === null}">
-                <td class="w80">#{{scheduledCampaign.campaignId}}
+              <tr>
+                <td [ngClass]="{'scheduled-campaign-error': scheduledCampaignHasMissingEnv(scheduledCampaign)}" class="w80">#{{scheduledCampaign.campaignId}}
                   @if (isFrequencyCampaign(scheduledCampaign)) {
                     <span data-toggle="tooltip"
                       title="{{scheduledCampaign.frequency.toLowerCase()}}"
@@ -140,10 +140,10 @@
                   }
                   - {{scheduledCampaign.campaignsTitle}}
                 </td>
-                <td class="text-nowrap">{{scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm'}}</td>
+                <td [ngClass]="{'scheduled-campaign-error': scheduledCampaignHasMissingEnv(scheduledCampaign)}" class="text-nowrap">{{scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm'}}</td>
                 <td>
-                  @if (scheduledCampaign.environment === null) {
-                    <span class="fa fa-triangle-exclamation"></span>
+                  @if (scheduledCampaignHasMissingEnv(scheduledCampaign)) {
+                    <span style="color: red;" class="fa fa-triangle-exclamation" ngbTooltip="{{'campaigns.list.error.environment' | translate}}"></span>
                   }
                 </td>
               </tr>
