@@ -29,7 +29,6 @@ import com.chutneytesting.environment.domain.exception.VariableAlreadyExistingEx
 import com.chutneytesting.server.core.domain.environment.UpdateEnvironmentHandler;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -49,6 +48,11 @@ public class EnvironmentService {
     public EnvironmentService(EnvironmentRepository environmentRepository, List<UpdateEnvironmentHandler> updateEnvironmentHandlers) {
         this.environmentRepository = environmentRepository;
         this.updateEnvironmentHandlers = updateEnvironmentHandlers;
+    }
+
+    public EnvironmentService(EnvironmentRepository environmentRepository) {
+        this.environmentRepository = environmentRepository;
+        this.updateEnvironmentHandlers = null;
     }
 
     public Set<String> listEnvironmentsNames() {
@@ -80,14 +84,15 @@ public class EnvironmentService {
     }
 
     public void deleteEnvironment(String environmentName) throws EnvironmentNotFoundException, CannotDeleteEnvironmentException {
-      if (environmentRepository.findByName(environmentName) == null) {
-        logger.error("Cannot delete environment with name {} : cannot delete the last env", environmentName);
-        return;
-      }
-      environmentRepository.delete(environmentName);
-      if (updateEnvironmentHandlers != null) {
-        updateEnvironmentHandlers.forEach(renameEnvironmentHandler -> renameEnvironmentHandler.deleteEnvironment(environmentName));
-      }
+        List<String> environmentNames = environmentRepository.listNames();
+        if (environmentNames.size() == 1 && environmentNames.get(0).equals(environmentName)) {
+            logger.error("Cannot delete environment with name {} : cannot delete the last env", environmentName);
+            throw new InvalidEnvironmentNameException("Cannot delete environment with name " + environmentName + " : cannot delete the last env");
+        }
+        environmentRepository.delete(environmentName);
+        if (updateEnvironmentHandlers != null) {
+            updateEnvironmentHandlers.forEach(renameEnvironmentHandler -> renameEnvironmentHandler.deleteEnvironment(environmentName));
+        }
     }
 
     public void updateEnvironment(String environmentName, Environment newVersion) throws InvalidEnvironmentNameException, EnvironmentNotFoundException {
