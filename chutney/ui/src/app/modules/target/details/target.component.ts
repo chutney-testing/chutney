@@ -55,7 +55,7 @@ export class TargetComponent implements OnInit {
                     null,
                     name
                 ));
-            this.targets = [...data.targets, ...newTargets]
+            this.targets = [...data.targets, ...newTargets].sort((a, b) => a.environment.localeCompare(b.environment));
         });
     }
 
