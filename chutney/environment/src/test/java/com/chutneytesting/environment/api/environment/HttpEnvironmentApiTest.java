@@ -68,7 +68,7 @@ public class HttpEnvironmentApiTest {
     private final String environmentBasePath = "/api/v2/environments";
 
     private final EnvironmentRepository environmentRepository = mock(EnvironmentRepository.class);
-    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, null);
+    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository);
     private final EnvironmentApi embeddedApplication = new EmbeddedEnvironmentApi(environmentService);
     private final HttpEnvironmentApi environmentControllerV2 = new HttpEnvironmentApi(embeddedApplication);
 

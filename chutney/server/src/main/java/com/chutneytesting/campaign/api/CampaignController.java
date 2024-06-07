@@ -82,14 +82,14 @@ public class CampaignController {
     @PreAuthorize("hasAuthority('CAMPAIGN_WRITE')")
     @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignDto saveCampaign(@RequestBody CampaignDto campaign) {
-        checkPresenceEnvironment(campaign);
+        hasEnvironment(campaign);
         return toDtoWithoutReport(campaignRepository.createOrUpdate(fromDto(campaign)));
     }
 
     @PreAuthorize("hasAuthority('CAMPAIGN_WRITE')")
     @PutMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignDto updateCampaign(@RequestBody CampaignDto campaign) {
-        checkPresenceEnvironment(campaign);
+        hasEnvironment(campaign);
         return toDtoWithoutReport(campaignRepository.createOrUpdate(fromDto(campaign)));
     }
 
@@ -155,7 +155,7 @@ public class CampaignController {
             .collect(Collectors.toList());
     }
 
-    private void checkPresenceEnvironment(CampaignDto campaign) {
+    private void hasEnvironment(CampaignDto campaign) {
         if (StringUtils.isBlank(campaign.getEnvironment())) {
             throw new IllegalArgumentException("Environment is missing for campaign with name " + campaign.getTitle());
         }

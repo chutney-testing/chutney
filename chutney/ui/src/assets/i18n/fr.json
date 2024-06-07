@@ -170,6 +170,11 @@
             "edit": "Editer les liens jira"
         }
     },
+    "environment": {
+        "error": {
+            "delete.last.env": "Vous ne pouvez pas supprimer le dernier environnement"
+        }
+    },
     "campaigns": {
         "search": {
             "placeholder": "Rechercher une campagne",

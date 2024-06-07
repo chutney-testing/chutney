@@ -16,6 +16,8 @@
 
 package com.chutneytesting.environment.domain;
 
+import static java.util.Collections.emptyList;
+
 import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmentException;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingTargetException;
 import com.chutneytesting.environment.domain.exception.CannotDeleteEnvironmentException;
@@ -29,6 +31,7 @@ import com.chutneytesting.environment.domain.exception.VariableAlreadyExistingEx
 import com.chutneytesting.server.core.domain.environment.UpdateEnvironmentHandler;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -47,7 +50,7 @@ public class EnvironmentService {
 
     public EnvironmentService(EnvironmentRepository environmentRepository, List<UpdateEnvironmentHandler> updateEnvironmentHandlers) {
         this.environmentRepository = environmentRepository;
-        this.updateEnvironmentHandlers = updateEnvironmentHandlers;
+        this.updateEnvironmentHandlers = Optional.ofNullable(updateEnvironmentHandlers).orElse(emptyList());
     }
 
     public EnvironmentService(EnvironmentRepository environmentRepository) {
@@ -85,7 +88,11 @@ public class EnvironmentService {
 
     public void deleteEnvironment(String environmentName) throws EnvironmentNotFoundException, CannotDeleteEnvironmentException {
         List<String> environmentNames = environmentRepository.listNames();
-        if (environmentNames.size() == 1 && environmentNames.get(0).equals(environmentName)) {
+        if (environmentNames.stream().noneMatch(env -> env.equals(environmentName))) {
+            logger.error("Environment not found for name {}", environmentName);
+            throw new EnvironmentNotFoundException("Environment not found for name " + environmentNames);
+        }
+        if (environmentNames.size() == 1) {
             logger.error("Cannot delete environment with name {} : cannot delete the last env", environmentName);
             throw new InvalidEnvironmentNameException("Cannot delete environment with name " + environmentName + " : cannot delete the last env");
         }

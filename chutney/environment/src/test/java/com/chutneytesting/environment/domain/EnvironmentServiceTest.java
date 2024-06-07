@@ -43,7 +43,7 @@ class EnvironmentServiceTest {
     @BeforeEach
     public void setUp() {
         environmentRepository = mock(EnvironmentRepository.class);
-        sut = new EnvironmentService(environmentRepository, null);
+        sut = new EnvironmentService(environmentRepository);
     }
 
     @Test()

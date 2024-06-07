@@ -59,7 +59,7 @@ public class VariableControllerTest {
     private final String variablesBasePath = "/api/v2/variables";
 
     private final EnvironmentRepository environmentRepository = mock(EnvironmentRepository.class);
-    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, null);
+    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository);
     private final EmbeddedVariableApi embeddedApplication = new EmbeddedVariableApi(environmentService);
     private final EnvironmentVariableController targetController = new EnvironmentVariableController(embeddedApplication);
 

@@ -67,7 +67,7 @@ public class TargetControllerTest {
     private final String targetBasePath = "/api/v2/targets";
 
     private final EnvironmentRepository environmentRepository = mock(EnvironmentRepository.class);
-    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository, null);
+    private final EnvironmentService environmentService = new EnvironmentService(environmentRepository);
     private final EmbeddedTargetApi embeddedApplication = new EmbeddedTargetApi(environmentService);
     private final TargetController targetController = new TargetController(embeddedApplication);
 

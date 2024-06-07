@@ -29,7 +29,7 @@ public class EnvironmentSpringConfiguration {
     public static final String ENVIRONMENT_CONFIGURATION_FOLDER = "${chutney.environment.configuration-folder:~/.chutney/conf/environment}";
 
 
-    @Bean(name = "localEnvironmentConfiguration")
+    @Bean
     EnvironmentConfiguration environmentConfiguration(@Value(ENVIRONMENT_CONFIGURATION_FOLDER) String storeFolderPath) {
         return new EnvironmentConfiguration(storeFolderPath);
     }

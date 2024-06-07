@@ -98,13 +98,10 @@ export class CampaignListComponent implements OnInit, OnDestroy {
     }
 
     scheduledCampaignHasMissingEnv(scheduledCampaign: CampaignScheduling): boolean {
-        return scheduledCampaign.campaignsId.filter(campaignId => {
-            const campaign = this.campaigns.find(campaign => campaign.id === campaignId)
-            if (campaign === undefined) {
-                return false
-            }
-            return campaign.environment === null || campaign.environment === undefined
-        }).length > 0
+        return scheduledCampaign.campaignsId.some(campaignId => {
+            const campaign = this.campaigns.find(campaign => campaign.id === campaignId);
+            return campaign == null || campaign.environment == null;
+        });
     }
 
     createCampaign() {

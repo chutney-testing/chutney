@@ -97,7 +97,13 @@ export class EnvironmentsComponent implements OnInit, DoCheck {
                 this.editableEnvironments.splice(index, 1);
                 this.environments.splice(index, 1);
             },
-            error: err => this.errorMessage = err.error
+            error: err => {
+                if (err.status === 400) {
+                    this.translateService.get("environment.error.delete.last.env").subscribe(msg => this.errorMessage = msg)
+                } else {
+                    this.errorMessage = err.error
+                }
+            }
         })
     }
 

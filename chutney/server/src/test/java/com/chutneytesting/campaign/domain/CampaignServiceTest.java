@@ -21,30 +21,24 @@ import static com.chutneytesting.server.core.domain.execution.report.ServerRepor
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.RUNNING;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
-import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import java.time.LocalDateTime;
 import java.util.List;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 class CampaignServiceTest {
     @Test
     void should_return_campaign_report_by_campaign_execution_id() {
         // G
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
-        CampaignRepository campaignRepository = mock(CampaignRepository.class);
         CampaignService campaignService = new CampaignService(campaignExecutionRepository);
 
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
@@ -98,7 +92,6 @@ class CampaignServiceTest {
         // Given
         Long campaignId = 1L;
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
-        CampaignRepository campaignRepository = mock(CampaignRepository.class);
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(1L)
             .testCaseTitle("")
@@ -161,7 +154,6 @@ class CampaignServiceTest {
     void should_return_campaign_report_by_campaign_execution_id_when_retry_scenario_executions_exist() {
         // G
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
-        CampaignRepository campaignRepository = mock(CampaignRepository.class);
         CampaignService campaignService = new CampaignService(campaignExecutionRepository);
 
         String scenarioId = "scenario 1";
@@ -206,7 +198,6 @@ class CampaignServiceTest {
         // Given
         Long campaignId = 1L;
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
-        CampaignRepository campaignRepository = mock(CampaignRepository.class);
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(1L)
             .testCaseTitle("")
@@ -252,7 +243,6 @@ class CampaignServiceTest {
         // Given
         Long campaignId = 1L;
         CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
-        CampaignRepository campaignRepository = mock(CampaignRepository.class);
         String scenario1Id = "scenario 1";
         ExecutionHistory.ExecutionSummary execution1 = ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(1L)

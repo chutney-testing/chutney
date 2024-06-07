@@ -26,7 +26,6 @@ import static com.chutneytesting.ServerConfigurationValues.EXECUTION_ASYNC_PUBLI
 import static com.chutneytesting.ServerConfigurationValues.SERVER_PORT_SPRING_VALUE;
 import static com.chutneytesting.ServerConfigurationValues.TASK_SQL_NB_LOGGED_ROW;
 import static com.chutneytesting.ServerConfigurationValues.TASK_SQL_NB_LOGGED_ROW_SPRING_VALUE;
-import static com.chutneytesting.environment.EnvironmentSpringConfiguration.ENVIRONMENT_CONFIGURATION_FOLDER;
 
 import com.chutneytesting.action.api.EmbeddedActionEngine;
 import com.chutneytesting.campaign.domain.CampaignEnvironmentUpdateHandler;
@@ -37,13 +36,11 @@ import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.design.domain.editionlock.TestCaseEditions;
 import com.chutneytesting.design.domain.editionlock.TestCaseEditionsService;
 import com.chutneytesting.engine.api.execution.TestEngine;
-import com.chutneytesting.environment.EnvironmentConfiguration;
 import com.chutneytesting.execution.domain.campaign.CampaignExecutionEngine;
 import com.chutneytesting.execution.infra.execution.ExecutionRequestMapper;
 import com.chutneytesting.execution.infra.execution.ServerTestEngineJavaImpl;
 import com.chutneytesting.jira.api.JiraXrayEmbeddedApi;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
-import com.chutneytesting.server.core.domain.environment.UpdateEnvironmentHandler;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngine;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngineAsync;
 import com.chutneytesting.server.core.domain.execution.ServerTestEngine;
@@ -244,12 +241,6 @@ public class ServerConfiguration {
     @Bean
     CampaignEnvironmentUpdateHandler campaignEnvironmentUpdateHandler(CampaignRepository campaignRepository) {
         return new CampaignEnvironmentUpdateHandler(campaignRepository);
-    }
-
-
-    @Bean
-    EnvironmentConfiguration environmentConfiguration(@Value(ENVIRONMENT_CONFIGURATION_FOLDER) String storeFolderPath, List<UpdateEnvironmentHandler> updateEnvironmentHandlers) {
-        return new EnvironmentConfiguration(storeFolderPath, updateEnvironmentHandlers);
     }
 
     // TODO - To move in infra when it will not be used in domain (ScenarioExecutionEngineAsync)
