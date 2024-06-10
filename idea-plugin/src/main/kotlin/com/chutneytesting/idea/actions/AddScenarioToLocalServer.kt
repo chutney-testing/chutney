@@ -7,13 +7,13 @@ import com.chutneytesting.idea.actions.converter.ScenarioV1ToV2Converter
 import com.chutneytesting.idea.logger.EventDataLogger
 import com.chutneytesting.idea.server.ChutneyServerRegistry
 import com.chutneytesting.idea.util.HJsonUtils
+import com.chutneytesting.idea.util.StringUtils.escapeSql
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
 import com.chutneytesting.kotlin.util.HttpClient
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 import com.intellij.openapi.actionSystem.LangDataKeys
 import com.intellij.openapi.diagnostic.Logger
-import org.apache.commons.lang.StringEscapeUtils.escapeSql
 import org.apache.commons.text.StringEscapeUtils
 import org.hjson.JsonValue
 import org.hjson.Stringify
