@@ -52,4 +52,8 @@ object StringUtils {
         }
         return false
     }
+
+  fun escapeSql(sql: String): String {
+    return sql.replace("'".toRegex(), "''")
+  }
 }

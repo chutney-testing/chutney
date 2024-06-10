@@ -9,6 +9,7 @@ import com.chutneytesting.idea.ChutneyUtil.isRemoteChutneyJson
 import com.chutneytesting.idea.actions.converter.ScenarioV1ToV2Converter
 import com.chutneytesting.idea.logger.EventDataLogger
 import com.chutneytesting.idea.settings.ChutneySettings
+import com.chutneytesting.idea.util.StringUtils.escapeSql
 import com.chutneytesting.kotlin.util.HttpClient
 import com.intellij.ide.util.PropertiesComponent
 import com.intellij.notification.NotificationListener
@@ -17,7 +18,6 @@ import com.intellij.openapi.vcs.checkin.CheckinHandler
 import com.intellij.openapi.vcs.ui.RefreshableOnComponent
 import com.intellij.psi.PsiManager
 import com.intellij.psi.search.searches.ReferencesSearch
-import org.apache.commons.lang.StringEscapeUtils.escapeSql
 import org.hjson.JsonValue
 import org.hjson.Stringify
 import java.awt.GridLayout
