@@ -73,17 +73,19 @@ class JiraModuleControllerTest {
         jiraRepository.saveForScenario("1", "SCE-1");
         jiraRepository.saveForScenario("2", "SCE-2");
         jiraRepository.saveForScenario("3", "SCE-3");
+        jiraRepository.saveDatasetForScenario("2", Map.of("dataset_1", "JIRA-02"));
 
         JiraModuleController jiraModuleController = new JiraModuleController(jiraRepository, jiraXrayService);
         mockMvc = MockMvcBuilders.standaloneSetup(jiraModuleController).build();
     }
 
     @Test
-    void should_not_create_HttpJiraXrayImpl_if_url_not_exist(){
+    void should_not_create_HttpJiraXrayImpl_if_url_not_exist() {
         jiraRepository.saveServerConfiguration(new JiraServerConfiguration("", "a username", "a password", null, null, null));
 
         assertThatExceptionOfType(RuntimeException.class)
-            .isThrownBy(() -> getJiraController("/api/ui/jira/v1/testexec/JIRA-10", new TypeReference<>() {}))
+            .isThrownBy(() -> getJiraController("/api/ui/jira/v1/testexec/JIRA-10", new TypeReference<>() {
+            }))
             .withMessageContaining("Cannot request xray server, jira url is undefined");
     }
 
@@ -107,22 +109,25 @@ class JiraModuleControllerTest {
 
     @Test
     void getByScenarioId() {
-        JiraDto jiraDto = getJiraController("/api/ui/jira/v1/scenario/1", new TypeReference<>() {
+        JiraScenarioLinksDto jiraDto = getJiraController("/api/ui/jira/v1/scenario/2", new TypeReference<>() {
         });
 
-        assertThat(jiraDto.chutneyId()).isEqualTo("1");
-        assertThat(jiraDto.id()).isEqualTo("SCE-1");
+        assertThat(jiraDto.chutneyId()).isEqualTo("2");
+        assertThat(jiraDto.id()).isEqualTo("SCE-2");
+        assertThat(jiraDto.datasetLinks()).containsEntry("dataset_1", "JIRA-02");
     }
 
     @Test
     void saveForScenario() {
-        JiraDto dto = ImmutableJiraDto.builder().chutneyId("123").id("SCE-123").build();
-        JiraDto jiraDto = postJiraController("/api/ui/jira/v1/scenario", new TypeReference<>() {
+        JiraScenarioLinksDto dto = ImmutableJiraScenarioLinksDto.builder().chutneyId("123").id("SCE-123").datasetLinks(Map.of("dataset_01", "JIRA-1")).build();
+        JiraScenarioLinksDto jiraDto = postJiraController("/api/ui/jira/v1/scenario", new TypeReference<>() {
         }, dto);
 
         assertThat(jiraDto.chutneyId()).isEqualTo("123");
         assertThat(jiraDto.id()).isEqualTo("SCE-123");
+        assertThat(jiraDto.datasetLinks()).containsEntry("dataset_01", "JIRA-1");
         assertThat(jiraRepository.getAllLinkedScenarios()).contains(entry("123", "SCE-123"));
+        assertThat(jiraRepository.getAllLinkedScenariosWithDataset()).contains(entry("123", Map.of("dataset_01", "JIRA-1")));
     }
 
     @Test
@@ -185,7 +190,8 @@ class JiraModuleControllerTest {
     @Test
     void saveForCampaign() {
         JiraDto dto = ImmutableJiraDto.builder().chutneyId("123").id("JIRA-123").build();
-        JiraDto jiraDto = postJiraController("/api/ui/jira/v1/campaign", new TypeReference<>() {}, dto);
+        JiraDto jiraDto = postJiraController("/api/ui/jira/v1/campaign", new TypeReference<>() {
+        }, dto);
 
         assertThat(jiraDto.chutneyId()).isEqualTo("123");
         assertThat(jiraDto.id()).isEqualTo("JIRA-123");
@@ -212,7 +218,7 @@ class JiraModuleControllerTest {
     @Test
     void getConfigurationUrl() throws Exception {
         String url = mockMvc.perform(MockMvcRequestBuilders.get("/api/ui/jira/v1/configuration/url")
-            .accept(MediaType.TEXT_PLAIN_VALUE)) // <--
+                .accept(MediaType.TEXT_PLAIN_VALUE)) // <--
             .andDo(print())
             .andExpect(MockMvcResultMatchers.status().isOk())
             .andReturn().getResponse().getContentAsString();
@@ -220,20 +226,20 @@ class JiraModuleControllerTest {
         assertThat(url).isEqualTo("an url");
     }
 
-  @Test
-  void loadServerConfigurationWithoutProxy() {
+    @Test
+    void loadServerConfigurationWithoutProxy() {
 
-      JiraRepository repository = new JiraFileRepository(Paths.get("src", "test", "resources", "jira").toAbsolutePath().toString());
-      JiraServerConfiguration expectedConfiguration = new JiraServerConfiguration("an url", "a username", "a password", "", "", "");
+        JiraRepository repository = new JiraFileRepository(Paths.get("src", "test", "resources", "jira").toAbsolutePath().toString());
+        JiraServerConfiguration expectedConfiguration = new JiraServerConfiguration("an url", "a username", "a password", "", "", "");
 
-      JiraServerConfiguration expected = repository.loadServerConfiguration();
+        JiraServerConfiguration expected = repository.loadServerConfiguration();
 
-      assertThat(expected).usingRecursiveComparison().isEqualTo(expectedConfiguration);
-  }
+        assertThat(expected).usingRecursiveComparison().isEqualTo(expectedConfiguration);
+    }
 
     @Test
     void saveConfiguration() throws Exception {
-      JiraServerConfiguration newConfiguration = new JiraServerConfiguration("a new url", "a new username", "a new password", "url proxy", "user proxy", "password proxy");
+        JiraServerConfiguration newConfiguration = new JiraServerConfiguration("a new url", "a new username", "a new password", "url proxy", "user proxy", "password proxy");
 
         mockMvc.perform(MockMvcRequestBuilders.post("/api/ui/jira/v1/configuration")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -269,7 +275,7 @@ class JiraModuleControllerTest {
     private <T> T getJiraController(String url, TypeReference<T> typeReference) {
         try {
             String contentAsString = mockMvc.perform(MockMvcRequestBuilders.get(url)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
+                    .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -282,7 +288,7 @@ class JiraModuleControllerTest {
     private void deleteJiraController(String url) {
         try {
             mockMvc.perform(MockMvcRequestBuilders.delete(url)
-                .accept(MediaType.APPLICATION_JSON_VALUE))
+                    .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn().getResponse().getContentAsString();
@@ -294,9 +300,9 @@ class JiraModuleControllerTest {
     private <T> T postJiraController(String url, TypeReference<T> typeReference, Object object) {
         try {
             String contentAsString = mockMvc.perform(MockMvcRequestBuilders.post(url)
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .content(om.writeValueAsString(object))
-                .accept(MediaType.APPLICATION_JSON_VALUE))
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .content(om.writeValueAsString(object))
+                    .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andDo(print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andReturn().getResponse().getContentAsString();

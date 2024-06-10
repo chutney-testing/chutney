@@ -21,8 +21,7 @@ import { Subscription } from 'rxjs';
 import { TestCase } from '@model';
 import { ScenarioService } from '@core/services';
 import { CanDeactivatePage } from '@core/guards';
-import { JiraPluginService } from '@core/services/jira-plugin.service';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { HjsonParserService } from '@shared/hjson-parser/hjson-parser.service';
 
 @Component({
@@ -39,7 +38,6 @@ export class RawEditionComponent
     modificationsSaved = false;
     errorMessage: any;
     modifiedContent = '';
-    pluginsForm: FormGroup;
     saveErrorMessage: string;
     defaultContent =
         '{\n' +
@@ -69,8 +67,6 @@ export class RawEditionComponent
 
     constructor(
         private eventManager: EventManagerService,
-        private formBuilder: FormBuilder,
-        private jiraLinkService: JiraPluginService,
         private route: ActivatedRoute,
         private router: Router,
         private scenarioService: ScenarioService,
@@ -79,9 +75,6 @@ export class RawEditionComponent
         super();
         this.testCase = new TestCase();
         this.previousTestCase = this.testCase.clone();
-        this.pluginsForm = this.formBuilder.group({
-            jiraId: '',
-        });
     }
 
     ngOnInit() {
@@ -140,7 +133,6 @@ export class RawEditionComponent
                     this.errorMessage = error._body;
                 }
             );
-            this.loadJiraLink(id);
         } else {
             this.testCase.title = 'scenario title';
             this.testCase.description = 'scenario description';
@@ -159,31 +151,11 @@ export class RawEditionComponent
         }
     }
 
-    private loadJiraLink(id: string) {
-        this.jiraLinkService.findByScenarioId(id).subscribe(
-            (jiraId) => {
-                this.pluginsForm.controls['jiraId'].setValue(jiraId);
-            },
-            (error) => {
-                console.log(error);
-            }
-        );
-    }
-
     saveScenario() {
         this.testCase.content = this.modifiedContent;
-        const jiraId = this.pluginsForm.value['jiraId'];
         this.scenarioService.createOrUpdateRawTestCase(this.testCase).subscribe(
             (response) => {
                 this.modificationsSaved = true;
-                this.jiraLinkService
-                    .saveForScenario(response, jiraId)
-                    .subscribe(
-                        () => {},
-                        (error) => {
-                            console.log(error);
-                        }
-                    );
                 this.router.navigateByUrl(
                     '/scenario/' + response + '/executions'
                 );

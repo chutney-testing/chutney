@@ -21,6 +21,7 @@ import com.chutneytesting.jira.domain.JiraServerConfiguration;
 import com.chutneytesting.jira.domain.JiraXrayService;
 import com.chutneytesting.jira.xrayapi.XrayTestExecTest;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -72,11 +73,14 @@ public class JiraModuleController {
 
     @PreAuthorize("hasAuthority('SCENARIO_WRITE')")
     @GetMapping(path = BASE_SCENARIO_URL + "/{scenarioId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public JiraDto getByScenarioId(@PathVariable String scenarioId) {
+    public JiraScenarioLinksDto getByScenarioId(@PathVariable String scenarioId) {
         String jiraId = jiraRepository.getByScenarioId(scenarioId);
-        return ImmutableJiraDto.builder()
+        Map<String, String> datasetLinks = jiraRepository.getAllLinkedScenariosWithDataset().getOrDefault(scenarioId, new HashMap<>());
+
+        return ImmutableJiraScenarioLinksDto.builder()
             .id(jiraId)
             .chutneyId(scenarioId)
+            .datasetLinks(datasetLinks)
             .build();
     }
 
@@ -84,11 +88,13 @@ public class JiraModuleController {
     @PostMapping(path = BASE_SCENARIO_URL,
         consumes = MediaType.APPLICATION_JSON_VALUE,
         produces = MediaType.APPLICATION_JSON_VALUE)
-    public JiraDto saveForScenario(@RequestBody JiraDto jiraDto) {
-        jiraRepository.saveForScenario(jiraDto.chutneyId(), jiraDto.id());
-        return ImmutableJiraDto.builder()
-            .id(jiraDto.id())
-            .chutneyId(jiraDto.chutneyId())
+    public JiraScenarioLinksDto saveForScenario(@RequestBody JiraScenarioLinksDto dto) {
+        jiraRepository.saveForScenario(dto.chutneyId(), dto.id());
+        jiraRepository.saveDatasetForScenario(dto.chutneyId(), dto.datasetLinks());
+        return ImmutableJiraScenarioLinksDto.builder()
+            .id(dto.id())
+            .chutneyId(dto.chutneyId())
+            .datasetLinks(dto.datasetLinks())
             .build();
     }
 
@@ -97,7 +103,6 @@ public class JiraModuleController {
     public void removeForScenario(@PathVariable String scenarioId) {
         jiraRepository.removeForScenario(scenarioId);
     }
-
 
     @PreAuthorize("hasAuthority('CAMPAIGN_READ')")
     @GetMapping(path = BASE_CAMPAIGN_URL + "/{campaignId}", produces = MediaType.APPLICATION_JSON_VALUE)

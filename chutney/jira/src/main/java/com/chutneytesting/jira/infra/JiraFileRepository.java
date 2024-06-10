@@ -37,6 +37,7 @@ public class JiraFileRepository implements JiraRepository {
 
     private static final String FILE_EXTENSION = ".json";
     private static final String SCENARIO_FILE = "scenario_link" + FILE_EXTENSION;
+    private static final String SCENARIO_DATASET_FILE = "scenario_dataset_link" + FILE_EXTENSION;
     private static final String CAMPAIGN_FILE = "campaign_link" + FILE_EXTENSION;
     private static final String CAMPAIGN_EXECUTION_FILE = "campaign_execution_link" + FILE_EXTENSION;
     private static final String CONFIGURATION_FILE = "jira_config" + FILE_EXTENSION;
@@ -72,6 +73,11 @@ public class JiraFileRepository implements JiraRepository {
     }
 
     @Override
+    public Map<String, Map<String, String>> getAllLinkedScenariosWithDataset() {
+        return getAllByDataset();
+    }
+
+    @Override
     public String getByScenarioId(String scenarioId) {
         return getById(SCENARIO_FILE, scenarioId);
     }
@@ -79,6 +85,14 @@ public class JiraFileRepository implements JiraRepository {
     @Override
     public void saveForScenario(String scenarioId, String jiraId) {
         save(SCENARIO_FILE, scenarioId, jiraId);
+    }
+
+    @Override
+    public void saveDatasetForScenario(String scenarioId, Map<String, String> datasetLinks) {
+        Map<String, Map<String, String>> all = getAllByDataset();
+        all.put(scenarioId, datasetLinks);
+        Path resolvedFilePath = storeFolderPath.resolve(SCENARIO_DATASET_FILE);
+        doSave(resolvedFilePath, all);
     }
 
     @Override
@@ -159,6 +173,24 @@ public class JiraFileRepository implements JiraRepository {
 
     private Map<String, String> getAll(String filePath) {
         Path resolvedFilePath = storeFolderPath.resolve(filePath);
+        if (!Files.exists(resolvedFilePath)) {
+            return new HashMap<>();
+        }
+        try {
+            byte[] bytes = Files.readAllBytes(resolvedFilePath);
+            try {
+                return objectMapper.readValue(bytes, new TypeReference<>() {
+                });
+            } catch (IOException e) {
+                throw new UnsupportedOperationException("Cannot deserialize configuration file: " + resolvedFilePath, e);
+            }
+        } catch (IOException e) {
+            throw new UnsupportedOperationException("Cannot read configuration file: " + resolvedFilePath, e);
+        }
+    }
+
+    private Map<String, Map<String, String>> getAllByDataset() {
+        Path resolvedFilePath = storeFolderPath.resolve(SCENARIO_DATASET_FILE);
         if (!Files.exists(resolvedFilePath)) {
             return new HashMap<>();
         }

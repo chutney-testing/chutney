@@ -35,6 +35,8 @@ import { TranslateService } from '@ngx-translate/core';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ScenarioJiraLinksModalComponent } from '../scenario-jira-links-modal/scenario-jira-links-modal.component';
 
 @Component({
     selector: 'chutney-scenarios',
@@ -76,6 +78,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         private stateService: StateService,
         private readonly route: ActivatedRoute,
         private translateService: TranslateService,
+        private modalService: NgbModal,
         @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings
     ) {
     }
@@ -173,6 +176,11 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         return this.jiraUrl + '/browse/' + this.jiraMap.get(id);
     }
 
+    showScenarioJiraLinks(scenario: ScenarioIndex) {
+        const modalRef = this.modalService.open(ScenarioJiraLinksModalComponent, { size: 'lg' });
+		modalRef.componentInstance.scenario = scenario;
+		modalRef.componentInstance.jiraUrl = this.jiraUrl;
+    }
 
     private onKeywordSearch() {
         this.searchSub$.pipe(

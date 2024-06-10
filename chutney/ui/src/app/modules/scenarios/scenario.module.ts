@@ -52,6 +52,7 @@ import {
 import { ReportPreviewComponent } from './components/execution/preview/report-preview.component';
 import { RxFor } from '@rx-angular/template/for';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
+import { ScenarioJiraLinksModalComponent } from './components/scenario-jira-links-modal/scenario-jira-links-modal.component';
 
 const ROUTES = [
     ...scenarioRoute
@@ -88,7 +89,8 @@ const ROUTES = [
         AuthoringInfoComponent,
         EditionInfoComponent,
         ScenarioExecutionsComponent,
-        ReportPreviewComponent
+        ReportPreviewComponent,
+        ScenarioJiraLinksModalComponent
     ],
     providers: [
         DateFormatPipe,

@@ -30,9 +30,13 @@ public interface JiraRepository {
      */
     Map<String, String> getAllLinkedScenarios();
 
+    Map<String, Map<String, String>> getAllLinkedScenariosWithDataset();
+
     String getByScenarioId(String scenarioId);
 
     void saveForScenario(String scenarioId, String jiraId);
+
+    void saveDatasetForScenario(String scenarioId, Map<String, String> datasetLinks);
 
     void removeForScenario(String scenarioId);
 

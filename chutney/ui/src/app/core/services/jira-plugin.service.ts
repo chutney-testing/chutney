@@ -19,7 +19,7 @@ import { HttpClient, HttpResponse } from '@angular/common/http';
 import { environment } from '@env/environment';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { JiraScenario,JiraTestExecutionScenarios } from '@model';
+import { JiraScenario,JiraScenarioLinks,JiraTestExecutionScenarios } from '@model';
 
 
 @Injectable({
@@ -56,15 +56,13 @@ export class JiraPluginService {
         .pipe(map((res: JiraTestExecutionScenarios) => res));
     }
 
-    public findByScenarioId(scenarioId: string): Observable<string> {
-        return this.http.get<JiraScenario>(environment.backend + this.scenarioUrl + '/' + scenarioId)
-            .pipe(map((jiraDto: JiraScenario) => {
-                return jiraDto.id;
-            }));
+    public findByScenarioId(scenarioId: string): Observable<JiraScenarioLinks> {
+        return this.http.get<JiraScenarioLinks>(environment.backend + this.scenarioUrl + '/' + scenarioId)
+        .pipe(map((res:JiraScenarioLinks) => res));
     }
 
-    public saveForScenario(scenarioId: string, jiraId: string): Observable<JiraScenario> {
-        return this.http.post<JiraScenario>(environment.backend + this.scenarioUrl, new JiraScenario(jiraId, scenarioId));
+    public saveForScenario(jiraScenarioLinks: JiraScenarioLinks): Observable<JiraScenarioLinks> {
+        return this.http.post<JiraScenarioLinks>(environment.backend + this.scenarioUrl, jiraScenarioLinks);
     }
 
     public removeForScenario(scenarioId: string) {

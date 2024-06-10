@@ -73,7 +73,6 @@
                     }
                 </th>
                 <th scope="col" class="w1">&nbsp;</th>
-                <th scope="col" class="w1">&nbsp;</th>
                 <th class="filter w12" scope="col">
                     <span>{{ 'scenarios.list.header.tags'  | translate  }}</span>
                 </th>
@@ -85,7 +84,7 @@
                         <span class="fa fa-caret-up"></span>
                     }
                 </th>
-                <th class="filter w10" scope="col" (click)="sortBy('creationDate')">{{ 'scenarios.list.header.creation'  | translate  }}
+                <th class="filter w8" scope="col" (click)="sortBy('creationDate')">{{ 'scenarios.list.header.creation'  | translate  }}
                     @if (orderBy == 'creationDate' && reverseOrder) {
                         <span class="fa fa-caret-down"></span>
                     }
@@ -93,7 +92,7 @@
                         <span class="fa fa-caret-up"></span>
                     }
                 </th>
-                <th class="w8" scope="col">
+                <th class="w11" scope="col">
                 </th>
             </tr>
             <tr class=" small">
@@ -109,7 +108,6 @@
                         (onDeSelectAll)="applyFilters()" >
                     </ng-multiselect-dropdown>
                 </th>
-                <th></th>
                 <th></th>
                 <th></th>
                 <th></th>
@@ -131,7 +129,7 @@
             </thead>
             <tbody>
                 @for (scenario of viewedScenarios; track scenario.id) {
-                    <tr class="align-baseline">
+                    <tr>
                         <td class="text-center text-nowrap">
                             <span>{{scenario.id}}</span>
                         </td>
@@ -142,17 +140,6 @@
                             {{ scenario.lastExecution != null ? (scenario.lastExecution | amLocale:'fr' | amTimeAgo) : "" }}
                         </td>
                         <td [routerLink]="['/scenario', scenario.id, 'executions']" (click)="$event.stopPropagation()" class="scenario-title cursor-pointer">{{scenario.title}}</td>
-                        <td>
-                            @if (jiraMap.has(scenario.id)) {
-                                <a role="button" class="btn btn-sm btn-link me-0"
-                                   target="_blank" href="{{getJiraLink(scenario.id)}}" rel="noopener noreferrer"
-                                   ngbPopover="{{jiraMap.get(scenario.id)}}" placement="left" (click)="$event.stopPropagation()"
-                                   triggers="mouseenter:mouseleave">
-                  <span class="fab fa-jira" aria-hidden="true">
-                  </span>
-                                </a>
-                            }
-                        </td>
                         <td>
                             <button type="button" class="btn btn-sm btn-link me-0"
                                     ngbPopover="{{scenario.description}}" placement="left"
@@ -189,13 +176,20 @@
                         <td scope="row" class="text-center">
                             {{ scenario.creationDate | amLocale:'fr' | amTimeAgo }}
                         </td>
-                        <td >
-                            <button type="button" class="btn bnt-xs" [routerLink]="['/scenario', scenario.id, 'executions']" [queryParams]="{open: 'last', active: 'last'}" (click)="$event.stopPropagation()" >
-                                <span  class="fa fa-eye"></span>
-                            </button>
-                            <button type="button" class="btn bnt-xs"  routerLink="{{'/scenario/' + scenario.id + '/raw-edition'}}" (click)="$event.stopPropagation()">
-                                <span  class="fa fa-edit"></span>
-                            </button>
+                        <td>
+                            <div class="float-end">
+                                <button type="button" class="btn bnt-xs pe-1" [routerLink]="['/scenario', scenario.id, 'executions']" [queryParams]="{open: 'last', active: 'last'}" (click)="$event.stopPropagation()" >
+                                    <span  class="fa fa-eye"></span>
+                                </button>
+                                <button type="button" class="btn bnt-xs px-1"  routerLink="{{'/scenario/' + scenario.id + '/raw-edition'}}" (click)="$event.stopPropagation()">
+                                    <span  class="fa fa-edit"></span>
+                                </button>
+                                @if ( jiraUrl !== '') {
+                                    <button type="button" class="btn bnt-xs px-1"  (click)="showScenarioJiraLinks(scenario)">
+                                        <span  class="fab fa-jira"></span>
+                                    </button>
+                                }
+                            </div>
                         </td>
                     </tr>
                 }
