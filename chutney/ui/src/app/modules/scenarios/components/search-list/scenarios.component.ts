@@ -46,6 +46,7 @@ import { ScenarioJiraLinksModalComponent } from '../scenario-jira-links-modal/sc
 export class ScenariosComponent implements OnInit, OnDestroy {
 
     urlParams: Subscription;
+    reloadSubscription: Subscription;
 
     scenarios: Array<ScenarioIndex> = [];
 
@@ -97,6 +98,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     ngOnDestroy(): void {
         this.urlParams?.unsubscribe();
+        this.reloadSubscription?.unsubscribe();
     }
 
     createNewScenario() {
@@ -190,7 +192,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     }
 
     private subscribeForScenarios() {
-        interval(3000)
+        this.reloadSubscription = interval(3000)
             .pipe(
                 mergeMap(() => this.fetchAndUpdateScenario()),
                 takeWhile(t => this.atLeastOneScenarioIsRunning(t)))
