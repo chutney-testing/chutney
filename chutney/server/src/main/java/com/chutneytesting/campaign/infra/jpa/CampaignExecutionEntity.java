@@ -105,7 +105,7 @@ public class CampaignExecutionEntity {
         partial = report.partialExecution;
         environment = report.executionEnvironment;
         userId = report.userId;
-        datasetId = report.dataSetId.orElse(null);
+        datasetId = report.dataSetId;
         this.scenarioExecutions.clear();
         scenarioExecutions.forEach(se -> {
             se.forCampaignExecution(this);

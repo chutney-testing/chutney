@@ -163,7 +163,7 @@ class CampaignExecutionTest {
                     assertThat(executionSummary.time()).isAfter(beforeStartExecution);
                     assertThat(executionSummary.status()).isEqualTo(NOT_EXECUTED);
                     assertThat(executionSummary.environment()).isEqualTo("env");
-                    assertThat(executionSummary.datasetId()).isEqualTo(campaignReport.dataSetId);
+                    assertThat(executionSummary.datasetId()).hasValue(campaignReport.dataSetId);
                     assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
                 });
             });
@@ -182,7 +182,7 @@ class CampaignExecutionTest {
                     assertThat(executionSummary.status()).isEqualTo(RUNNING);
                     assertThat(executionSummary.environment()).isEqualTo("env");
                     assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
-                    assertThat(executionSummary.datasetId()).isEqualTo(campaignReport.dataSetId);
+                    assertThat(executionSummary.datasetId()).hasValue(campaignReport.dataSetId);
                 });
             });
         }

@@ -16,8 +16,6 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
-import static java.util.Optional.ofNullable;
-
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -109,7 +107,7 @@ public class CampaignExecutionReportBuilder {
             partialExecution,
             executionEnvironment,
             userId,
-            ofNullable(dataSetId),
+            dataSetId,
             startDate,
             status,
             scenarioExecutionReports

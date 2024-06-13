@@ -46,7 +46,7 @@ public class CampaignExecution {
     public final String campaignName;
     public final boolean partialExecution;
     public final String executionEnvironment;
-    public final Optional<String> dataSetId;
+    public final String dataSetId;
     public final String userId;
 
     // Not mandatory
@@ -62,7 +62,7 @@ public class CampaignExecution {
         boolean partialExecution,
         String executionEnvironment,
         String userId,
-        Optional<String> dataSetId,
+        String dataSetId,
         LocalDateTime startDate,
         ServerReportStatus status,
         List<ScenarioExecutionCampaign> scenarioExecutions
@@ -72,7 +72,7 @@ public class CampaignExecution {
         this.campaignName = campaignName;
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
-        this.dataSetId = dataSetId.filter(not(String::isBlank));
+        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank)).orElse(null);
         this.userId = userId;
         this.scenarioExecutions = scenarioExecutions;
 
@@ -132,7 +132,7 @@ public class CampaignExecution {
     }
 
     private Optional<String> selectDatasetId(TestCaseDataset testCaseDataset) {
-        return ofNullable(testCaseDataset.datasetId()).or(() -> dataSetId).filter(not(String::isBlank));
+        return ofNullable(testCaseDataset.datasetId()).or(() -> ofNullable(dataSetId)).filter(not(String::isBlank));
     }
 
     public void endScenarioExecution(ScenarioExecutionCampaign scenarioExecutionCampaign) throws UnsupportedOperationException {
@@ -220,7 +220,7 @@ public class CampaignExecution {
             .partialExecution(partialExecution)
             .campaignName(campaignName)
             .environment(executionEnvironment)
-            .dataSetId(dataSetId.orElse(null))
+            .dataSetId(dataSetId)
             .userId(userId)
             .startDate(startDate)
             .status(status)
