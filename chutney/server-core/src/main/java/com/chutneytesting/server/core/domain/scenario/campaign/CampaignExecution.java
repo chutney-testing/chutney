@@ -17,6 +17,7 @@
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.RUNNING;
+import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
@@ -27,7 +28,6 @@ import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutio
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -54,24 +54,6 @@ public class CampaignExecution {
     private ServerReportStatus status;
     private final List<ScenarioExecutionCampaign> scenarioExecutions;
     public final Long campaignId;
-
-    public CampaignExecution(Long executionId,
-                             String campaignName,
-                             boolean partialExecution,
-                             String executionEnvironment,
-                             String dataSetId,
-                             String userId) {
-        this.executionId = executionId;
-        this.campaignId = null;
-        this.partialExecution = partialExecution;
-        this.executionEnvironment = executionEnvironment;
-        this.scenarioExecutions = new ArrayList<>();
-        this.campaignName = campaignName;
-        this.startDate = now();
-        this.status = RUNNING;
-        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank));
-        this.userId = userId;
-    }
 
     public CampaignExecution(Long executionId,
                              Long campaignId,
@@ -116,14 +98,15 @@ public class CampaignExecution {
 
         if (scenarioExecutions.isEmpty()) {
             this.startDate = ofNullable(startDate).orElseGet(LocalDateTime::now);
-            this.status = ofNullable(status).orElse(RUNNING);
+            this.status = ofNullable(status).orElse(SUCCESS);
         } else {
             this.startDate = ofNullable(startDate).orElseGet(() -> findStartDate(scenarioExecutions));
             this.status = ofNullable(status).orElseGet(() -> findStatus(scenarioExecutions));
         }
     }
 
-    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment) {
+    public void addScenarioExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment) {
+        this.status = RUNNING;
         testCaseDatasets.forEach(testCase ->
             this.scenarioExecutions.add(
                 new ScenarioExecutionCampaign(
@@ -267,7 +250,7 @@ public class CampaignExecution {
 
     public List<ScenarioExecutionCampaign> failedScenarioExecutions() {
         return scenarioExecutionReports().stream()
-            .filter(s -> !ServerReportStatus.SUCCESS.equals(s.execution().status()))
+            .filter(s -> !SUCCESS.equals(s.execution().status()))
             .toList();
     }
 

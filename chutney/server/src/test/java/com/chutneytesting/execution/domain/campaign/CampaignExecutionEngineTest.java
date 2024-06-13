@@ -56,6 +56,7 @@ import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
@@ -269,8 +270,12 @@ public class CampaignExecutionEngineTest {
         String env = "env";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L, "", false, env, null, "");
-        when(campaignExecutionRepository.currentExecutions(1L)).thenReturn(List.of(mockReport));
+        CampaignExecution mockReport = CampaignExecutionReportBuilder.builder()
+            .environment(env)
+            .userId("")
+            .status(ServerReportStatus.RUNNING)
+            .build();
+        when(campaignExecutionRepository.currentExecutions(campaign.id)).thenReturn(List.of(mockReport));
 
         // When
         assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user"))
@@ -283,7 +288,10 @@ public class CampaignExecutionEngineTest {
         String otherEnv = "otherEnv";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L, "", false, otherEnv, null, "");
+        CampaignExecution mockReport = CampaignExecutionReportBuilder.builder()
+            .environment(otherEnv)
+            .userId("")
+            .build();
         when(campaignExecutionRepository.currentExecutions(anyLong())).thenReturn(List.of(mockReport));
 
         // When
