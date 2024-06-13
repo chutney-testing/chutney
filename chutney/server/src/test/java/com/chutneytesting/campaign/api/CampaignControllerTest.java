@@ -18,7 +18,6 @@ package com.chutneytesting.campaign.api;
 
 import static java.lang.Integer.MAX_VALUE;
 import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -45,6 +44,7 @@ import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -269,10 +269,10 @@ public class CampaignControllerTest {
     public void should_retrieve_executions_and_current_execution_when_found_campaign() throws Exception {
         // Given
 
-        CampaignExecution report1 = new CampaignExecution(1L, existingCampaign.getId(), emptyList(), "...", false, "", null, "");
-        CampaignExecution report2 = new CampaignExecution(2L, existingCampaign.getId(), emptyList(), "...", false, "", null, "");
-        CampaignExecution report3 = new CampaignExecution(3L, existingCampaign.getId(), emptyList(), "...", false, "", null, "");
-        CampaignExecution report4 = new CampaignExecution(4L, existingCampaign.getId(), emptyList(), "...", false, "", null, "");
+        CampaignExecution report1 = CampaignExecutionReportBuilder.builder().executionId(1L).build();
+        CampaignExecution report2 = CampaignExecutionReportBuilder.builder().executionId(2L).build();
+        CampaignExecution report3 = CampaignExecutionReportBuilder.builder().executionId(3L).build();
+        CampaignExecution report4 = CampaignExecutionReportBuilder.builder().executionId(4L).build();
 
         repository.saveCampaignExecution(existingCampaign.getId(), report1);
         repository.saveCampaignExecution(existingCampaign.getId(), report2);
@@ -296,8 +296,7 @@ public class CampaignControllerTest {
     @Test
     public void should_retrieve_execution_when_found_campaign() throws Exception {
         // Given
-        CampaignExecution report1 = new CampaignExecution(1L, existingCampaign.getId(), emptyList(), existingCampaign.getTitle(), false, "", null, "user_2");
-
+        CampaignExecution report1 = CampaignExecutionReportBuilder.builder().executionId(1L).userId("user_2").build();
         repository.saveCampaignExecution(existingCampaign.getId(), report1);
 
         // When
@@ -317,19 +316,30 @@ public class CampaignControllerTest {
     public void should_add_current_executions_when_last_executions_asked_for() throws Exception {
         // Given
         // one persisted execution and two current campaigns executions
-        ExecutionHistory.ExecutionSummary execution0 = mock(ExecutionHistory.ExecutionSummary.class);
-        when(execution0.time()).thenReturn(LocalDateTime.now().minusDays(1));
-        CampaignExecution campaignExecution0 = new CampaignExecution(1L, 1L, singletonList(new ScenarioExecutionCampaign("20", "...", execution0)), "title", false, "", null, "");
         CampaignDto anotherExistingCampaign = new CampaignDto(null, "title", "description", emptyList(), emptyList(), "env", false, false, null, null);
         anotherExistingCampaign = insertCampaign(anotherExistingCampaign);
+
+        ExecutionHistory.ExecutionSummary execution0 = mock(ExecutionHistory.ExecutionSummary.class);
+        when(execution0.time()).thenReturn(LocalDateTime.now().minusDays(1));
+        CampaignExecution campaignExecution0 = CampaignExecutionReportBuilder.builder()
+            .executionId(1L)
+            .campaignId(anotherExistingCampaign.getId())
+            .addScenarioExecutionReport(new ScenarioExecutionCampaign("20", "...", execution0))
+            .build();
         repository.saveCampaignExecution(anotherExistingCampaign.getId(), campaignExecution0);
 
-        CampaignExecution campaignExecution1 = new CampaignExecution(10L, 1L, emptyList(), existingCampaign.getTitle(), false, "", null, "");
+        CampaignExecution campaignExecution1 = CampaignExecutionReportBuilder.builder()
+            .executionId(10L)
+            .campaignId(1L)
+            .build();
         awaitDuring(100, MILLISECONDS); // Avoid reports with same startDate...
-        CampaignExecution campaignExecution2 = new CampaignExecution(5L, 2L, emptyList(), anotherExistingCampaign.getTitle(), false, "", null, "");
+        CampaignExecution campaignExecution2 = CampaignExecutionReportBuilder.builder()
+            .executionId(5L)
+            .campaignId(2L)
+            .build();
 
-        repository.saveCampaignExecution(campaignExecution1.executionId, campaignExecution1);
-        repository.saveCampaignExecution(campaignExecution2.executionId, campaignExecution2);
+        repository.saveCampaignExecution(campaignExecution1.campaignId, campaignExecution1);
+        repository.saveCampaignExecution(campaignExecution2.campaignId, campaignExecution2);
 
         // When
         // last executions asked for
@@ -338,10 +348,9 @@ public class CampaignControllerTest {
         CampaignExecutionReportDto[] lastExecutions = resultExtractor.reports();
 
         // Then
-        assertThat(lastExecutions).hasSize(3);
-        assertThat(lastExecutions[0].getExecutionId()).isEqualTo(campaignExecution0.executionId);
-        assertThat(lastExecutions[1].getExecutionId()).isEqualTo(campaignExecution1.executionId);
-        assertThat(lastExecutions[2].getExecutionId()).isEqualTo(campaignExecution2.executionId);
+        assertThat(lastExecutions).hasSize(3)
+            .extracting(CampaignExecutionReportDto::getExecutionId)
+            .containsExactly(campaignExecution2.executionId, campaignExecution1.executionId, campaignExecution0.executionId);
     }
 
     @Test

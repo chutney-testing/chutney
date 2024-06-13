@@ -46,6 +46,7 @@ import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionR
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.execution.report.StepExecutionReportCore;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -397,7 +398,16 @@ public class DatabaseExecutionHistoryRepositoryTest {
             ScenarioExecutionEntity scenarioExecutionTwo = givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
 
             Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user");
+            CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
+                .executionId(campaignExecutionId)
+                .campaignId(campaign.id())
+                .campaignName(campaign.title())
+                .partialExecution(true)
+                .environment("env")
+                .addScenarioExecutionReport(scenarioExecutionOneReport)
+                .userId("user")
+                .dataSetId("ds287")
+                .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
             // When
@@ -424,7 +434,16 @@ public class DatabaseExecutionHistoryRepositoryTest {
             givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
 
             Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = new CampaignExecution(campaignExecutionId, campaign.id(), singletonList(scenarioExecutionOneReport), campaign.title(), true, "env", "#2:87", "user");
+            CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
+                .executionId(campaignExecutionId)
+                .campaignId(campaign.id())
+                .campaignName(campaign.title())
+                .partialExecution(true)
+                .environment("env")
+                .addScenarioExecutionReport(scenarioExecutionOneReport)
+                .userId("user")
+                .dataSetId("ds287")
+                .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
             // When

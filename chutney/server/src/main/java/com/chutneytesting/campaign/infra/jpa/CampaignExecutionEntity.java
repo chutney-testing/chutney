@@ -16,7 +16,6 @@
 
 package com.chutneytesting.campaign.infra.jpa;
 
-import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
@@ -24,6 +23,7 @@ import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -118,10 +118,9 @@ public class CampaignExecutionEntity {
     }
 
     public CampaignExecution toDomain(CampaignEntity campaign, boolean withScenariosExecutions, boolean isRunning, Function<String, String> scenarioTitleSupplier) {
-        List<ScenarioExecutionCampaign> scenarioExecutionCampaigns = emptyList();
         if (withScenariosExecutions) {
             if (isRunning) {
-                scenarioExecutionCampaigns = campaign.campaignScenarios().stream()
+                var scenarioExecutionReports = campaign.campaignScenarios().stream()
                     .map(cs ->
                         scenarioExecutions.stream()
                             .filter(se -> se.scenarioId().equals(cs.scenarioId()) && ofNullable(se.datasetId()).equals(ofNullable(cs.datasetId())))
@@ -129,22 +128,45 @@ public class CampaignExecutionEntity {
                             .map(se -> new ScenarioExecutionCampaign(se.scenarioId(), se.scenarioTitle(), se.toDomain()))
                             .orElseGet(() -> blankScenarioExecutionReport(cs, scenarioTitleSupplier)))
                     .collect(Collectors.toCollection(ArrayList::new));
+
+                return CampaignExecutionReportBuilder.builder()
+                    .executionId(id)
+                    .campaignId(campaignId)
+                    .campaignName(campaign.title())
+                    .partialExecution(ofNullable(partial).orElse(false))
+                    .environment(environment)
+                    .dataSetId(datasetId)
+                    .userId(userId)
+                    .status(ServerReportStatus.RUNNING)
+                    .scenarioExecutionReport(scenarioExecutionReports)
+                    .build();
             } else {
-                scenarioExecutionCampaigns = scenarioExecutions.stream()
+                var scenarioExecutionReports = scenarioExecutions.stream()
                     .map(se -> new ScenarioExecutionCampaign(se.scenarioId(), se.scenarioTitle(), se.toDomain()))
                     .collect(Collectors.toCollection(ArrayList::new));
+
+                return CampaignExecutionReportBuilder.builder()
+                    .executionId(id)
+                    .campaignId(campaignId)
+                    .campaignName(campaign.title())
+                    .partialExecution(ofNullable(partial).orElse(false))
+                    .environment(environment)
+                    .dataSetId(datasetId)
+                    .userId(userId)
+                    .scenarioExecutionReport(scenarioExecutionReports)
+                    .build();
             }
         }
 
-        return new CampaignExecution(
-            id,
-            campaignId,
-            scenarioExecutionCampaigns,
-            campaign.title(),
-            ofNullable(partial).orElse(false),
-            environment,
-            datasetId,
-            userId);
+        return CampaignExecutionReportBuilder.builder()
+            .executionId(id)
+            .campaignId(campaignId)
+            .campaignName(campaign.title())
+            .partialExecution(ofNullable(partial).orElse(false))
+            .environment(environment)
+            .dataSetId(datasetId)
+            .userId(userId)
+            .build();
     }
 
     private ScenarioExecutionCampaign blankScenarioExecutionReport(CampaignScenarioEntity campaignScenarioEntity, Function<String, String> titleSupplier) {

@@ -39,6 +39,7 @@ import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -1199,15 +1200,14 @@ public class PurgeServiceTest {
             .toList();
 
         ExecutionHistory.ExecutionSummary firsScenarioExecution = scenarioExecutionsForCampaign.get(0).execution();
-        return new CampaignExecution(
-            campaignExecutionId,
-            campaignId,
-            scenarioExecutionsForCampaign,
-            "",
-            partialExecution,
-            campaignEnv,
-            firsScenarioExecution.datasetId().orElse(null),
-            firsScenarioExecution.user()
-        );
+        return CampaignExecutionReportBuilder.builder()
+            .executionId(campaignExecutionId)
+            .campaignId(campaignId)
+            .environment(campaignEnv)
+            .partialExecution(partialExecution)
+            .scenarioExecutionReport(scenarioExecutionsForCampaign)
+            .userId(firsScenarioExecution.user())
+            .dataSetId(firsScenarioExecution.datasetId().orElse(null))
+            .build();
     }
 }

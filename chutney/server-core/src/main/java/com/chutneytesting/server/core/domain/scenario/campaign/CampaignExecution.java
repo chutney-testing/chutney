@@ -55,26 +55,6 @@ public class CampaignExecution {
     private final List<ScenarioExecutionCampaign> scenarioExecutions;
     public final Long campaignId;
 
-    public CampaignExecution(Long executionId,
-                             Long campaignId,
-                             List<ScenarioExecutionCampaign> scenarioExecutions,
-                             String campaignName,
-                             boolean partialExecution,
-                             String executionEnvironment,
-                             String dataSetId,
-                             String userId) {
-        this.executionId = executionId;
-        this.campaignId = campaignId;
-        this.campaignName = campaignName;
-        this.scenarioExecutions = scenarioExecutions;
-        this.startDate = findStartDate(scenarioExecutions);
-        this.status = findStatus(scenarioExecutions);
-        this.partialExecution = partialExecution;
-        this.executionEnvironment = executionEnvironment;
-        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank));
-        this.userId = userId;
-    }
-
     CampaignExecution(
         Long executionId,
         Long campaignId,
