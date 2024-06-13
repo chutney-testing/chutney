@@ -29,7 +29,6 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -113,15 +112,14 @@ public class CampaignExecution {
         this.executionEnvironment = executionEnvironment;
         this.dataSetId = dataSetId.filter(not(String::isBlank));
         this.userId = userId;
+        this.scenarioExecutions = scenarioExecutions;
 
-        if (scenarioExecutions == null) {
-            this.startDate = ofNullable(startDate).orElse(now());
+        if (scenarioExecutions.isEmpty()) {
+            this.startDate = ofNullable(startDate).orElseGet(LocalDateTime::now);
             this.status = ofNullable(status).orElse(RUNNING);
-            this.scenarioExecutions = null;
         } else {
-            this.startDate = findStartDate(scenarioExecutions);
-            this.status = findStatus(scenarioExecutions);
-            this.scenarioExecutions = scenarioExecutions;
+            this.startDate = ofNullable(startDate).orElseGet(() -> findStartDate(scenarioExecutions));
+            this.status = ofNullable(status).orElseGet(() -> findStatus(scenarioExecutions));
         }
     }
 
@@ -254,16 +252,16 @@ public class CampaignExecution {
 
     public CampaignExecution withoutRetries() {
         return CampaignExecutionReportBuilder.builder()
-            .setExecutionId(executionId)
-            .setCampaignId(campaignId)
-            .setPartialExecution(partialExecution)
-            .setCampaignName(campaignName)
-            .setExecutionEnvironment(executionEnvironment)
-            .setDataSetId(dataSetId.orElse(null))
-            .setUserId(userId)
-            .setStartDate(startDate)
-            .setStatus(status)
-            .setScenarioExecutionReport(filterRetry(scenarioExecutions))
+            .executionId(executionId)
+            .campaignId(campaignId)
+            .partialExecution(partialExecution)
+            .campaignName(campaignName)
+            .environment(executionEnvironment)
+            .dataSetId(dataSetId.orElse(null))
+            .userId(userId)
+            .startDate(startDate)
+            .status(status)
+            .scenarioExecutionReport(filterRetry(scenarioExecutions))
             .build();
     }
 
