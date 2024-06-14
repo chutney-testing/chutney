@@ -445,6 +445,31 @@ public class DatabaseTestCaseRepositoryTest {
         }
 
         @Test
+        public void should_not_find_removed_scenario_when_search() {
+            GwtTestCase GWT_TEST_CASE = GwtTestCase.builder()
+                .withMetadata(TestCaseMetadataImpl.builder()
+                    .build())
+                .withScenario(
+                    GwtScenario.builder()
+                        .withGivens(List.of(GwtStep.builder().withDescription("chutney of momos").build()))
+                        .withWhen(GwtStep.NONE).build()
+                ).build();
+            // Given
+            String scenarioID = sut.save(GWT_TEST_CASE);
+
+            // When
+            List<TestCaseMetadata> raw = sut.search("momos");
+            // Then
+            assertThat(raw).hasSize(1).extracting("id").containsExactly(scenarioID);
+
+            // When
+            sut.removeById(scenarioID);
+            // Then
+            List<TestCaseMetadata> raw2 = sut.search("momos");
+            assertThat(raw2).isEmpty();
+        }
+
+        @Test
         public void should_split_in_3_words_when_search_without_nested_quote() {
             // When
             List<String> words = sut.getWordsToSearchWithQuotes("toto tutu tata");

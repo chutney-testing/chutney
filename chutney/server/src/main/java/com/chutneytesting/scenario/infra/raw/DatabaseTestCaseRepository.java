@@ -75,8 +75,8 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     @Transactional
     public String save(GwtTestCase testCase) {
         if (testCaseDoesNotExist(testCase.id())) {
-          saveScenarioWithExplicitId(testCase);
-          return testCase.id();
+            saveScenarioWithExplicitId(testCase);
+            return testCase.id();
         }
         try {
             return scenarioJpaRepository.save(ScenarioEntity.fromGwtTestCase(testCase)).getId().toString();
@@ -153,7 +153,8 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     public List<TestCaseMetadata> search(String textFilter) {
         if (!textFilter.isEmpty()) {
             List<String> words = getWordsToSearchWithQuotes(escapeSql(textFilter));
-            Specification<ScenarioEntity> scenarioDaoSpecification = buildLikeSpecificationOnContent(words);
+            Specification<ScenarioEntity> scenarioDaoSpecification = buildLikeSpecificationOnContent(words)
+                .and(ScenarioJpaRepository.activatedScenarioSpecification());
 
             CriteriaBuilder builder = entityManager.getCriteriaBuilder();
             CriteriaQuery<ScenarioEntity> query = builder.createQuery(ScenarioEntity.class);
