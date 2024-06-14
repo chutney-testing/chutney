@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 
 import { Authorization, ScenarioIndex, TestCase } from '@model';
 import { JiraPluginService, LoginService, ScenarioService } from '@core/services';
@@ -26,18 +26,22 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { EventManagerService } from '@shared';
 import { MenuItem } from '@shared/components/layout/menuItem';
 import { EnvironmentService } from '@core/services/environment.service';
+import { ScenarioExecuteModalComponent } from '../../execute-modal/scenario-execute-modal.component';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
     selector: 'chutney-scenario-execution-menu',
     templateUrl: './scenario-execution-menu.component.html',
     styleUrls: ['./scenario-execution-menu.component.scss']
 })
-export class ScenarioExecutionMenuComponent implements OnInit {
+export class ScenarioExecutionMenuComponent implements OnInit, OnChanges {
 
     testCaseId: string;
 
     environments: Array<string>;
     testCaseMetadata: ScenarioIndex;
+
+    @Input() canReplay: boolean;
 
     @ViewChild('delete_modal') deleteModal: TemplateRef<any>;
 
@@ -45,15 +49,23 @@ export class ScenarioExecutionMenuComponent implements OnInit {
     modalRef: BsModalRef;
     rightMenuItems: MenuItem[];
 
+    executeLastMenuItem = {
+        label: 'global.actions.execute.last',
+        click: this.replay.bind(this),
+        iconClass: 'fa fa-play',
+        authorizations: [Authorization.SCENARIO_EXECUTE]
+    };
+
     constructor(private environmentService: EnvironmentService,
-                private fileSaverService: FileSaverService,
-                private jiraLinkService: JiraPluginService,
-                private router: Router,
-                private scenarioService: ScenarioService,
-                private loginService: LoginService,
-                private modalService: BsModalService,
-                private route: ActivatedRoute,
-                private eventManagerService: EventManagerService) {
+        private fileSaverService: FileSaverService,
+        private jiraLinkService: JiraPluginService,
+        private router: Router,
+        private scenarioService: ScenarioService,
+        private loginService: LoginService,
+        private modalService: BsModalService,
+        private ngbModalService: NgbModal,
+        private route: ActivatedRoute,
+        private eventManagerService: EventManagerService) {
     }
 
 
@@ -69,12 +81,23 @@ export class ScenarioExecutionMenuComponent implements OnInit {
                 this.environments = environments;
                 this.initRightMenu();
             });
-
-
     }
 
-    executeScenario(envName: string) {
-        this.eventManagerService.broadcast({name: 'execute', env: envName});
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['canReplay']) {
+            if (!this.rightMenuItems?.find(item => item.label === 'global.actions.execute.last') && this.canReplay) {
+                this.rightMenuItems.splice(0, 0, this.executeLastMenuItem);
+            }
+        }
+    }
+
+    replay() {
+        this.eventManagerService.broadcast({ name: 'executeLast' });
+    }
+
+    executeScenario() {
+        const modalRef = this.ngbModalService.open(ScenarioExecuteModalComponent, { centered: true });
+        modalRef.componentInstance.environments = this.environments;
     }
 
     deleteScenario(id: string) {
@@ -99,7 +122,7 @@ export class ScenarioExecutionMenuComponent implements OnInit {
     }
 
     openModal() {
-        this.modalRef = this.modalService.show(this.deleteModal, {class: 'modal-sm'});
+        this.modalRef = this.modalService.show(this.deleteModal, { class: 'modal-sm' });
     }
 
     confirm(): void {
@@ -121,15 +144,13 @@ export class ScenarioExecutionMenuComponent implements OnInit {
     }
 
     private initRightMenu() {
-        const rightMenuItems: any [] = [
+        const rightMenuItems: any[] = [
             {
                 label: 'global.actions.execute',
                 click: this.executeScenario.bind(this),
                 iconClass: 'fa fa-play',
-                authorizations: [Authorization.SCENARIO_EXECUTE],
-                options: this.environments.map(env => {
-                    return {id: env, label: env};
-                })
+                secondaryIconClass: 'fa-solid fa-gear fa-2xs',
+                authorizations: [Authorization.SCENARIO_EXECUTE]
             },
             {
                 label: 'global.actions.edit',
