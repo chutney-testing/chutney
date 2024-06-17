@@ -56,6 +56,7 @@ import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
@@ -269,8 +270,12 @@ public class CampaignExecutionEngineTest {
         String env = "env";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L, "", false, env, null, "");
-        when(campaignExecutionRepository.currentExecutions(1L)).thenReturn(List.of(mockReport));
+        CampaignExecution mockReport = CampaignExecutionReportBuilder.builder()
+            .environment(env)
+            .userId("")
+            .status(ServerReportStatus.RUNNING)
+            .build();
+        when(campaignExecutionRepository.currentExecutions(campaign.id)).thenReturn(List.of(mockReport));
 
         // When
         assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user"))
@@ -283,7 +288,10 @@ public class CampaignExecutionEngineTest {
         String otherEnv = "otherEnv";
         Campaign campaign = createCampaign(1L, env);
 
-        CampaignExecution mockReport = new CampaignExecution(1L, "", false, otherEnv, null, "");
+        CampaignExecution mockReport = CampaignExecutionReportBuilder.builder()
+            .environment(otherEnv)
+            .userId("")
+            .build();
         when(campaignExecutionRepository.currentExecutions(anyLong())).thenReturn(List.of(mockReport));
 
         // When
@@ -314,7 +322,11 @@ public class CampaignExecutionEngineTest {
     public void should_return_last_existing_campaign_execution_for_existing_campaign() {
         // Given
         Campaign campaign = createCampaign();
-        CampaignExecution campaignExecution = new CampaignExecution(123L, campaign.id, emptyList(), "", false, campaign.executionEnvironment(), null, "");
+        CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
+            .executionId(123L)
+            .campaignId(campaign.id)
+            .environment(campaign.executionEnvironment())
+            .build();
 
 
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
@@ -379,10 +391,22 @@ public class CampaignExecutionEngineTest {
     @Test
     public void should_retrieve_current_campaign_execution_on_a_given_env() {
         String env = "env";
-        CampaignExecution report = new CampaignExecution(1L, 33L, emptyList(), "", false, env, null, "");
+        CampaignExecution report = CampaignExecutionReportBuilder.builder()
+            .executionId(1L)
+            .campaignId(33L)
+            .environment(env)
+            .build();
         String otherEnv = "otherEnv";
-        CampaignExecution report2 = new CampaignExecution(2L, 33L, emptyList(), "", false, otherEnv, null, "");
-        CampaignExecution report3 = new CampaignExecution(3L, 42L, emptyList(), "", false, otherEnv, null, "");
+        CampaignExecution report2 = CampaignExecutionReportBuilder.builder()
+            .executionId(2L)
+            .campaignId(33L)
+            .environment(otherEnv)
+            .build();
+        CampaignExecution report3 = CampaignExecutionReportBuilder.builder()
+            .executionId(3L)
+            .campaignId(42L)
+            .environment(otherEnv)
+            .build();
         when(campaignExecutionRepository.currentExecutions(33L)).thenReturn(List.of(report, report2));
         when(campaignExecutionRepository.currentExecutions(42L)).thenReturn(List.of(report3));
 

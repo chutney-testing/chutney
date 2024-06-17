@@ -29,6 +29,7 @@ import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionR
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.execution.report.StepExecutionReportCore;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Maps;
@@ -105,8 +106,16 @@ public class SurefireCampaignExecutionReportBuilderTest {
         when(executionHistoryRepository.getExecution(scenarioExecutionReportKO.scenarioId(), failure_report.executionId)).thenReturn(failure_execution);
 
         // And a campaign report with previous scenario executions
-        CampaignExecution campaignExecution1 = new CampaignExecution(1L, 1L, Arrays.asList(scenarioExecutionReportOK, scenarioExecutionReportKO), "test Campaign Title", false, "", null, "");
-        CampaignExecution campaignExecution2 = new CampaignExecution(1L, 1L, Arrays.asList(scenarioExecutionReportOK, scenarioExecutionReportKO), "test Campaign Title 2", false, "", null, "");
+        CampaignExecution campaignExecution1 = CampaignExecutionReportBuilder.builder()
+            .campaignName("test Campaign Title")
+            .addScenarioExecutionReport(scenarioExecutionReportOK)
+            .addScenarioExecutionReport(scenarioExecutionReportKO)
+            .build();
+        CampaignExecution campaignExecution2 = CampaignExecutionReportBuilder.builder()
+            .campaignName("test Campaign Title 2")
+            .addScenarioExecutionReport(scenarioExecutionReportOK)
+            .addScenarioExecutionReport(scenarioExecutionReportKO)
+            .build();
 
         // When we zip it
         byte[] zip = surefireCampaignExecutionReportBuilder.createReport(Lists.list(campaignExecution1, campaignExecution2));

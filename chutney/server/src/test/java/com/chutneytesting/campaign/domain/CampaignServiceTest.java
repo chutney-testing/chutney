@@ -64,13 +64,13 @@ class CampaignServiceTest {
             .build();
         ScenarioExecutionCampaign scenarioExecutionReport2 = new ScenarioExecutionCampaign("scenario 2", "", execution2);
         CampaignExecution campaignReport = CampaignExecutionReportBuilder.builder()
-            .setCampaignId(42L)
-            .setExecutionEnvironment("test env")
-            .setPartialExecution(true)
-            .setCampaignName("test name")
-            .setExecutionId(43L)
-            .setDataSetId("dataset id test")
-            .setStartDate(LocalDateTime.MAX)
+            .campaignId(42L)
+            .environment("test env")
+            .partialExecution(true)
+            .campaignName("test name")
+            .executionId(43L)
+            .dataSetId("dataset id test")
+            .startDate(LocalDateTime.MAX)
             .addScenarioExecutionReport(scenarioExecutionReport1)
             .addScenarioExecutionReport(scenarioExecutionReport2)
             .build();
@@ -302,18 +302,18 @@ class CampaignServiceTest {
         ScenarioExecutionCampaign scenarioExecutionReport5 = new ScenarioExecutionCampaign(scenario2Id, "", execution5);
         List<CampaignExecution> allExecutions = List.of(
             CampaignExecutionReportBuilder.builder()
-                .setExecutionId(1L)
+                .executionId(1L)
                 .addScenarioExecutionReport(scenarioExecutionReport1)
                 .addScenarioExecutionReport(scenarioExecutionReport4)
                 .addScenarioExecutionReport(scenarioExecutionReport3)
                 .build(),
             CampaignExecutionReportBuilder.builder()
-                .setExecutionId(2L)
+                .executionId(2L)
                 .addScenarioExecutionReport(scenarioExecutionReport1)
                 .addScenarioExecutionReport(scenarioExecutionReport2)
                 .build(),
             CampaignExecutionReportBuilder.builder()
-                .setExecutionId(3L)
+                .executionId(3L)
                 .addScenarioExecutionReport(scenarioExecutionReport3)
                 .addScenarioExecutionReport(scenarioExecutionReport2)
                 .addScenarioExecutionReport(scenarioExecutionReport5)

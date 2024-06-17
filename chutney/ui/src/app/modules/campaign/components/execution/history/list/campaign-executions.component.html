@@ -102,6 +102,11 @@
                       {{ execution.running }}
                     </span>
                   </div>
+                } @else if (execution.isRunning()) {
+                  <div class="btn btn-sm position-relative"
+                       [ngbTooltip]="ExecutionStatus.toString(ExecutionStatus.RUNNING) | translate" placement="right">
+                      <span class="fa-solid fa-2xl fa-spinner fa-pulse text-warning"></span>
+                  </div>
                 }
                 @if (execution.hasPaused()) {
                   <div class="btn btn-sm position-relative"

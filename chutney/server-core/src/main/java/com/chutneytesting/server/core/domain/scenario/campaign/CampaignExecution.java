@@ -17,6 +17,7 @@
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.RUNNING;
+import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
@@ -27,9 +28,7 @@ import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutio
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +46,7 @@ public class CampaignExecution {
     public final String campaignName;
     public final boolean partialExecution;
     public final String executionEnvironment;
-    public final Optional<String> dataSetId;
+    public final String dataSetId;
     public final String userId;
 
     // Not mandatory
@@ -56,44 +55,6 @@ public class CampaignExecution {
     private final List<ScenarioExecutionCampaign> scenarioExecutions;
     public final Long campaignId;
 
-    public CampaignExecution(Long executionId,
-                             String campaignName,
-                             boolean partialExecution,
-                             String executionEnvironment,
-                             String dataSetId,
-                             String userId) {
-        this.executionId = executionId;
-        this.campaignId = null;
-        this.partialExecution = partialExecution;
-        this.executionEnvironment = executionEnvironment;
-        this.scenarioExecutions = new ArrayList<>();
-        this.campaignName = campaignName;
-        this.startDate = now();
-        this.status = RUNNING;
-        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank));
-        this.userId = userId;
-    }
-
-    public CampaignExecution(Long executionId,
-                             Long campaignId,
-                             List<ScenarioExecutionCampaign> scenarioExecutions,
-                             String campaignName,
-                             boolean partialExecution,
-                             String executionEnvironment,
-                             String dataSetId,
-                             String userId) {
-        this.executionId = executionId;
-        this.campaignId = campaignId;
-        this.campaignName = campaignName;
-        this.scenarioExecutions = scenarioExecutions;
-        this.startDate = findStartDate(scenarioExecutions);
-        this.status = findStatus(scenarioExecutions);
-        this.partialExecution = partialExecution;
-        this.executionEnvironment = executionEnvironment;
-        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank));
-        this.userId = userId;
-    }
-
     CampaignExecution(
         Long executionId,
         Long campaignId,
@@ -101,7 +62,7 @@ public class CampaignExecution {
         boolean partialExecution,
         String executionEnvironment,
         String userId,
-        Optional<String> dataSetId,
+        String dataSetId,
         LocalDateTime startDate,
         ServerReportStatus status,
         List<ScenarioExecutionCampaign> scenarioExecutions
@@ -111,21 +72,21 @@ public class CampaignExecution {
         this.campaignName = campaignName;
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
-        this.dataSetId = dataSetId.filter(not(String::isBlank));
+        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank)).orElse(null);
         this.userId = userId;
+        this.scenarioExecutions = scenarioExecutions;
 
-        if (scenarioExecutions == null) {
-            this.startDate = ofNullable(startDate).orElse(now());
-            this.status = ofNullable(status).orElse(RUNNING);
-            this.scenarioExecutions = null;
+        if (scenarioExecutions.isEmpty()) {
+            this.startDate = ofNullable(startDate).orElseGet(LocalDateTime::now);
+            this.status = ofNullable(status).orElse(SUCCESS);
         } else {
-            this.startDate = findStartDate(scenarioExecutions);
-            this.status = findStatus(scenarioExecutions);
-            this.scenarioExecutions = scenarioExecutions;
+            this.startDate = ofNullable(startDate).orElseGet(() -> findStartDate(scenarioExecutions));
+            this.status = ofNullable(status).orElseGet(() -> findStatus(scenarioExecutions));
         }
     }
 
-    public void initExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment) {
+    public void addScenarioExecution(List<TestCaseDataset> testCaseDatasets, String executionEnvironment) {
+        this.status = RUNNING;
         testCaseDatasets.forEach(testCase ->
             this.scenarioExecutions.add(
                 new ScenarioExecutionCampaign(
@@ -170,8 +131,27 @@ public class CampaignExecution {
                     .build()));
     }
 
+    public void updateScenarioExecutionId(ExecutionHistory.Execution storedExecution) throws UnsupportedOperationException {
+        OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
+            .filter(i -> {
+                var se = this.scenarioExecutions.get(i);
+                return se.scenarioId().equals(storedExecution.scenarioId()) &&
+                    se.execution().datasetId().equals(storedExecution.datasetId());
+            })
+            .findFirst();
+        var scenarioExecution = this.scenarioExecutions.get(indexOpt.getAsInt()).execution();
+        this.scenarioExecutions.set(indexOpt.getAsInt(),
+            new ScenarioExecutionCampaign(
+                storedExecution.scenarioId(),
+                storedExecution.testCaseTitle(),
+                ImmutableExecutionHistory.ExecutionSummary.builder()
+                    .from(scenarioExecution)
+                    .executionId(storedExecution.executionId())
+                    .build()));
+    }
+
     private Optional<String> selectDatasetId(TestCaseDataset testCaseDataset) {
-        return ofNullable(testCaseDataset.datasetId()).or(() -> dataSetId).filter(not(String::isBlank));
+        return ofNullable(testCaseDataset.datasetId()).or(() -> ofNullable(dataSetId)).filter(not(String::isBlank));
     }
 
     public void endScenarioExecution(ScenarioExecutionCampaign scenarioExecutionCampaign) throws UnsupportedOperationException {
@@ -254,22 +234,22 @@ public class CampaignExecution {
 
     public CampaignExecution withoutRetries() {
         return CampaignExecutionReportBuilder.builder()
-            .setExecutionId(executionId)
-            .setCampaignId(campaignId)
-            .setPartialExecution(partialExecution)
-            .setCampaignName(campaignName)
-            .setExecutionEnvironment(executionEnvironment)
-            .setDataSetId(dataSetId.orElse(null))
-            .setUserId(userId)
-            .setStartDate(startDate)
-            .setStatus(status)
-            .setScenarioExecutionReport(filterRetry(scenarioExecutions))
+            .executionId(executionId)
+            .campaignId(campaignId)
+            .partialExecution(partialExecution)
+            .campaignName(campaignName)
+            .environment(executionEnvironment)
+            .dataSetId(dataSetId)
+            .userId(userId)
+            .startDate(startDate)
+            .status(status)
+            .scenarioExecutionReport(filterRetry(scenarioExecutions))
             .build();
     }
 
     public List<ScenarioExecutionCampaign> failedScenarioExecutions() {
         return scenarioExecutionReports().stream()
-            .filter(s -> !ServerReportStatus.SUCCESS.equals(s.execution().status()))
+            .filter(s -> !SUCCESS.equals(s.execution().status()))
             .toList();
     }
 

@@ -16,8 +16,6 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
-import static java.util.Optional.ofNullable;
-
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -46,42 +44,42 @@ public class CampaignExecutionReportBuilder {
 
     }
 
-    public CampaignExecutionReportBuilder setExecutionId(Long executionId) {
+    public CampaignExecutionReportBuilder executionId(Long executionId) {
         this.executionId = executionId;
         return this;
     }
 
-    public CampaignExecutionReportBuilder setCampaignName(String campaignName) {
+    public CampaignExecutionReportBuilder campaignName(String campaignName) {
         this.campaignName = campaignName;
         return this;
     }
 
-    public CampaignExecutionReportBuilder setPartialExecution(boolean partialExecution) {
+    public CampaignExecutionReportBuilder partialExecution(boolean partialExecution) {
         this.partialExecution = partialExecution;
         return this;
     }
 
-    public CampaignExecutionReportBuilder setExecutionEnvironment(String executionEnvironment) {
+    public CampaignExecutionReportBuilder environment(String executionEnvironment) {
         this.executionEnvironment = executionEnvironment;
         return this;
     }
 
-    public CampaignExecutionReportBuilder setStartDate(LocalDateTime startDate) {
+    public CampaignExecutionReportBuilder startDate(LocalDateTime startDate) {
         this.startDate = startDate;
         return this;
     }
 
-    public CampaignExecutionReportBuilder setStatus(ServerReportStatus status) {
+    public CampaignExecutionReportBuilder status(ServerReportStatus status) {
         this.status = status;
         return this;
     }
 
-    public CampaignExecutionReportBuilder setDataSetId(String dataSetId) {
+    public CampaignExecutionReportBuilder dataSetId(String dataSetId) {
         this.dataSetId = dataSetId;
         return this;
     }
 
-    public CampaignExecutionReportBuilder setUserId(String userId) {
+    public CampaignExecutionReportBuilder userId(String userId) {
         this.userId = userId;
         return this;
     }
@@ -91,12 +89,12 @@ public class CampaignExecutionReportBuilder {
         return this;
     }
 
-    public CampaignExecutionReportBuilder setScenarioExecutionReport(List<ScenarioExecutionCampaign> scenarioExecutionsReports) {
+    public CampaignExecutionReportBuilder scenarioExecutionReport(List<ScenarioExecutionCampaign> scenarioExecutionsReports) {
         this.scenarioExecutionReports = new ArrayList<>(scenarioExecutionsReports);
         return this;
     }
 
-    public CampaignExecutionReportBuilder setCampaignId(Long campaignId) {
+    public CampaignExecutionReportBuilder campaignId(Long campaignId) {
         this.campaignId = campaignId;
         return this;
     }
@@ -109,7 +107,7 @@ public class CampaignExecutionReportBuilder {
             partialExecution,
             executionEnvironment,
             userId,
-            ofNullable(dataSetId),
+            dataSetId,
             startDate,
             status,
             scenarioExecutionReports

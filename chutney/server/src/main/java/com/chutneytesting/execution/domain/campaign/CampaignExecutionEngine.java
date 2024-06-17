@@ -41,6 +41,7 @@ import com.chutneytesting.server.core.domain.scenario.ScenarioNotParsableExcepti
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.TestCaseDataset;
 import com.chutneytesting.tools.Try;
@@ -158,14 +159,15 @@ public class CampaignExecutionEngine {
         verifyNotAlreadyRunning(campaign);
         Long executionId = campaignExecutionRepository.generateCampaignExecutionId(campaign.id, campaign.executionEnvironment());
 
-        CampaignExecution campaignExecution = new CampaignExecution(
-            executionId,
-            campaign.title,
-            !failedExecutions.isEmpty(),
-            campaign.executionEnvironment(),
-            isNotBlank(campaign.externalDatasetId) ? campaign.externalDatasetId : null,
-            userId
-        );
+        CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
+            .executionId(executionId)
+            .campaignId(campaign.id)
+            .campaignName(campaign.title)
+            .partialExecution(!failedExecutions.isEmpty())
+            .environment(campaign.executionEnvironment())
+            .dataSetId(isNotBlank(campaign.externalDatasetId) ? campaign.externalDatasetId : null)
+            .userId(userId)
+            .build();
 
         campaignExecutionRepository.startExecution(campaign.id, campaignExecution);
         currentCampaignExecutionsStopRequests.put(executionId, Boolean.FALSE);
@@ -211,7 +213,7 @@ public class CampaignExecutionEngine {
             .map(Optional::get)
             .toList();
 
-        campaignExecution.initExecution(testCaseDatasets, campaign.executionEnvironment());
+        campaignExecution.addScenarioExecution(testCaseDatasets, campaign.executionEnvironment());
         try {
             if (campaign.parallelRun) {
                 Collection<Callable<Object>> toExecute = Lists.newArrayList();

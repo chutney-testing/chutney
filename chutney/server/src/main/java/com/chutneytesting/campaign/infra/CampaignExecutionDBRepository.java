@@ -17,6 +17,7 @@
 package com.chutneytesting.campaign.infra;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.Validate.notBlank;
 import static org.apache.commons.lang3.Validate.notNull;
 
@@ -27,15 +28,13 @@ import com.chutneytesting.campaign.infra.jpa.CampaignExecutionEntity;
 import com.chutneytesting.execution.domain.campaign.CampaignExecutionNotFoundException;
 import com.chutneytesting.execution.infra.storage.DatabaseExecutionJpaRepository;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
-import com.chutneytesting.server.core.domain.scenario.TestCaseMetadata;
-import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -49,18 +48,16 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     private final CampaignExecutionJpaRepository campaignExecutionJpaRepository;
     private final CampaignJpaRepository campaignJpaRepository;
     private final DatabaseExecutionJpaRepository scenarioExecutionJpaRepository;
-    private final TestCaseRepository testCaseRepository;
     private final Map<Long, List<CampaignExecution>> currentCampaignExecutions = new ConcurrentHashMap<>();
 
     public CampaignExecutionDBRepository(
         CampaignExecutionJpaRepository campaignExecutionJpaRepository,
         CampaignJpaRepository campaignJpaRepository,
-        DatabaseExecutionJpaRepository scenarioExecutionJpaRepository,
-        TestCaseRepository testCaseRepository) {
+        DatabaseExecutionJpaRepository scenarioExecutionJpaRepository
+    ) {
         this.campaignExecutionJpaRepository = campaignExecutionJpaRepository;
         this.campaignJpaRepository = campaignJpaRepository;
         this.scenarioExecutionJpaRepository = scenarioExecutionJpaRepository;
-        this.testCaseRepository = testCaseRepository;
     }
 
     @Override
@@ -107,10 +104,8 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
 
     @Override
     public List<CampaignExecution> getExecutionHistory(Long campaignId) {
-        CampaignEntity campaign = campaignJpaRepository.findById(campaignId).orElseThrow(() -> new CampaignNotFoundException(campaignId));
         return campaignExecutionJpaRepository.findByCampaignIdOrderByIdDesc(campaignId).stream()
-            .map(ce -> toDomainWithCampaign(campaign, ce))
-            .filter(Objects::nonNull)
+            .map(this::toDomain)
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -133,7 +128,6 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
         return campaignExecutionJpaRepository.findAll(
                 PageRequest.of(0, numberOfExecution.intValue(), Sort.by(Sort.Direction.DESC, "id"))).stream()
             .map(this::toDomain)
-            .filter(Objects::nonNull)
             .toList();
     }
 
@@ -164,23 +158,24 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
         campaignExecutionJpaRepository.save(newExecution);
         return newExecution.id();
     }
+
     private CampaignExecution toDomain(CampaignExecutionEntity campaignExecution) {
-        return toDomainWithCampaign(
-            campaignJpaRepository.findById(campaignExecution.campaignId()).orElseThrow(() -> new CampaignExecutionNotFoundException(campaignExecution.campaignId(), campaignExecution.id())),
-            campaignExecution);
+        CampaignEntity campaign = campaignJpaRepository.findById(campaignExecution.campaignId())
+            .orElseThrow(() -> new CampaignNotFoundException(campaignExecution.campaignId()));
+        return ofNullable(runningCampaignExecution(campaignExecution)).orElseGet(() ->
+            campaignExecution.toDomain(campaign.title())
+        );
     }
 
-    private CampaignExecution toDomainWithCampaign(CampaignEntity campaign, CampaignExecutionEntity campaignExecutionEntity) {
-        return campaignExecutionEntity.toDomain(campaign, isCampaignExecutionRunning(campaignExecutionEntity), this::title);
+    private Supplier<CampaignExecutionNotFoundException> campaignExecutionNotFoundExceptionSupplier(CampaignExecutionEntity campaignExecution) {
+        return () -> new CampaignExecutionNotFoundException(campaignExecution.campaignId(), campaignExecution.id());
     }
 
-    private String title(String scenarioId) {
-        return testCaseRepository.findMetadataById(scenarioId).map(TestCaseMetadata::title).orElse("");
-    }
-
-    private boolean isCampaignExecutionRunning(CampaignExecutionEntity campaignExecutionEntity) {
+    private CampaignExecution runningCampaignExecution(CampaignExecutionEntity campaignExecutionEntity) {
         return currentExecutions(campaignExecutionEntity.campaignId())
             .stream()
-            .anyMatch(exec -> exec.executionId.equals(campaignExecutionEntity.id()));
+            .filter(exec -> exec.executionId.equals(campaignExecutionEntity.id()))
+            .findAny()
+            .orElse(null);
     }
 }
