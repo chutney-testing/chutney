@@ -100,7 +100,7 @@ export class EnvironmentsComponent implements OnInit, DoCheck {
                 this.environments.splice(index, 1);
             },
             error: err => {
-                if (err.status === 400) {
+                if (err.status === 409) {
                     this.errorMessage = this.errorDeleteLastMessage;
                 } else {
                     this.errorMessage = err.error

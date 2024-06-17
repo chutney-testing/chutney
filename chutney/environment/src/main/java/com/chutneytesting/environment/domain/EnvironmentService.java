@@ -25,6 +25,7 @@ import com.chutneytesting.environment.domain.exception.EnvVariableNotFoundExcept
 import com.chutneytesting.environment.domain.exception.EnvironmentNotFoundException;
 import com.chutneytesting.environment.domain.exception.InvalidEnvironmentNameException;
 import com.chutneytesting.environment.domain.exception.NoEnvironmentFoundException;
+import com.chutneytesting.environment.domain.exception.SingleEnvironmentException;
 import com.chutneytesting.environment.domain.exception.TargetNotFoundException;
 import com.chutneytesting.environment.domain.exception.UnresolvedEnvironmentException;
 import com.chutneytesting.environment.domain.exception.VariableAlreadyExistingException;
@@ -94,7 +95,7 @@ public class EnvironmentService {
         }
         if (environmentNames.size() == 1) {
             logger.error("Cannot delete environment with name {} : cannot delete the last env", environmentName);
-            throw new InvalidEnvironmentNameException("Cannot delete environment with name " + environmentName + " : cannot delete the last env");
+            throw new SingleEnvironmentException("Cannot delete environment with name " + environmentName + " : cannot delete the last env");
         }
         environmentRepository.delete(environmentName);
         updateEnvironmentHandlers.forEach(renameEnvironmentHandler -> renameEnvironmentHandler.deleteEnvironment(environmentName));

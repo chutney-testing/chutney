@@ -160,7 +160,7 @@ public class HttpEnvironmentApiTest {
         addAvailableEnvironment("env_test");
         mockMvc.perform(delete(environmentBasePath + "/env_test"))
             .andDo(MockMvcResultHandlers.log())
-            .andExpect(status().isBadRequest());
+            .andExpect(status().isConflict());
     }
 
     @Test

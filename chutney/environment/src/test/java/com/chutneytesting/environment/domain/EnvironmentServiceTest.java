@@ -30,6 +30,7 @@ import static org.mockito.Mockito.when;
 import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmentException;
 import com.chutneytesting.environment.domain.exception.InvalidEnvironmentNameException;
 import com.chutneytesting.environment.domain.exception.NoEnvironmentFoundException;
+import com.chutneytesting.environment.domain.exception.SingleEnvironmentException;
 import com.chutneytesting.environment.domain.exception.UnresolvedEnvironmentException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -133,7 +134,7 @@ class EnvironmentServiceTest {
         // When & Then
         assertThatThrownBy(() -> {
             sut.deleteEnvironment("ENV");
-        }).isInstanceOf(InvalidEnvironmentNameException.class)
+        }).isInstanceOf(SingleEnvironmentException.class)
             .hasMessageContaining("Cannot delete environment with name ENV : cannot delete the last env");
     }
 
