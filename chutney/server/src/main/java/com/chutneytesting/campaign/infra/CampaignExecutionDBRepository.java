@@ -32,7 +32,6 @@ import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -89,7 +88,7 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     public CampaignExecution getLastExecution(Long campaignId) {
         return campaignExecutionJpaRepository
             .findFirstByCampaignIdOrderByIdDesc(campaignId)
-            .map(campaignExecution -> toDomain(campaignExecution, () -> new CampaignExecutionNotFoundException(campaignExecution.campaignId(), campaignExecution.id())))
+            .map(this::toDomain)
             .orElseThrow(() -> new CampaignExecutionNotFoundException(campaignId));
     }
 
@@ -106,8 +105,7 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     @Override
     public List<CampaignExecution> getExecutionHistory(Long campaignId) {
         return campaignExecutionJpaRepository.findByCampaignIdOrderByIdDesc(campaignId).stream()
-            .map(ce -> toDomain(ce, () -> new CampaignNotFoundException(campaignId)))
-            .filter(Objects::nonNull)
+            .map(this::toDomain)
             .collect(Collectors.toCollection(ArrayList::new));
     }
 
@@ -129,15 +127,14 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
     public List<CampaignExecution> getLastExecutions(Long numberOfExecution) {
         return campaignExecutionJpaRepository.findAll(
                 PageRequest.of(0, numberOfExecution.intValue(), Sort.by(Sort.Direction.DESC, "id"))).stream()
-            .map(campaignExecution -> toDomain(campaignExecution, campaignExecutionNotFoundExceptionSupplier(campaignExecution)))
-            .filter(Objects::nonNull)
+            .map(this::toDomain)
             .toList();
     }
 
     @Override
     public CampaignExecution getCampaignExecutionById(Long campaignExecId) {
         return campaignExecutionJpaRepository.findById(campaignExecId)
-            .map(campaignExecution -> toDomain(campaignExecution, campaignExecutionNotFoundExceptionSupplier(campaignExecution)))
+            .map(this::toDomain)
             .orElseThrow(() -> new CampaignExecutionNotFoundException(null, campaignExecId));
     }
 
@@ -162,8 +159,9 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
         return newExecution.id();
     }
 
-    private CampaignExecution toDomain(CampaignExecutionEntity campaignExecution, Supplier<? extends RuntimeException> campaignExceptionSupplier) {
-        CampaignEntity campaign = campaignJpaRepository.findById(campaignExecution.campaignId()).orElseThrow(campaignExceptionSupplier);
+    private CampaignExecution toDomain(CampaignExecutionEntity campaignExecution) {
+        CampaignEntity campaign = campaignJpaRepository.findById(campaignExecution.campaignId())
+            .orElseThrow(() -> new CampaignNotFoundException(campaignExecution.campaignId()));
         return ofNullable(runningCampaignExecution(campaignExecution)).orElseGet(() ->
             campaignExecution.toDomain(campaign.title())
         );
