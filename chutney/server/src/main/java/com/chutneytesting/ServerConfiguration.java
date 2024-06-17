@@ -28,6 +28,7 @@ import static com.chutneytesting.ServerConfigurationValues.TASK_SQL_NB_LOGGED_RO
 import static com.chutneytesting.ServerConfigurationValues.TASK_SQL_NB_LOGGED_ROW_SPRING_VALUE;
 
 import com.chutneytesting.action.api.EmbeddedActionEngine;
+import com.chutneytesting.campaign.domain.CampaignEnvironmentUpdateHandler;
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.campaign.domain.CampaignService;
@@ -94,7 +95,7 @@ public class ServerConfiguration {
 
     @PostConstruct
     public void logPort() throws UnknownHostException {
-      LOGGER.debug("Starting server {} on {}", InetAddress.getLocalHost().getCanonicalHostName(), port);
+        LOGGER.debug("Starting server {} on {}", InetAddress.getLocalHost().getCanonicalHostName(), port);
     }
 
     /**
@@ -237,6 +238,10 @@ public class ServerConfiguration {
         return new CampaignService(campaignExecutionRepository);
     }
 
+    @Bean
+    CampaignEnvironmentUpdateHandler campaignEnvironmentUpdateHandler(CampaignRepository campaignRepository) {
+        return new CampaignEnvironmentUpdateHandler(campaignRepository);
+    }
 
     // TODO - To move in infra when it will not be used in domain (ScenarioExecutionEngineAsync)
     @Bean

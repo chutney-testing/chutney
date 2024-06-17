@@ -129,7 +129,7 @@ public class TargetControllerTest {
         addAvailableEnvironment("env_test", "server 1");
 
         mockMvc.perform(
-                post(targetBasePath )
+                post(targetBasePath)
                     .content("{\"name\": \"server 2\", \"url\": \"ssh://somehost:42\", \"environment\": \"env_test\"}")
                     .contentType(MediaType.APPLICATION_JSON))
             .andDo(MockMvcResultHandlers.log())

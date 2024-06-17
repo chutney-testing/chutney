@@ -124,7 +124,7 @@ public class HttpEnvironmentApiTest {
             .andExpect(status().isOk());
 
         ArgumentCaptor<Environment> environmentArgumentCaptor = ArgumentCaptor.forClass(Environment.class);
-        verify(environmentRepository, times(1)).save(environmentArgumentCaptor.capture());
+        verify(environmentRepository).save(environmentArgumentCaptor.capture());
 
         Environment savedEnvironment = environmentArgumentCaptor.getValue();
         assertThat(savedEnvironment).isNotNull();
@@ -156,12 +156,11 @@ public class HttpEnvironmentApiTest {
     }
 
     @Test
-    public void deleteEnvironment_deletes_it_from_repo() throws Exception {
-        mockMvc.perform(delete(environmentBasePath + "/env test"))
+    public void deleteEnvironment_does_not_deletes_last_env() throws Exception {
+        addAvailableEnvironment("env_test");
+        mockMvc.perform(delete(environmentBasePath + "/env_test"))
             .andDo(MockMvcResultHandlers.log())
-            .andExpect(status().isOk());
-
-        verify(environmentRepository, times(1)).delete(eq("env test"));
+            .andExpect(status().isConflict());
     }
 
     @Test
@@ -171,6 +170,17 @@ public class HttpEnvironmentApiTest {
         mockMvc.perform(delete(environmentBasePath + "/env test"))
             .andDo(MockMvcResultHandlers.log())
             .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void deleteEnvironment_deletes_it_from_repo() throws Exception {
+        addAvailableEnvironment("env_test_1");
+        addAvailableEnvironment("env_test_2");
+        mockMvc.perform(delete(environmentBasePath + "/env_test_2"))
+            .andDo(MockMvcResultHandlers.log())
+            .andExpect(status().isOk());
+
+        verify(environmentRepository).delete(eq("env_test_2"));
     }
 
     @Test
@@ -197,7 +207,7 @@ public class HttpEnvironmentApiTest {
             .andExpect(status().isOk());
 
         ArgumentCaptor<Environment> environmentArgumentCaptor = ArgumentCaptor.forClass(Environment.class);
-        verify(environmentRepository, times(1)).save(environmentArgumentCaptor.capture());
+        verify(environmentRepository).save(environmentArgumentCaptor.capture());
         verify(environmentRepository, times(0)).delete(any());
 
         Environment savedEnvironment = environmentArgumentCaptor.getValue();
@@ -218,8 +228,8 @@ public class HttpEnvironmentApiTest {
             .andExpect(status().isOk());
 
         ArgumentCaptor<Environment> environmentArgumentCaptor = ArgumentCaptor.forClass(Environment.class);
-        verify(environmentRepository, times(1)).save(environmentArgumentCaptor.capture());
-        verify(environmentRepository, times(1)).delete(eq("env_test"));
+        verify(environmentRepository).save(environmentArgumentCaptor.capture());
+        verify(environmentRepository).delete(eq("env_test"));
 
         Environment savedEnvironment = environmentArgumentCaptor.getValue();
         assertThat(savedEnvironment).isNotNull();

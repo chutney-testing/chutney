@@ -135,4 +135,14 @@ public class DatabaseCampaignRepository implements CampaignRepository {
             .map(CampaignEntity::toDomain)
             .toList();
     }
+
+    @Override
+    public List<Campaign> findCampaignsByEnvironment(String environment) {
+        if (isNullOrEmpty(environment)) {
+            return emptyList();
+        }
+        return campaignJpaRepository.findByEnvironment(environment).stream()
+            .map(CampaignEntity::toDomain)
+            .toList();
+    }
 }

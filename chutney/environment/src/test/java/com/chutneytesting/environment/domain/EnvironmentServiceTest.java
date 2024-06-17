@@ -20,12 +20,17 @@ import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmentException;
 import com.chutneytesting.environment.domain.exception.InvalidEnvironmentNameException;
 import com.chutneytesting.environment.domain.exception.NoEnvironmentFoundException;
+import com.chutneytesting.environment.domain.exception.SingleEnvironmentException;
 import com.chutneytesting.environment.domain.exception.UnresolvedEnvironmentException;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -119,5 +124,30 @@ class EnvironmentServiceTest {
             .isInstanceOf(UnresolvedEnvironmentException.class)
             .hasMessage("There is more than one environment. Could not resolve the default one");
 
+    }
+
+    @Test
+    void delete_env_should_not_delete_the_last_env() {
+        // Given
+        when(environmentRepository.listNames()).thenReturn(List.of("ENV"));
+
+        // When & Then
+        assertThatThrownBy(() -> {
+            sut.deleteEnvironment("ENV");
+        }).isInstanceOf(SingleEnvironmentException.class)
+            .hasMessageContaining("Cannot delete environment with name ENV : cannot delete the last env");
+    }
+
+    @Test
+    void delete_env_should_delete_when_it_is_not_the_last_env() {
+        // Given
+        when(environmentRepository.listNames()).thenReturn(List.of("ENV", "OTHER"));
+        doNothing().when(environmentRepository).delete(any());
+
+        // When
+        sut.deleteEnvironment("ENV");
+
+        // Then
+        verify(environmentRepository, times(1)).delete(eq("ENV"));
     }
 }

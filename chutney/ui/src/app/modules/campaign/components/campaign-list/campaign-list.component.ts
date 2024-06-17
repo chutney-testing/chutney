@@ -97,6 +97,13 @@ export class CampaignListComponent implements OnInit, OnDestroy {
         this.loadSchedulingCampaign();
     }
 
+    scheduledCampaignHasMissingEnv(scheduledCampaign: CampaignScheduling): boolean {
+        return scheduledCampaign.campaignsId.some(campaignId => {
+            const campaign = this.campaigns.find(campaign => campaign.id === campaignId);
+            return campaign == null || campaign.environment == null;
+        });
+    }
+
     createCampaign() {
         const url = '/campaign/edition';
         this.router.navigateByUrl(url);

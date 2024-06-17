@@ -17,6 +17,7 @@
 package com.chutneytesting.campaign.infra;
 
 import com.chutneytesting.campaign.infra.jpa.CampaignEntity;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -30,4 +31,6 @@ public interface CampaignJpaRepository extends CrudRepository<CampaignEntity, Lo
         Long id,
         String title,
         String description);
+
+    List<CampaignEntity> findByEnvironment(String environment);
 }

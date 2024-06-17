@@ -17,6 +17,7 @@
 package com.chutneytesting.campaign.infra;
 
 import static java.util.Arrays.asList;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -221,6 +222,46 @@ public class DatabaseCampaignRepositoryTest {
 
             // Then
             Assertions.assertThat(scenarioCampaigns).isEmpty();
+        }
+
+        @Test
+        public void should_find_campaigns_related_to_a_given_environment() {
+            // Given
+            Campaign campaign1 = new Campaign(null, "campaignTestName1", "campaignDesc1", emptyList(), "env", false, false, null, null);
+            Campaign campaign2 = new Campaign(null, "campaignTestName2", "campaignDesc2", emptyList(), "env1", false, false, null, null);
+            Campaign campaign3 = new Campaign(null, "campaignTestName3", "campaignDesc3", emptyList(), "env1", false, false, null, null);
+            Campaign campaign4 = new Campaign(null, "campaignTestName4", "campaignDesc4", emptyList(), "env2", false, false, null, null);
+            sut.createOrUpdate(campaign1);
+            sut.createOrUpdate(campaign2);
+            sut.createOrUpdate(campaign3);
+            sut.createOrUpdate(campaign4);
+
+            // When
+            List<String> scenarioCampaignNames = sut.findCampaignsByEnvironment("env1").stream()
+                .map(sc -> sc.title)
+                .collect(Collectors.toList());
+
+            // Then
+            Assertions.assertThat(scenarioCampaignNames).containsExactlyInAnyOrder(
+                campaign2.title,
+                campaign3.title
+            );
+        }
+
+        @Test
+        public void should_find_no_campaigns_related_to_a_given_environment() {
+            // Given
+            ScenarioEntity s1 = givenScenario();
+            Campaign campaign1 = new Campaign(null, "campaignTestName2", "campaignDesc2", scenariosIds(s1), "env1", false, false, null, null);
+            sut.createOrUpdate(campaign1);
+
+            // When
+            List<String> scenarioCampaignNames = sut.findCampaignsByEnvironment("env3").stream()
+                .map(sc -> sc.title)
+                .collect(Collectors.toList());
+
+            // Then
+            Assertions.assertThat(scenarioCampaignNames).isEmpty();
         }
     }
 }

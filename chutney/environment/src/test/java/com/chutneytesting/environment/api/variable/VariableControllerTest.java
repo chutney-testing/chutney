@@ -79,6 +79,7 @@ public class VariableControllerTest {
                 %s
             ]
         """.formatted(variableTemplate);
+
     @BeforeEach
     public void setUp() {
         MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter = new MappingJackson2HttpMessageConverter();

@@ -126,7 +126,7 @@
           <tbody>
             @for (scheduledCampaign of scheduledCampaigns; track scheduledCampaign.id) {
               <tr>
-                <td class="w80">#{{scheduledCampaign.campaignId}}
+                <td [ngClass]="{'scheduled-campaign-error': scheduledCampaignHasMissingEnv(scheduledCampaign)}" class="w80">#{{scheduledCampaign.campaignId}}
                   @if (isFrequencyCampaign(scheduledCampaign)) {
                     <span data-toggle="tooltip"
                       title="{{scheduledCampaign.frequency.toLowerCase()}}"
@@ -140,7 +140,12 @@
                   }
                   - {{scheduledCampaign.campaignsTitle}}
                 </td>
-                <td class="text-nowrap">{{scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm'}}</td>
+                <td [ngClass]="{'scheduled-campaign-error': scheduledCampaignHasMissingEnv(scheduledCampaign)}" class="text-nowrap">{{scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm'}}</td>
+                <td>
+                  @if (scheduledCampaignHasMissingEnv(scheduledCampaign)) {
+                    <span style="color: red;" class="fa fa-triangle-exclamation" ngbTooltip="{{'campaigns.list.error.environment' | translate}}"></span>
+                  }
+                </td>
               </tr>
             }
           </tbody>

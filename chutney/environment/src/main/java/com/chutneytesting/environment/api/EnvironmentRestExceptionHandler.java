@@ -21,6 +21,7 @@ import com.chutneytesting.environment.domain.exception.AlreadyExistingTargetExce
 import com.chutneytesting.environment.domain.exception.EnvVariableNotFoundException;
 import com.chutneytesting.environment.domain.exception.EnvironmentNotFoundException;
 import com.chutneytesting.environment.domain.exception.InvalidEnvironmentNameException;
+import com.chutneytesting.environment.domain.exception.SingleEnvironmentException;
 import com.chutneytesting.environment.domain.exception.TargetNotFoundException;
 import com.chutneytesting.environment.domain.exception.VariableAlreadyExistingException;
 import java.time.format.DateTimeParseException;
@@ -77,7 +78,8 @@ public class EnvironmentRestExceptionHandler extends ResponseEntityExceptionHand
     @ExceptionHandler({
         AlreadyExistingTargetException.class,
         AlreadyExistingEnvironmentException.class,
-        VariableAlreadyExistingException.class
+        VariableAlreadyExistingException.class,
+        SingleEnvironmentException.class
     })
     protected ResponseEntity<Object> conflict(RuntimeException ex, WebRequest request) {
         String bodyOfResponse = ex.getMessage();

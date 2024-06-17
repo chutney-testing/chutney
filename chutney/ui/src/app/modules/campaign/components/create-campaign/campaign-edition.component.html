@@ -67,6 +67,11 @@
           <chutney-environment-combo [environments]="environments" [defaultValue]="campaign.environment"
             (selectionEvent)="setSelectedEnvironment($event)">
           </chutney-environment-combo>
+          @if (submitted && !this.selectedEnvironment) {
+            <div class="error-message">
+              {{ 'campaigns.edition.form.environment' | translate }}
+            </div>
+          }
         </div>
       }
 
