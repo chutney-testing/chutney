@@ -34,11 +34,13 @@ export class EnvironmentsComponent implements OnInit, DoCheck {
     editionIndex: number;
     errorMessage: string;
     nameValidationMessage: string;
+    errorDeleteLastMessage: string
 
     constructor(private route: ActivatedRoute,
                 private environmentService: EnvironmentService,
                 public validationService: ValidationService,
                 private translateService: TranslateService) {
+        this.translateService.get("environment.error.delete.last.env").subscribe(msg => this.errorDeleteLastMessage = msg)
     }
 
     ngOnInit(): void {
@@ -99,7 +101,7 @@ export class EnvironmentsComponent implements OnInit, DoCheck {
             },
             error: err => {
                 if (err.status === 400) {
-                    this.translateService.get("environment.error.delete.last.env").subscribe(msg => this.errorMessage = msg)
+                    this.errorMessage = this.errorDeleteLastMessage;
                 } else {
                     this.errorMessage = err.error
                 }

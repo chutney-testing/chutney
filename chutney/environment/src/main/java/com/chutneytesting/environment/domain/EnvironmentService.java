@@ -55,7 +55,7 @@ public class EnvironmentService {
 
     public EnvironmentService(EnvironmentRepository environmentRepository) {
         this.environmentRepository = environmentRepository;
-        this.updateEnvironmentHandlers = null;
+        this.updateEnvironmentHandlers = emptyList();
     }
 
     public Set<String> listEnvironmentsNames() {
@@ -97,9 +97,7 @@ public class EnvironmentService {
             throw new InvalidEnvironmentNameException("Cannot delete environment with name " + environmentName + " : cannot delete the last env");
         }
         environmentRepository.delete(environmentName);
-        if (updateEnvironmentHandlers != null) {
-            updateEnvironmentHandlers.forEach(renameEnvironmentHandler -> renameEnvironmentHandler.deleteEnvironment(environmentName));
-        }
+        updateEnvironmentHandlers.forEach(renameEnvironmentHandler -> renameEnvironmentHandler.deleteEnvironment(environmentName));
     }
 
     public void updateEnvironment(String environmentName, Environment newVersion) throws InvalidEnvironmentNameException, EnvironmentNotFoundException {
@@ -112,9 +110,7 @@ public class EnvironmentService {
         createOrUpdate(newEnvironment);
         if (!newEnvironment.name.equals(environmentName)) {
             environmentRepository.delete(environmentName);
-            if (updateEnvironmentHandlers != null) {
-                updateEnvironmentHandlers.forEach(renameEnvironmentHandler -> renameEnvironmentHandler.renameEnvironment(environmentName, newEnvironment.name));
-            }
+            updateEnvironmentHandlers.forEach(renameEnvironmentHandler -> renameEnvironmentHandler.renameEnvironment(environmentName, newEnvironment.name));
         }
     }
 

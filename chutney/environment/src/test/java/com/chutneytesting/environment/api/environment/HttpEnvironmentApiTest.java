@@ -124,7 +124,7 @@ public class HttpEnvironmentApiTest {
             .andExpect(status().isOk());
 
         ArgumentCaptor<Environment> environmentArgumentCaptor = ArgumentCaptor.forClass(Environment.class);
-        verify(environmentRepository, times(1)).save(environmentArgumentCaptor.capture());
+        verify(environmentRepository).save(environmentArgumentCaptor.capture());
 
         Environment savedEnvironment = environmentArgumentCaptor.getValue();
         assertThat(savedEnvironment).isNotNull();
@@ -180,7 +180,7 @@ public class HttpEnvironmentApiTest {
             .andDo(MockMvcResultHandlers.log())
             .andExpect(status().isOk());
 
-        verify(environmentRepository, times(1)).delete(eq("env_test_2"));
+        verify(environmentRepository).delete(eq("env_test_2"));
     }
 
     @Test
@@ -207,7 +207,7 @@ public class HttpEnvironmentApiTest {
             .andExpect(status().isOk());
 
         ArgumentCaptor<Environment> environmentArgumentCaptor = ArgumentCaptor.forClass(Environment.class);
-        verify(environmentRepository, times(1)).save(environmentArgumentCaptor.capture());
+        verify(environmentRepository).save(environmentArgumentCaptor.capture());
         verify(environmentRepository, times(0)).delete(any());
 
         Environment savedEnvironment = environmentArgumentCaptor.getValue();
@@ -228,8 +228,8 @@ public class HttpEnvironmentApiTest {
             .andExpect(status().isOk());
 
         ArgumentCaptor<Environment> environmentArgumentCaptor = ArgumentCaptor.forClass(Environment.class);
-        verify(environmentRepository, times(1)).save(environmentArgumentCaptor.capture());
-        verify(environmentRepository, times(1)).delete(eq("env_test"));
+        verify(environmentRepository).save(environmentArgumentCaptor.capture());
+        verify(environmentRepository).delete(eq("env_test"));
 
         Environment savedEnvironment = environmentArgumentCaptor.getValue();
         assertThat(savedEnvironment).isNotNull();
