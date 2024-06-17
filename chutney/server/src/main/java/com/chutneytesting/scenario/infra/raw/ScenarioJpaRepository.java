@@ -56,6 +56,10 @@ public interface ScenarioJpaRepository extends CrudRepository<ScenarioEntity, Lo
         };
     }
 
+    static Specification<ScenarioEntity> activatedScenarioSpecification() {
+        return (root, query, builder) -> builder.equal(root.get("activated"), true);
+    }
+
     @Modifying
     @Query(nativeQuery = true, value = "INSERT INTO SCENARIO (ID, TITLE, DESCRIPTION, CONTENT, TAGS, CREATION_DATE, ACTIVATED, USER_ID, UPDATE_DATE, VERSION, DEFAULT_DATASET_ID) VALUES (:id, :title, :description, :content, :tags, :creationDate, :activated, :userId, :updateDate, :version, :defaultDataset)")
     void saveWithExplicitId(
