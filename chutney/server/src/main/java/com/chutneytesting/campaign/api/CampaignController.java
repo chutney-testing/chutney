@@ -29,17 +29,24 @@ import com.chutneytesting.campaign.api.dto.CampaignMapper;
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.campaign.domain.CampaignService;
+import com.chutneytesting.dataset.domain.DatasetService;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
+import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
+import java.nio.file.NoSuchFileException;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -61,19 +68,20 @@ public class CampaignController {
 
     private final TestCaseRepositoryAggregator repositoryAggregator;
     private final CampaignRepository campaignRepository;
-
+    private final DatasetService datasetService;
     private final CampaignExecutionRepository campaignExecutionRepository;
     private final ExecutionHistoryRepository executionHistoryRepository;
     private final CampaignService campaignService;
 
     public CampaignController(TestCaseRepositoryAggregator repositoryAggregator,
                               CampaignRepository campaignRepository,
-                              CampaignExecutionRepository campaignExecutionRepository,
+                              DatasetService datasetService, CampaignExecutionRepository campaignExecutionRepository,
                               ExecutionHistoryRepository executionHistoryRepository,
                               CampaignService campaignService) {
 
         this.repositoryAggregator = repositoryAggregator;
         this.campaignRepository = campaignRepository;
+        this.datasetService = datasetService;
         this.campaignExecutionRepository = campaignExecutionRepository;
         this.executionHistoryRepository = executionHistoryRepository;
         this.campaignService = campaignService;
@@ -83,6 +91,7 @@ public class CampaignController {
     @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignDto saveCampaign(@RequestBody CampaignDto campaign) {
         hasEnvironment(campaign);
+        isDatasetValid(campaign);
         return toDtoWithoutReport(campaignRepository.createOrUpdate(fromDto(campaign)));
     }
 
@@ -90,6 +99,7 @@ public class CampaignController {
     @PutMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignDto updateCampaign(@RequestBody CampaignDto campaign) {
         hasEnvironment(campaign);
+        isDatasetValid(campaign);
         return toDtoWithoutReport(campaignRepository.createOrUpdate(fromDto(campaign)));
     }
 
@@ -159,5 +169,20 @@ public class CampaignController {
         if (StringUtils.isBlank(campaign.getEnvironment())) {
             throw new IllegalArgumentException("Environment is missing for campaign with name " + campaign.getTitle());
         }
+    }
+
+    private void isDatasetValid(CampaignDto campaign) {
+        Set<String> datasetIds = new HashSet<>();
+        datasetIds.add(campaign.getDatasetId());
+        datasetIds.addAll(campaign.getScenarios().stream().map(CampaignDto.CampaignScenarioDto::datasetId).toList());
+        datasetIds.stream().filter(Strings::isNotBlank).forEach(datasetId -> {
+            try {
+                if (datasetService.findById(datasetId) == null) {
+                    throw new DataSetNotFoundException(campaign.getDatasetId());
+                }
+            } catch (Exception exception) {
+                throw new DataSetNotFoundException(campaign.getDatasetId());
+            }
+        });
     }
 }
