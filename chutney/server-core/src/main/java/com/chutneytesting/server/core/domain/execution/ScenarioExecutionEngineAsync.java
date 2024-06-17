@@ -106,6 +106,10 @@ public class ScenarioExecutionEngineAsync {
         ExecutionRequest executionRequestProcessed = new ExecutionRequest(testCasePreProcessors.apply(executionRequest), executionRequest.environment, executionRequest.userId, executionRequest.dataset, executionRequest.campaignExecution, executionRequest.tags);
         // Initialize execution history
         ExecutionHistory.Execution storedExecution = storeInitialReport(executionRequestProcessed);
+        // Campaign execution update
+        if(ofNullable(executionRequest.campaignExecution).isPresent()) {
+            executionRequest.campaignExecution.updateScenarioExecutionId(storedExecution);
+        }
         // Start engine execution
         Pair<Observable<StepExecutionReportCore>, Long> followResult = callEngineExecution(executionRequestProcessed, storedExecution);
         // Build execution observable

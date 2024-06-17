@@ -41,6 +41,7 @@ import com.chutneytesting.server.core.domain.execution.state.ExecutionStateRepos
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.observers.TestObserver;
@@ -91,7 +92,7 @@ public class ScenarioExecutionEngineAsyncTest {
     }
 
     @Test
-    public void should_store_initial_report_and_notify_start_end_execution_and_metrics_when_execute_empty_scenario() {
+    public void should_store_initial_report_and_notify_start_end_execution_and_metrics_and_update_campaignExecution_when_execute_empty_scenario() {
         // Given
         final TestCase testCase = emptyTestCase();
         final String scenarioId = testCase.id();
@@ -112,15 +113,17 @@ public class ScenarioExecutionEngineAsyncTest {
             0,
             0
         );
+        CampaignExecution campaignExecution = mock(CampaignExecution.class);
 
         // When
         DataSet dataset = DataSet.builder().withId("DATASET").withName("...").build();
-        ExecutionRequest request = new ExecutionRequest(testCase, "Exec env", "Exec user", dataset);
+        ExecutionRequest request = new ExecutionRequest(testCase, "Exec env", "Exec user", dataset, campaignExecution);
         sut.execute(request);
 
         // Then
         verify(testCasePreProcessors).apply(request);
         verify(executionEngine).executeAndFollow(any());
+        verify(campaignExecution).updateScenarioExecutionId(any());
         ArgumentCaptor<ExecutionHistory.DetachedExecution> argumentCaptor = ArgumentCaptor.forClass(ExecutionHistory.DetachedExecution.class);
         verify(executionHistoryRepository).store(eq(scenarioId), argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().environment()).isEqualTo("Exec env");

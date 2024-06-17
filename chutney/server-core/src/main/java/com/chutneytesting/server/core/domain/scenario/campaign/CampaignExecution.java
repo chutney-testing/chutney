@@ -131,6 +131,25 @@ public class CampaignExecution {
                     .build()));
     }
 
+    public void updateScenarioExecutionId(ExecutionHistory.Execution storedExecution) throws UnsupportedOperationException {
+        OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
+            .filter(i -> {
+                var se = this.scenarioExecutions.get(i);
+                return se.scenarioId().equals(storedExecution.scenarioId()) &&
+                    se.execution().datasetId().equals(storedExecution.datasetId());
+            })
+            .findFirst();
+        var scenarioExecution = this.scenarioExecutions.get(indexOpt.getAsInt()).execution();
+        this.scenarioExecutions.set(indexOpt.getAsInt(),
+            new ScenarioExecutionCampaign(
+                storedExecution.scenarioId(),
+                storedExecution.testCaseTitle(),
+                ImmutableExecutionHistory.ExecutionSummary.builder()
+                    .from(scenarioExecution)
+                    .executionId(storedExecution.executionId())
+                    .build()));
+    }
+
     private Optional<String> selectDatasetId(TestCaseDataset testCaseDataset) {
         return ofNullable(testCaseDataset.datasetId()).or(() -> ofNullable(dataSetId)).filter(not(String::isBlank));
     }

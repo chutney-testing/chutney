@@ -116,7 +116,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
 
     private ExecutionSummary scenarioExecutionToExecutionSummary(ScenarioExecutionEntity scenarioExecution) {
         CampaignExecution campaignExecution = ofNullable(scenarioExecution.campaignExecution())
-            .map(ce -> ce.toDomain(campaignJpaRepository.findById(ce.campaignId()).get(), false, null))
+            .map(ce -> ce.toDomain(campaignJpaRepository.findById(ce.campaignId()).get().title()))
             .orElse(null);
         return scenarioExecution.toDomain(campaignExecution);
     }

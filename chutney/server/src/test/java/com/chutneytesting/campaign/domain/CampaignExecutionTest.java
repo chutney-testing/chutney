@@ -185,6 +185,30 @@ class CampaignExecutionTest {
                     assertThat(executionSummary.datasetId()).hasValue(campaignReport.dataSetId);
                 });
             });
+
+            // When
+            ExecutionHistory.Execution scenarioExecution = mock(ExecutionHistory.Execution.class);
+            when(scenarioExecution.scenarioId()).thenReturn(testCase.metadata().id());
+            when(scenarioExecution.testCaseTitle()).thenReturn(testCase.metadata().title());
+            when(scenarioExecution.executionId()).thenReturn(666L);
+            when(scenarioExecution.datasetId()).thenReturn(Optional.of(campaignReport.dataSetId));
+
+            campaignReport.updateScenarioExecutionId(scenarioExecution);
+
+            // Then
+            assertThat(campaignReport.scenarioExecutionReports()).hasSize(1);
+            assertThat(campaignReport.scenarioExecutionReports().get(0)).satisfies(report -> {
+                assertThat(report.scenarioId()).isEqualTo(testCase.metadata().id());
+                assertThat(report.scenarioName()).isEqualTo(testCase.metadata().title());
+                assertThat(report.execution()).satisfies(executionSummary -> {
+                    assertThat(executionSummary.executionId()).isEqualTo(666L);
+                    assertThat(executionSummary.time()).isAfter(beforeStartExecution);
+                    assertThat(executionSummary.status()).isEqualTo(RUNNING);
+                    assertThat(executionSummary.environment()).isEqualTo("env");
+                    assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
+                    assertThat(executionSummary.datasetId()).hasValue(campaignReport.dataSetId);
+                });
+            });
         }
 
         @Test

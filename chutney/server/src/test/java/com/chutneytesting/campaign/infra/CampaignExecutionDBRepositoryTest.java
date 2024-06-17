@@ -399,7 +399,7 @@ public class CampaignExecutionDBRepositoryTest {
     @ParameterizedTest
     @MethodSource("invalidInputProvider")
     void shouldThrowExceptionForInvalidInputs(Long campaignId, String environment, Class<?> exceptionExpected) {
-        CampaignExecutionRepository sut = new CampaignExecutionDBRepository(null,null,null,null);
+        CampaignExecutionRepository sut = new CampaignExecutionDBRepository(null,null,null);
         assertThatThrownBy(() -> sut.generateCampaignExecutionId(campaignId, environment))
             .isInstanceOf(exceptionExpected);
     }
