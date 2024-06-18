@@ -20,4 +20,8 @@ public class DataSetNotFoundException extends RuntimeException {
     public DataSetNotFoundException(String id) {
         super("Dataset [" + id + "] could not be found");
     }
+
+  public DataSetNotFoundException(String id, Throwable throwable) {
+    super("Dataset [" + id + "] could not be found", throwable);
+  }
 }

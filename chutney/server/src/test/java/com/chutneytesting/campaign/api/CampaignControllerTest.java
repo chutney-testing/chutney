@@ -35,9 +35,11 @@ import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.api.dto.ScenarioExecutionReportOutlineDto;
 import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.campaign.infra.FakeCampaignRepository;
+import com.chutneytesting.dataset.domain.DatasetService;
 import com.chutneytesting.scenario.api.raw.dto.ImmutableTestCaseIndexDto;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
+import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
@@ -78,6 +80,7 @@ public class CampaignControllerTest {
     private TestCaseRepositoryAggregator repositoryAggregator;
 
     private final ExecutionHistoryRepository executionHistoryRepository = mock(ExecutionHistoryRepository.class);
+    private final DatasetService datasetService = mock(DatasetService.class);
     private MockMvc mockMvc;
     private ResultExtractor resultExtractor;
     private CampaignDto existingCampaign;
@@ -88,7 +91,7 @@ public class CampaignControllerTest {
         resultExtractor = new ResultExtractor();
 
         repositoryAggregator = mock(TestCaseRepositoryAggregator.class);
-        CampaignController campaignController = new CampaignController(repositoryAggregator, repository, repository, executionHistoryRepository, new CampaignService(repository));
+        CampaignController campaignController = new CampaignController(repositoryAggregator, repository, datasetService, repository, executionHistoryRepository, new CampaignService(repository));
         mockMvc = MockMvcBuilders.standaloneSetup(campaignController)
             .setControllerAdvice(new RestExceptionHandler(Mockito.mock(ChutneyMetrics.class)))
             .build();
@@ -378,6 +381,36 @@ public class CampaignControllerTest {
         Assertions.assertThat(ids).containsExactly(
             "55", "44-44"
         );
+    }
+
+    @Test
+    public void should_throw_exception_if_campaign_dataset_is_not_found() throws Exception {
+        // When
+        CampaignDto campaignDto = new CampaignDto(null, "test", "desc",
+            List.of(new CampaignScenarioDto("1")), emptyList(), "env", false, false, "UNKNOWN_DATASET", emptyList());
+
+        when(datasetService.findById("UNKNOWN_DATASET")).thenThrow(new DataSetNotFoundException("UNKNOWN_DATASET"));
+
+        // Then
+        execute(post(BASE_URL)
+            .content(om.writeValueAsString(campaignDto))
+            .contentType(APPLICATION_JSON_VALUE))
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
+    }
+
+    @Test
+    public void should_throw_exception_if_scenario_dataset_is_not_found() throws Exception {
+        // When
+        CampaignDto campaignDto = new CampaignDto(null, "test", "desc",
+            List.of(new CampaignScenarioDto("1", "UNKNOWN_DATASET")), emptyList(), "env", false, false, null, emptyList());;
+
+        when(datasetService.findById("UNKNOWN_DATASET")).thenThrow(new DataSetNotFoundException("UNKNOWN_DATASET"));
+
+        // Then
+        execute(post(BASE_URL)
+            .content(om.writeValueAsString(campaignDto))
+            .contentType(APPLICATION_JSON_VALUE))
+            .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
     private void createExistingCampaign() throws Exception {

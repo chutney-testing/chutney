@@ -108,7 +108,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         this.loadAllScenarios();
         this.datasetService.findAll().subscribe((res: Array<Dataset>) => {
             this.datasets = res.map(dataset => {
-                return {"id": dataset.name, "text": dataset.name}
+                return {"id": dataset.id, "text": dataset.name}
             });
         });
         this.dropdownDatasetSettings = {...this.dropdownSettings, singleSelection: true}
@@ -410,7 +410,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         try {
             error.json();
         } catch (exception) {
-            error.message = error.text();
+            error.message = error.error;
         }
         this.submitted = false;
         this.errorMessage = error.message;

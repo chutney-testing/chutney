@@ -97,7 +97,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         ReportNotFoundException.class,
         ScenarioNotFoundException.class,
         ScenarioNotRunningException.class,
-        TargetNotFoundException.class
+        TargetNotFoundException.class,
+        DataSetNotFoundException.class
     })
     protected ResponseEntity<Object> notFound(RuntimeException ex, WebRequest request) {
         return handleExceptionInternalWithExceptionMessageAsBody(ex, HttpStatus.NOT_FOUND, request);
