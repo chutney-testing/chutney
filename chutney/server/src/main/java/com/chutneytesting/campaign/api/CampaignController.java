@@ -38,15 +38,12 @@ import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryR
 import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
-import java.nio.file.NoSuchFileException;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -175,7 +172,7 @@ public class CampaignController {
         Set<String> datasetIds = new HashSet<>();
         datasetIds.add(campaign.getDatasetId());
         datasetIds.addAll(campaign.getScenarios().stream().map(CampaignDto.CampaignScenarioDto::datasetId).toList());
-        datasetIds.stream().filter(Strings::isNotBlank).forEach(datasetId -> {
+        datasetIds.stream().filter(StringUtils::isNotBlank).forEach(datasetId -> {
             try {
                 if (datasetService.findById(datasetId) == null) {
                     throw new DataSetNotFoundException(campaign.getDatasetId());
