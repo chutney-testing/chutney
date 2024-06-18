@@ -57,7 +57,6 @@ export const appRoutes: Routes = [
             },
             {
                 path: 'dataset',
-                title: 'dataset',
                 loadChildren: () => import('./modules/dataset/dataset.module').then(m => m.DatasetModule),
                 canActivate: [authGuard, featuresGuard], // add requiredAuthorizations
                 data: {
