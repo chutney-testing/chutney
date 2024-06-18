@@ -410,7 +410,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         try {
             error.json();
         } catch (exception) {
-            error.message = error.text();
+            error.message = error.error;
         }
         this.submitted = false;
         this.errorMessage = error.message;
