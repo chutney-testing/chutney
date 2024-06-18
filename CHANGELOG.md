@@ -1,5 +1,24 @@
 # Changelog
 
+## [2.9.0.2](https://github.com/chutney-testing/chutney/tree/2.9.0.2)
+
+### 🐛 Fixed bugs:
+* Content search only on activated scenario by @rbenyoussef in https://github.com/chutney-testing/chutney/pull/114
+* Fix campaign edition filters width by @rbenyoussef in https://github.com/chutney-testing/chutney/pull/115
+* Update campaigns when renaming environment by @DelaunayAlex in https://github.com/chutney-testing/chutney/pull/87
+* Fix campaign execution status by @boddissattva in https://github.com/chutney-testing/chutney/pull/116
+* Delete dataset module HTML title by @boddissattva in https://github.com/chutney-testing/chutney/pull/118
+* Use the id instead of the name for scenario dataset in cam… by @DelaunayAlex in https://github.com/chutney-testing/chutney/pull/117
+
+**Full Changelog**: https://github.com/chutney-testing/chutney/compare/2.9.0.1...2.9.0.2
+
+## [2.9.0.1](https://github.com/chutney-testing/chutney/tree/2.9.0.1)
+
+### 🐛 Fixed bugs:
+* Scenarios list refresh must be unsubscribed by @boddissattva in https://github.com/chutney-testing/chutney/pull/113
+
+**Full Changelog**: https://github.com/chutney-testing/chutney/compare/2.9.0...2.9.0.1
+
 ## [2.9.0](https://github.com/chutney-testing/chutney/tree/2.9.0)
 
 ### 🚀 Implemented enhancements:
