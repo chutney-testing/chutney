@@ -25,6 +25,7 @@ import static com.chutneytesting.tools.file.FileUtils.initFolder;
 import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.dataset.DataSetAlreadyExistException;
+import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
 import com.chutneytesting.tools.file.FileUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -83,7 +84,7 @@ public class FileDatasetRepository implements DataSetRepository {
         try {
             DataSet byId = findById(dataSet.name);
             return !byId.equals(DataSet.NO_DATASET);
-        } catch (UncheckedIOException e) {
+        } catch (DataSetNotFoundException e) {
             return false;
         }
     }
@@ -95,12 +96,12 @@ public class FileDatasetRepository implements DataSetRepository {
         }
 
         Path file = this.storeFolderPath.resolve(fileName + FILE_EXTENSION);
-        String content = FileUtils.readContent(file);
         try {
+            String content = FileUtils.readContent(file);
             BasicFileAttributes attr = Files.readAttributes(file, BasicFileAttributes.class);
             return fromDto(objectMapper.readValue(content, DatasetDto.class), attr.creationTime().toInstant());
-        } catch (IOException e) {
-            throw new UncheckedIOException("Cannot read " + file.toUri(), e);
+        } catch (IOException | UncheckedIOException e) {
+            throw new DataSetNotFoundException("Cannot read " + file.toUri(), e);
         }
     }
 

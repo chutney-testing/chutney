@@ -32,17 +32,15 @@ import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.dataset.domain.DatasetService;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
-import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -88,7 +86,7 @@ public class CampaignController {
     @PostMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignDto saveCampaign(@RequestBody CampaignDto campaign) {
         hasEnvironment(campaign);
-        isDatasetValid(campaign);
+        validateDataset(campaign);
         return toDtoWithoutReport(campaignRepository.createOrUpdate(fromDto(campaign)));
     }
 
@@ -96,7 +94,7 @@ public class CampaignController {
     @PutMapping(path = "", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignDto updateCampaign(@RequestBody CampaignDto campaign) {
         hasEnvironment(campaign);
-        isDatasetValid(campaign);
+        validateDataset(campaign);
         return toDtoWithoutReport(campaignRepository.createOrUpdate(fromDto(campaign)));
     }
 
@@ -168,18 +166,13 @@ public class CampaignController {
         }
     }
 
-    private void isDatasetValid(CampaignDto campaign) {
-        Set<String> datasetIds = new HashSet<>();
-        datasetIds.add(campaign.getDatasetId());
-        datasetIds.addAll(campaign.getScenarios().stream().map(CampaignDto.CampaignScenarioDto::datasetId).toList());
-        datasetIds.stream().filter(StringUtils::isNotBlank).forEach(datasetId -> {
-            try {
-                if (datasetService.findById(datasetId) == null) {
-                    throw new DataSetNotFoundException(campaign.getDatasetId());
-                }
-            } catch (Exception exception) {
-                throw new DataSetNotFoundException(campaign.getDatasetId());
-            }
-        });
+    private void validateDataset(CampaignDto campaign) {
+        Stream.concat(
+            Stream.of(campaign.getDatasetId()),
+            campaign.getScenarios().stream().map(CampaignDto.CampaignScenarioDto::datasetId)
+        )
+        .filter(StringUtils::isNotBlank)
+        .distinct()
+        .forEach(datasetService::findById);
     }
 }

@@ -22,6 +22,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.dataset.DataSetAlreadyExistException;
+import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
 import com.chutneytesting.tools.file.FileUtils;
 import java.io.File;
 import java.io.IOException;
@@ -53,6 +54,13 @@ public class FileDatasetRepositoryTest {
         sut.save(updatedDataset);
         DataSet toValid = sut.findById(id);
         assertThat(toValid.description).isEqualTo("new description");
+    }
+
+    @Test
+    void should_throw_exception_when_dataset_not_found() {
+      String datasetId = "UNKNOWED_DATASET";
+      assertThatThrownBy(() -> sut.findById(datasetId))
+          .isInstanceOf(DataSetNotFoundException.class);
     }
 
     @Test

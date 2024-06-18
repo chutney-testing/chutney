@@ -40,6 +40,7 @@ import com.chutneytesting.dataset.domain.DatasetService;
 import com.chutneytesting.scenario.api.raw.dto.ImmutableTestCaseIndexDto;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
+import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
@@ -379,6 +380,8 @@ public class CampaignControllerTest {
         CampaignDto campaignDto = new CampaignDto(null, "test", "desc",
             List.of(new CampaignScenarioDto("1")), emptyList(), "env", false, false, "UNKNOWN_DATASET", emptyList());
 
+        when(datasetService.findById("UNKNOWN_DATASET")).thenThrow(new DataSetNotFoundException("UNKNOWN_DATASET"));
+
         // Then
         execute(post(BASE_URL)
             .content(om.writeValueAsString(campaignDto))
@@ -391,6 +394,8 @@ public class CampaignControllerTest {
         // When
         CampaignDto campaignDto = new CampaignDto(null, "test", "desc",
             List.of(new CampaignScenarioDto("1", "UNKNOWN_DATASET")), emptyList(), "env", false, false, null, emptyList());;
+
+        when(datasetService.findById("UNKNOWN_DATASET")).thenThrow(new DataSetNotFoundException("UNKNOWN_DATASET"));
 
         // Then
         execute(post(BASE_URL)
