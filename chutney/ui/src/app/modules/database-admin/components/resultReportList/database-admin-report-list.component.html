@@ -122,7 +122,7 @@
               [ngbTooltip]="ExecutionStatus.toString(execution.status) | translate" placement="right"
             ></i>
           </td>
-          <td>
+          <td class="text-break">
             <ngb-highlight [result]="execution.error"
             [term]="filtersForm.get('keyword').value"></ngb-highlight>
           </td>

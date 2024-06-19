@@ -166,7 +166,7 @@
                   {{ scenarioReportOutline.scenarioName }}
                 </ng-container>
               </td>
-              <td class="align-middle">
+              <td class="align-middle text-break">
                 <span><small (click)="showMore[i]=!showMore[i]">{{ (!showMore[i] && scenarioReportOutline.error.length > 100) ? (scenarioReportOutline.error | slice:0:100) + " ..." : (scenarioReportOutline.error) }}</small></span>
               </td>
               <td class="text-center align-middle text-nowrap">

@@ -39,6 +39,11 @@ $base-color: var(--bs-primary) !important;
     }
 }
 
-
-
-
+ng-multiselect-dropdown .multiselect-dropdown .dropdown-btn .selected-item-container .selected-item {
+    display: flex;
+    span {
+        text-overflow: ellipsis;
+        display: block;
+        overflow: hidden;
+    }
+}
