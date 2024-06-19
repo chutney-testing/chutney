@@ -25,7 +25,7 @@
     }
 
     <div class="row row-cols-lg-auto g-3">
-      <div class="col-sm-7">
+      <div class="col-lg">
         <label for="title">{{ 'campaigns.edition.form.title.label' | translate }}</label>
         <input type="text" id="title" class="form-control" formControlName="title">
         @if (submitted && this.campaignForm.hasError('required', 'title')) {
@@ -34,8 +34,7 @@
           </div>
         }
       </div>
-
-      <div class="col-sm">
+      <div class="col-lg-4">
         <label for="description">{{ 'campaigns.edition.form.description' | translate }}</label>
         <input type="text" id="description" class="form-control" formControlName="description">
       </div>
@@ -99,7 +98,7 @@
       </div>
     </div>
     <div class="row justify-content-end">
-      <div class="col-6">
+      <div class="col-6 ps-0">
         <div class="row row-cols-12">
           <div class="col">
             <input name="search" type="text" class="form-control search-field mb-2 border" id="scenariosFilter"
@@ -133,7 +132,7 @@
             }
           </div>
         }
-        </div>  
+        </div>
       </div>
     </div>
     <div class="row">
@@ -177,8 +176,8 @@
                   </td>
                   <td class="pe-5">
                     @if (datasets.length > 0) {
-                      <ng-multiselect-dropdown 
-                                      [settings]="dropdownDatasetSettings" 
+                      <ng-multiselect-dropdown
+                                      [settings]="dropdownDatasetSettings"
                                       class="dataset-combo"
                                       [placeholder]="'campaigns.edition.selectDatasetScenario' | translate"
                                       [data]="datasets"
@@ -205,10 +204,21 @@
         <div class="row table-responsive">
           <table class="table table-striped table-hover">
             <thead>
-              <th colspan="5">
-                {{ 'campaigns.edition.scenarios.pick.title' | translate }}
+              <th colspan="6">
+                <span class="p-0">
+                    {{ 'campaigns.edition.scenarios.pick.title' | translate }}
+                </span>
+                @if (hasJiraId()) {
+                    <div class="jira-link float-end p-0 me-2">
+                        <label for="jiraLinkTests">
+                            <span class="fab fa-jira"></span>
+                            {{ 'campaigns.edition.jiraLinkedTest' | translate }}
+                        </label>
+                        <input type="checkbox" id="jiraLinkTests" class="ms-2"
+                        formControlName="onlyLinkedScenarios" (change)="jiraFilter()">
+                    </div>
+                }
               </th>
-              <th></th>
             </thead>
             <tbody>
               @for (scenario of scenarios |  scenarioCampaignSearch : selectedTags | searchTextPipe  : campaignForm.controls['scenariosFilter'].value : ['title', 'id'] | withoutScenario:scenariosToAdd | withoutScenario:jiraScenariosToExclude; track scenario.id) {
