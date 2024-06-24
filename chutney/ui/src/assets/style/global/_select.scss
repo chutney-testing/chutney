@@ -50,6 +50,6 @@ ng-multiselect-dropdown .multiselect-dropdown .dropdown-btn .selected-item-conta
 
 
 ng-multiselect-dropdown .multiselect-dropdown .dropdown-list {
-    display: fixed;
     width: auto;
+    min-width: 100%
 }
