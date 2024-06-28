@@ -39,6 +39,7 @@ import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReport;
 import com.chutneytesting.engine.domain.execution.strategies.StepStrategyDefinition;
 import com.chutneytesting.tools.Try;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.time.Duration;
@@ -356,6 +357,7 @@ public class Step {
         private final Map<String, Object> localContext;
         private final Map<String, Object> evaluatedInputs;
         private final Map<String, Object> stepOutputs;
+        private final ObjectMapper objectMapper = new ObjectMapper(); // TODO use object mapper used for the report
 
         private StepContext() {
             this(new ScenarioContextImpl(), new LinkedHashMap<>(), new LinkedHashMap<>());
@@ -415,7 +417,26 @@ public class Step {
         }
 
         private StepContext copy() {
-            return new StepContext(scenarioContext.unmodifiable(), unmodifiableMap(localContext), unmodifiableMap(evaluatedInputs), unmodifiableMap(stepOutputs));
+            ScenarioContext scenarioContextCopy = new ScenarioContextImpl();
+            deepCopyMapStringObject(evaluatedInputs, scenarioContext);
+
+            Map<String, Object> evaluatedInputsCopy = new HashMap<>();
+            deepCopyMapStringObject(evaluatedInputs, evaluatedInputsCopy);
+
+            Map<String, Object> stepOutputsCopy = new HashMap<>();
+            deepCopyMapStringObject(stepOutputs, stepOutputsCopy);
+
+            Map<String, Object> localContextCopy = new HashMap<>();
+            deepCopyMapStringObject(localContext, localContextCopy);
+
+            return new StepContext(scenarioContextCopy.unmodifiable(), unmodifiableMap(localContextCopy), unmodifiableMap(evaluatedInputsCopy), unmodifiableMap(stepOutputsCopy));
+
+          //return new StepContext(scenarioContextCopy.unmodifiable(), unmodifiableMap(localContextCopy), unmodifiableMap(evaluatedInputsCopy), unmodifiableMap(stepOutputsCopy));
+
+        }
+
+        private void deepCopyMapStringObject(Map<String, Object> original, Map<String, Object> copy) {
+            original.keySet().forEach(key -> copy.put(key, original.get(key) == null ? null : objectMapper.convertValue(original.get(key), original.get(key).getClass())));
         }
     }
 }
