@@ -254,6 +254,49 @@ public class PurgeServiceTest {
     }
 
     @Nested
+    @DisplayName("deletes empty campaign's execution")
+    class CleanEmptyCampaignExecution {
+        @Test
+        void empty_campaign_execution() {
+            // Given
+            // One campaign's execution without scenarios' executions
+            // And a configuration limit set to 0 for campaigns' executions
+            int maxCampaignExecutionsConfiguration = 0;
+            Long campaignId = 1L;
+
+            CampaignExecution campaignExecution1 = CampaignExecutionReportBuilder.builder()
+                .executionId(1L)
+                .campaignId(campaignId)
+                .environment("env")
+                .userId("user")
+                .build();
+
+            ExecutionHistoryRepository executionsRepository = mock(ExecutionHistoryRepository.class);
+
+            CampaignRepository campaignRepository = mock(CampaignRepository.class);
+            when(campaignRepository.findAll()).thenReturn(List.of(
+                CampaignBuilder.builder().setId(campaignId).build()
+            ));
+            CampaignExecutionRepository campaignExecutionRepository = mock(CampaignExecutionRepository.class);
+            when(campaignExecutionRepository.getExecutionHistory(campaignId)).thenReturn(List.of(
+                campaignExecution1
+            ));
+
+            // When
+            PurgeServiceImpl sut = new PurgeServiceImpl(mock(TestCaseRepository.class), executionsRepository, campaignRepository, campaignExecutionRepository, 100, maxCampaignExecutionsConfiguration);
+            PurgeReport report = sut.purge();
+
+            // Then
+            // The campaign's execution is deleted
+            verify(executionsRepository, times(0)).deleteExecutions(anySet());
+            verify(campaignExecutionRepository).deleteExecutions(anySet());
+            verify(campaignExecutionRepository).deleteExecutions(Set.of(1L));
+            assertThat(report.scenariosExecutionsIds()).isEmpty();
+            assertThat(report.campaignsExecutionsIds()).containsExactly(1L);
+        }
+    }
+
+    @Nested
     @DisplayName("deletes campaigns' executions according to configuration")
     class CleanCampaignsExecutionsWithoutManualScenarioExecution {
         @Nested

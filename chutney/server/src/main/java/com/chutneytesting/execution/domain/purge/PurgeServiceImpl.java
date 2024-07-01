@@ -49,6 +49,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -145,33 +146,46 @@ public class PurgeServiceImpl implements PurgeService {
             cer -> cer.executionEnvironment,
             campaignExecutionRepository::deleteExecutions
         ) {
+            // Not thread safe
             private Map<Boolean, List<CampaignExecution>> campaignExecutionsByPartialExecution;
+            private List<CampaignExecution> emptyCampaignExecutions;
 
             /**
-             * Transform executions to filter only those that are not manual replays.
+             * Transform executions to filter only those that are not manual replays and not empty.
              */
             @Override
             public List<CampaignExecution> handleExecutionsForOneEnvironment(List<CampaignExecution> executionsFromOneEnvironment) {
-                campaignExecutionsByPartialExecution = executionsFromOneEnvironment.stream()
+                Map<Boolean, List<CampaignExecution>> campaignExecutionsByEmpty = executionsFromOneEnvironment.stream()
+                    .collect(groupingBy(cer -> cer.scenarioExecutionReports().isEmpty()));
+                emptyCampaignExecutions = ofNullable(campaignExecutionsByEmpty.get(true)).orElse(emptyList());
+
+                campaignExecutionsByPartialExecution = ofNullable(campaignExecutionsByEmpty.get(false)).orElse(emptyList()).stream()
                     .collect(groupingBy(cer -> cer.partialExecution));
-                return campaignExecutionsByPartialExecution.get(false);
+                return ofNullable(campaignExecutionsByPartialExecution.get(false)).orElse(emptyList());
             }
 
             /**
-             * Select all manual replays (for deletion) that are older than the oldest campaign execution kept.
+             * Select all manual replays (for deletion) that are older than the oldest campaign execution kept and empty executions.
              */
             @Override
             public Collection<Long> findExtraExecutionsIdsToDelete(List<CampaignExecution> timeSortedExecutionsForOneEnvironment) {
+                return Stream.concat(
+                    manualReplaysOlderThanOldestCampaignExecution(timeSortedExecutionsForOneEnvironment),
+                    emptyCampaignExecutions.stream().map(ce -> ce.executionId)
+                ).toList();
+            }
+
+            private Stream<Long> manualReplaysOlderThanOldestCampaignExecution(List<CampaignExecution> timeSortedExecutionsForOneEnvironment) {
                 LocalDateTime oldestCampaignExecutionToKeptStartDate;
                 if (!timeSortedExecutionsForOneEnvironment.isEmpty() && maxCampaignExecutions > 0) {
                     oldestCampaignExecutionToKeptStartDate = timeSortedExecutionsForOneEnvironment.get(maxCampaignExecutions - 1).startDate;
                 } else {
                     oldestCampaignExecutionToKeptStartDate = LocalDateTime.MAX;
                 }
+
                 return ofNullable(campaignExecutionsByPartialExecution.get(true)).orElse(emptyList()).stream()
                     .filter(cer -> cer.startDate.isBefore(oldestCampaignExecutionToKeptStartDate))
-                    .map(cer -> cer.executionId)
-                    .toList();
+                    .map(cer -> cer.executionId);
             }
         };
     }
@@ -310,10 +324,6 @@ public class PurgeServiceImpl implements PurgeService {
          * @return The list of deleted executions ids.
          */
         private Set<Long> purgeOldestExecutionsFromOneEnvironment(List<Execution> executionsFromOneEnvironment) {
-            if (executionsFromOneEnvironment.size() <= maxExecutionsToKeep) {
-                return emptySet();
-            }
-
             List<Execution> timeSortedExecutionsForOneEnvironment = executionsFromOneEnvironment.stream()
                 .sorted(comparing(executionDateFunction).reversed())
                 .toList();
