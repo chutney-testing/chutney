@@ -1,10 +1,9 @@
-import { Component, inject, Input, OnInit } from "@angular/core";
+import { Component, inject, OnInit } from "@angular/core";
 import { Dataset } from "@core/model";
 import { DataSetService, EnvironmentService } from "@core/services";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { TranslateService } from "@ngx-translate/core";
 import { EventManagerService } from "@shared";
-
 
 
 @Component({
@@ -18,9 +17,13 @@ export class ScenarioExecuteModalComponent implements OnInit {
 
     environments: string[];
     datasets: Array<Dataset>;
+    filteredDatasets: Array<Dataset>;
 
-    selectDatasetId: string = null;
     selectedEnv: string = null;
+    selectedDataset: Dataset = null;
+    datasetDetails: Dataset = null;
+
+    isCollapsed = true;
 
     errorMessage = "";
 
@@ -35,6 +38,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
     ngOnInit(): void {
         this.datasetService.findAll().subscribe((res: Array<Dataset>) => {
             this.datasets = res;
+            this.filteredDatasets = res;
         });
         this.environmentService.names().subscribe((res: string[]) => {
             this.environments = res;
@@ -46,7 +50,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
 
     execute() {
         if (this.selectedEnv) {
-            this.eventManagerService.broadcast({ name: 'execute', env: this.selectedEnv, dataset: this.selectDatasetId });
+            this.eventManagerService.broadcast({ name: 'execute', env: this.selectedEnv, dataset: this.selectedDataset?.id });
             this.activeModal.close();
         } else {
             this.translateService.get('scenarios.execution.errors.environment').subscribe((res: string) => {
@@ -55,12 +59,24 @@ export class ScenarioExecuteModalComponent implements OnInit {
         }
     }
 
-    selectDataset(event: any) {
-        this.selectDatasetId = event.target.value;
+    datasetFilter(event: any) {
+        const query = event.target.value.toLowerCase();
+        this.filteredDatasets = this.datasets.filter(dataset => dataset.name.toLowerCase().includes(query) || dataset.tags.join(";").toLowerCase().includes(query));
     }
 
-    selectEnvironment(event: any) {
-        this.selectedEnv = event.target.value;
+    getDatasetDetails() {
+        if (this.selectedDataset) {
+            this.datasetService.findById(this.selectedDataset?.id).subscribe((res: Dataset) => {
+                this.datasetDetails = res;
+            });
+        } else {
+            this.datasetDetails = null;
+            this.isCollapsed = true;
+        }
     }
 
+    showHideDataset(event: any) {
+        event.stopPropagation();
+        this.isCollapsed = !this.isCollapsed;
+    }
 }
