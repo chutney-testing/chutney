@@ -162,9 +162,14 @@ public class PurgeServiceImpl implements PurgeService {
              */
             @Override
             public Collection<Long> findExtraExecutionsIdsToDelete(List<CampaignExecution> timeSortedExecutionsForOneEnvironment) {
-                var oldestCampaignExecutionToKept = timeSortedExecutionsForOneEnvironment.get(maxCampaignExecutions - 1);
+                LocalDateTime oldestCampaignExecutionToKeptStartDate;
+                if (!timeSortedExecutionsForOneEnvironment.isEmpty() && maxCampaignExecutions > 0) {
+                    oldestCampaignExecutionToKeptStartDate = timeSortedExecutionsForOneEnvironment.get(maxCampaignExecutions - 1).startDate;
+                } else {
+                    oldestCampaignExecutionToKeptStartDate = LocalDateTime.MAX;
+                }
                 return ofNullable(campaignExecutionsByPartialExecution.get(true)).orElse(emptyList()).stream()
-                    .filter(cer -> cer.startDate.isBefore(oldestCampaignExecutionToKept.startDate))
+                    .filter(cer -> cer.startDate.isBefore(oldestCampaignExecutionToKeptStartDate))
                     .map(cer -> cer.executionId)
                     .toList();
             }
