@@ -19,6 +19,7 @@ package com.chutneytesting.campaign.infra.jpa;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
+import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
@@ -29,6 +30,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Version;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -113,15 +115,21 @@ public class CampaignExecutionEntity {
             .map(se -> new ScenarioExecutionCampaign(se.scenarioId(), se.scenarioTitle(), se.toDomain()))
             .collect(Collectors.toCollection(ArrayList::new));
 
-        return CampaignExecutionReportBuilder.builder()
+        CampaignExecutionReportBuilder campaignExecutionReportBuilder = CampaignExecutionReportBuilder.builder()
             .executionId(id)
             .campaignId(campaignId)
             .campaignName(campaignTitle)
             .partialExecution(ofNullable(partial).orElse(false))
             .environment(environment)
             .dataSetId(datasetId)
-            .userId(userId)
-            .scenarioExecutionReport(scenarioExecutionReports)
-            .build();
+            .userId(userId);
+
+        if (scenarioExecutionReports.isEmpty()) {
+            campaignExecutionReportBuilder.status(ServerReportStatus.SUCCESS).startDate(LocalDateTime.MIN);
+        } else {
+            campaignExecutionReportBuilder.scenarioExecutionReport(scenarioExecutionReports);
+        }
+
+        return campaignExecutionReportBuilder.build();
     }
 }
