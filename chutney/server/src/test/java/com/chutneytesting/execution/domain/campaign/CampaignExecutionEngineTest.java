@@ -291,6 +291,20 @@ public class CampaignExecutionEngineTest {
     }
 
     @Test
+    public void should_throw_when_replay_is_empty() {
+        when(campaignExecutionRepository.getCampaignExecutionById(1L)).thenReturn(
+            CampaignExecutionReportBuilder.builder()
+                .addScenarioExecutionReport(
+                    new ScenarioExecutionCampaign("1", "", executionWithId("1", 1L).summary())
+                )
+                .build()
+        );
+
+        assertThatThrownBy(() -> sut.replayCampaignExecution(1L, ""))
+            .isInstanceOf(CampaignEmptyExecutionException.class);
+    }
+
+    @Test
     public void should_execute_campaign_in_parallel_on_two_different_envs() {
         String otherEnv = "otherEnv";
         Campaign campaign = createCampaign(firstTestCase, secondTestCase);

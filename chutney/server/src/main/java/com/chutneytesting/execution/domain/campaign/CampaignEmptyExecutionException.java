@@ -18,9 +18,14 @@
 package com.chutneytesting.execution.domain.campaign;
 
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 
 public class CampaignEmptyExecutionException extends RuntimeException {
     public CampaignEmptyExecutionException(Campaign campaign) {
         super(String.format("Campaign [%s] has no associated scenarios to execute", campaign.title));
+    }
+
+    public CampaignEmptyExecutionException(CampaignExecution campaignExecution) {
+        super(String.format("Campaign [%s] execution [%d] has no failed scenarios' executions to execute", campaignExecution.campaignName, campaignExecution.executionId));
     }
 }

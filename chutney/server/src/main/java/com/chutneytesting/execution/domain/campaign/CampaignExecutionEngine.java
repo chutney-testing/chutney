@@ -146,9 +146,13 @@ public class CampaignExecutionEngine {
 
     public CampaignExecution replayCampaignExecution(Long campaignExecutionId, String userId) {
         CampaignExecution campaignExecution = campaignExecutionRepository.getCampaignExecutionById(campaignExecutionId).withoutRetries();
+        List<ScenarioExecutionCampaign> failedExecutions = campaignExecution.failedScenarioExecutions();
+        if (failedExecutions.isEmpty()) {
+            throw new CampaignEmptyExecutionException(campaignExecution);
+        }
         Campaign campaign = campaignRepository.findById(campaignExecution.campaignId);
         campaign.executionEnvironment(campaignExecution.executionEnvironment);
-        return executeScenarioInCampaign(campaignExecution.failedScenarioExecutions(), campaign, userId);
+        return executeScenarioInCampaign(failedExecutions, campaign, userId);
     }
 
     CampaignExecution executeScenarioInCampaign(Campaign campaign, String userId) {
