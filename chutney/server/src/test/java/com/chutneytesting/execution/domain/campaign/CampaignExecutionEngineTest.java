@@ -267,11 +267,10 @@ public class CampaignExecutionEngineTest {
 
     @Test
     public void should_throw_when_campaign_already_running_on_the_same_env() {
-        String env = "env";
-        Campaign campaign = createCampaign(1L, env);
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
 
         CampaignExecution mockReport = CampaignExecutionReportBuilder.builder()
-            .environment(env)
+            .environment(campaign.executionEnvironment())
             .userId("")
             .status(ServerReportStatus.RUNNING)
             .build();
@@ -283,10 +282,18 @@ public class CampaignExecutionEngineTest {
     }
 
     @Test
+    public void should_throw_when_campaign_is_empty() {
+        Campaign campaign = createCampaign();
+
+        // When
+        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user"))
+            .isInstanceOf(CampaignEmptyExecutionException.class);
+    }
+
+    @Test
     public void should_execute_campaign_in_parallel_on_two_different_envs() {
-        String env = "env";
         String otherEnv = "otherEnv";
-        Campaign campaign = createCampaign(1L, env);
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
 
         CampaignExecution mockReport = CampaignExecutionReportBuilder.builder()
             .environment(otherEnv)
@@ -301,7 +308,7 @@ public class CampaignExecutionEngineTest {
     @Test
     public void should_generate_campaign_execution_id_when_executed() {
         // Given
-        Campaign campaign = createCampaign();
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
 
         when(campaignRepository.findByName(campaign.title)).thenReturn(singletonList(campaign));
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
@@ -314,7 +321,7 @@ public class CampaignExecutionEngineTest {
         verify(campaignRepository).findById(campaign.id);
         verify(campaignRepository).findByName(campaign.title);
 
-        verify(campaignExecutionRepository, times(2)).generateCampaignExecutionId(campaign.id, "campaignEnv");
+        verify(campaignExecutionRepository, times(2)).generateCampaignExecutionId(campaign.id, campaign.executionEnvironment());
     }
 
 
@@ -359,7 +366,7 @@ public class CampaignExecutionEngineTest {
     @Test
     public void should_execute_campaign_with_given_environment_when_executed_by_id() {
         // Given
-        Campaign campaign = createCampaign();
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
 
         // When
@@ -375,7 +382,7 @@ public class CampaignExecutionEngineTest {
     @Test
     public void should_execute_campaign_with_given_environment_when_executed_by_name() {
         // Given
-        Campaign campaign = createCampaign();
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
         when(campaignRepository.findByName(anyString())).thenReturn(singletonList(campaign));
 
         // When

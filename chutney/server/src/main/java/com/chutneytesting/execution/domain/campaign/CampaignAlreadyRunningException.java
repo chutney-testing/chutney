@@ -19,10 +19,9 @@ package com.chutneytesting.execution.domain.campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.time.format.DateTimeFormatter;
 
-@SuppressWarnings("serial")
 public class CampaignAlreadyRunningException extends RuntimeException {
 
-    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("YYYYMMdd HH:mm:ss");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern("yyyyMMdd HH:mm:ss");
 
     public CampaignAlreadyRunningException(CampaignExecution currentReport) {
         super(String.format("Campaign [%s] is already running on [%s] since [%s]",

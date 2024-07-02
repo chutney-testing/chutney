@@ -156,6 +156,7 @@ public class CampaignExecutionEngine {
     }
 
     CampaignExecution executeScenarioInCampaign(List<ScenarioExecutionCampaign> failedExecutions, Campaign campaign, String userId) {
+        verifyNotEmpty(campaign);
         verifyNotAlreadyRunning(campaign);
         Long executionId = campaignExecutionRepository.generateCampaignExecutionId(campaign.id, campaign.executionEnvironment());
 
@@ -313,6 +314,12 @@ public class CampaignExecutionEngine {
         Optional<CampaignExecution> currentReport = currentExecution(campaign.id, campaign.executionEnvironment());
         if (currentReport.isPresent() && !currentReport.get().status().isFinal()) {
             throw new CampaignAlreadyRunningException(currentReport.get());
+        }
+    }
+
+    private void verifyNotEmpty(Campaign campaign) {
+        if (campaign.scenarios.isEmpty()) {
+            throw new CampaignEmptyExecutionException(campaign);
         }
     }
 

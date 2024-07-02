@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { combineLatest, Observable, of, tap, identity, timer } from 'rxjs';
@@ -27,11 +27,10 @@ import { FileSaverService } from 'ngx-filesaver';
 import * as JSZip from 'jszip';
 
 import { CampaignService, EnvironmentService, JiraPluginService, LoginService, ScenarioService } from '@core/services';
-import { Authorization, ScenarioIndex, TestCase } from '@model';
+import { Authorization, Campaign, ScenarioIndex, TestCase } from '@model';
 import { EventManagerService } from '@shared';
 import { MenuItem } from '@shared/components/layout/menuItem';
 import { HttpErrorResponse } from '@angular/common/http';
-import { TranslateService } from '@ngx-translate/core';
 
 @Component({
     selector: 'chutney-campaign-execution-menu',
@@ -40,13 +39,11 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class CampaignExecutionMenuComponent implements OnInit {
 
-    campaignId: number;
+    @Input() campaign: Campaign;
     rightMenuItems: MenuItem[] = [];
 
     private environments: Array<string> = [];
     private modalRef: BsModalRef;
-
-    private campaignWithComponentError: string;
 
     @ViewChild('delete_modal') deleteModal: TemplateRef<any>;
 
@@ -60,25 +57,15 @@ export class CampaignExecutionMenuComponent implements OnInit {
         private jiraLinkService: JiraPluginService,
         private loginService: LoginService,
         private modalService: BsModalService,
-        private translateService: TranslateService,
         private eventManagerService: EventManagerService) {
     }
 
     ngOnInit(): void {
-        this.initTranslation();
-
         this.route.params.pipe(
-            tap(params => this.campaignId = params['id']),
             switchMap(() => this.environments$())
         ).subscribe(environments => {
             this.environments = environments;
             this.initRightMenu();
-        });
-    }
-
-    private initTranslation() {
-      this.translateService.get('campaigns.export.component.error').subscribe((res: string) => {
-          this.campaignWithComponentError = res;
         });
     }
 
@@ -90,23 +77,27 @@ export class CampaignExecutionMenuComponent implements OnInit {
     }
 
     private executeCampaign(envName: string) {
-        this.broadcastCatchError(this.campaignService.executeCampaign(this.campaignId, envName)).subscribe();
-        timer(1000).pipe(
-            switchMap(() => of(this.eventManagerService.broadcast({ name: 'execute', env: envName })))
-        ).subscribe();
+        if (this.campaign.scenarios.length == 0) {
+            this.broadcastError('');
+        } else {
+            this.broadcastCatchError(this.campaignService.executeCampaign(this.campaign.id, envName)).subscribe();
+            timer(1000).pipe(
+                switchMap(() => of(this.eventManagerService.broadcast({ name: 'execute', env: envName })))
+            ).subscribe();
+        }
     }
 
     private deleteCampaign() {
         combineLatest([
-            this.broadcastCatchError(this.campaignService.delete(this.campaignId)),
-            this.broadcastCatchError(this.jiraLinkService.removeForCampaign(this.campaignId))
+            this.broadcastCatchError(this.campaignService.delete(this.campaign.id)),
+            this.broadcastCatchError(this.jiraLinkService.removeForCampaign(this.campaign.id))
         ]).subscribe(() => this.router.navigateByUrl('/campaign'));
     }
 
     private exportCampaign() {
         combineLatest([
-            this.broadcastCatchError(this.campaignService.find(this.campaignId)),
-            this.broadcastCatchError(this.campaignService.findAllScenarios(this.campaignId))
+            this.broadcastCatchError(this.campaignService.find(this.campaign.id)),
+            this.broadcastCatchError(this.campaignService.findAllScenarios(this.campaign.id))
         ]).subscribe(([campaign, scenarios]) => this.createZip(campaign.title, scenarios));
     }
 
@@ -143,19 +134,21 @@ export class CampaignExecutionMenuComponent implements OnInit {
     }
 
     private initRightMenu() {
+        const emptyCampaign = this.emptyCampaign();
         this.rightMenuItems = [
             {
-                label: 'global.actions.execute',
+                label: emptyCampaign ? 'campaigns.execution.error.empty' : 'global.actions.execute',
                 click: this.executeCampaign.bind(this),
                 iconClass: 'fa fa-play',
                 authorizations: [Authorization.CAMPAIGN_EXECUTE],
                 options: this.environments.map(env => {
                     return { id: env, label: env };
-                })
+                }),
+                disabled: emptyCampaign
             },
             {
                 label: 'global.actions.edit',
-                link: `/campaign/${this.campaignId}/edition`,
+                link: `/campaign/${this.campaign.id}/edition`,
                 iconClass: 'fa fa-pencil-alt',
                 authorizations: [Authorization.CAMPAIGN_WRITE]
             },
@@ -185,5 +178,9 @@ export class CampaignExecutionMenuComponent implements OnInit {
                 throw err;
             })
         );
+    }
+
+    private emptyCampaign(): boolean {
+        return this.campaign.scenarios.length == 0;
     }
 }

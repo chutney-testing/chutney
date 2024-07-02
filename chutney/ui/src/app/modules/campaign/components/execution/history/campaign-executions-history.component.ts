@@ -125,9 +125,12 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
     }
 
     private refreshCampaign() {
-        this.campaign$().subscribe(c => {
-            this.openReport({ execution: this.campaignReports[0], focus: true });
-        });
+        console.log('this.campaign.scenarios.length : '+this.campaign.scenarios.length);
+        if (this.campaign.scenarios.length > 0) {
+            this.campaign$().subscribe(c => {
+                this.openReport({ execution: this.campaignReports[0], focus: true });
+            });
+        }
     }
 
     private onMenuError(menuErrorEvent: any) {

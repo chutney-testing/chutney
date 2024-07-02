@@ -1,14 +1,14 @@
-<chutney-campaign-execution-menu></chutney-campaign-execution-menu>
-@if (errors.length > 0) {
-  <div class="alert alert-dismissible alert-danger mt-4">
-    <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errors = []"></button>
-    @for (err of errors; track $index) {
-      {{ err }}<br />
-    }
-  </div>
-}
-
 @if (campaign) {
+    <chutney-campaign-execution-menu [campaign]="campaign"></chutney-campaign-execution-menu>
+    @if (errors.length > 0) {
+        <div class="alert alert-dismissible alert-danger mt-4">
+            <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errors = []"></button>
+            @for (err of errors; track $index) {
+            {{ err }}<br />
+            }
+        </div>
+    }
+
   <div>
     <h5>{{ campaign.title }}</h5>
     <h6>{{ campaign.description }}</h6>
