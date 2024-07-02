@@ -112,7 +112,7 @@
 
         <!-- test dependencies versions -->
         <jqwik.version>1.8.5</jqwik.version>
-        <wiremock.version>3.6.0</wiremock.version>
+        <wiremock.version>3.8.0</wiremock.version>
         <testcontainers.version>1.19.8</testcontainers.version>
     </properties>
 
