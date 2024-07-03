@@ -26,6 +26,5 @@ public class SeleniumModule extends SimpleModule {
     public SeleniumModule() {
         super(NAME);
         addSerializer(WebDriver.class, new WebDriverSerializer());
-        addDeserializer(WebDriver.class, new WebDriverDeserializer());
     }
 }

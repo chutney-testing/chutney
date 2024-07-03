@@ -40,10 +40,10 @@ public class StepExecutionReport implements Status.HavingStatus {
     public final String targetName;
     public final String targetUrl;
     public final String strategy;
-    public final Map<String, Object> evaluatedInputs;
+    public final Map<String, String> evaluatedInputs;
 
     @JsonIgnore
-    public Map<String, Object> stepResults;
+    public Map<String, String> stepResults;
     @JsonIgnore
     public Map<String, Object> scenarioContext;
 
@@ -78,8 +78,8 @@ public class StepExecutionReport implements Status.HavingStatus {
                                String targetName,
                                String targetUrl,
                                String strategy,
-                               Map<String, Object> evaluatedInputs,
-                               Map<String, Object> stepResults,
+                               Map<String, String> evaluatedInputs,
+                               Map<String, String> stepResults,
                                Map<String, Object> scenarioContext
     ) {
         this.executionId = executionId;

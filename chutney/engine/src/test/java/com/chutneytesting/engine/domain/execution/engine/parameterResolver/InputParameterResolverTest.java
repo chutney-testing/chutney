@@ -44,7 +44,7 @@ public class InputParameterResolverTest {
     @Test
     public void could_resolve_parameter_annotated_with_Input_api_annotation() {
         java.lang.reflect.Parameter[] actionParameters = CanResolveAction.class.getDeclaredConstructors()[0].getParameters();
-        InputParameterResolver sut = new InputParameterResolver(emptyMap());
+        InputParameterResolver sut = new InputParameterResolver(new HashMap<>());
 
         Parameter annotatedParameter = Parameter.fromJavaParameter(actionParameters[0]);
         assertThat(sut.canResolve(annotatedParameter)).isTrue();
@@ -62,7 +62,7 @@ public class InputParameterResolverTest {
     public void could_not_resolve_nameless_annotated_parameter() {
         java.lang.reflect.Parameter[] actionParameters = NoNameInputAction.class.getDeclaredConstructors()[0].getParameters();
         Parameter namelessParameter = Parameter.fromJavaParameter(actionParameters[0]);
-        InputParameterResolver sut = new InputParameterResolver(emptyMap());
+        InputParameterResolver sut = new InputParameterResolver(new HashMap<>());
 
         assertThatThrownBy(() -> sut.resolve(namelessParameter))
             .isExactlyInstanceOf(InputNameMandatoryException.class);

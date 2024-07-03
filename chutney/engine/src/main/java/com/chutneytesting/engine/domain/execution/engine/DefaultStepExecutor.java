@@ -36,6 +36,7 @@ import com.chutneytesting.engine.domain.execution.engine.parameterResolver.Typed
 import com.chutneytesting.engine.domain.execution.engine.step.Step;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import org.slf4j.LoggerFactory;
 
@@ -50,13 +51,13 @@ public class DefaultStepExecutor implements StepExecutor {
     }
 
     @Override
-    public void execute(ScenarioExecution scenarioExecution, Target targetServer, Step step) {
+    public void execute(ScenarioExecution scenarioExecution, Target targetServer, Map<String, Object> evaluateInput, Step step) {
         String type = step.type();
 
         Optional<ActionTemplate> matchedAction = actionTemplateRegistry.getByIdentifier(type);
 
         if (matchedAction.isPresent()) {
-            List<ParameterResolver> parameterResolvers = gatherResolvers(scenarioExecution, targetServer, step);
+            List<ParameterResolver> parameterResolvers = gatherResolvers(scenarioExecution, targetServer, evaluateInput, step);
 
             ActionExecutionResult executionResult;
             try {
@@ -80,9 +81,9 @@ public class DefaultStepExecutor implements StepExecutor {
 
     }
 
-    private List<ParameterResolver> gatherResolvers(ScenarioExecution scenarioExecution, Target target, Step step) {
+    private List<ParameterResolver> gatherResolvers(ScenarioExecution scenarioExecution, Target target, Map<String, Object> evaluateInput, Step step) {
         List<ParameterResolver> parameterResolvers = new ArrayList<>();
-        parameterResolvers.add(new InputParameterResolver(step.getEvaluatedInputs()));
+        parameterResolvers.add(new InputParameterResolver(evaluateInput));
         parameterResolvers.add(new TypedValueParameterResolver<>(Target.class, target));
         parameterResolvers.add(new TypedValueParameterResolver<>(Logger.class, new DelegateLogger(step::addInformation, step::failure)));
         parameterResolvers.add(new TypedValueParameterResolver<>(StepDefinitionSpi.class, step.definition()));

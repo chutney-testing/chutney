@@ -24,6 +24,7 @@ import com.chutneytesting.glacio.GlacioAdapterConfiguration;
 import com.chutneytesting.junit.api.Chutney;
 import com.chutneytesting.junit.api.EnvironmentService;
 import com.chutneytesting.tools.UncheckedException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.Constructor;
 import java.util.List;
 import java.util.Optional;
@@ -43,6 +44,7 @@ public class ChutneyTestEngine extends HierarchicalTestEngine<ChutneyEngineExecu
     public static final String CHUTNEY_JUNIT_ENGINE_ID = "chutney-junit-engine";
     private static final Logger LOGGER = LoggerFactory.getLogger(ChutneyTestEngine.class);
     private static final String CHUTNEY_JUNIT_ENV_PATH = ".chutney/junit/conf";
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Override
     public String getId() {
@@ -63,7 +65,7 @@ public class ChutneyTestEngine extends HierarchicalTestEngine<ChutneyEngineExecu
     public TestDescriptor discover(EngineDiscoveryRequest engineDiscoveryRequest, UniqueId uniqueId) {
         try {
             ConfigurationParameters cp = new SystemEnvConfigurationParameters(engineDiscoveryRequest.getConfigurationParameters());
-            GlacioAdapterConfiguration glacioAdapterConfiguration = new GlacioAdapterConfiguration(getEnvironmentDirectoryPath(cp));
+            GlacioAdapterConfiguration glacioAdapterConfiguration = new GlacioAdapterConfiguration(getEnvironmentDirectoryPath(cp), objectMapper);
             ChutneyEngineDescriptor engineDescriptor = new ChutneyEngineDescriptor(uniqueId, "Chutney", findChutneyClass(getEnvironmentDirectoryPath(cp)));
             new DiscoverySelectorResolver(glacioAdapterConfiguration.glacioAdapter(), getEnvironmentName(cp)).resolveSelectors(engineDiscoveryRequest, engineDescriptor);
             return engineDescriptor;
@@ -77,7 +79,7 @@ public class ChutneyTestEngine extends HierarchicalTestEngine<ChutneyEngineExecu
     protected ChutneyEngineExecutionContext createExecutionContext(ExecutionRequest executionRequest) {
         try {
             ConfigurationParameters cp = new SystemEnvConfigurationParameters(executionRequest.getConfigurationParameters());
-            GlacioAdapterConfiguration glacioAdapterConfiguration = new GlacioAdapterConfiguration(getEnvironmentDirectoryPath(cp));
+            GlacioAdapterConfiguration glacioAdapterConfiguration = new GlacioAdapterConfiguration(getEnvironmentDirectoryPath(cp), objectMapper);
             return new ChutneyEngineExecutionContext(glacioAdapterConfiguration.executionConfiguration(), getEnvironment(cp));
         } catch (Exception e) {
             LOGGER.error("{} create execution context error", getId(), e);

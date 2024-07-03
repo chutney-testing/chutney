@@ -26,19 +26,23 @@ import com.chutneytesting.engine.api.execution.ExecutionRequestDto;
 import com.chutneytesting.engine.api.execution.StepExecutionReportDto;
 import com.chutneytesting.engine.api.execution.TestEngine;
 import com.chutneytesting.tools.Jsons;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 class ForEachStrategyTest {
 
+    private final static String zoneDateTimeRegexPattern = "\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}(\\.\\d+)?(Z|[+-]\\d{2}:\\d{2}|\\[.*])";
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+
     @Test
     public void should_fail_if_no_dataset_with_iteration_strategy() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/error_without_dataset_iterations.json", ExecutionRequestDto.class);
 
         // W
@@ -51,7 +55,7 @@ class ForEachStrategyTest {
     @Test
     public void should_resolve_name_from_context_with_iteration_strategy() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/iteration_strategy_step_with_name_resolver_from_context_put.json", ExecutionRequestDto.class);
 
         // W
@@ -69,7 +73,7 @@ class ForEachStrategyTest {
     @Test
     public void should_resolve_name_with_idx_in_child_from_dataset_of_parent_of_parent() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/iteration_strategy_using_idx_in_sub_sub_step.json", ExecutionRequestDto.class);
 
         // W
@@ -91,7 +95,7 @@ class ForEachStrategyTest {
     @Test
     public void should_resolve_name_in_child_with_value_from_dataset_of_parent_of_parent() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/iteration_strategy_using_value_in_sub_sub_sub_step.json", ExecutionRequestDto.class);
 
         // W
@@ -120,7 +124,7 @@ class ForEachStrategyTest {
     @Test
     public void should_resolve_a_part_of_the_name_of_the_parent_iteration_from_context_put_but_keep_the_var_from_dataset_unevaluated() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/iteration_strategy_with_variable_in_name_from_context_put_and_datset.json", ExecutionRequestDto.class);
 
         // W
@@ -138,7 +142,7 @@ class ForEachStrategyTest {
     @Test
     public void should_resolve_a_part_of_the_name_of_the_child_iteration_from_context_put_but_keep_the_var_from_dataset_unevaluated() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/final_step_iteration_strategy_with_variable_in_name_from_context_put_and_datset.json", ExecutionRequestDto.class);
 
         // W
@@ -156,7 +160,7 @@ class ForEachStrategyTest {
     @Test
     public void should_repeat_step_with_iteration_strategy() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/simple_step_iterations.json", ExecutionRequestDto.class);
 
         // W
@@ -170,7 +174,7 @@ class ForEachStrategyTest {
     @Test
     public void should_iterate_once_over_dataset_constant_if_datatable_is_empty() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/simple_step_iterations_over_constants.json", ExecutionRequestDto.class);
 
         // W
@@ -184,7 +188,7 @@ class ForEachStrategyTest {
     @Test
     public void should_evaluate_dataset_before_iterations() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/step_iteration_evaluated_dataset.json", ExecutionRequestDto.class);
 
         // W
@@ -211,7 +215,7 @@ class ForEachStrategyTest {
     @Test
     public void should_preserve_input_types() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/step_iteration_preserve_input_types.json", ExecutionRequestDto.class);
 
         // W
@@ -221,20 +225,27 @@ class ForEachStrategyTest {
         StepExecutionReportDto iterationWithMap = result.steps.get(0);
         assertThat(iterationWithMap.steps).hasSize(2);
         assertThat(iterationWithMap.status).isEqualTo(SUCCESS);
-        assertThat(((HashMap<?, ?>) iterationWithMap.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).values())
-            .hasExactlyElementsOfTypes(ZonedDateTime.class);
+        String resultInput = iterationWithMap.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0);
+        resultInput = resultInput.replace("{\"time_minus_0\":", "").split("\\.")[0];
+        ZonedDateTime dateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(Long.parseLong(resultInput)), ZoneId.of("Europe/Paris"));
+        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("Europe/Paris"));
+        assertThat(dateTime).isAfter(now.minusHours(1L));
+        assertThat(dateTime).isBefore(now);
 
         StepExecutionReportDto iterationWithList = result.steps.get(1);
         assertThat(iterationWithList.steps).hasSize(2);
         assertThat(iterationWithList.status).isEqualTo(SUCCESS);
-        assertThat(((ArrayList<?>) iterationWithList.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).get(0))
-            .isOfAnyClassIn(ZonedDateTime.class);
+        resultInput = iterationWithList.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0);
+        resultInput = resultInput.replace("[", "").split("\\.")[0];
+        dateTime = ZonedDateTime.ofInstant(Instant.ofEpochSecond(Long.parseLong(resultInput)), ZoneId.of("Europe/Paris"));
+        assertThat(dateTime).isAfter(now.minusHours(1L));
+        assertThat(dateTime).isBefore(now);
     }
 
     @Test
     public void should_fail_at_end_by_default() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/simple_step_iterations_fail_at_end.json", ExecutionRequestDto.class);
 
         // W
@@ -254,7 +265,7 @@ class ForEachStrategyTest {
     @Test
     public void should_repeat_step_with_iteration_strategy_and_data_from_context() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/step_iterations_using_data_from_context.json", ExecutionRequestDto.class);
 
         // W
@@ -268,7 +279,7 @@ class ForEachStrategyTest {
     @Test
     public void should_iterate_within_parent_step_and_keep_substep_own_strategy() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/step_iterations_with_parent_and_substeps.json", ExecutionRequestDto.class);
 
         // W
@@ -289,7 +300,7 @@ class ForEachStrategyTest {
     @Test
     public void should_accept_nested_loops_and_override_dataset() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/step_nested_iterations_with_overridden_dataset.json", ExecutionRequestDto.class);
 
         // W
@@ -322,7 +333,7 @@ class ForEachStrategyTest {
     @Test
     public void should_accept_nested_loops_with_different_dataset() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/step_nested_iterations_with_different_dataset.json", ExecutionRequestDto.class);
 
         // W
@@ -346,7 +357,7 @@ class ForEachStrategyTest {
     @Test
     public void should_accept_double_nested_loops_with_different_dataset() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/forEachStrategy/step_double_nested_iterations_with_different_dataset.json", ExecutionRequestDto.class);
 
         // W

@@ -42,6 +42,7 @@ import com.chutneytesting.engine.domain.execution.engine.step.Step;
 import com.chutneytesting.engine.domain.execution.evaluation.SpelFunctions;
 import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.tools.Jsons;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import java.util.ArrayList;
 import java.util.List;
@@ -52,6 +53,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 public class IfStrategyTest {
+
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     static Stream<Arguments> datasetForIf_strategy_nominal_cases() {
         return Stream.of(
@@ -276,7 +279,7 @@ public class IfStrategyTest {
     @Test
     public void should_resolve_name_from_context_with_strategy_if() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/ifStrategy/if_strategy_step_with_name_resolver_from_context_put.json", ExecutionRequestDto.class);
 
         // W

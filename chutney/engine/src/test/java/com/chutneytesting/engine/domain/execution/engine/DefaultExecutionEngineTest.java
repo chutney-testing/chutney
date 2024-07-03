@@ -43,6 +43,7 @@ import com.chutneytesting.engine.domain.execution.strategies.StepExecutionStrate
 import com.chutneytesting.engine.domain.execution.strategies.StepExecutionStrategy;
 import com.chutneytesting.engine.domain.report.Reporter;
 import com.chutneytesting.tools.loader.ExtensionLoaders;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -69,6 +70,7 @@ class DefaultExecutionEngineTest {
     public static final String tearDownRootNodeName = "TearDown";
     private static final String throwableToCatchMessage = "Should be caught by fault barrier";
     private final Dataset emptyDataset = new Dataset(emptyMap(), emptyList());
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @ParameterizedTest(name = "{index}: {0}")
     @MethodSource("execution_throwable")
@@ -79,7 +81,7 @@ class DefaultExecutionEngineTest {
         when(stepExecutionStrategies.buildStrategyFrom(any())).thenReturn(strategy);
 
         Reporter reporter = new Reporter();
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(dataEvaluator, stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(dataEvaluator, stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
         StepDefinition stepDefinition = new StepDefinition("name", null, "type", null, null, null, null, null);
 
         // When
@@ -115,7 +117,7 @@ class DefaultExecutionEngineTest {
         scenarioExecution.registerFinallyAction(finallyAction);
 
         Reporter reporter = new Reporter();
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(dataEvaluator, stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(dataEvaluator, stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
         StepDefinition stepDefinition = new StepDefinition("name", null, "type", null, null, null, null, null);
 
         // When
@@ -150,7 +152,7 @@ class DefaultExecutionEngineTest {
 
         ScenarioExecution scenarioExecution = createScenarioExecution(null);
         Reporter reporter = new Reporter();
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
 
         Map<String, Object> inputs = singletonMap("currentEnvironment", "${#environment}");
         StepDefinition stepDefinition = new StepDefinition("fakeScenario", null, "", null, inputs, null, null, null);
@@ -180,7 +182,7 @@ class DefaultExecutionEngineTest {
 
         ScenarioExecution scenarioExecution = createScenarioExecution(null);
         Reporter reporter = new Reporter();
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
 
         Map<String, Object> inputs = singletonMap("currentEnvironment", "${#environment}");
         StepDefinition stepDefinition = new StepDefinition("fakeScenario", null, "", null, inputs, null, null, null);
@@ -213,7 +215,7 @@ class DefaultExecutionEngineTest {
 
         Reporter reporter = new Reporter();
 
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
 
         // When
         Long executionId = sut.execute(stepDefinition, dataset, createScenarioExecution(null), fakeEnvironment);
@@ -241,7 +243,7 @@ class DefaultExecutionEngineTest {
 
         Reporter reporter = new Reporter();
 
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
 
         // When
         Long executionId = sut.execute(stepDefinition, dataset, createScenarioExecution(null), fakeEnvironment);
@@ -269,7 +271,7 @@ class DefaultExecutionEngineTest {
 
         Reporter reporter = new Reporter();
 
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(null), stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
         Dataset dataset = new Dataset(emptyMap(), emptyList());
 
         // When
@@ -302,7 +304,7 @@ class DefaultExecutionEngineTest {
             .classpathToClass("META-INF/extension/chutney.functions")
             .load().forEach(c -> ReflectionUtils.doWithMethods(c, spelFunctionCallback));
         SpelFunctions functions = spelFunctionCallback.getSpelFunctions();
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(functions), stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(functions), stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
 
         // When
         Long executionId = sut.execute(stepDefinition, dataset, createScenarioExecution(null), fakeEnvironment);
@@ -333,7 +335,7 @@ class DefaultExecutionEngineTest {
             .classpathToClass("META-INF/extension/chutney.functions")
             .load().forEach(c -> ReflectionUtils.doWithMethods(c, spelFunctionCallback));
         SpelFunctions functions = spelFunctionCallback.getSpelFunctions();
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(functions), stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(new StepDataEvaluator(functions), stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
 
         // When
         Long executionId = sut.execute(stepDefinition, dataset, createScenarioExecution(null), fakeEnvironment);
@@ -357,7 +359,7 @@ class DefaultExecutionEngineTest {
             .thenReturn(strategy); // for tear down step
 
         Reporter reporter = new Reporter();
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(dataEvaluator, stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(dataEvaluator, stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
         StepDefinition stepDefinition = new StepDefinition("name", null, "type", null, null, null, null, null);
 
         ScenarioExecution scenarioExecution = createScenarioExecution(null);
@@ -390,7 +392,7 @@ class DefaultExecutionEngineTest {
     public void execute_tear_down_steps_in_declaration_order() {
         // Given
         Reporter reporter = new Reporter();
-        DefaultExecutionEngine sut = new DefaultExecutionEngine(dataEvaluator, stepExecutionStrategies, delegationService, reporter, actionExecutor);
+        DefaultExecutionEngine sut = new DefaultExecutionEngine(dataEvaluator, stepExecutionStrategies, delegationService, reporter, actionExecutor, objectMapper);
 
         StepExecutionStrategy strategy = mock(StepExecutionStrategy.class);
         when(strategy.execute(any(), any(), any(), any()))

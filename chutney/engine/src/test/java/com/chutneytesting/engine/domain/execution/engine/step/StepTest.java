@@ -56,6 +56,7 @@ import com.chutneytesting.engine.domain.execution.report.StepExecutionReport;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReportBuilder;
 import com.chutneytesting.engine.infrastructure.delegation.HttpClient;
 import com.chutneytesting.tools.Jsons;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 import java.time.Instant;
 import java.util.HashMap;
@@ -75,11 +76,12 @@ public class StepTest {
 
     private final StepDataEvaluator dataEvaluator = new StepDataEvaluator(new SpelFunctions());
     private final Target fakeTarget = TargetImpl.NONE;
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Test
     public void stop_should_not_execute_test() {
         StepExecutor stepExecutor = mock(StepExecutor.class);
-        doThrow(new RuntimeException()).when(stepExecutor).execute(any(), any(), any());
+        doThrow(new RuntimeException()).when(stepExecutor).execute(any(), any(), any(), any());
         Step step = buildEmptyStep(stepExecutor);
 
         ScenarioExecution execution = ScenarioExecution.createScenarioExecution(null);
@@ -101,14 +103,14 @@ public class StepTest {
         RxBus.getInstance().registerOnExecutionId(PauseExecutionCommand.class, execution.executionId, e -> {
             Schedulers.io().createWorker().schedule(() -> step.execute(execution, new ScenarioContextImpl()));
             await().atMost(1100, MILLISECONDS).untilAsserted(() ->
-                verify(stepExecutor, times(0)).execute(any(), any(), any())
+                verify(stepExecutor, times(0)).execute(any(), any(),any(), any())
             );
         });
         RxBus.getInstance().post(new PauseExecutionCommand(execution.executionId));
 
         RxBus.getInstance().registerOnExecutionId(ResumeExecutionCommand.class, execution.executionId, e -> {
             await().atMost(1100, MILLISECONDS).untilAsserted(() ->
-                verify(stepExecutor, times(1)).execute(any(), any(), any())
+                verify(stepExecutor, times(1)).execute(any(), any(), any(), any())
             );
         });
         RxBus.getInstance().post(new ResumeExecutionCommand(execution.executionId));
@@ -124,7 +126,7 @@ public class StepTest {
         outputs.put("anotherValue", "43");
 
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, null, null, outputs, null);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList());
+        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList(), objectMapper);
         ScenarioContextImpl scenarioContext = new ScenarioContextImpl();
 
         // When
@@ -145,7 +147,7 @@ public class StepTest {
         validations.put("second assert", "${true}");
 
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, null, null, null, validations);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList());
+        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList(), objectMapper);
         ScenarioContextImpl scenarioContext = new ScenarioContextImpl();
 
         // When
@@ -169,7 +171,7 @@ public class StepTest {
         validations.put("second assert", "${true}");
 
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, null, null, null, validations);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList());
+        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList(), objectMapper);
         ScenarioContextImpl scenarioContext = new ScenarioContextImpl();
 
         // When
@@ -194,16 +196,16 @@ public class StepTest {
         outputs.put("anotherValue", "${#anotherValueToEvaluate}");
 
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, null, null, outputs, null);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList());
+        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList(), objectMapper);
         ScenarioContextImpl scenarioContext = new ScenarioContextImpl();
 
         // When
         step.execute(ScenarioExecution.createScenarioExecution(null), scenarioContext);
 
         // Then
-        assertThat(step.getScenarioContext().get("aValue")).as("New value").isEqualTo(500);
+        assertThat(step.getScenarioContext().get("aValue")).as("New value").isEqualTo("500");
         assertThat(step.getScenarioContext().get("anotherValue")).as("New value").isEqualTo("{ new value }");
-        assertThat(step.getStepOutputs().get("aValue")).as("New value").isEqualTo(500);
+        assertThat(step.getStepOutputs().get("aValue")).as("New value").isEqualTo("500");
         assertThat(step.getStepOutputs().get("anotherValue")).as("New value").isEqualTo("{ new value }");
     }
 
@@ -211,8 +213,8 @@ public class StepTest {
     public void context_is_update_with_values_from_a_remote_execution() {
 
         // Given
-        Map<String, Object> fakeStepResults = new HashMap<>();
-        fakeStepResults.put("aResultKeySetByAAction", 4242);
+        Map<String, String> fakeStepResults = new HashMap<>();
+        fakeStepResults.put("aResultKeySetByAAction", "4242");
         fakeStepResults.put("anotherResultKeySetByAAction", "{ a value as string }");
 
         //  This scenario will be executed by a faked delegate agent which returns stepResults
@@ -222,6 +224,7 @@ public class StepTest {
             .setStartDate(Instant.now())
             .setStatus(Status.SUCCESS)
             .setStepResults(fakeStepResults)
+            .setEvaluatedInputs(new HashMap<>())
             .createStepExecutionReport();
         when(mockHttpClient.handDown(any(), any()))
             .thenReturn(fakeRemoteReport);
@@ -233,17 +236,17 @@ public class StepTest {
         outputs.put("anAliasForReuse", "${#aResultKeySetByAAction}");
         outputs.put("anotherAliasForReuse", "${#anotherResultKeySetByAAction}");
 
-        StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, null, null, outputs, null);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, fakeRemoteStepExecutor, emptyList());
+        StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, new HashMap<>(), null, outputs, null);
+        Step step = new Step(dataEvaluator, fakeStepDefinition, fakeRemoteStepExecutor, emptyList(), objectMapper);
         ScenarioContextImpl scenarioContext = new ScenarioContextImpl();
 
         // When
         step.execute(ScenarioExecution.createScenarioExecution(null), scenarioContext);
 
         // Then
-        assertThat(step.getScenarioContext().get("anAliasForReuse")).as("New value from Remote").isEqualTo(4242);
+        assertThat(step.getScenarioContext().get("anAliasForReuse")).as("New value from Remote").isEqualTo("4242");
         assertThat(step.getScenarioContext().get("anotherAliasForReuse")).as("New value from Remote").isEqualTo("{ a value as string }");
-        assertThat(step.getStepOutputs().get("anAliasForReuse")).as("New value from Remote").isEqualTo(4242);
+        assertThat(step.getStepOutputs().get("anAliasForReuse")).as("New value from Remote").isEqualTo("4242");
         assertThat(step.getStepOutputs().get("anotherAliasForReuse")).as("New value from Remote").isEqualTo("{ a value as string }");
 
     }
@@ -257,7 +260,7 @@ public class StepTest {
         inputs.put("targetName", "${#target.name}");
 
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, inputs, null, null, null);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, mock(StepExecutor.class), emptyList());
+        Step step = new Step(dataEvaluator, fakeStepDefinition, mock(StepExecutor.class), emptyList(), objectMapper);
 
         // When
         step.execute(ScenarioExecution.createScenarioExecution(null), new ScenarioContextImpl());
@@ -308,7 +311,7 @@ public class StepTest {
     @Test
     public void should_not_compute_substeps_status_if_current_status_is_failure() {
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, null, null, null, null);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, mock(StepExecutor.class), Lists.list(mock(Step.class), mock(Step.class)));
+        Step step = new Step(dataEvaluator, fakeStepDefinition, mock(StepExecutor.class), Lists.list(mock(Step.class), mock(Step.class)), objectMapper);
         step.failure("...");
         assertThat(step.status()).isEqualTo(Status.FAILURE);
 
@@ -329,7 +332,7 @@ public class StepTest {
         outputs.put("anotherValue", "42");
 
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, null, null, outputs, null);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList());
+        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList(), objectMapper);
         ScenarioContextImpl scenarioContext = new ScenarioContextImpl();
 
         // When
@@ -351,7 +354,7 @@ public class StepTest {
         inputs.put("validations", Map.of("validation_1", "${#validation}"));
 
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "final", null, inputs, null, null, null);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, mock(StepExecutor.class), emptyList());
+        Step step = new Step(dataEvaluator, fakeStepDefinition, mock(StepExecutor.class), emptyList(), objectMapper);
 
         // When
         step.execute(ScenarioExecution.createScenarioExecution(null), new ScenarioContextImpl());
@@ -360,7 +363,7 @@ public class StepTest {
         assertThat(step.getEvaluatedInputs()).hasSize(2);
         assertThat(step.getEvaluatedInputs().get("currentEnvironment")).isEqualTo("${#environment}");
         assertThat(step.getEvaluatedInputs()).containsKeys("validations");
-        assertThat(((Map<?, ?>) step.getEvaluatedInputs().get("validations")).get("validation_1")).isEqualTo("${#validation}");
+        assertThat(step.getEvaluatedInputs().get("validations")).isEqualTo("{\"validation_1\":\"${#validation}\"}");
 
     }
 
@@ -381,7 +384,7 @@ public class StepTest {
 
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "taskType", null, emptyMap(), null, null, null);
         StepExecutor stepExecutorMock = mock(StepExecutor.class);
-        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutorMock, emptyList());
+        Step step = new Step(dataEvaluator, fakeStepDefinition, stepExecutorMock, emptyList(), objectMapper);
 
         // When
 
@@ -389,7 +392,7 @@ public class StepTest {
 
         // Then
         ArgumentCaptor<Target> targetCaptor = ArgumentCaptor.forClass(Target.class);
-        verify(stepExecutorMock).execute(any(), targetCaptor.capture(), any());
+        verify(stepExecutorMock).execute(any(), targetCaptor.capture(), any(), any());
 
         Target target = targetCaptor.getValue();
         assertThat(target.name()).isEqualTo("NAME");
@@ -422,7 +425,7 @@ public class StepTest {
     @Test
     public void should_replace_variable_in_name_from_the_context() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/simpleStep/simple_step_with_var_from_context_put.json", ExecutionRequestDto.class);
 
         // W
@@ -448,6 +451,8 @@ public class StepTest {
             .setName("fake")
             .setDuration(42L)
             .setStatus(remoteStatus)
+            .setEvaluatedInputs(new HashMap<>())
+            .setStepResults(new HashMap<>())
             .createStepExecutionReport();
         when(mockHttpClient.handDown(any(), any()))
             .thenReturn(fakeRemoteReport);
@@ -463,7 +468,7 @@ public class StepTest {
 
     private Step buildEmptyStep(StepExecutor stepExecutor) {
         StepDefinition fakeStepDefinition = new StepDefinition("fakeScenario", fakeTarget, "actionType", null, null, null, null, null);
-        return new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList());
+        return new Step(dataEvaluator, fakeStepDefinition, stepExecutor, emptyList(), objectMapper);
     }
 
     private static class FakeStepExecutor implements StepExecutor {
@@ -475,7 +480,7 @@ public class StepTest {
         }
 
         @Override
-        public void execute(ScenarioExecution scenarioExecution, Target target, Step step) {
+        public void execute(ScenarioExecution scenarioExecution, Target target, Map<String, Object> evaluateInput, Step step) {
             step.updateContextFrom(executionResult);
         }
     }

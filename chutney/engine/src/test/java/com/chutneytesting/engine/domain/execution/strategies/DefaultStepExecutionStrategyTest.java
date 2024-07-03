@@ -41,6 +41,7 @@ import com.chutneytesting.engine.domain.execution.engine.step.Step;
 import com.chutneytesting.engine.domain.execution.evaluation.SpelFunctions;
 import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.tools.Jsons;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Sets;
 import java.util.Arrays;
 import java.util.Collections;
@@ -58,6 +59,7 @@ public class DefaultStepExecutionStrategyTest {
     private DefaultStepExecutionStrategy strategy = DefaultStepExecutionStrategy.instance;
     private StepDataEvaluator dataEvaluator = new StepDataEvaluator(new SpelFunctions());
     private StepExecutor stepExecutor = new DefaultStepExecutor(new DefaultActionTemplateRegistry(new ActionTemplateLoaders(Collections.singletonList(new TestActionTemplateLoader()))));
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Test
     public void should_execute_the_step() {
@@ -132,7 +134,7 @@ public class DefaultStepExecutionStrategyTest {
     @Test
     public void should_resolve_name_from_context_with_default_strategy() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/defaultStrategy/default_strategy_step_with_name_resolver_from_context_put.json", ExecutionRequestDto.class);
 
         // W
@@ -157,7 +159,7 @@ public class DefaultStepExecutionStrategyTest {
     }
 
     private Step buildStep(String name, String type, Step... subSteps) {
-        return new Step(dataEvaluator, buildStepDef(name, type), stepExecutor, Arrays.asList(subSteps));
+        return new Step(dataEvaluator, buildStepDef(name, type), stepExecutor, Arrays.asList(subSteps), objectMapper);
     }
 
     private StepDefinition buildStepDef(String name, String type) {

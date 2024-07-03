@@ -31,6 +31,7 @@ import com.chutneytesting.engine.api.execution.ExecutionRequestDto.StepDefinitio
 import com.chutneytesting.engine.api.execution.StatusDto;
 import com.chutneytesting.engine.api.execution.StepExecutionReportDto;
 import com.chutneytesting.engine.api.execution.TestEngine;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.reactivex.rxjava3.core.Observable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,7 +45,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 
 public class ExecutionConfigurationTest {
 
-    private final ExecutionConfiguration sut = new ExecutionConfiguration();
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+    private final ExecutionConfiguration sut = new ExecutionConfiguration(objectMapper);
     private final String FAKE_ENV_NAME = "fakeEnv";
     private final EnvironmentDto FAKE_ENV = new EnvironmentDto(FAKE_ENV_NAME, emptyMap());
     private final DatasetDto dataset = new DatasetDto(Collections.emptyMap(), Collections.emptyList());
@@ -150,7 +152,7 @@ public class ExecutionConfigurationTest {
     public void should_shutdown_threads_on_close() throws Exception {
         //G
         ExecutorService executorService = Executors.newFixedThreadPool(10);
-        ExecutionConfiguration executionConfiguration = new ExecutionConfiguration(5L, executorService, emptyMap(), null, null);
+        ExecutionConfiguration executionConfiguration = new ExecutionConfiguration(5L, executorService, emptyMap(), null, null, objectMapper);
 
         //W
         executionConfiguration.embeddedTestEngine().close();

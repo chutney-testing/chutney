@@ -26,6 +26,7 @@ import com.chutneytesting.engine.domain.execution.engine.evaluation.StepDataEval
 import com.chutneytesting.engine.domain.execution.engine.scenario.ScenarioContext;
 import com.chutneytesting.engine.domain.execution.engine.step.Step;
 import com.chutneytesting.engine.domain.execution.report.Status;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -107,25 +108,25 @@ public class ForEachStrategy implements StepExecutionStrategy {
 
         StepDefinition newDef = iterationDefinition(indexName, index, step.definition(), new StepStrategyDefinition("", new StrategyProperties()));
         List<Step> newSubSteps = subSteps.stream().map(
-            subStep -> buildIterationDefinition(indexName, index, subStep.dataEvaluator(), subStep.definition(), subStep.executor(), subStep.subSteps(), subStep.strategy().orElse(new StepStrategyDefinition("", new StrategyProperties())))
+            subStep -> buildIterationDefinition(indexName, index, subStep.dataEvaluator(), subStep.definition(), subStep.executor(), subStep.subSteps(), subStep.strategy().orElse(new StepStrategyDefinition("", new StrategyProperties())), step.getObjectMapper())
         ).toList();
 
         return Pair.of(
-            new Step(step.dataEvaluator(), newDef, step.executor(), newSubSteps),
+            new Step(step.dataEvaluator(), newDef, step.executor(), newSubSteps, step.getObjectMapper()),
             iterationContext
         );
     }
 
     private Pair<Step, Map<String, Object>> buildIteration(String indexName, Integer index, Step step, Map<String, Object> iterationContext) {
         return Pair.of(
-            new Step(step.dataEvaluator(), iterationDefinition(indexName, index, step.definition(), new StepStrategyDefinition("", new StrategyProperties())), step.executor(), emptyList()),
+            new Step(step.dataEvaluator(), iterationDefinition(indexName, index, step.definition(), new StepStrategyDefinition("", new StrategyProperties())), step.executor(), emptyList(), step.getObjectMapper()),
             iterationContext
         );
     }
 
-    private Step buildIterationDefinition(String indexName, Integer index, StepDataEvaluator dataEvaluator, StepDefinition definition, StepExecutor executor, List<Step> subStep, StepStrategyDefinition strategy) {
+    private Step buildIterationDefinition(String indexName, Integer index, StepDataEvaluator dataEvaluator, StepDefinition definition, StepExecutor executor, List<Step> subStep, StepStrategyDefinition strategy, ObjectMapper objectMapper) {
         StepDefinition iterationDefinition = iterationDefinition(indexName, index, definition, Optional.ofNullable(strategy).orElse(new StepStrategyDefinition("", new StrategyProperties())));
-        return new Step(dataEvaluator, iterationDefinition, executor, subStep.stream().map(step -> buildIterationDefinition(indexName, index, step.dataEvaluator(), step.definition(), step.executor(), step.subSteps(), step.strategy().orElse(null))).collect(Collectors.toList())); // We need this list to be mutable because of the clear in step.removeStepExecution()
+        return new Step(dataEvaluator, iterationDefinition, executor, subStep.stream().map(step -> buildIterationDefinition(indexName, index, step.dataEvaluator(), step.definition(), step.executor(), step.subSteps(), step.strategy().orElse(null), objectMapper)).collect(Collectors.toList()), objectMapper); // We need this list to be mutable because of the clear in step.removeStepExecution()
     }
 
     private StepDefinition iterationDefinition(String indexName, Integer index, StepDefinition definition, StepStrategyDefinition strategyDefinition) {

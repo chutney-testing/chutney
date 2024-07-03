@@ -24,5 +24,5 @@ import java.util.Map;
 public record StepExecutionReportCoreDto(String name, Long duration, Instant startDate, ServerReportStatus status,
                                   List<String> information, List<String> errors, List<StepExecutionReportCoreDto> steps,
                                   String type, String targetName, String targetUrl, String strategy,
-                                  Map<String, Object> evaluatedInputs, Map<String, Object> stepOutputs) {
+                                 Map<String, String> evaluatedInputs, Map<String, String> stepOutputs) {
 }

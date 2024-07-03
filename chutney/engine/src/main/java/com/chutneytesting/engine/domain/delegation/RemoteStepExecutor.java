@@ -18,10 +18,10 @@ package com.chutneytesting.engine.domain.delegation;
 
 import com.chutneytesting.action.spi.injectable.Target;
 import com.chutneytesting.engine.domain.execution.ScenarioExecution;
-import com.chutneytesting.engine.domain.execution.engine.Environment;
 import com.chutneytesting.engine.domain.execution.engine.StepExecutor;
 import com.chutneytesting.engine.domain.execution.engine.step.Step;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReport;
+import java.util.Map;
 import org.springframework.util.Assert;
 
 public class RemoteStepExecutor implements StepExecutor {
@@ -35,7 +35,7 @@ public class RemoteStepExecutor implements StepExecutor {
     }
 
     @Override
-    public void execute(ScenarioExecution scenarioExecution, Target target, Step step) {
+    public void execute(ScenarioExecution scenarioExecution, Target target, Map<String, Object> evaluateInput, Step step) {
         try {
             StepExecutionReport remoteReport = delegationClient.handDown(step, agentInfo);
 

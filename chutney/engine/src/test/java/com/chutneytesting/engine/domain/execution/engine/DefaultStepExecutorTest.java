@@ -50,7 +50,7 @@ public class DefaultStepExecutorTest {
         Step step = mock(Step.class, RETURNS_DEEP_STUBS);
 
         StepExecutor stepExecutor = new DefaultStepExecutor(actionTemplateRegistry);
-        stepExecutor.execute(createScenarioExecution(null), mock(TargetImpl.class), step);
+        stepExecutor.execute(createScenarioExecution(null), mock(TargetImpl.class), new HashMap<>(), step);
 
         verify(actionTemplate.create(any()), times(1)).execute();
         verify(step, times(0)).failure(any(Exception.class));
@@ -66,7 +66,7 @@ public class DefaultStepExecutorTest {
         Step step = mock(Step.class, RETURNS_DEEP_STUBS);
 
         StepExecutor stepExecutor = new DefaultStepExecutor(actionTemplateRegistry);
-        stepExecutor.execute(createScenarioExecution(null), mock(TargetImpl.class), step);
+        stepExecutor.execute(createScenarioExecution(null), mock(TargetImpl.class), new HashMap<>(), step);
 
         verify(step, times(1)).failure("Action [null] failed: java.lang.RuntimeException");
     }
@@ -80,7 +80,7 @@ public class DefaultStepExecutorTest {
         Step step = mock(Step.class, RETURNS_DEEP_STUBS);
 
         StepExecutor stepExecutor = new DefaultStepExecutor(actionTemplateRegistry);
-        stepExecutor.execute(createScenarioExecution(null), mock(TargetImpl.class), step);
+        stepExecutor.execute(createScenarioExecution(null), mock(TargetImpl.class), new HashMap<>(), step);
 
         verify(step, times(1)).failure("validation error");
     }
@@ -92,7 +92,7 @@ public class DefaultStepExecutorTest {
 
         when(actionTemplateRegistry.getByIdentifier(any())).thenReturn(of(actionTemplate));
 
-        Map<String, Object> inputs = new HashMap<>();
+        Map<String, String> inputs = new HashMap<>();
         inputs.put("stringParam", "teststring");
         inputs.put("param1", "a");
         inputs.put("param2", "b");
@@ -101,7 +101,7 @@ public class DefaultStepExecutorTest {
         when(step.getEvaluatedInputs()).thenReturn(inputs);
 
         StepExecutor stepExecutor = new DefaultStepExecutor(actionTemplateRegistry);
-        stepExecutor.execute(createScenarioExecution(null), mock(TargetImpl.class), step);
+        stepExecutor.execute(createScenarioExecution(null), mock(TargetImpl.class), new HashMap<>(), step);
 
         verify(step, times(0)).failure(any(Exception.class));
     }

@@ -38,13 +38,12 @@ import com.chutneytesting.engine.domain.execution.event.EndScenarioExecutionEven
 import com.chutneytesting.engine.domain.execution.event.StartScenarioExecutionEvent;
 import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReport;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.reactivex.rxjava3.observers.TestObserver;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.parallel.Execution;
-import org.junit.jupiter.api.parallel.ExecutionMode;
 
 public class ReporterTest {
 
@@ -54,6 +53,7 @@ public class ReporterTest {
     private Reporter sut;
     private Step step;
     private ScenarioExecution scenarioExecution;
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @BeforeEach
     public void before() {
@@ -209,7 +209,7 @@ public class ReporterTest {
 
     private Step buildStep(StepDefinition definition) {
         final List<Step> steps = definition.steps.stream().map(this::buildStep).toList();
-        return new Step(dataEvaluator, definition, null, steps);
+        return new Step(dataEvaluator, definition, null, steps, objectMapper);
     }
 
     private void executeFakeScenarioSuccess() {

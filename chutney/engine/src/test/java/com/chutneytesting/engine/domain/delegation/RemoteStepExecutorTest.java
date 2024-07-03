@@ -33,6 +33,7 @@ import com.chutneytesting.engine.domain.execution.engine.step.Step;
 import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReport;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReportBuilder;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import java.time.Instant;
 import java.util.Collections;
@@ -60,7 +61,7 @@ public class RemoteStepExecutorTest {
 
         // When
         RemoteStepExecutor remoteStepExecutor = new RemoteStepExecutor(mockHttpClient, mockDelegate);
-        remoteStepExecutor.execute(null, mock(TargetImpl.class), mockStep);
+        remoteStepExecutor.execute(null, mock(TargetImpl.class), Collections.emptyMap(), mockStep);
 
         // Then
         verify(mockStep, times(1)).updateContextFrom(fakeRemoteReport);
@@ -81,7 +82,7 @@ public class RemoteStepExecutorTest {
 
         // When & Then
         assertThatExceptionOfType(IllegalArgumentException.class)
-            .isThrownBy(() -> /* When */ remoteStepExecutor.execute(null, mock(TargetImpl.class), mock(Step.class)));
+            .isThrownBy(() -> /* When */ remoteStepExecutor.execute(null, mock(TargetImpl.class), Collections.emptyMap(), mock(Step.class)));
     }
 
     @Test
@@ -97,7 +98,7 @@ public class RemoteStepExecutorTest {
             .createStepExecutionReport();
 
         DelegationClient mockHttpClient = mock(DelegationClient.class);
-        Step step = new Step(mock(StepDataEvaluator.class), mock(StepDefinition.class), mock(StepExecutor.class), emptyList());
+        Step step = new Step(mock(StepDataEvaluator.class), mock(StepDefinition.class), mock(StepExecutor.class), emptyList(), new ObjectMapper().findAndRegisterModules());
         Step spyCurrentStep = spy(step);
         NamedHostAndPort mockDelegate = mock(NamedHostAndPort.class);
         when(mockHttpClient.handDown(any(), any()))
@@ -105,7 +106,7 @@ public class RemoteStepExecutorTest {
 
         // When
         RemoteStepExecutor remoteStepExecutor = new RemoteStepExecutor(mockHttpClient, mockDelegate);
-        remoteStepExecutor.execute(null, mock(TargetImpl.class), spyCurrentStep);
+        remoteStepExecutor.execute(null, mock(TargetImpl.class), Collections.emptyMap(), spyCurrentStep);
 
         // Then
         verify(spyCurrentStep, times(1)).updateContextFrom(fakeRemoteReport);

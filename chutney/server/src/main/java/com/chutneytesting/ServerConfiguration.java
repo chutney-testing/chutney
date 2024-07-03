@@ -132,11 +132,12 @@ public class ServerConfiguration {
         @Qualifier("engineExecutor") ThreadPoolTaskExecutor engineExecutor,
         @Value(TASK_SQL_NB_LOGGED_ROW_SPRING_VALUE) String nbLoggedRow,
         @Value(ENGINE_DELEGATION_USER_SPRING_VALUE) String delegateUser,
-        @Value(ENGINE_DELEGATION_PASSWORD_SPRING_VALUE) String delegatePassword
+        @Value(ENGINE_DELEGATION_PASSWORD_SPRING_VALUE) String delegatePassword,
+        @Qualifier("reportObjectMapper") ObjectMapper objectMapper
     ) {
         Map<String, String> actionsConfiguration = new HashMap<>();
         actionsConfiguration.put(TASK_SQL_NB_LOGGED_ROW, nbLoggedRow);
-        return new ExecutionConfiguration(reporterTTL, engineExecutor.getThreadPoolExecutor(), actionsConfiguration, delegateUser, delegatePassword);
+        return new ExecutionConfiguration(reporterTTL, engineExecutor.getThreadPoolExecutor(), actionsConfiguration, delegateUser, delegatePassword, objectMapper);
     }
 
     @Bean

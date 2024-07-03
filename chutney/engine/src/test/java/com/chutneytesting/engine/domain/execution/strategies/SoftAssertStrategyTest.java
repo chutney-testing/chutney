@@ -33,11 +33,13 @@ import com.chutneytesting.engine.domain.execution.engine.scenario.ScenarioContex
 import com.chutneytesting.engine.domain.execution.engine.step.Step;
 import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.tools.Jsons;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 
 public class SoftAssertStrategyTest {
 
     private final StepExecutionStrategy sut = new SoftAssertStrategy();
+    private final ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
 
     @Test
     public void should_run_all_substeps_regardless_of_failure_when_using_soft_assert_on_parent_step() {
@@ -97,7 +99,7 @@ public class SoftAssertStrategyTest {
     @Test
     public void should_resolve_name_from_context_with_strategy_soft_assert() {
         // G
-        final TestEngine testEngine = new ExecutionConfiguration().embeddedTestEngine();
+        final TestEngine testEngine = new ExecutionConfiguration(objectMapper).embeddedTestEngine();
         ExecutionRequestDto requestDto = Jsons.loadJsonFromClasspath("scenarios_examples/softAssertStrategy/soft_assert_strategy_step_with_name_resolver_from_context_put.json", ExecutionRequestDto.class);
 
         // W

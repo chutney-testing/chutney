@@ -26,6 +26,7 @@ import com.chutneytesting.glacio.domain.parser.IParseExecutableStep;
 import com.chutneytesting.glacio.domain.parser.StepFactory;
 import com.chutneytesting.glacio.domain.parser.StepFactory.EXECUTABLE_KEYWORD;
 import com.chutneytesting.glacio.domain.parser.executable.DefaultGlacioParser;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Map;
@@ -39,8 +40,8 @@ public class GlacioAdapterConfiguration {
 
     private final GlacioAdapter glacioAdapter;
 
-    public GlacioAdapterConfiguration(String envFolderPath) throws IOException {
-        this.executionConfiguration = new ExecutionConfiguration();
+    public GlacioAdapterConfiguration(String envFolderPath, ObjectMapper objectMapper) throws IOException {
+        this.executionConfiguration = new ExecutionConfiguration(objectMapper);
         this.environmentConfiguration = new EnvironmentConfiguration(envFolderPath);
 
         final StepFactory stepFactory = createExecutableStepFactory();

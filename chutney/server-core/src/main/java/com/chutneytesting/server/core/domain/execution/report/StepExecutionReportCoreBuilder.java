@@ -36,8 +36,8 @@ public class StepExecutionReportCoreBuilder {
     private String targetName = "";
     private String targetUrl = "";
     private String strategy = "sequential";
-    private Map<String, Object> evaluatedInputs;
-    private Map<String, Object> stepOutputs;
+    private Map<String, String> evaluatedInputs;
+    private Map<String, String> stepOutputs;
 
     public StepExecutionReportCoreBuilder setName(String name) {
         this.name = name;
@@ -89,12 +89,12 @@ public class StepExecutionReportCoreBuilder {
         return this;
     }
 
-    public StepExecutionReportCoreBuilder setEvaluatedInputs(Map<String, Object> evaluatedInputs) {
+    public StepExecutionReportCoreBuilder setEvaluatedInputs(Map<String, String> evaluatedInputs) {
         this.evaluatedInputs = evaluatedInputs;
         return this;
     }
 
-    public StepExecutionReportCoreBuilder setStepOutputs(Map<String, Object> stepOutputs) {
+    public StepExecutionReportCoreBuilder setStepOutputs(Map<String, String> stepOutputs) {
         this.stepOutputs = stepOutputs;
         return this;
     }

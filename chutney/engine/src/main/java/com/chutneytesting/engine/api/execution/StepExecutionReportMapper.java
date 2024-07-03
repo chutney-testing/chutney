@@ -49,7 +49,7 @@ class StepExecutionReportMapper {
     static class StepContextMapper {
 
         @SuppressWarnings("unchecked")
-        static StepExecutionReportDto.StepContextDto toDto(Map<String, Object> scenarioContext, Map<String, Object> evaluatedInput, Map<String, Object> stepResults) {
+        static StepExecutionReportDto.StepContextDto toDto(Map<String, Object> scenarioContext, Map<String, String> evaluatedInput, Map<String, String> stepResults) {
             return new StepExecutionReportDto.StepContextDto(
                 scenarioContext != null ? scenarioContext : EMPTY_MAP,
                 evaluatedInput != null ? evaluatedInput : EMPTY_MAP,

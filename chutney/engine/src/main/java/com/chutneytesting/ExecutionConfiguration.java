@@ -44,6 +44,7 @@ import com.chutneytesting.engine.domain.report.Reporter;
 import com.chutneytesting.engine.infrastructure.delegation.HttpClient;
 import com.chutneytesting.tools.ThrowingFunction;
 import com.chutneytesting.tools.loader.ExtensionLoaders;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
@@ -68,11 +69,11 @@ public class ExecutionConfiguration {
 
     private final Long reporterTTL;
 
-    public ExecutionConfiguration() {
-        this(5L, Executors.newFixedThreadPool(10), emptyMap(), null, null);
+    public ExecutionConfiguration(ObjectMapper objectMapper) {
+        this(5L, Executors.newFixedThreadPool(10), emptyMap(), null, null, objectMapper);
     }
 
-    public ExecutionConfiguration(Long reporterTTL, ExecutorService actionExecutor, Map<String, String> actionsConfiguration, String user, String password) {
+    public ExecutionConfiguration(Long reporterTTL, ExecutorService actionExecutor, Map<String, String> actionsConfiguration, String user, String password, ObjectMapper objectMapper) {
         this.reporterTTL = reporterTTL;
 
         ActionTemplateLoader actionTemplateLoaderV2 = createActionTemplateLoaderV2();
@@ -81,7 +82,7 @@ public class ExecutionConfiguration {
 
         actionTemplateRegistry = new DefaultActionTemplateRegistry(new ActionTemplateLoaders(singletonList(actionTemplateLoaderV2)));
         reporter = createReporter();
-        executionEngine = createExecutionEngine(actionExecutor, user, password);
+        executionEngine = createExecutionEngine(actionExecutor, user, password, objectMapper);
         embeddedTestEngine = createEmbeddedTestEngine(new EngineActionsConfiguration(actionsConfiguration));
     }
 
@@ -135,13 +136,15 @@ public class ExecutionConfiguration {
         return new Reporter(reporterTTL);
     }
 
-    private ExecutionEngine createExecutionEngine(ExecutorService actionExecutor, String user, String password) {
+    private ExecutionEngine createExecutionEngine(ExecutorService actionExecutor, String user, String password, ObjectMapper objectMapper) {
         return new DefaultExecutionEngine(
             new StepDataEvaluator(spelFunctions),
             new StepExecutionStrategies(stepExecutionStrategies),
             new DelegationService(new DefaultStepExecutor(actionTemplateRegistry), new HttpClient(user, password)),
             reporter,
-            actionExecutor);
+            actionExecutor,
+            objectMapper
+        );
     }
 
     private TestEngine createEmbeddedTestEngine(ActionsConfiguration actionsConfiguration) {

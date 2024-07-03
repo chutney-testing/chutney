@@ -41,6 +41,7 @@ import com.chutneytesting.engine.domain.execution.strategies.StepExecutionStrate
 import com.chutneytesting.engine.domain.execution.strategies.StepStrategyDefinition;
 import com.chutneytesting.engine.domain.execution.strategies.StrategyProperties;
 import com.chutneytesting.engine.domain.report.Reporter;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -61,23 +62,25 @@ public class DefaultExecutionEngine implements ExecutionEngine {
     private final StepExecutionStrategies stepExecutionStrategies;
     private final DelegationService delegationService;
     private final Reporter reporter;
+    private final ObjectMapper objectMapper;
 
     public DefaultExecutionEngine(StepDataEvaluator dataEvaluator,
                                   StepExecutionStrategies stepExecutionStrategies,
                                   DelegationService delegationService,
                                   Reporter reporter,
-                                  ExecutorService actionExecutor) {
+                                  ExecutorService actionExecutor, ObjectMapper objectMapper) {
         this.dataEvaluator = dataEvaluator;
         this.stepExecutionStrategies = stepExecutionStrategies != null ? stepExecutionStrategies : new StepExecutionStrategies();
         this.delegationService = delegationService;
         this.reporter = reporter;
         this.actionExecutor = actionExecutor;
+        this.objectMapper = objectMapper;
     }
 
     @Override
     public Long execute(StepDefinition stepDefinition, Dataset dataset, ScenarioExecution execution, Environment environment) {
 
-        AtomicReference<Step> rootStep = new AtomicReference<>(Step.nonExecutable(stepDefinition));
+        AtomicReference<Step> rootStep = new AtomicReference<>(Step.nonExecutable(stepDefinition, objectMapper));
         reporter.createPublisher(execution.executionId, rootStep.get());
 
         actionExecutor.execute(() -> {
@@ -157,7 +160,7 @@ public class DefaultExecutionEngine implements ExecutionEngine {
             );
 
             return Optional.of(
-                new Step(dataEvaluator, finalRootStepDefinition, delegationService.findExecutor(empty()), finalStepsWithDefinitions.getRight())
+                new Step(dataEvaluator, finalRootStepDefinition, delegationService.findExecutor(empty()), finalStepsWithDefinitions.getRight(), objectMapper)
             );
         } catch (RuntimeException e) {
             rootStep.get().failure(e);
@@ -194,6 +197,6 @@ public class DefaultExecutionEngine implements ExecutionEngine {
         final StepExecutor executor = delegationService.findExecutor(target);
         final List<Step> steps = definition.steps.stream().map(this::buildStep).collect(toList());
 
-        return new Step(dataEvaluator, definition, executor, steps);
+        return new Step(dataEvaluator, definition, executor, steps, objectMapper);
     }
 }
