@@ -177,7 +177,7 @@ public class PurgeServiceImpl implements PurgeService {
 
             private Stream<Long> manualReplaysOlderThanOldestCampaignExecution(List<CampaignExecution> timeSortedExecutionsForOneEnvironment) {
                 LocalDateTime oldestCampaignExecutionToKeptStartDate;
-                if (!timeSortedExecutionsForOneEnvironment.isEmpty() && maxCampaignExecutions > 0) {
+                if (!timeSortedExecutionsForOneEnvironment.isEmpty() && maxCampaignExecutions > 0 && maxCampaignExecutions < timeSortedExecutionsForOneEnvironment.size()) {
                     oldestCampaignExecutionToKeptStartDate = timeSortedExecutionsForOneEnvironment.get(maxCampaignExecutions - 1).startDate;
                 } else {
                     oldestCampaignExecutionToKeptStartDate = LocalDateTime.MAX;

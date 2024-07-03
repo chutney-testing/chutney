@@ -261,6 +261,7 @@ public class PurgeServiceTest {
             // Given
             // One campaign's execution without scenarios' executions
             // And a configuration limit set to 0 for campaigns' executions
+            // (If the campaign wasn't empty, it should be kept by the "keep last success no matter what" rule)
             int maxCampaignExecutionsConfiguration = 0;
             Long campaignId = 1L;
 
