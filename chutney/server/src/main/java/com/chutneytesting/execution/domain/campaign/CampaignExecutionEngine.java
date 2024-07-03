@@ -144,7 +144,7 @@ public class CampaignExecutionEngine {
             .orElseThrow(() -> new CampaignExecutionNotFoundException(null, executionId));
     }
 
-    public CampaignExecution replayCampaignExecution(Long campaignExecutionId, String userId) {
+    public CampaignExecution replayFailedScenariosExecutionsForExecution(Long campaignExecutionId, String userId) {
         CampaignExecution campaignExecution = campaignExecutionRepository.getCampaignExecutionById(campaignExecutionId).withoutRetries();
         List<ScenarioExecutionCampaign> failedExecutions = campaignExecution.failedScenarioExecutions();
         if (failedExecutions.isEmpty()) {
@@ -160,7 +160,7 @@ public class CampaignExecutionEngine {
     }
 
     CampaignExecution executeScenarioInCampaign(List<ScenarioExecutionCampaign> failedExecutions, Campaign campaign, String userId) {
-        verifyNotEmpty(campaign);
+        verifyHasScenarios(campaign);
         verifyNotAlreadyRunning(campaign);
         Long executionId = campaignExecutionRepository.generateCampaignExecutionId(campaign.id, campaign.executionEnvironment());
 
@@ -321,7 +321,7 @@ public class CampaignExecutionEngine {
         }
     }
 
-    private void verifyNotEmpty(Campaign campaign) {
+    private void verifyHasScenarios(Campaign campaign) {
         if (campaign.scenarios.isEmpty()) {
             throw new CampaignEmptyExecutionException(campaign);
         }

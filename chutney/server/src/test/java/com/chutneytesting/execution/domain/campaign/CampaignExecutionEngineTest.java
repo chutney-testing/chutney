@@ -300,7 +300,7 @@ public class CampaignExecutionEngineTest {
                 .build()
         );
 
-        assertThatThrownBy(() -> sut.replayCampaignExecution(1L, ""))
+        assertThatThrownBy(() -> sut.replayFailedScenariosExecutionsForExecution(1L, ""))
             .isInstanceOf(CampaignEmptyExecutionException.class);
     }
 

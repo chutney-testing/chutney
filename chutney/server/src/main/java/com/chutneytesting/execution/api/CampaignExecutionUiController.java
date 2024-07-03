@@ -94,7 +94,7 @@ public class CampaignExecutionUiController {
     @PostMapping(path = {"/replay/{campaignExecutionId}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public CampaignExecutionReportDto replayFailedScenario(@PathVariable("campaignExecutionId") Long campaignExecutionId) {
         String userId = userService.currentUser().getId();
-        CampaignExecution newExecution = campaignExecutionEngine.replayCampaignExecution(campaignExecutionId, userId);
+        CampaignExecution newExecution = campaignExecutionEngine.replayFailedScenariosExecutionsForExecution(campaignExecutionId, userId);
         return toDto(newExecution);
     }
 

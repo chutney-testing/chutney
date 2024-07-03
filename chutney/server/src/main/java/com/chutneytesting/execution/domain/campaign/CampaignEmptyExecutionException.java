@@ -26,6 +26,6 @@ public class CampaignEmptyExecutionException extends RuntimeException {
     }
 
     public CampaignEmptyExecutionException(CampaignExecution campaignExecution) {
-        super(String.format("Campaign [%s] execution [%d] has no failed scenarios' executions to execute", campaignExecution.campaignName, campaignExecution.executionId));
+        super(String.format("Campaign [%s] has no failed scenarios' executions to re-execute for execution [%d]", campaignExecution.campaignName, campaignExecution.executionId));
     }
 }

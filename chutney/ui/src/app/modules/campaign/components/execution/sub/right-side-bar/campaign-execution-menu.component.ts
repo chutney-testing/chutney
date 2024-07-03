@@ -77,14 +77,10 @@ export class CampaignExecutionMenuComponent implements OnInit {
     }
 
     private executeCampaign(envName: string) {
-        if (this.campaign.scenarios.length == 0) {
-            this.broadcastError('');
-        } else {
-            this.broadcastCatchError(this.campaignService.executeCampaign(this.campaign.id, envName)).subscribe();
-            timer(1000).pipe(
-                switchMap(() => of(this.eventManagerService.broadcast({ name: 'execute', env: envName })))
-            ).subscribe();
-        }
+        this.broadcastCatchError(this.campaignService.executeCampaign(this.campaign.id, envName)).subscribe();
+        timer(1000).pipe(
+            switchMap(() => of(this.eventManagerService.broadcast({ name: 'execute', env: envName })))
+        ).subscribe();
     }
 
     private deleteCampaign() {
@@ -134,7 +130,7 @@ export class CampaignExecutionMenuComponent implements OnInit {
     }
 
     private initRightMenu() {
-        const emptyCampaign = this.emptyCampaign();
+        const emptyCampaign = this.hasCampaignWithoutScenarios();
         this.rightMenuItems = [
             {
                 label: emptyCampaign ? 'campaigns.execution.error.empty' : 'global.actions.execute',
@@ -180,7 +176,7 @@ export class CampaignExecutionMenuComponent implements OnInit {
         );
     }
 
-    private emptyCampaign(): boolean {
+    private hasCampaignWithoutScenarios(): boolean {
         return this.campaign.scenarios.length == 0;
     }
 }

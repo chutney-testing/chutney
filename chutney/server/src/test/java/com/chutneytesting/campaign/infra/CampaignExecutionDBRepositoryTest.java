@@ -72,7 +72,7 @@ public class CampaignExecutionDBRepositoryTest {
 
             Long campaignExecutionId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
 
-            CampaignExecution campaignExecution1 = CampaignExecutionReportBuilder.builder()
+            CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
                 .executionId(campaignExecutionId)
                 .campaignId(campaign.id())
                 .campaignName(campaign.title())
@@ -81,7 +81,7 @@ public class CampaignExecutionDBRepositoryTest {
                 .userId("user")
                 .build();
 
-            sut.saveCampaignExecution(campaign.id(), campaignExecution1);
+            sut.saveCampaignExecution(campaign.id(), campaignExecution);
 
             CampaignExecution report = sut.getLastExecution(campaign.id());
 
