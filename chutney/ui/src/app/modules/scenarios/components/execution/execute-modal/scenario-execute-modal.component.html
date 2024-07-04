@@ -19,34 +19,34 @@
 
   <div class="row mt-4">
     <p-floatLabel>
-      <p-dropdown 
-        [options]="filteredDatasets" 
-        [(ngModel)]="selectedDataset" 
-        optionLabel="name" 
+      <p-dropdown
+        [options]="filteredDatasets"
+        [(ngModel)]="selectedDataset"
+        optionLabel="name"
         [filter]="true"
         [showClear]="true"
-        [emptyMessage]=" 'global.msg.empty' | translate " 
-        placeholder="" 
+        [emptyMessage]=" 'global.msg.empty' | translate "
+        placeholder=""
         (onChange)="this.getDatasetDetails()"
         inputId="dataset-selection" styleClass="w-100">
         <ng-template pTemplate="selectedItem" let-selectedDataset>
-          <div>
-            <span>{{ selectedDataset.name }} </span>
-            <button class="btn btn-sm my-0 py-0 float-end" (click)="this.showHideDataset($event)">
-              <i class="bi bi-eye-fill">
-              </i>
-            </button>
+          <div class="d-flex justify-content-between">
+            <span class="option-label">{{ selectedDataset.name }} </span>
+            @if ( datasetDetails?.uniqueValues.length ) {
+              <div class="px-1 my-auto">
+                <p-button class="bi bi-eye-fill" (click)="this.showHideDataset($event)" [rounded]="true" [text]="true" severity="secondary" />
+              </div>
+            }
           </div>
         </ng-template>
         <ng-template let-dataset pTemplate="item">
           <div>
-            <span>{{ dataset.name }}</span>
+            <span class="option-label">{{ dataset.name }}</span>
             <div class="float-end">
               @for (tag of dataset.tags; track $index) {
               <span class="chutney-tag chutney-tag-selected">{{ tag }}</span>
               }
             </div>
-
           </div>
         </ng-template>
         <ng-template pTemplate="filter" let-options="options">
