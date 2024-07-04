@@ -18,7 +18,7 @@ import { Component, } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { registerLocaleData } from '@angular/common';
 import localeFr from '@angular/common/locales/fr';
-import moment from 'moment';
+import * as moment from 'moment';
 
 @Component({
     selector: 'chutney-main',
@@ -40,11 +40,29 @@ export class AppComponent {
     }
 
     private updateMomentLocal(lang: string) {
-        this.translate.get('global.smallword.at').subscribe(at =>
-            moment.updateLocale(lang, {
-                calendar: {
-                    sameElse: 'L [' + at + '] hh:mm'
-                }
-            }));
+        moment.updateLocale(lang, chutneyMomentCalendar[lang]);
     }
 }
+
+const chutneyMomentCalendar = {
+    'en': {
+        calendar: {
+            sameDay: '[Today at] HH:mm',
+            nextDay: '[Tomorrow at] HH:mm',
+            nextWeek: 'dddd [at] HH:mm',
+            lastDay: '[Yesterday at] HH:mm',
+            lastWeek: '[Last] dddd [at] HH:mm',
+            sameElse: 'L [at] HH:mm',
+        }
+    },
+    'fr': {
+        calendar: {
+            sameDay: '[Aujourd’hui à] HH:mm',
+            nextDay: '[Demain à] HH:mm',
+            nextWeek: 'dddd [à] HH:mm',
+            lastDay: '[Hier à] HH:mm',
+            lastWeek: 'dddd [dernier à] HH:mm',
+            sameElse: 'L [à] HH:mm',
+        }
+    }
+};
