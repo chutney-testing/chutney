@@ -109,9 +109,9 @@ public class EngineIntegrationTest {
         assertThat(report.steps).hasSize(3);
         assertThat(report.steps.get(0).steps.get(0).type).isEqualTo("success");
         assertThat(report.steps.get(1).steps.get(0).type).isEqualTo("context-put");
-        assertThat(report.steps.get(1).steps.get(0).context.evaluatedInputs).containsExactly(entry("entries", Map.of("var1", "value1 split", "var 2", "value2").toString()));
+        assertThat(report.steps.get(1).steps.get(0).context.evaluatedInputs).containsExactly(entry("entries", "{\"var 2\":\"value2\",\"var1\":\"value1 split\"}"));
         assertThat(report.steps.get(2).steps.get(0).type).isEqualTo("context-put");
-        assertThat(report.steps.get(2).steps.get(0).context.evaluatedInputs).containsExactly(entry("entries", Map.of("var1", "value1 split", "var 2", "value2").toString()));
+        assertThat(report.steps.get(2).steps.get(0).context.evaluatedInputs).containsExactly(entry("entries", "{\"var1\":\"value1 split\",\"var 2\":\"value2\"}"));
 
         report = reports.get(1); // Default parser
         assertThat(report.status).isEqualTo(SUCCESS);
@@ -119,7 +119,7 @@ public class EngineIntegrationTest {
         assertThat(report.steps.get(0).steps.get(0).type).isEqualTo("success");
         assertThat(report.steps.get(1).steps.get(0).type).isEqualTo("context-put");
         assertThat(report.steps.get(1).steps.get(0).information.get(2)).isEqualTo("Validation [assertion : ${'value1 split'.equals(#var1)}] : OK");
-        assertThat(report.steps.get(1).steps.get(0).context.evaluatedInputs).containsExactly(entry("entries", Map.of("var1", "value1 split", "var 2", "value2").toString()));
+        assertThat(report.steps.get(1).steps.get(0).context.evaluatedInputs).containsExactly(entry("entries", "{\"var 2\":\"value2\",\"var1\":\"value1 split\"}"));
     }
 
     @Test
@@ -138,7 +138,7 @@ public class EngineIntegrationTest {
             .containsOnly(
                 entry("uri", "/orgs/chutney-testing"),
                 entry("timeout", "2000 s"),
-                entry("headers", Map.of("X-Extra-Header", "An extra header").toString())
+                entry("headers", "{\"X-Extra-Header\":\"An extra header\"}")
             );
         assertThat(report.steps.get(0).context.stepResults.get("statusOk")).isEqualTo("true");
         assertThat(report.steps.get(0).context.stepResults.get("jsonBody")).asString().isNotBlank();

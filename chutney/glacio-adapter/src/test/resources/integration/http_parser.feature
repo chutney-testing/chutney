@@ -10,7 +10,7 @@ Feature: HTTP feature
             With timeout 2000 s
             With headers
             | X-Extra-Header | An extra header |
-            Take statusOk ${200 == #status}
+            Take statusOk ${"200" == #status}
             Take jsonBody ${#json(#body, '$')}
             Keep headersString ${#headers}
         Then Execute debug
