@@ -1,7 +1,7 @@
 <div class="middle-sidebar chutney-nav-menu d-flex justify-content-center sticky-top">
   <div class="nav">
     @if (menuItems?.length) {
-      @for (item of menuItems; track $index) {
+      @for (item of menuItems; track item.label) {
         <ng-container
           [ngTemplateOutlet]="!!item.options && item.options.length > 1 ? dropDownItem : simpleItem"
           [ngTemplateOutletContext]="{item:item}">
@@ -29,6 +29,9 @@
       <a class="nav-link cursor-pointer" role="nav-link" [routerLink]="getItemLink(item)"
         (click)="onItemClick(item)">
         <i [ngClass]="item.iconClass"></i>
+        @if(item.secondaryIconClass) {
+          <span class="secondary-icon" [ngClass]="item.secondaryIconClass" ></span>
+        }
       </a>
     </div>
   </ng-template>

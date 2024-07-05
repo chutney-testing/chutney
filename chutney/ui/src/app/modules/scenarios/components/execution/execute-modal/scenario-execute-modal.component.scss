@@ -1,0 +1,22 @@
+th > span, th > button{
+    background-color: transparent !important;
+}
+
+.option-label {
+    white-space: normal !important;
+}
+
+::ng-deep .p-dropdown-items {
+    padding-left: 0rem; 
+    font-size: .8rem;
+  }
+  
+::ng-deep .p-dropdown-panel {
+    width: 2.357rem;
+  }
+
+::ng-deep .p-dropdown-header {
+    background-color: inherit;
+    padding: 0.5rem; 
+    border-bottom: none;
+  }

@@ -1,0 +1,82 @@
+<div class="modal-body" ngbAutofocus>
+
+  @if (errorMessage) {
+  <div class="alert alert-dismissible alert-danger mt-3">
+    <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errorMessage = null"></button>
+    {{ errorMessage }}
+  </div>
+  }
+
+  @if (environments.length > 1) {
+  <div class="row mt-4">
+    <p-floatLabel>
+      <p-dropdown [options]="environments" [(ngModel)]="selectedEnv" placeholder="" styleClass="w-100"
+        inputId="env-selection"></p-dropdown>
+      <label for="env-selection">{{ "scenarios.execution.history.env" | translate }}</label>
+    </p-floatLabel>
+  </div>
+  }
+
+  <div class="row mt-4">
+    <p-floatLabel>
+      <p-dropdown
+        [options]="filteredDatasets"
+        [(ngModel)]="selectedDataset"
+        optionLabel="name"
+        [filter]="true"
+        [showClear]="true"
+        [emptyMessage]=" 'global.msg.empty' | translate "
+        placeholder=""
+        (onChange)="this.getDatasetDetails()"
+        inputId="dataset-selection" styleClass="w-100">
+        <ng-template pTemplate="selectedItem" let-selectedDataset>
+          <div class="d-flex justify-content-between">
+            <span class="option-label">{{ selectedDataset.name }} </span>
+            @if ( datasetDetails?.uniqueValues.length ) {
+              <div class="px-1 my-auto">
+                <p-button class="bi bi-eye-fill" (click)="this.showHideDataset($event)" [rounded]="true" [text]="true" severity="secondary" />
+              </div>
+            }
+          </div>
+        </ng-template>
+        <ng-template let-dataset pTemplate="item">
+          <div>
+            <span class="option-label">{{ dataset.name }}</span>
+            <div class="float-end">
+              @for (tag of dataset.tags; track $index) {
+              <span class="chutney-tag chutney-tag-selected">{{ tag }}</span>
+              }
+            </div>
+          </div>
+        </ng-template>
+        <ng-template pTemplate="filter" let-options="options">
+          <div class="flex gap-1">
+            <div class="p-inputgroup" (click)="$event.stopPropagation()">
+              <input type="text" role="searchbox" autocomplete="off" class="p-dropdown-filter p-inputtext p-component"
+                [(ngModel)]="filterValue" (keyup)="datasetFilter($event)" />
+              <span class="p-inputgroup-addon"><i class="fa-solid fa-magnifying-glass"></i></span>
+            </div>
+          </div>
+        </ng-template>
+      </p-dropdown>
+      <label for="dataset-selection">{{ "scenarios.execution.history.dataset" | translate }}</label>
+    </p-floatLabel>
+  </div>
+
+  <div [ngbCollapse]="isCollapsed" class="my-2">
+    <table class="table table-hover table-sm">
+      <tbody>
+        @for ( datasetUniqueValue of datasetDetails?.uniqueValues; track $index) {
+        <tr>
+          <td>{{ datasetUniqueValue.key }}</td>
+          <td>{{ datasetUniqueValue.value }}</td>
+        </tr>
+        }
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="modal-footer">
+  <button type="button" class="btn btn-light" (click)="activeModal.dismiss('cancel click')">{{ "global.actions.cancel" | translate }}</button>
+  <button type="button" class="btn btn-primary" (click)="execute()">{{ "global.actions.execute" | translate }}</button>
+</div>

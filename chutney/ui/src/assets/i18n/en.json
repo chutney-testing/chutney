@@ -125,7 +125,8 @@
             },
             "errors": {
                 "execution": "Scenario can't be executed",
-                "parse": "Scenario can't be parsed"
+                "parse": "Scenario can't be parsed",
+                "environment": "No environment selected"
             },
             "dataset.title": "Dataset",
             "inputs": "Inputs",
@@ -439,6 +440,7 @@
             "edit": "Edit",
             "editRaw": "Raw edition",
             "execute": "Execute",
+            "execute.last": "Rerun last",
             "delete": "Delete",
             "save": "Save",
             "record": "Save",

@@ -125,7 +125,8 @@
             },
             "errors": {
                 "execution": "Impossible d'exécuter le scénario",
-                "parse": "Impossible de parser le scénario"
+                "parse": "Impossible de parser le scénario",
+                "environment": "Aucun environnement sélectionné"
             },
             "dataset.title": "Dataset",
             "inputs": "Entrées",
@@ -439,6 +440,7 @@
             "edit": "Éditer",
             "editRaw": "Édition brute",
             "execute": "Exécuter",
+            "execute.last": "Relancer la derniere exécution",
             "delete": "Supprimer",
             "save": "Sauvegarder",
             "record": "Enregistrer",

@@ -34,21 +34,23 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
 
     tabs: Execution[] = [];
     activeTab = '0';
-    executions: Execution [] = [];
+    executions: Execution[] = [];
+    canReplay: boolean = false;
     scenarioId: string;
     private _executionsFilters: Params = {};
     private tabFilters: Params = {};
     scenario: GwtTestCase;
     error: string;
     private scenarioExecution$: Subscription;
+    private scenarioExecutionLast$: Subscription;
     private readonly LAST_ID = 'last';
 
     constructor(private route: ActivatedRoute,
-                private router: Router,
-                private scenarioExecutionService: ScenarioExecutionService,
-                private scenarioService: ScenarioService,
-                private eventManagerService: EventManagerService,
-                private alertService: AlertService) {
+        private router: Router,
+        private scenarioExecutionService: ScenarioExecutionService,
+        private scenarioService: ScenarioService,
+        private eventManagerService: EventManagerService,
+        private alertService: AlertService) {
     }
 
     ngOnInit(): void {
@@ -58,12 +60,12 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
                 switchMap(() => this.loadScenario()),
                 switchMap(() => this.getScenarioExecutions())
             ).subscribe({
-            next: () => {
-                this.onQueryParamsChange()
-                this.onRightMenuAction();
-            },
-            error: (error) => this.error = error.error
-        });
+                next: () => {
+                    this.onQueryParamsChange()
+                    this.onRightMenuAction();
+                },
+                error: (error) => this.error = error.error
+            });
     }
 
     private onQueryParamsChange() {
@@ -81,6 +83,7 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
                 tap(executions => {
                     executions?.forEach(e => e.tags.sort());
                     this.executions = executions;
+                    this.canReplay = executions.length > 0;
                 })
             );
     }
@@ -121,14 +124,14 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
     }
 
     set executionsFilters(value: Params) {
-        const {open, active, ...executionsParams} = value;
+        const { open, active, ...executionsParams } = value;
         this._executionsFilters = executionsParams;
         this.updateQueryParams();
     }
 
     updateExecutionStatus(executionId: number, update: { status: ExecutionStatus, error: string }) {
         const execution = this.getExecution(executionId.toString());
-        if(update.status in ExecutionStatus) {
+        if (update.status in ExecutionStatus) {
             execution.status = update.status;
         }
         execution.error = update.error;
@@ -149,7 +152,7 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
     }
 
     private updateQueryParams() {
-        let queryParams = this.cleanParams({...this.executionsFilters, ...this.tabFilters});
+        let queryParams = this.cleanParams({ ...this.executionsFilters, ...this.tabFilters });
         this.router.navigate([], {
             relativeTo: this.route,
             queryParams: queryParams
@@ -191,7 +194,7 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
         let openedExecutions$ = of([]);
         this.cleanQueryParams(queryParams);
         if (queryParams['open']) {
-            let executions$: Observable<Execution> [] = queryParams['open']
+            let executions$: Observable<Execution>[] = queryParams['open']
                 .split(',')
                 .map(id => {
                     let execution = this.getExecution(id);
@@ -214,15 +217,15 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
     private findScenarioExecutionSummary(id): Observable<Execution> {
         return this.scenarioExecutionService.findScenarioExecutionSummary(+id)
             .pipe(
-            catchError(error => {
-                this.error = error.error;
-                return EMPTY
-            })
-        );
+                catchError(error => {
+                    this.error = error.error;
+                    return EMPTY
+                })
+            );
     }
 
     private getOpenTabs(opens: string) {
-        return this.tabs. map((exec, i) => {
+        return this.tabs.map((exec, i) => {
             if (opens.includes(this.LAST_ID) && i === 0) {
                 return this.LAST_ID;
             }
@@ -231,7 +234,7 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
     }
 
     private getExecution(id: string): Execution {
-        if (id === this.LAST_ID){
+        if (id === this.LAST_ID) {
             return this.executions[0];
         }
         return this.executions.find(exec => exec.executionId.toString() === id);
@@ -262,32 +265,35 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
     }
 
     private onRightMenuAction() {
-        this.scenarioExecution$ = this.eventManagerService.subscribe('execute', (data) => this.executeScenario(data.env));
+        this.scenarioExecutionLast$ = this.eventManagerService.subscribe('executeLast', () => this.replay(this.executions[0].executionId));
+        this.scenarioExecution$ = this.eventManagerService.subscribe('execute', (data) => this.executeScenario(data.env, data.dataset));
     }
 
-    private executeScenario(env: string, dataset: string= null) {
+    private executeScenario(env: string, dataset: string = null) {
         this.scenarioExecutionService
             .executeScenarioAsync(this.scenarioId, env, dataset)
             .pipe(
                 delay(1000),
                 switchMap(executionId => this.findScenarioExecutionSummary(+executionId)))
             .subscribe({
-                    next: (executionSummary) => {
-                        this.openReport({
-                            execution: executionSummary,
-                            focus: true
-                        });
-                        this.executions.unshift(executionSummary);
-                    },
-                    error: error => {
-                        this.error = error.error;
-                    }
+                next: (executionSummary) => {
+                    this.openReport({
+                        execution: executionSummary,
+                        focus: true
+                    });
+                    this.executions.unshift(executionSummary);
+                    this.canReplay = true;
+                },
+                error: error => {
+                    this.error = error.error;
                 }
+            }
             );
     }
 
     ngOnDestroy(): void {
         this.eventManagerService.destroy(this.scenarioExecution$);
+        this.eventManagerService.destroy(this.scenarioExecutionLast$);
     }
 
     getActiveTab() {

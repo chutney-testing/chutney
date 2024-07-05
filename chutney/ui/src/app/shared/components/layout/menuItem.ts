@@ -22,8 +22,9 @@ export class MenuItem {
     link?: string;
     click?: Function;
     iconClass?: string;
+    secondaryIconClass?: string;
     authorizations?: Authorization[];
     feature?: FeatureName;
-    options?: {id: string,label: string} [];
+    options?: { id: string, label: string }[];
     children?: MenuItem[] = [];
 }
