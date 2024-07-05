@@ -34,7 +34,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -165,10 +164,6 @@ public class CampaignExecutionDBRepository implements CampaignExecutionRepositor
         return ofNullable(runningCampaignExecution(campaignExecution)).orElseGet(() ->
             campaignExecution.toDomain(campaign.title())
         );
-    }
-
-    private Supplier<CampaignExecutionNotFoundException> campaignExecutionNotFoundExceptionSupplier(CampaignExecutionEntity campaignExecution) {
-        return () -> new CampaignExecutionNotFoundException(campaignExecution.campaignId(), campaignExecution.id());
     }
 
     private CampaignExecution runningCampaignExecution(CampaignExecutionEntity campaignExecutionEntity) {

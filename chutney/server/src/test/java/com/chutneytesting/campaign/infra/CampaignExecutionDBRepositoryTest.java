@@ -28,9 +28,9 @@ import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Stream;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -64,6 +64,30 @@ public class CampaignExecutionDBRepositoryTest {
         @Autowired
         private CampaignExecutionRepository sut;
 
+
+        @Test
+        public void should_set_start_date_and_status_on_empty_execution() {
+            ScenarioEntity scenarioEntity = givenScenario();
+            CampaignEntity campaign = givenCampaign(scenarioEntity);
+
+            Long campaignExecutionId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
+
+            CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
+                .executionId(campaignExecutionId)
+                .campaignId(campaign.id())
+                .campaignName(campaign.title())
+                .partialExecution(true)
+                .environment("env")
+                .userId("user")
+                .build();
+
+            sut.saveCampaignExecution(campaign.id(), campaignExecution);
+
+            CampaignExecution report = sut.getLastExecution(campaign.id());
+
+            assertThat(report.startDate).isEqualTo(LocalDateTime.MIN);
+            assertThat(report.status()).isEqualTo(ServerReportStatus.SUCCESS);
+        }
 
         @Test
         public void should_return_the_last_campaign_execution() {
@@ -219,63 +243,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("status", scenarioTwoExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioTwoExecution.environment())
                 .hasFieldOrPropertyWithValue("datasetId", scenarioTwoExecution.datasetId())
-            ;
-        }
-
-        @Test
-        @Disabled
-        // I don't know why is this here and how it was success before ?
-        // When a campaign is running, as in this test, user interface add current executions by separate call (cf. campaignController)
-        // Therefore the implementation i made by not included the current execution if there is in getExecutionHistory method
-        // So this test does not make sense for me now.
-        // TODO - To move elsewhere ?
-        public void campaign_execution_history_should_list_not_executed_scenarios() {
-            ScenarioEntity scenarioEntityOne = givenScenario();
-            ScenarioEntity scenarioEntityTwo = givenScenario();
-            CampaignEntity campaign = givenCampaign(scenarioEntityOne, scenarioEntityTwo);
-
-            ScenarioExecutionEntity scenarioOneExecution = givenScenarioExecution(scenarioEntityOne.getId(), ServerReportStatus.SUCCESS);
-            ScenarioExecutionCampaign scenarioOneExecutionReport = new ScenarioExecutionCampaign(scenarioEntityOne.getId().toString(), scenarioEntityOne.getTitle(), scenarioOneExecution.toDomain());
-            Long campaignExecutionId = sut.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
-                .executionId(campaignExecutionId)
-                .campaignId(campaign.id())
-                .campaignName(campaign.title())
-                .partialExecution(true)
-                .environment("env")
-                .addScenarioExecutionReport(scenarioOneExecutionReport)
-                .userId("user")
-                .build();
-            sut.startExecution(campaign.id(), campaignExecution);
-            sut.saveCampaignExecution(campaign.id(), campaignExecution);
-
-            List<CampaignExecution> reports = sut.getExecutionHistory(campaign.id());
-
-            assertThat(reports).hasSize(1)
-                .first()
-                .hasFieldOrPropertyWithValue("executionId", campaignExecution.executionId)
-                .hasFieldOrPropertyWithValue("campaignName", campaignExecution.campaignName)
-                .hasFieldOrPropertyWithValue("partialExecution", campaignExecution.partialExecution)
-                .hasFieldOrPropertyWithValue("dataSetId", campaignExecution.dataSetId)
-                .hasFieldOrPropertyWithValue("executionEnvironment", campaignExecution.executionEnvironment)
-                .hasFieldOrPropertyWithValue("userId", campaignExecution.userId)
-            ;
-
-            assertThat(reports.get(0).scenarioExecutionReports()).hasSize(2);
-
-            assertThat(reports.get(0).scenarioExecutionReports()).element(0)
-                .hasFieldOrPropertyWithValue("scenarioId", scenarioEntityOne.getId().toString())
-                .hasFieldOrPropertyWithValue("scenarioName", scenarioEntityOne.getTitle())
-                .extracting("execution")
-                .hasFieldOrPropertyWithValue("executionId", scenarioOneExecution.id())
-                .hasFieldOrPropertyWithValue("status", scenarioOneExecution.status())
-            ;
-            assertThat(reports.get(0).scenarioExecutionReports()).element(1)
-                .hasFieldOrPropertyWithValue("scenarioId", scenarioEntityTwo.getId().toString())
-                .hasFieldOrPropertyWithValue("scenarioName", scenarioEntityTwo.getTitle())
-                .extracting("execution")
-                .hasFieldOrPropertyWithValue("executionId", -1L)
-                .hasFieldOrPropertyWithValue("status", ServerReportStatus.NOT_EXECUTED)
             ;
         }
 

@@ -125,9 +125,11 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
     }
 
     private refreshCampaign() {
-        this.campaign$().subscribe(c => {
-            this.openReport({ execution: this.campaignReports[0], focus: true });
-        });
+        if (this.campaign.scenarios.length > 0) {
+            this.campaign$().subscribe(c => {
+                this.openReport({ execution: this.campaignReports[0], focus: true });
+            });
+        }
     }
 
     private onMenuError(menuErrorEvent: any) {
@@ -177,15 +179,17 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
     }
 
     openReport(request: { execution: CampaignReport, focus: boolean }) {
-        var tabs = this.tabs;
-        if (!this.isOpened(request.execution.report.executionId.toString())) {
-            tabs = tabs.concat(request.execution);
+        if (request.execution) {
+            var tabs = this.tabs;
+            if (!this.isOpened(request.execution.report.executionId.toString())) {
+                tabs = tabs.concat(request.execution);
+            }
+
+            this.tabFilters['open'] = tabs.map(exec => exec.report.executionId).toString();
+            this.tabFilters['active'] = request.focus ? request.execution.report.executionId : null;
+
+            this.updateQueryParams();
         }
-
-        this.tabFilters['open'] = tabs.map(exec => exec.report.executionId).toString();
-        this.tabFilters['active'] = request.focus ? request.execution.report.executionId : null;
-
-        this.updateQueryParams();
     }
 
     get executionsFilters(): Params {

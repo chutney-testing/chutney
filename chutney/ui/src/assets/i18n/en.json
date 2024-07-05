@@ -246,6 +246,9 @@
             },
             "update": {
                 "jira": "Update jira status ?"
+            },
+            "error": {
+                "empty": "Execution disabled - empty campaign"
             }
         },
         "edition": {
@@ -305,9 +308,6 @@
                 "date": "Date required"
             },
             "nothing": "Nothing scheduled"
-        },
-        "export": {
-            "component.error": "Campaign has some component scenarios which cannot be exported"
         }
     },
     "admin": {

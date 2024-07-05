@@ -246,6 +246,9 @@
             },
             "update": {
                 "jira": "Mettre à jour le statut jira ?"
+            },
+            "error": {
+                "empty": "Exécution impossible - campagne vide"
             }
         },
         "edition": {
@@ -284,7 +287,7 @@
             "selectJiraTag": "Sélectionner statut d'execution jira",
             "selectDatasetScenario": "Ajouter un dataset",
             "errors": {
-                "scenarioDatasetDuplicate": "La combinaison existe déjà pour le scenario {{scenarioId}} et le dataset {{datasetId}}" 
+                "scenarioDatasetDuplicate": "La combinaison existe déjà pour le scenario {{scenarioId}} et le dataset {{datasetId}}"
             }
         },
         "confirm": {
@@ -305,9 +308,6 @@
                 "date": "Saisir une date"
             },
             "nothing": "Aucune planification"
-        },
-        "export": {
-            "component.error": "La campagne possède des scénarios de type composant qui ne sont pas exportables"
         }
     },
     "admin": {

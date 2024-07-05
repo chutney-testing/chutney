@@ -27,4 +27,5 @@ export class MenuItem {
     feature?: FeatureName;
     options?: { id: string, label: string }[];
     children?: MenuItem[] = [];
+    disabled?: boolean = false;
 }

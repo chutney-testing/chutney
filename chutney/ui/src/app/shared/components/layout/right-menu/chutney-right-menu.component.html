@@ -12,7 +12,7 @@
 
   <ng-template #dropDownItem let-item='item'>
     <div class="nav-item" placement="bottom" ngbDropdown display="dynamic" *hasAuthorization="item.authorizations || []">
-      <a class="nav-link" tabindex="0" ngbDropdownToggle id="executeDropdown" role="button">
+      <a class="nav-link" [ngClass]="{'disabled': item.disabled}" tabindex="0" ngbDropdownToggle id="executeDropdown" role="button">
         <i [ngClass]="item.iconClass"></i>
       </a>
       <div ngbDropdownMenu aria-labelledby="executeDropdown" class="dropdown-menu">
@@ -26,7 +26,7 @@
 
   <ng-template #simpleItem let-item='item'>
     <div class="nav-item" placement="bottom" ngbTooltip="{{item.label | translate}}" *hasAuthorization="item.authorizations || []">
-      <a class="nav-link cursor-pointer" role="nav-link" [routerLink]="getItemLink(item)"
+      <a class="nav-link cursor-pointer" [ngClass]="{'disabled': item.disabled}" role="nav-link" [routerLink]="getItemLink(item)"
         (click)="onItemClick(item)">
         <i [ngClass]="item.iconClass"></i>
         @if(item.secondaryIconClass) {

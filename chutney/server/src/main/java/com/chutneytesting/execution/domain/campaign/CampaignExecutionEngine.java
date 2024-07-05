@@ -144,11 +144,15 @@ public class CampaignExecutionEngine {
             .orElseThrow(() -> new CampaignExecutionNotFoundException(null, executionId));
     }
 
-    public CampaignExecution replayCampaignExecution(Long campaignExecutionId, String userId) {
+    public CampaignExecution replayFailedScenariosExecutionsForExecution(Long campaignExecutionId, String userId) {
         CampaignExecution campaignExecution = campaignExecutionRepository.getCampaignExecutionById(campaignExecutionId).withoutRetries();
+        List<ScenarioExecutionCampaign> failedExecutions = campaignExecution.failedScenarioExecutions();
+        if (failedExecutions.isEmpty()) {
+            throw new CampaignEmptyExecutionException(campaignExecution);
+        }
         Campaign campaign = campaignRepository.findById(campaignExecution.campaignId);
         campaign.executionEnvironment(campaignExecution.executionEnvironment);
-        return executeScenarioInCampaign(campaignExecution.failedScenarioExecutions(), campaign, userId);
+        return executeScenarioInCampaign(failedExecutions, campaign, userId);
     }
 
     CampaignExecution executeScenarioInCampaign(Campaign campaign, String userId) {
@@ -156,6 +160,7 @@ public class CampaignExecutionEngine {
     }
 
     CampaignExecution executeScenarioInCampaign(List<ScenarioExecutionCampaign> failedExecutions, Campaign campaign, String userId) {
+        verifyHasScenarios(campaign);
         verifyNotAlreadyRunning(campaign);
         Long executionId = campaignExecutionRepository.generateCampaignExecutionId(campaign.id, campaign.executionEnvironment());
 
@@ -313,6 +318,12 @@ public class CampaignExecutionEngine {
         Optional<CampaignExecution> currentReport = currentExecution(campaign.id, campaign.executionEnvironment());
         if (currentReport.isPresent() && !currentReport.get().status().isFinal()) {
             throw new CampaignAlreadyRunningException(currentReport.get());
+        }
+    }
+
+    private void verifyHasScenarios(Campaign campaign) {
+        if (campaign.scenarios.isEmpty()) {
+            throw new CampaignEmptyExecutionException(campaign);
         }
     }
 
