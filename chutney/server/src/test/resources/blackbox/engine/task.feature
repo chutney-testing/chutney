@@ -7,13 +7,13 @@ Feature: Engine actions exposition
                 On CHUTNEY_LOCAL
                 With uri /api/action/v1
                 Take allTasks ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         And Request engine for action <action-id>
             Do http-get
                 On CHUTNEY_LOCAL
                 With uri /api/action/v1/<action-id>
                 Take action ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then Its inputs are present in both responses
             Do json-compare Assert inputs from all actions
                 With document1 ${#allTasks}

@@ -22,7 +22,7 @@ Feature: HTTP Task test
                     ]
                 }
                 """
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         And this scenario is saved
             Do http-post Post scenario to Chutney instance
                 On CHUTNEY_LOCAL
@@ -52,14 +52,14 @@ Feature: HTTP Task test
                 }
                 """
                 Take scenarioId ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When last saved scenario is executed
             Do http-post Post scenario execution to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/scenario/execution/v1/${#scenarioId}/HTTP_ENV_<verb>_KO
                 With timeout 5 s
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the report status is FAILURE
             Do compare
                 With actual ${#json(#report, "$.report.status")}
@@ -104,7 +104,7 @@ Feature: HTTP Task test
                     ]
                 }
                 """
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         And this scenario is saved
             Do http-post Post scenario to Chutney instance
                 On CHUTNEY_LOCAL
@@ -134,14 +134,14 @@ Feature: HTTP Task test
                 }
                 """
                 Take scenarioId ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When last saved scenario is executed
             Do http-post Post scenario execution to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/scenario/execution/v1/${#scenarioId}/HTTP_ENV_<verb>
                 With timeout 5 s
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the report status is SUCCESS
             Do compare
                 With actual ${#json(#report, "$.report.status")}

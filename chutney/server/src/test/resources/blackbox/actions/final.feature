@@ -25,14 +25,14 @@ Feature: Final action for registering final actions for a testcase
                 }
                 """
                 Take scenarioId ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When Last saved scenario is executed
             Do http-post Post scenario execution to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/scenario/execution/v1/${#scenarioId}/DEFAULT
                 With timeout 5 s
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then The report status is SUCCESS
             Do compare
                 With actual ${#json(#report, "$.report.status")}
@@ -93,14 +93,14 @@ Feature: Final action for registering final actions for a testcase
                 }
                 """
                 Take scenarioId ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When Last saved scenario is executed
             Do http-post Post scenario execution to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/scenario/execution/v1/${#scenarioId}/DEFAULT
                 With timeout 5 s
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then The report status is FAILURE
             Do compare
                 With actual ${#json(#report, "$.report.status")}
@@ -145,7 +145,7 @@ Feature: Final action for registering final actions for a testcase
                     ]
                 }
                 """
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         And A scenario is saved
             Do http-post Post scenario to Chutney instance
                 On CHUTNEY_LOCAL
@@ -174,14 +174,14 @@ Feature: Final action for registering final actions for a testcase
                 }
                 """
                 Take scenarioId ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When Last saved scenario is executed
             Do http-post Post scenario execution to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/scenario/execution/v1/${#scenarioId}/ENV_FINAL
                 With timeout 5 s
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then The report contains the executions (in declaration reverse order) of all the final actions action
             Do json-assert
                 With document ${#report}

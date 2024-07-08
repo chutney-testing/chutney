@@ -15,7 +15,7 @@ Feature: Replace scenario parameters with data set or global var values
                     "message": "{ \"simple\": { \"word\": \"a_word\", \"line\": \"one line\", \"multiline\": \"My half empty glass,\\nI will fill your empty half.\\nNow you are half full.\" }, \"escape\": { \"quote\": \"line with quote \\\"\", \"backslash\": \"line with backslash \\\\\", \"slash\": \"line with slash as url http://host:port/path\", \"apostrophe\": \"line with apostrophe '\" } }"
                 }
                 """
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
 
     Scenario: Execute gwt scenario with global vars
         Given a testcase written with GWT form
@@ -130,14 +130,14 @@ Feature: Replace scenario parameters with data set or global var values
                 }
                 """
                 Take scenarioId ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When last saved scenario is executed
             Do http-post Post scenario execution to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/scenario/execution/v1/${#scenarioId}/DEFAULT
                 With timeout 5 s
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the report status is SUCCESS
             Do compare
                 With actual ${#json(#report, "$.report.status")}

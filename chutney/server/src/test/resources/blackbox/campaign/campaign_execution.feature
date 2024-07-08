@@ -25,7 +25,7 @@ Feature:  Campaign execution
                 }
                 """
                 Take scenario1Id ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         And a scenario with name "scenario2" is stored
             Do http-post Post scenario to Chutney instance
                 On CHUTNEY_LOCAL
@@ -48,7 +48,7 @@ Feature:  Campaign execution
                 }
                 """
                 Take scenario2Id ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
 
     Scenario: Execution by campaign id with 2 scenarios
         Given a campaign is stored
@@ -70,13 +70,13 @@ Feature:  Campaign execution
                 }
                 """
                 Take campaignId ${#jsonPath(#body, "$.id")}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When this campaign is executed by id
             Do http-get
                 On CHUTNEY_LOCAL
                 With uri /api/ui/campaign/execution/v1/byID/${#campaignId}
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the execution report is returned
             Do compare Check execution id not empty
                 With actual ${#json(#report, "$.executionId").toString()}
@@ -115,7 +115,7 @@ Feature:  Campaign execution
                 }
                 """
                 Take datasetId ${#jsonPath(#body, '$.id')}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         And a campaign with name "campaignName" is stored
             Do http-post Post campaign to Chutney instance
                 On CHUTNEY_LOCAL
@@ -135,14 +135,14 @@ Feature:  Campaign execution
                 }
                 """
                 Take campaignId ${#jsonPath(#body, "$.id")}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When this campaign is executed by name
             Do http-get
                 On CHUTNEY_LOCAL
                 With uri /api/ui/campaign/execution/v1/campaignName/DEFAULT
                 Take report ${#json(#body, "$[0]")}
                 Take executionId ${#json(#body, "$[0].executionId").toString()}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the execution reports are returned
             Do compare Check execution id not empty
                 With actual ${#executionId}
@@ -187,13 +187,13 @@ Feature:  Campaign execution
                 }
                 """
                 Take campaignId ${#jsonPath(#body, "$.id")}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When this campaign is executed for surefire
             Do http-get
                 On CHUTNEY_LOCAL
                 With uri /api/ui/campaign/execution/v1/campaignSurefire/surefire
                 Take responseHeaders ${#headers}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the response is a non empty zip file
             Do compare
                 With actual ${#responseHeaders.getContentType().toString()}
@@ -222,7 +222,7 @@ Feature:  Campaign execution
                 On CHUTNEY_LOCAL
                 With uri /api/ui/campaign/execution/v1/unknownName
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the campaign report is empty
             Do compare
                 With actual ${#report}

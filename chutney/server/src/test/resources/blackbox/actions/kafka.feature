@@ -22,7 +22,7 @@ Feature: Kafka all Tasks test
                     ]
                 }
                 """
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         And this scenario is saved
             Do http-post Post scenario to Chutney instance
                 On CHUTNEY_LOCAL
@@ -45,14 +45,14 @@ Feature: Kafka all Tasks test
                 }
                 """
                 Take scenarioId ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When last saved scenario is executed
             Do http-post Post scenario execution to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/scenario/execution/v1/${#scenarioId}/KAFKA_ENV_KO
                 With timeout 5 s
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the report status is FAILURE
             Do compare
                 With actual ${#json(#report, "$.report.status")}
@@ -83,7 +83,7 @@ Feature: Kafka all Tasks test
                     ]
                 }
                 """
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         And this scenario is saved
             Do http-post Post scenario to Chutney instance
                 On CHUTNEY_LOCAL
@@ -119,14 +119,14 @@ Feature: Kafka all Tasks test
                 }
                 """
                 Take scenarioId ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When last saved scenario is executed
             Do http-post Post scenario execution to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/scenario/execution/v1/${#scenarioId}/KAFKA_ENV_OK
                 With timeout 5 s
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the report status is SUCCESS
             Do compare
                 With actual ${#json(#report, "$.report.status")}
@@ -162,7 +162,7 @@ Feature: Kafka all Tasks test
                     ]
                 }
                 """
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         And this scenario is saved
             Do http-post Post scenario to Chutney instance
                 On CHUTNEY_LOCAL
@@ -210,14 +210,14 @@ Feature: Kafka all Tasks test
                 }
                 """
                 Take scenarioId ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         When last saved scenario is executed
             Do http-post Post scenario execution to Chutney instance
                 On CHUTNEY_LOCAL
                 With uri /api/ui/scenario/execution/v1/${#scenarioId}/KAFKA_ENV_<testEnvName>
                 With timeout 5 s
                 Take report ${#body}
-                Validate httpStatusCode_200 ${#status == 200}
+                Validate httpStatusCode_200 ${#status == "200"}
         Then the report status is <reportStatus>
             Do compare Global status
                 With actual ${#json(#report, "$.report.status")}
