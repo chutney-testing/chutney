@@ -229,7 +229,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
 
     private initFilters() {
         const allTagsInScenario: string[] = this.findAllTags();
-        this.tags = this.getTagsForComboModel(allTagsInScenario);
+        this.tags = allTagsInScenario.map(tag => this.toSelectOption(tag,tag));
         this.status = [...new Set(this.scenarios.map(scenario => scenario.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
     }
 
@@ -256,7 +256,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
     private setSelectedTags() {
         const savedTags = this.stateService.getTags();
         if (savedTags != null) {
-            this.selectedTags = this.getTagsForComboModel(savedTags);
+            this.selectedTags = this.tags.filter(tag => savedTags.includes(tag.id));
         }
     }
 
@@ -277,7 +277,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
                         }
                         if (params['tags']) {
                             const uriTag = params['tags'].split(',');
-                            this.selectedTags = this.getTagsForComboModel(uriTag);
+                            this.selectedTags = this.tags.filter(tag => uriTag.includes(tag.id));
                         }
                         this.applyFilters();
                         this.urlParams?.unsubscribe()
@@ -354,16 +354,7 @@ export class ScenariosComponent implements OnInit, OnDestroy {
         }
     }
 
-
     private getSelectedTags() {
         return this.selectedTags.map((i) => i.text);
-    }
-
-    private getTagsForComboModel(tags: String[]) {
-        let index = 0;
-        return tags.map((t) => {
-            index++;
-            return {'id': index, 'text': t};
-        });
     }
 }
