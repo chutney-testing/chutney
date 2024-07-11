@@ -156,7 +156,7 @@ Get the [official documentation](https://www.chutney-testing.com/) for more info
 
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square)
 
-See the [Getting started](chutney/GETTING_STARTED.md), which document how to install and setup the required environment for developing
+See the [Getting started](GETTING_STARTED.md), which document how to install and setup the required environment for developing
 
 You don't need to be a developer to contribute, nor do much, you can simply:
 * Enhance documentation,
