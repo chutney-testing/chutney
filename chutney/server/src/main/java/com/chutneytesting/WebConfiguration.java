@@ -17,7 +17,6 @@
 package com.chutneytesting;
 
 import com.chutneytesting.security.AuditHandler;
-import com.chutneytesting.tools.ui.MyMixInForIgnoreType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;

@@ -44,14 +44,20 @@ import com.chutneytesting.engine.domain.report.Reporter;
 import com.chutneytesting.engine.infrastructure.delegation.HttpClient;
 import com.chutneytesting.tools.ThrowingFunction;
 import com.chutneytesting.tools.loader.ExtensionLoaders;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.io.Resource;
 import org.springframework.util.ReflectionUtils;
 
 public class ExecutionConfiguration {
@@ -65,7 +71,7 @@ public class ExecutionConfiguration {
 
     private final SpelFunctions spelFunctions;
     private final Set<StepExecutionStrategy> stepExecutionStrategies;
-
+    private static ObjectMapper objectMapper;
     private final Long reporterTTL;
 
     public ExecutionConfiguration() {
@@ -103,6 +109,21 @@ public class ExecutionConfiguration {
 
     public ExecutionEngine executionEngine() {
         return executionEngine;
+    }
+
+    public static ObjectMapper reportObjectMapper() {
+        if (objectMapper == null) {
+            SimpleModule jdomElementModule = new SimpleModule();
+            jdomElementModule.addSerializer(Element.class, new JDomElementSerializer());
+            objectMapper = new ObjectMapper()
+                .addMixIn(Resource.class, MyMixInForIgnoreType.class)
+                .setSerializationInclusion(JsonInclude.Include.NON_NULL)
+                .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+                .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
+                .registerModule(jdomElementModule)
+                .findAndRegisterModules();
+        }
+        return objectMapper;
     }
 
     private ActionTemplateLoader createActionTemplateLoaderV2() {

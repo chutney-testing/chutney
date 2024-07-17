@@ -21,6 +21,7 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 
+import com.chutneytesting.ExecutionConfiguration;
 import com.chutneytesting.action.spi.ActionExecutionResult;
 import com.chutneytesting.action.spi.injectable.Target;
 import com.chutneytesting.engine.domain.environment.TargetImpl;
@@ -39,6 +40,8 @@ import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReport;
 import com.chutneytesting.engine.domain.execution.strategies.StepStrategyDefinition;
 import com.chutneytesting.tools.Try;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.time.Duration;
@@ -67,7 +70,7 @@ public class Step {
     private Target target;
     private final StepExecutor executor;
     private final StepDataEvaluator dataEvaluator;
-
+    private static final ObjectMapper objectMapper = ExecutionConfiguration.reportObjectMapper();
     private StepContext stepContext;
 
     public Step(StepDataEvaluator dataEvaluator, StepDefinition definition, StepExecutor executor, List<Step> steps) {
@@ -77,7 +80,7 @@ public class Step {
         this.executor = executor;
         this.steps = steps;
         this.state = new StepState(definition.name);
-        this.stepContext = new StepContext();
+        this.stepContext = new StepContext(objectMapper);
     }
 
     public static Step nonExecutable(StepDefinition definition) {
@@ -111,7 +114,7 @@ public class Step {
             target = dataEvaluator.evaluateTarget(target, evaluationContext);
             resolveName(evaluationContext);
             Try
-                .exec(() -> this.stepContext = new StepContext(scenarioContext, localContext, evaluatedInputs))
+                .exec(() -> this.stepContext = new StepContext(scenarioContext, localContext, evaluatedInputs, objectMapper))
                 .ifSuccess(stepContextExecuted -> {
                     executor.execute(scenarioExecution, target, this);
                     if (Status.SUCCESS.equals(this.state.status())) {
@@ -152,6 +155,10 @@ public class Step {
 
     public String name() {
         return this.state.name();
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
     }
 
     public void resolveName(Map<String, Object> context) {
@@ -329,10 +336,6 @@ public class Step {
         this.steps.add(step);
     }
 
-    public void addStepExecution(List<Step> steps) {
-        steps.forEach(this::addStepExecution);
-    }
-
     public Map<String, Object> getEvaluatedInputs() {
         return unmodifiableMap(this.stepContext.getEvaluatedInputs());
     }
@@ -343,6 +346,14 @@ public class Step {
 
     public Map<String, Object> getStepOutputs() {
         return unmodifiableMap(this.stepContext.getStepOutputs());
+    }
+
+    public Map<String, Object> getStepContextInputSnapshot() {
+        return this.stepContext.stepContextSnapshot.getInputsSnapshot();
+    }
+
+    public Map<String, Object> getStepContextOutputSnapshot() {
+        return this.stepContext.stepContextSnapshot.getOutputsSnapshot();
     }
 
     public void removeStepExecution() {
@@ -356,20 +367,27 @@ public class Step {
         private final Map<String, Object> localContext;
         private final Map<String, Object> evaluatedInputs;
         private final Map<String, Object> stepOutputs;
+        private StepContextSnapshot stepContextSnapshot;
 
-        private StepContext() {
-            this(new ScenarioContextImpl(), new LinkedHashMap<>(), new LinkedHashMap<>());
+        private StepContext(ObjectMapper objectMapper) {
+            this(new ScenarioContextImpl(), new LinkedHashMap<>(), new LinkedHashMap<>(), objectMapper);
         }
 
-        private StepContext(ScenarioContext scenarioContext, Map<String, Object> localContext, Map<String, Object> evaluatedInputs) throws EvaluationException {
-            this(scenarioContext, localContext, evaluatedInputs, new LinkedHashMap<>());
+        private StepContext(ScenarioContext scenarioContext, Map<String, Object> localContext, Map<String, Object> evaluatedInputs, ObjectMapper objectMapper) throws EvaluationException {
+            this(scenarioContext, localContext, evaluatedInputs, new LinkedHashMap<>(), objectMapper);
         }
 
-        private StepContext(ScenarioContext scenarioContext, Map<String, Object> localContext, Map<String, Object> evaluatedInputs, Map<String, Object> stepOutputs) {
+        private StepContext(ScenarioContext scenarioContext, Map<String, Object> localContext, Map<String, Object> evaluatedInputs, Map<String, Object> stepOutputs, ObjectMapper objectMapper) {
             this.scenarioContext = scenarioContext;
             this.localContext = localContext;
             this.evaluatedInputs = evaluatedInputs;
             this.stepOutputs = stepOutputs;
+            this.stepContextSnapshot = new StepContextSnapshot(objectMapper);
+        }
+
+        private StepContext copySnapshotsInputOutput() {
+            this.stepContextSnapshot = new StepContextSnapshot(evaluatedInputs, stepOutputs, objectMapper);
+            return this;
         }
 
         private Map<String, Object> evaluationContext() {
@@ -385,17 +403,6 @@ public class Step {
 
         private Map<String, Object> getEvaluatedInputs() {
             return ofNullable(evaluatedInputs).orElse(emptyMap());
-        }
-
-        @SafeVarargs
-        private void addLocalContext(Map.Entry<String, Object>... entries) {
-            this.addLocalContext(Map.ofEntries(entries));
-        }
-
-        private void addLocalContext(Map<String, Object> localContext) {
-            if (localContext != null) {
-                this.localContext.putAll(localContext);
-            }
         }
 
         private void addStepOutputs(Map<String, Object> stepOutputs) {
@@ -415,7 +422,47 @@ public class Step {
         }
 
         private StepContext copy() {
-            return new StepContext(scenarioContext.unmodifiable(), unmodifiableMap(localContext), unmodifiableMap(evaluatedInputs), unmodifiableMap(stepOutputs));
+            return new StepContext(scenarioContext.unmodifiable(), unmodifiableMap(localContext), unmodifiableMap(evaluatedInputs), unmodifiableMap(stepOutputs), objectMapper).copySnapshotsInputOutput();
+        }
+    }
+
+    public static class StepContextSnapshot {
+        private final Map<String, Object> inputsSnapshot;
+        private final Map<String, Object> outputsSnapshot;
+        private final ObjectMapper objectMapper;
+
+        public StepContextSnapshot(ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+            this.inputsSnapshot = emptyMap();
+            this.outputsSnapshot = emptyMap();
+        }
+
+        public StepContextSnapshot(Map<String, Object> inputsSnapshot, Map<String, Object> outputsSnapshot, ObjectMapper objectMapper) {
+            this.objectMapper = objectMapper;
+            this.inputsSnapshot = mapStringObjectToString(inputsSnapshot);
+            this.outputsSnapshot = mapStringObjectToString(outputsSnapshot);
+        }
+
+        public Map<String, Object> getInputsSnapshot() {
+            return unmodifiableMap(inputsSnapshot);
+        }
+
+        public Map<String, Object> getOutputsSnapshot() {
+            return unmodifiableMap(outputsSnapshot);
+        }
+
+        private Map<String, Object> mapStringObjectToString(Map<String, Object> originalMap) {
+            Map<String, Object> stringMap = new HashMap<>();
+            originalMap.forEach((key, value) -> {
+                try {
+                    String stringObject = objectMapper.writeValueAsString(value);
+                    Object jsonObject = objectMapper.readTree(stringObject);
+                    stringMap.put(key, jsonObject);
+                } catch (JsonProcessingException e) {
+                    throw new RuntimeException(e);
+                }
+            });
+            return stringMap;
         }
     }
 }

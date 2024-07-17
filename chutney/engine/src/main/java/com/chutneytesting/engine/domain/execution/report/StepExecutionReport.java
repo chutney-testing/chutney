@@ -41,9 +41,12 @@ public class StepExecutionReport implements Status.HavingStatus {
     public final String targetUrl;
     public final String strategy;
     public final Map<String, Object> evaluatedInputs;
+    public final Map<String, Object> evaluatedInputsSnapshot;
 
     @JsonIgnore
     public Map<String, Object> stepResults;
+    @JsonIgnore
+    public Map<String, Object> stepResultsSnapshot;
     @JsonIgnore
     public Map<String, Object> scenarioContext;
 
@@ -62,7 +65,7 @@ public class StepExecutionReport implements Status.HavingStatus {
                                String targetUrl,
                                String strategy
     ) {
-        this(executionId, name, environment, duration, startDate, status, information, errors, steps, type, targetName, targetUrl, strategy, null, null, null);
+        this(executionId, name, environment, duration, startDate, status, information, errors, steps, type, targetName, targetUrl, strategy, null, null, null, null, null);
     }
 
     public StepExecutionReport(Long executionId,
@@ -80,7 +83,9 @@ public class StepExecutionReport implements Status.HavingStatus {
                                String strategy,
                                Map<String, Object> evaluatedInputs,
                                Map<String, Object> stepResults,
-                               Map<String, Object> scenarioContext
+                               Map<String, Object> scenarioContext,
+                               Map<String, Object> evaluatedInputsSnapshot,
+                               Map<String, Object> stepResultsSnapshot
     ) {
         this.executionId = executionId;
         this.name = name;
@@ -96,7 +101,9 @@ public class StepExecutionReport implements Status.HavingStatus {
         this.targetUrl = targetUrl;
         this.strategy = strategy;
         this.evaluatedInputs = evaluatedInputs != null ? evaluatedInputs : emptyMap();
+        this.evaluatedInputsSnapshot = evaluatedInputsSnapshot != null ? evaluatedInputsSnapshot : emptyMap();
         this.stepResults = stepResults != null ? stepResults : emptyMap();
+        this.stepResultsSnapshot = stepResultsSnapshot != null ? stepResultsSnapshot : emptyMap();
         this.scenarioContext = scenarioContext != null ? scenarioContext : emptyMap();
     }
 

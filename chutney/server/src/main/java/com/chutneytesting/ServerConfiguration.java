@@ -49,17 +49,11 @@ import com.chutneytesting.server.core.domain.execution.processor.TestCasePreProc
 import com.chutneytesting.server.core.domain.execution.processor.TestCasePreProcessors;
 import com.chutneytesting.server.core.domain.execution.state.ExecutionStateRepository;
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
-import com.chutneytesting.tools.ui.MyMixInForIgnoreType;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import jakarta.annotation.PostConstruct;
-import java.io.IOException;
-import java.io.Serial;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Clock;
@@ -69,8 +63,6 @@ import java.util.Map;
 import javax.sql.DataSource;
 import liquibase.integration.spring.SpringLiquibase;
 import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -256,26 +248,5 @@ public class ServerConfiguration {
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
             .registerModule(jdomElementModule)
             .findAndRegisterModules();
-    }
-
-    // TODO - To remove when Reporter will serialize itself
-    static class JDomElementSerializer extends StdSerializer<Element> {
-
-        @Serial
-        private static final long serialVersionUID = 1L;
-
-        protected JDomElementSerializer() {
-            this(null);
-        }
-
-        protected JDomElementSerializer(Class<Element> t) {
-            super(t);
-        }
-
-        @Override
-        public void serialize(Element element, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-            String xmlString = new XMLOutputter(Format.getCompactFormat()).outputString(element);
-            jsonGenerator.writeObject(xmlString);
-        }
     }
 }
