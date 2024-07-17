@@ -26,9 +26,11 @@ import com.chutneytesting.engine.api.execution.ExecutionRequestDto;
 import com.chutneytesting.engine.api.execution.StepExecutionReportDto;
 import com.chutneytesting.engine.api.execution.TestEngine;
 import com.chutneytesting.tools.Jsons;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.node.TextNode;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
@@ -199,13 +201,13 @@ class ForEachStrategyTest {
         assertThat(iteration0.status).isEqualTo(SUCCESS);
         assertThat(iteration0.name).startsWith("0 -");
         assertThat(iteration0.information.get(0)).isEqualTo("Validation [check_0_ok : ${#check_0 == \"/\" + #generatedID + \"/0\"}] : OK");
-        assertDoesNotThrow(() -> UUID.fromString((String) iteration0.context.evaluatedInputs.get("stringParam")));
+        assertDoesNotThrow(() -> UUID.fromString(((JsonNode) iteration0.context.evaluatedInputs.get("stringParam")).asText()));
 
         StepExecutionReportDto iteration1 = parentStep.steps.get(1);
         assertThat(iteration1.status).isEqualTo(SUCCESS);
         assertThat(iteration1.name).startsWith("1 -");
         assertThat(iteration1.information.get(0)).isEqualTo("Validation [check_1_ok : ${#check_1 == \"/\" + #generatedID + \"/1\"}] : OK");
-        assertDoesNotThrow(() -> UUID.fromString((String) iteration1.context.evaluatedInputs.get("stringParam")));
+        assertDoesNotThrow(() -> UUID.fromString(((JsonNode) iteration1.context.evaluatedInputs.get("stringParam")).asText()));
     }
 
     @Test
@@ -221,14 +223,12 @@ class ForEachStrategyTest {
         StepExecutionReportDto iterationWithMap = result.steps.get(0);
         assertThat(iterationWithMap.steps).hasSize(2);
         assertThat(iterationWithMap.status).isEqualTo(SUCCESS);
-        assertThat(((HashMap<?, ?>) iterationWithMap.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).values())
-            .hasExactlyElementsOfTypes(ZonedDateTime.class);
+        assertDoesNotThrow(() -> ZonedDateTime.parse(((ObjectNode) iterationWithMap.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).elements().next().asText()));
 
         StepExecutionReportDto iterationWithList = result.steps.get(1);
         assertThat(iterationWithList.steps).hasSize(2);
         assertThat(iterationWithList.status).isEqualTo(SUCCESS);
-        assertThat(((ArrayList<?>) iterationWithList.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).get(0))
-            .isOfAnyClassIn(ZonedDateTime.class);
+        assertDoesNotThrow(() -> ZonedDateTime.parse(((ArrayNode) iterationWithList.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).elements().next().asText()));
     }
 
     @Test
@@ -306,17 +306,21 @@ class ForEachStrategyTest {
         StepExecutionReportDto firstIteration = parentIterativeStep.steps.get(0).steps.get(0);
         assertThat(firstIteration.steps).hasSize(2);
         assertThat(firstIteration.steps.get(0).name).startsWith("0 -");
-        assertThat(firstIteration.steps.get(0).context.stepResults).containsEntry("environment_0.0","overriddenEnvX");
+        assertThat(firstIteration.steps.get(0).context.stepResults).containsKey("environment_0.0");
+        assertThat(((TextNode)firstIteration.steps.get(0).context.stepResults.get("environment_0.0")).asText()).isEqualTo("overriddenEnvX");
         assertThat(firstIteration.steps.get(1).name).startsWith("1 -");
-        assertThat(firstIteration.steps.get(1).context.stepResults).containsEntry("environment_0.1","overriddenEnvY");
+        assertThat(firstIteration.steps.get(1).context.stepResults).containsKey("environment_0.1");
+        assertThat(((TextNode)firstIteration.steps.get(1).context.stepResults.get("environment_0.1")).asText()).isEqualTo("overriddenEnvY");
 
         // And the second iteration contains 2 nested iterations
         StepExecutionReportDto secondIteration = parentIterativeStep.steps.get(1).steps.get(0);
         assertThat(secondIteration.steps).hasSize(2);
         assertThat(secondIteration.steps.get(0).name).startsWith("0 -");
-        assertThat(secondIteration.steps.get(0).context.stepResults).containsEntry("environment_1.0","overriddenEnvX");
+        assertThat(secondIteration.steps.get(0).context.stepResults).containsKey("environment_1.0");
+        assertThat(((TextNode)secondIteration.steps.get(0).context.stepResults.get("environment_1.0")).asText()).isEqualTo("overriddenEnvX");
         assertThat(secondIteration.steps.get(1).name).startsWith("1 -");
-        assertThat(secondIteration.steps.get(1).context.stepResults).containsEntry("environment_1.1","overriddenEnvY");
+        assertThat(secondIteration.steps.get(1).context.stepResults).containsKey("environment_1.1");
+        assertThat(((TextNode)secondIteration.steps.get(1).context.stepResults.get("environment_1.1")).asText()).contains("overriddenEnvY");
     }
 
     @Test

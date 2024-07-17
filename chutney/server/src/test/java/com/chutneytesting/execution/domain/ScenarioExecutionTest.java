@@ -25,6 +25,7 @@ import com.chutneytesting.server.core.domain.execution.report.StepExecutionRepor
 import com.chutneytesting.server.core.domain.execution.report.StepExecutionReportCoreBuilder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,20 +34,43 @@ import org.junit.jupiter.api.Test;
 public class ScenarioExecutionTest {
 
     @Test
-    public void should_serialize_and_deserialize_input_and_output_in_report() throws JsonProcessingException {
+    public void should_serialize_and_deserialize_simple_input_and_output_in_report() throws JsonProcessingException {
         // Given
         ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
-        Map<String, Object> mapStringObject = Map.of("TUTU", Map.of("TOTO", Map.of("BUBU",Map.of("VIVI","LALA"))));
+        Map<String, Object> mapStringObject = Map.of("TUTU", "TITI");
 
         Step.StepContextSnapshot stepContextSnapshot = new Step.StepContextSnapshot(mapStringObject, mapStringObject, objectMapper);
-        StepExecutionReportCore stepExecutionReport = new StepExecutionReportCoreBuilder().setStepOutputs(new HashMap<>(stepContextSnapshot.getOutputsSnapshot())).createStepExecutionReport();
+        StepExecutionReportCore stepExecutionReport = new StepExecutionReportCoreBuilder()
+            .setStepOutputs(new HashMap<>(stepContextSnapshot.getOutputsSnapshot()))
+            .setEvaluatedInputs(new HashMap<>(stepContextSnapshot.getInputsSnapshot()))
+            .createStepExecutionReport();
         ScenarioExecutionReport scenarioExecutionReport = new ScenarioExecutionReport(1L, "", "", "", List.of(), stepExecutionReport);
 
         // When
         String serializedReport = objectMapper.writeValueAsString(scenarioExecutionReport);
 
         // Then
-        assertThat(serializedReport).isEqualTo("{\"executionId\":1,\"scenarioName\":\"\",\"environment\":\"\",\"user\":\"\",\"tags\":[],\"constants\":{},\"datatable\":[],\"report\":{\"name\":null,\"duration\":0,\"startDate\":null,\"status\":null,\"information\":[],\"errors\":[],\"steps\":[],\"type\":null,\"targetName\":\"\",\"targetUrl\":\"\",\"strategy\":\"sequential\",\"evaluatedInputs\":{\"TUTU\":{\"TOTO\":{\"BUBU\":{\"VIVI\":\"LALA\"}}}}},\"stepOutputs\":{\"TUTU\":{\"TOTO\":{\"BUBU\":{\"VIVI\":\"LALA\"}}}}},\"contextVariables\":{}}");
+        assertThat(serializedReport).isEqualTo("{\"executionId\":1,\"scenarioName\":\"\",\"environment\":\"\",\"user\":\"\",\"tags\":[],\"constants\":{},\"datatable\":[],\"report\":{\"name\":null,\"duration\":0,\"startDate\":null,\"status\":null,\"information\":[],\"errors\":[],\"steps\":[],\"type\":null,\"targetName\":\"\",\"targetUrl\":\"\",\"strategy\":\"sequential\",\"evaluatedInputs\":{\"TUTU\":\"TITI\"},\"stepOutputs\":{\"TUTU\":\"TITI\"}},\"contextVariables\":{}}");
+
+    }
+    @Test
+    public void should_serialize_and_deserialize_complex_input_and_output_in_report() throws JsonProcessingException {
+        // Given
+        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules();
+        Map<String, Object> mapStringObject = Map.of("TUTU", Map.of("TOTO", Map.of("BUBU",Map.of("VIVI","LALA"))));
+
+        Step.StepContextSnapshot stepContextSnapshot = new Step.StepContextSnapshot(mapStringObject, mapStringObject, objectMapper);
+        StepExecutionReportCore stepExecutionReport = new StepExecutionReportCoreBuilder()
+            .setStepOutputs(new HashMap<>(stepContextSnapshot.getOutputsSnapshot()))
+            .setEvaluatedInputs(new HashMap<>(stepContextSnapshot.getInputsSnapshot()))
+            .createStepExecutionReport();
+        ScenarioExecutionReport scenarioExecutionReport = new ScenarioExecutionReport(1L, "", "", "", List.of(), stepExecutionReport);
+
+        // When
+        String serializedReport = objectMapper.writeValueAsString(scenarioExecutionReport);
+
+        // Then
+        assertThat(serializedReport).isEqualTo("{\"executionId\":1,\"scenarioName\":\"\",\"environment\":\"\",\"user\":\"\",\"tags\":[],\"constants\":{},\"datatable\":[],\"report\":{\"name\":null,\"duration\":0,\"startDate\":null,\"status\":null,\"information\":[],\"errors\":[],\"steps\":[],\"type\":null,\"targetName\":\"\",\"targetUrl\":\"\",\"strategy\":\"sequential\",\"evaluatedInputs\":{\"TUTU\":{\"TOTO\":{\"BUBU\":{\"VIVI\":\"LALA\"}}}},\"stepOutputs\":{\"TUTU\":{\"TOTO\":{\"BUBU\":{\"VIVI\":\"LALA\"}}}}},\"contextVariables\":{}}");
 
     }
 }
