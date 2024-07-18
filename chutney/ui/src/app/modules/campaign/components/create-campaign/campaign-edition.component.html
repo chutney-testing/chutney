@@ -139,57 +139,64 @@
       <!-- Left side -->
       <div class="col-md-6">
           <table class="table table-striped table-hover">
-            <thead>
-              <th colspan="4">
-                {{ 'campaigns.edition.scenarios.title' | translate }}
+            <thead class="w-100">
+              <th class="w-100 d-flex justify-content-between">
+                <div>
+                  {{ 'campaigns.edition.scenarios.title' | translate }}
+                </div>
+                <div class="text-center dataset-header">
+                  @if (datasets.length > 0) {
+                    Dataset
+                  }
+                </div>
               </th>
-              <th class="text-center pe-5">
-                @if (datasets.length > 0) {
-                  Dataset
-                }
-              </th>
-              <th></th>
             </thead>
             <tbody dragula="DRAGGABLE" [(dragulaModel)]="scenariosToAdd">
               @for (scenario of scenariosToAdd; track scenario) {
-                <tr class="cursor">
-                  <td class="text-nowrap">{{scenario?.scenarioId.id}}</td>
-                  <td class="scenario-title-cell">{{scenario?.scenarioId.title}}</td>
-                  <td class="p-0">
-                    @if (jiraMap.has(scenario.id)) {
-                      <span
-                        [ngClass]="getJiraLastExecutionStatusClass(scenario.scenarioId.id)" class="badge">
-                        {{getJiraLastExecutionStatus(scenario.scenarioId.id)}}
-                      </span>
-                    }
+                <tr class="cursor w-100">
+                  <td class="w-100">
+                    <div class="w-100 d-flex justify-content-between align-items-center flex-wrap">
+                      <div class="d-flex flex-row">
+                        <div class="text-nowrap me-4">{{scenario?.scenarioId.id}}</div>
+                        <div class="scenario-title-cell w-100 me-2">{{scenario?.scenarioId.title}}</div>
+                      </div>
+                      <div class="p-0">
+                        @if (jiraMap.has(scenario.id)) {
+                          <span
+                            [ngClass]="getJiraLastExecutionStatusClass(scenario.scenarioId.id)" class="badge">
+                            {{getJiraLastExecutionStatus(scenario.scenarioId.id)}}
+                          </span>
+                        }
+                      </div>
+                      <div class="p-0">
+                        @if (jiraMap.has(scenario.id)) {
+                          <a  role="button" class="btn btn-sm btn-link me-0"
+                            target="_blank" href="{{getJiraLink(scenario.scenarioId.id)}}" rel="noopener noreferrer"
+                            ngbPopover="{{jiraMap.get(scenario.scenarioId.id)}}" placement="left" (click)="$event.stopPropagation()"
+                            triggers="mouseenter:mouseleave">
+                            <span class="fab fa-jira" aria-hidden="true">
+                            </span>
+                          </a>
+                        }
+                      </div>
+                      <div class="p-0 me-2">
+                        @if (datasets.length > 0) {
+                          <ng-multiselect-dropdown
+                                          [settings]="dropdownDatasetSettings"
+                                          class="dataset-combo"
+                                          [placeholder]="'campaigns.edition.selectDatasetScenario' | translate"
+                                          [data]="datasets"
+                                          [ngModel]="scenario.dataset === null ? [] : [scenario.dataset]"
+                                          [ngModelOptions]="{standalone: true}"
+                                          (onSelect)="selectDatasetScenario($event, scenario)"
+                                          (onDeSelect)="deselectDatasetScenario(scenario)">
+                          </ng-multiselect-dropdown>
+                        }
+                      </div>
+                    </div>
                   </td>
-                  <td class="p-0">
-                    @if (jiraMap.has(scenario.id)) {
-                      <a  role="button" class="btn btn-sm btn-link me-0"
-                        target="_blank" href="{{getJiraLink(scenario.scenarioId.id)}}" rel="noopener noreferrer"
-                        ngbPopover="{{jiraMap.get(scenario.scenarioId.id)}}" placement="left" (click)="$event.stopPropagation()"
-                        triggers="mouseenter:mouseleave">
-                        <span class="fab fa-jira" aria-hidden="true">
-                        </span>
-                      </a>
-                    }
-                  </td>
-                  <td class="pe-5">
-                    @if (datasets.length > 0) {
-                      <ng-multiselect-dropdown
-                                      [settings]="dropdownDatasetSettings"
-                                      class="dataset-combo"
-                                      [placeholder]="'campaigns.edition.selectDatasetScenario' | translate"
-                                      [data]="datasets"
-                                      [ngModel]="scenario.dataset === null ? [] : [scenario.dataset]"
-                                      [ngModelOptions]="{standalone: true}"
-                                      (onSelect)="selectDatasetScenario($event, scenario)"
-                                      (onDeSelect)="deselectDatasetScenario(scenario)">
-                      </ng-multiselect-dropdown>
-                    }
-                  </td>
-                  <td class="p-0">
-                    <button type="button" class="btn btn-outline-primary btn-sm me-2"
+                  <td>
+                    <button type="button" class="btn btn-outline-primary btn-sm "
                             (click)="removeScenario(scenario)">
                       <span class="fa fa-arrow-circle-right"></span>
                     </button>
