@@ -139,27 +139,21 @@
       <!-- Left side -->
       <div class="col-md-6">
           <table class="table table-striped table-hover">
-            <thead class="w-100">
-              <th class="w-100 d-flex justify-content-between">
-                <div>
-                  {{ 'campaigns.edition.scenarios.title' | translate }}
-                </div>
-                <div class="text-center dataset-header">
-                  @if (datasets.length > 0) {
-                    Dataset
-                  }
-                </div>
+            <thead>
+              <th colspan="2">
+                {{ 'campaigns.edition.scenarios.title' | translate }}
               </th>
+              <th></th>
             </thead>
             <tbody dragula="DRAGGABLE" [(dragulaModel)]="scenariosToAdd">
               @for (scenario of scenariosToAdd; track scenario) {
-                <tr class="cursor w-100">
-                  <td class="w-100">
-                    <div class="w-100 d-flex justify-content-between align-items-center flex-wrap">
-                      <div class="d-flex flex-row">
-                        <div class="text-nowrap me-4">{{scenario?.scenarioId.id}}</div>
-                        <div class="scenario-title-cell w-100 me-2">{{scenario?.scenarioId.title}}</div>
-                      </div>
+                <tr class="cursor">
+                  <td>
+                    <div class="text-nowrap">{{scenario?.scenarioId.id}}</div>
+                  </td>
+                  <td class="d-flex flex-column">
+                    <div class="d-flex flex-columns mb-2">
+                      <div class="scenario-title-cell">{{scenario?.scenarioId.title}}</div>
                       <div class="p-0">
                         @if (jiraMap.has(scenario.id)) {
                           <span
@@ -179,24 +173,24 @@
                           </a>
                         }
                       </div>
-                      <div class="p-0 me-2">
-                        @if (datasets.length > 0) {
-                          <ng-multiselect-dropdown
-                                          [settings]="dropdownDatasetSettings"
-                                          class="dataset-combo"
-                                          [placeholder]="'campaigns.edition.selectDatasetScenario' | translate"
-                                          [data]="datasets"
-                                          [ngModel]="scenario.dataset === null ? [] : [scenario.dataset]"
-                                          [ngModelOptions]="{standalone: true}"
-                                          (onSelect)="selectDatasetScenario($event, scenario)"
-                                          (onDeSelect)="deselectDatasetScenario(scenario)">
-                          </ng-multiselect-dropdown>
-                        }
-                      </div>
+                    </div>
+                    <div class="pe-5">
+                      @if (datasets.length > 0) {
+                        <ng-multiselect-dropdown
+                                        [settings]="dropdownDatasetSettings"
+                                        class="dataset-combo w-100"
+                                        [placeholder]="'campaigns.edition.selectDatasetScenario' | translate"
+                                        [data]="datasets"
+                                        [ngModel]="scenario.dataset === null ? [] : [scenario.dataset]"
+                                        [ngModelOptions]="{standalone: true}"
+                                        (onSelect)="selectDatasetScenario($event, scenario)"
+                                        (onDeSelect)="deselectDatasetScenario(scenario)">
+                        </ng-multiselect-dropdown>
+                      }
                     </div>
                   </td>
-                  <td>
-                    <button type="button" class="btn btn-outline-primary btn-sm "
+                  <td class="p-0">
+                    <button type="button" class="btn btn-outline-primary btn-sm me-2"
                             (click)="removeScenario(scenario)">
                       <span class="fa fa-arrow-circle-right"></span>
                     </button>

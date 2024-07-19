@@ -34,10 +34,6 @@ span.search-field {
 }
 
 
-.dataset-header {
-    margin-right: 100px;
-}
-
 fieldset {
     width: 100%;
 }
@@ -103,4 +99,19 @@ fieldset legend {
 .dataset-combo {
     min-width:200px;
     display: inline-block;
+}
+
+::ng-deep ng-multiselect-dropdown .multiselect-dropdown .dropdown-btn  {
+    .selected-item-container {
+        width: 95%;
+
+        .selected-item {
+            min-width: fit-content; 
+
+            span {
+                word-break: break-all;
+                padding-right: 10px;
+            }
+        }
+    }
 }
