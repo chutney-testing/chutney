@@ -102,6 +102,8 @@ fieldset legend {
 }
 
 ::ng-deep ng-multiselect-dropdown .multiselect-dropdown .dropdown-btn  {
+    font-size: small;
+
     .selected-item-container {
         width: 95%;
 
