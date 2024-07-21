@@ -223,11 +223,13 @@ class ForEachStrategyTest {
         StepExecutionReportDto iterationWithMap = result.steps.get(0);
         assertThat(iterationWithMap.steps).hasSize(2);
         assertThat(iterationWithMap.status).isEqualTo(SUCCESS);
+        assertThat(iterationWithMap.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).isInstanceOf(ObjectNode.class);
         assertDoesNotThrow(() -> ZonedDateTime.parse(((ObjectNode) iterationWithMap.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).elements().next().asText()));
 
         StepExecutionReportDto iterationWithList = result.steps.get(1);
         assertThat(iterationWithList.steps).hasSize(2);
         assertThat(iterationWithList.status).isEqualTo(SUCCESS);
+        assertThat(iterationWithList.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).isInstanceOf(ArrayNode.class);
         assertDoesNotThrow(() -> ZonedDateTime.parse(((ArrayNode) iterationWithList.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).elements().next().asText()));
     }
 
@@ -307,9 +309,11 @@ class ForEachStrategyTest {
         assertThat(firstIteration.steps).hasSize(2);
         assertThat(firstIteration.steps.get(0).name).startsWith("0 -");
         assertThat(firstIteration.steps.get(0).context.stepResults).containsKey("environment_0.0");
+        assertThat(firstIteration.steps.get(0).context.stepResults.get("environment_0.0")).isInstanceOf(TextNode.class);
         assertThat(((TextNode)firstIteration.steps.get(0).context.stepResults.get("environment_0.0")).asText()).isEqualTo("overriddenEnvX");
         assertThat(firstIteration.steps.get(1).name).startsWith("1 -");
         assertThat(firstIteration.steps.get(1).context.stepResults).containsKey("environment_0.1");
+        assertThat(firstIteration.steps.get(1).context.stepResults.get("environment_0.1")).isInstanceOf(TextNode.class);
         assertThat(((TextNode)firstIteration.steps.get(1).context.stepResults.get("environment_0.1")).asText()).isEqualTo("overriddenEnvY");
 
         // And the second iteration contains 2 nested iterations
@@ -317,9 +321,11 @@ class ForEachStrategyTest {
         assertThat(secondIteration.steps).hasSize(2);
         assertThat(secondIteration.steps.get(0).name).startsWith("0 -");
         assertThat(secondIteration.steps.get(0).context.stepResults).containsKey("environment_1.0");
+        assertThat(secondIteration.steps.get(0).context.stepResults.get("environment_1.0")).isInstanceOf(TextNode.class);
         assertThat(((TextNode)secondIteration.steps.get(0).context.stepResults.get("environment_1.0")).asText()).isEqualTo("overriddenEnvX");
         assertThat(secondIteration.steps.get(1).name).startsWith("1 -");
         assertThat(secondIteration.steps.get(1).context.stepResults).containsKey("environment_1.1");
+        assertThat(secondIteration.steps.get(1).context.stepResults.get("environment_1.1")).isInstanceOf(TextNode.class);
         assertThat(((TextNode)secondIteration.steps.get(1).context.stepResults.get("environment_1.1")).asText()).contains("overriddenEnvY");
     }
 

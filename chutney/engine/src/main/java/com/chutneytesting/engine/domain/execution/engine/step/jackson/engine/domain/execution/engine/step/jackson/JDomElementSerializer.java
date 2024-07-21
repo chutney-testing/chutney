@@ -15,7 +15,7 @@
  *
  */
 
-package com.chutneytesting;
+package com.chutneytesting.engine.domain.execution.engine.step.jackson;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;

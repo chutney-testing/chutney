@@ -21,7 +21,6 @@ import static java.util.Collections.emptyMap;
 import static java.util.Collections.unmodifiableMap;
 import static java.util.Optional.ofNullable;
 
-import com.chutneytesting.ExecutionConfiguration;
 import com.chutneytesting.action.spi.ActionExecutionResult;
 import com.chutneytesting.action.spi.injectable.Target;
 import com.chutneytesting.engine.domain.environment.TargetImpl;
@@ -29,10 +28,8 @@ import com.chutneytesting.engine.domain.execution.RxBus;
 import com.chutneytesting.engine.domain.execution.ScenarioExecution;
 import com.chutneytesting.engine.domain.execution.StepDefinition;
 import com.chutneytesting.engine.domain.execution.engine.StepExecutor;
-import com.chutneytesting.engine.domain.execution.engine.evaluation.EvaluationException;
 import com.chutneytesting.engine.domain.execution.engine.evaluation.StepDataEvaluator;
 import com.chutneytesting.engine.domain.execution.engine.scenario.ScenarioContext;
-import com.chutneytesting.engine.domain.execution.engine.scenario.ScenarioContextImpl;
 import com.chutneytesting.engine.domain.execution.event.BeginStepExecutionEvent;
 import com.chutneytesting.engine.domain.execution.event.EndStepExecutionEvent;
 import com.chutneytesting.engine.domain.execution.event.PauseStepExecutionEvent;
@@ -40,15 +37,11 @@ import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReport;
 import com.chutneytesting.engine.domain.execution.strategies.StepStrategyDefinition;
 import com.chutneytesting.tools.Try;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,7 +63,6 @@ public class Step {
     private Target target;
     private final StepExecutor executor;
     private final StepDataEvaluator dataEvaluator;
-    private static final ObjectMapper objectMapper = ExecutionConfiguration.reportObjectMapper();
     private StepContext stepContext;
 
     public Step(StepDataEvaluator dataEvaluator, StepDefinition definition, StepExecutor executor, List<Step> steps) {
@@ -80,7 +72,7 @@ public class Step {
         this.executor = executor;
         this.steps = steps;
         this.state = new StepState(definition.name);
-        this.stepContext = new StepContext(objectMapper);
+        this.stepContext = new StepContext();
     }
 
     public static Step nonExecutable(StepDefinition definition) {
@@ -114,7 +106,7 @@ public class Step {
             target = dataEvaluator.evaluateTarget(target, evaluationContext);
             resolveName(evaluationContext);
             Try
-                .exec(() -> this.stepContext = new StepContext(scenarioContext, localContext, evaluatedInputs, objectMapper))
+                .exec(() -> this.stepContext = new StepContext(scenarioContext, localContext, evaluatedInputs))
                 .ifSuccess(stepContextExecuted -> {
                     executor.execute(scenarioExecution, target, this);
                     if (Status.SUCCESS.equals(this.state.status())) {
@@ -155,10 +147,6 @@ public class Step {
 
     public String name() {
         return this.state.name();
-    }
-
-    public ObjectMapper getObjectMapper() {
-        return objectMapper;
     }
 
     public void resolveName(Map<String, Object> context) {
@@ -349,120 +337,15 @@ public class Step {
     }
 
     public Map<String, Object> getStepContextInputSnapshot() {
-        return this.stepContext.stepContextSnapshot.getInputsSnapshot();
+        return this.stepContext.getStepContextSnapshot().getInputsSnapshot();
     }
 
     public Map<String, Object> getStepContextOutputSnapshot() {
-        return this.stepContext.stepContextSnapshot.getOutputsSnapshot();
+        return this.stepContext.getStepContextSnapshot().getOutputsSnapshot();
     }
 
     public void removeStepExecution() {
         this.steps.clear();
     }
 
-
-    private static class StepContext {
-
-        private final ScenarioContext scenarioContext;
-        private final Map<String, Object> localContext;
-        private final Map<String, Object> evaluatedInputs;
-        private final Map<String, Object> stepOutputs;
-        private StepContextSnapshot stepContextSnapshot;
-
-        private StepContext(ObjectMapper objectMapper) {
-            this(new ScenarioContextImpl(), new LinkedHashMap<>(), new LinkedHashMap<>(), objectMapper);
-        }
-
-        private StepContext(ScenarioContext scenarioContext, Map<String, Object> localContext, Map<String, Object> evaluatedInputs, ObjectMapper objectMapper) throws EvaluationException {
-            this(scenarioContext, localContext, evaluatedInputs, new LinkedHashMap<>(), objectMapper);
-        }
-
-        private StepContext(ScenarioContext scenarioContext, Map<String, Object> localContext, Map<String, Object> evaluatedInputs, Map<String, Object> stepOutputs, ObjectMapper objectMapper) {
-            this.scenarioContext = scenarioContext;
-            this.localContext = localContext;
-            this.evaluatedInputs = evaluatedInputs;
-            this.stepOutputs = stepOutputs;
-            this.stepContextSnapshot = new StepContextSnapshot(objectMapper);
-        }
-
-        private StepContext copySnapshotsInputOutput() {
-            this.stepContextSnapshot = new StepContextSnapshot(evaluatedInputs, stepOutputs, objectMapper);
-            return this;
-        }
-
-        private Map<String, Object> evaluationContext() {
-            final Map<String, Object> allResults = Maps.newLinkedHashMap(scenarioContext);
-            allResults.putAll(localContext);
-            allResults.putAll(stepOutputs);
-            return allResults;
-        }
-
-        private ScenarioContext getScenarioContext() {
-            return scenarioContext;
-        }
-
-        private Map<String, Object> getEvaluatedInputs() {
-            return ofNullable(evaluatedInputs).orElse(emptyMap());
-        }
-
-        private void addStepOutputs(Map<String, Object> stepOutputs) {
-            if (stepOutputs != null) {
-                this.stepOutputs.putAll(stepOutputs);
-            }
-        }
-
-        private void addScenarioContext(Map<String, Object> context) {
-            if (context != null) {
-                this.scenarioContext.putAll(context);
-            }
-        }
-
-        private Map<String, Object> getStepOutputs() {
-            return ofNullable(stepOutputs).orElse(emptyMap());
-        }
-
-        private StepContext copy() {
-            return new StepContext(scenarioContext.unmodifiable(), unmodifiableMap(localContext), unmodifiableMap(evaluatedInputs), unmodifiableMap(stepOutputs), objectMapper).copySnapshotsInputOutput();
-        }
-    }
-
-    public static class StepContextSnapshot {
-        private final Map<String, Object> inputsSnapshot;
-        private final Map<String, Object> outputsSnapshot;
-        private final ObjectMapper objectMapper;
-
-        public StepContextSnapshot(ObjectMapper objectMapper) {
-            this.objectMapper = objectMapper;
-            this.inputsSnapshot = emptyMap();
-            this.outputsSnapshot = emptyMap();
-        }
-
-        public StepContextSnapshot(Map<String, Object> inputsSnapshot, Map<String, Object> outputsSnapshot, ObjectMapper objectMapper) {
-            this.objectMapper = objectMapper;
-            this.inputsSnapshot = mapStringObjectToString(inputsSnapshot);
-            this.outputsSnapshot = mapStringObjectToString(outputsSnapshot);
-        }
-
-        public Map<String, Object> getInputsSnapshot() {
-            return unmodifiableMap(inputsSnapshot);
-        }
-
-        public Map<String, Object> getOutputsSnapshot() {
-            return unmodifiableMap(outputsSnapshot);
-        }
-
-        private Map<String, Object> mapStringObjectToString(Map<String, Object> originalMap) {
-            Map<String, Object> stringMap = new HashMap<>();
-            originalMap.forEach((key, value) -> {
-                try {
-                    String stringObject = objectMapper.writeValueAsString(value);
-                    Object jsonObject = objectMapper.readTree(stringObject);
-                    stringMap.put(key, jsonObject);
-                } catch (JsonProcessingException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-            return stringMap;
-        }
-    }
 }

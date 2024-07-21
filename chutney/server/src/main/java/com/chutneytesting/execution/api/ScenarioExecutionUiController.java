@@ -16,7 +16,6 @@
 
 package com.chutneytesting.execution.api;
 
-import com.chutneytesting.JDomElementSerializer;
 import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.environment.api.environment.EmbeddedEnvironmentApi;
 import com.chutneytesting.execution.domain.GwtScenarioMarshaller;
@@ -33,19 +32,15 @@ import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
-import com.chutneytesting.MyMixInForIgnoreType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import io.reactivex.rxjava3.core.Observable;
 import java.io.IOException;
 import java.util.Optional;
-import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
@@ -198,15 +193,10 @@ public class ScenarioExecutionUiController {
 
     // TODO - Use Spring serialization
     public ObjectMapper dtoReportObjectMapper() {
-        SimpleModule jdomElementModule = new SimpleModule();
-        jdomElementModule.addSerializer(Element.class, new JDomElementSerializer());
-
         return new ObjectMapper()
-            .addMixIn(Resource.class, MyMixInForIgnoreType.class)
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-            .registerModule(jdomElementModule)
             .findAndRegisterModules();
     }
 }

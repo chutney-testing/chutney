@@ -52,7 +52,6 @@ import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.module.SimpleModule;
 import jakarta.annotation.PostConstruct;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -62,7 +61,6 @@ import java.util.List;
 import java.util.Map;
 import javax.sql.DataSource;
 import liquibase.integration.spring.SpringLiquibase;
-import org.jdom2.Element;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -238,15 +236,10 @@ public class ServerConfiguration {
     // TODO - To move in infra when it will not be used in domain (ScenarioExecutionEngineAsync)
     @Bean
     public ObjectMapper reportObjectMapper() {
-        SimpleModule jdomElementModule = new SimpleModule();
-        jdomElementModule.addSerializer(Element.class, new JDomElementSerializer());
-
         return new ObjectMapper()
-            .addMixIn(Resource.class, MyMixInForIgnoreType.class)
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-            .registerModule(jdomElementModule)
             .findAndRegisterModules();
     }
 }
