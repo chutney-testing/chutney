@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- from https://schema.elsevier.com/dtds/document/bkapi/bkapi-opensearch.xsd -->
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:opensearch="http://a9.com/-/spec/opensearch/1.1/"
+            elementFormDefault="qualified" targetNamespace="http://a9.com/-/spec/opensearch/1.1/">
+    <xsd:import namespace="http://prismstandard.org/namespaces/basic/2.0/" schemaLocation="prism.xsd"/>
+    <xsd:element name="totalResults" type="xsd:string"/>
+    <xsd:element name="startIndex" type="xsd:string"/>
+    <xsd:element name="itemsPerPage" type="xsd:string"/>
+    <xsd:element name="Query" type="opensearch:query-tp"/>
+    <xsd:complexType name="query-tp">
+        <xsd:attribute name="request" type="xsd:string" use="required"/>
+        <xsd:attribute name="searchTerms" type="xsd:string" use="required"/>
+    </xsd:complexType>
+</xsd:schema>

@@ -9,7 +9,12 @@ Everything you need to run the app and start coding.
 
 ## <a name="use"></a> How to run Chutney server
 
-### Run in local-dev mode
+### Run with docker
+To launch Chutney, two docker images could be used :
+* The [local-dev server](chutney/.docker) directly
+* The [demo server](example/.docker) with some example scenarios
+
+### Run in local-dev mode manually
 To launch Chutney in _local-dev_ mode, use
 * the classpath of [packaging/local-dev](chutney/packaging/local-dev) module
 * `com.chutneytesting.ServerBootstrap` as main class
@@ -18,6 +23,7 @@ To launch Chutney in _local-dev_ mode, use
 
 ### Prerequisites
 
+* [Java](https://adoptium.net/fr/temurin/releases/?package=jdk&version=17) - version 17
 * [Maven](https://maven.apache.org/) - version 3.9.2 or higher - Java dependency management
 * [Node](https://nodejs.org/en/) - version 20.10.0 or higher - JavaScript runtime
 * [Npm] (https://www.npmjs.com/) - version 6.14.4 or higher - JavaScript package manager
@@ -28,16 +34,16 @@ Upon running **direnv allow** inside ui module folder, it will install node, npm
 
 You can use a Javascript launcher such as [Volta](https://volta.sh/) to take care of **Node** and **Npm** by using the additional command line property: `-DuseExternalNpm=true`
 
-## How to build 
+## How to build
 
-* Build and install Chutney: `chutney/mvn clean install -DskipTests`
-* Build and install kotlin-dsl: `kotlin-dsl/gradlew clean build -x test :chutney-kotlin-dsl:publishToMavenLocal`
-* Install local-api-insecure-jar: use install-local-api-unsecure-jar [run configuration](https://github.com/chutney-testing/chutney/blob/main/.idea/runConfigurations/install_local_api_unsecure_jar.xml)
+* Build and install Chutney: `mvn clean install -DskipTests -f chutney/pom.xml`
+* Build and install kotlin-dsl: `cd kotlin-dsl && gradlew clean build -x test publishToMavenLocal`
+* Install local-api-insecure-jar: use install-local-api-unsecure-jar [run configuration](https://github.com/chutney-testing/chutney/blob/main/.idea/runConfigurations/install_local_api_unsecure_jar.xml) or manually run maven command with options in this file as arguments.
 * Build plugin: `idea-plugin/gradlew clean buildPlugin`
 
 ## Modules explanation
 
-* chutney: server with ui to show and execute scenario
+* chutney: server with ui to show and execute scenario with local-dev docker image
   * engine: Execution engine which sole responsibility is to execute scenarios and provide a report for each execution
   * packaging: default packaging used to start Chutney
   * server/server-core: Main module that
@@ -53,5 +59,5 @@ You can use a Javascript launcher such as [Volta](https://volta.sh/) to take car
   * ui : Front-end of Chutney
 * kotlin-dsl: dsl to test as code and synchronise scenario with a server
 * idea-plugin: plugin intellij to have interaction with a Chutney server
-* docs: documenation as code for [chutney-testing](https://www.chutney-testing.com)
-
+* docs: documentation as code for [chutney-testing](https://www.chutney-testing.com)
+* example : Example project demonstrating the use of kotlin DSL with demo docker image

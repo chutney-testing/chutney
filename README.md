@@ -58,8 +58,8 @@ You can find all the documentation of [how to write a scenario here](https://www
 ### Example of a scenario
 
 Here is an example of a scenario written in Kotlin.
-* [Scenario source](https://github.com/chutney-testing/chutney/blob/main/kotlin-dsl/example/src/main/kotlin/com/chutneytesting/example/scenario/http_scenario.kt)
-* [How to run it locally with test containers](https://github.com/chutney-testing/chutney/blob/main/kotlin-dsl/example/src/test/kotlin/com/chutneytesting/example/http/HttpScenarioTest.kt)
+* [Scenario source](https://github.com/chutney-testing/chutney/blob/main/example/src/main/kotlin/com/chutneytesting/example/scenario/http_scenario.kt)
+* [How to run it locally with test containers](https://github.com/chutney-testing/chutney/blob/main/example/src/test/kotlin/com/chutneytesting/example/http/HttpScenarioTest.kt)
 
 ```kotlin
     const val HTTP_TARGET_NAME = "HTTP_TARGET"
@@ -143,7 +143,7 @@ Here is an example of a scenario written in Kotlin.
 * In this example the scenario will save the content of FILM to an external server.
 * Then it will update it, fetch it and finally verify that the FILM has indeed been updated.
 * In this scenario we perform Http Actions, you can find [all available Chutney Actions here](https://www.chutney-testing.com/documentation/actions/)
-* You can find some other example with jms, kafka, rabbit or sql [here](https://github.com/chutney-testing/chutney/tree/main/kotlin-dsl/example/src/main/kotlin/com/chutneytesting/example/scenario)
+* You can find some other example with jms, kafka, rabbit or sql [here](https://github.com/chutney-testing/chutney/tree/main/example/src/main/kotlin/com/chutneytesting/example/scenario)
 -------------
 
 ## <a name="documentation"></a> Documentation
@@ -166,9 +166,9 @@ You don't need to be a developer to contribute, nor do much, you can simply:
 * [Give us advices or ideas](https://github.com/chutney-testing/chutney/discussions/categories/ideas),
 * etc.
 
-To help you start, we invite you to read [Contributing](chutney/CONTRIBUTING.md), which gives you rules and code conventions to respect
+To help you start, we invite you to read [Contributing](CONTRIBUTING.md), which gives you rules and code conventions to respect
 
-To contribute to this documentation (README, CONTRIBUTING, etc.), we conforms to the [CommonMark Spec](https://spec.commonmark.org/)
+To contribute to this documentation (README, CONTRIBUTING, etc.), we conform to the [CommonMark Spec](https://spec.commonmark.org/)
 
 ## <a name="support"></a> Support
 

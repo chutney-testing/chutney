@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!-- from https://schema.elsevier.com/dtds/document/bkapi/bkapi-prism.xsd -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           elementFormDefault="qualified" targetNamespace="http://prismstandard.org/namespaces/basic/2.0/">
+    <xs:element name="url" type="xs:string"/>
+    <xs:element name="aggregationType" type="xs:string"/>
+    <xs:element name="publisher" type="xs:string"/>
+    <xs:element name="publicationName" type="xs:string"/>
+    <xs:element name="isbn" type="xs:string"/>
+    <xs:element name="issn" type="xs:string"/>
+    <xs:element name="eIssn" type="xs:string"/>
+    <xs:element name="volume" type="xs:string"/>
+    <xs:element name="issueIdentifier" type="xs:string"/>
+    <xs:element name="issueName" type="xs:string"/>
+    <xs:element name="pageRange" type="xs:string"/>
+    <xs:element name="startingPage" type="xs:string"/>
+    <xs:element name="endingPage" type="xs:string"/>
+    <xs:element name="coverDate" type="xs:string"/>
+    <xs:element name="coverDisplayDate" type="xs:string"/>
+    <xs:element name="doi" type="xs:string"/>
+    <xs:element name="copyright" type="xs:string"/>
+    <xs:element name="number" type="xs:string"/>
+    <xs:element name="edition" type="xs:string"/>
+    <xs:element name="teaser" type="xs:string"/>
+</xs:schema>

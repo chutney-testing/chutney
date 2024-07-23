@@ -1,5 +1,1 @@
-include(":dsl")
-include(":example")
-
-rootProject.name = "chutney-kotlin"
-project(":dsl").name = "chutney-kotlin-dsl"
+rootProject.name = "chutney-kotlin-dsl"

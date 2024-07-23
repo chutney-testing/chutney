@@ -1,5 +1,5 @@
-name: 'build all projects'
-description: 'build all projects sequentially'
+name: 'build plugin'
+description: 'build plugin'
 inputs:
   goals:
     default: "clean buildPlugin"

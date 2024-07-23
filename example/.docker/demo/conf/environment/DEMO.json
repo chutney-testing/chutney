@@ -1,0 +1,18 @@
+{
+  "name" : "DEMO",
+  "description" : "Chutney demo environment",
+  "targets" : [ {
+    "name" : "CHUTNEY_DB",
+    "url" : "tcp://localhost",
+    "properties" : {
+      "jdbcUrl" : "jdbc:sqlite:./.chutney/chutney-demo.db",
+      "maximumPoolSize" : "1"
+    }
+  }, {
+    "name" : "SWAPI",
+    "url" : "https://swapi.dev/api"
+  }, {
+    "name" : "ARXIV",
+    "url" : "http://export.arxiv.org/api"
+  } ]
+}
