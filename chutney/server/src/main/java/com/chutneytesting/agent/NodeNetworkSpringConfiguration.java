@@ -31,7 +31,7 @@ import com.chutneytesting.agent.domain.explore.ExploreAgentsService;
 import com.chutneytesting.agent.infra.storage.JsonFileAgentNetworkDao;
 import com.chutneytesting.engine.domain.delegation.ConnectionChecker;
 import com.chutneytesting.environment.api.environment.EmbeddedEnvironmentApi;
-import com.chutneytesting.engine.domain.execution.engine.step.jackson.MyMixInForIgnoreType;
+import com.chutneytesting.tools.MyMixInForIgnoreType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -43,7 +43,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.Resource;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.client.RestTemplate;
 
@@ -55,7 +54,6 @@ public class NodeNetworkSpringConfiguration {
     @Bean
     public ObjectMapper agentNetworkObjectMapper() {
         return new ObjectMapper()
-            .addMixIn(Resource.class, MyMixInForIgnoreType.class)
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)

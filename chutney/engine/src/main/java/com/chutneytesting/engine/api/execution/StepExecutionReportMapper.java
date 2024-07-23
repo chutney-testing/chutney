@@ -17,6 +17,7 @@
 package com.chutneytesting.engine.api.execution;
 
 import static java.util.Collections.EMPTY_MAP;
+import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReport;
@@ -51,9 +52,9 @@ class StepExecutionReportMapper {
         @SuppressWarnings("unchecked")
         static StepExecutionReportDto.StepContextDto toDto(Map<String, Object> scenarioContext, Map<String, Object> evaluatedInputSnapshot, Map<String, Object> stepResultsSnapshot) {
             return new StepExecutionReportDto.StepContextDto(
-                scenarioContext != null ? scenarioContext : EMPTY_MAP,
-                evaluatedInputSnapshot != null ? evaluatedInputSnapshot : EMPTY_MAP,
-                stepResultsSnapshot != null ? stepResultsSnapshot : EMPTY_MAP
+                ofNullable(scenarioContext).orElse(EMPTY_MAP),
+                ofNullable(evaluatedInputSnapshot).orElse(EMPTY_MAP),
+                ofNullable(stepResultsSnapshot).orElse(EMPTY_MAP)
             );
         }
 

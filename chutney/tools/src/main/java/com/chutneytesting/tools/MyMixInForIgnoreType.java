@@ -15,7 +15,7 @@
  *
  */
 
-package com.chutneytesting.engine.domain.execution.engine.step.jackson;
+package com.chutneytesting.tools;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreType;
 

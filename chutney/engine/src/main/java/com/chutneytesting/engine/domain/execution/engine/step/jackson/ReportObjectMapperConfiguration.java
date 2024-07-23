@@ -17,14 +17,13 @@
 
 package com.chutneytesting.engine.domain.execution.engine.step.jackson;
 
+import com.chutneytesting.tools.MyMixInForIgnoreType;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import org.jdom2.Element;
 import org.springframework.core.io.Resource;
-import com.chutneytesting.engine.domain.execution.engine.step.jackson.MyMixInForIgnoreType;
-import com.chutneytesting.engine.domain.execution.engine.step.jackson.JDomElementSerializer;
 
 public class ReportObjectMapperConfiguration {
 

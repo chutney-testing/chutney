@@ -31,7 +31,7 @@ public class StepContextSnapshotTest {
     public void should_serialize_and_deserialize_simple_input_and_output_in_report() throws JsonProcessingException {
         // Given
         ObjectMapper objectMapper = ReportObjectMapperConfiguration.reportObjectMapper();
-        Map<String, Object> mapStringObject = Map.of("TUTU", "TITI");
+        Map<String, Object> mapStringObject = Map.of("inputObject", "inputValue");
 
         StepContextSnapshot stepContextSnapshot = new StepContextSnapshot(mapStringObject, mapStringObject);
 
@@ -40,15 +40,15 @@ public class StepContextSnapshotTest {
         String serializedOutput = objectMapper.writeValueAsString(stepContextSnapshot.getInputsSnapshot());
 
         // Then
-        assertThat(serializedInput).isEqualTo("{\"TUTU\":\"TITI\"}");
-        assertThat(serializedOutput).isEqualTo("{\"TUTU\":\"TITI\"}");
+        assertThat(serializedInput).isEqualTo("{\"inputObject\":\"inputValue\"}");
+        assertThat(serializedOutput).isEqualTo("{\"inputObject\":\"inputValue\"}");
 
     }
     @Test
     public void should_serialize_and_deserialize_complex_input_and_output_in_report() throws JsonProcessingException {
         // Given
         ObjectMapper objectMapper = ReportObjectMapperConfiguration.reportObjectMapper();
-        Map<String, Object> mapStringObject = Map.of("TUTU", Map.of("TOTO", Map.of("BUBU",Map.of("VIVI","LALA"))));
+        Map<String, Object> mapStringObject = Map.of("inputObject", Map.of("inputValue1", Map.of("inputValue2",Map.of("inputValue3","value"))));
 
         StepContextSnapshot stepContextSnapshot = new StepContextSnapshot(mapStringObject, mapStringObject);
 
@@ -57,7 +57,7 @@ public class StepContextSnapshotTest {
         String serializedOutput = objectMapper.writeValueAsString(stepContextSnapshot.getInputsSnapshot());
 
         // Then
-        assertThat(serializedInput).isEqualTo("{\"TUTU\":{\"TOTO\":{\"BUBU\":{\"VIVI\":\"LALA\"}}}}");
-        assertThat(serializedOutput).isEqualTo("{\"TUTU\":{\"TOTO\":{\"BUBU\":{\"VIVI\":\"LALA\"}}}}");
+        assertThat(serializedInput).isEqualTo("{\"inputObject\":{\"inputValue1\":{\"inputValue2\":{\"inputValue3\":\"value\"}}}}");
+        assertThat(serializedOutput).isEqualTo("{\"inputObject\":{\"inputValue1\":{\"inputValue2\":{\"inputValue3\":\"value\"}}}}");
     }
 }

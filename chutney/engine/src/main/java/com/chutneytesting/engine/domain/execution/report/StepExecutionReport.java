@@ -18,6 +18,7 @@ package com.chutneytesting.engine.domain.execution.report;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -100,11 +101,11 @@ public class StepExecutionReport implements Status.HavingStatus {
         this.targetName = targetName;
         this.targetUrl = targetUrl;
         this.strategy = strategy;
-        this.evaluatedInputs = evaluatedInputs != null ? evaluatedInputs : emptyMap();
-        this.evaluatedInputsSnapshot = evaluatedInputsSnapshot != null ? evaluatedInputsSnapshot : emptyMap();
-        this.stepResults = stepResults != null ? stepResults : emptyMap();
-        this.stepResultsSnapshot = stepResultsSnapshot != null ? stepResultsSnapshot : emptyMap();
-        this.scenarioContext = scenarioContext != null ? scenarioContext : emptyMap();
+        this.evaluatedInputs = ofNullable(evaluatedInputs).orElse(emptyMap());
+        this.evaluatedInputsSnapshot = ofNullable(evaluatedInputsSnapshot).orElse(emptyMap());
+        this.stepResults = ofNullable(stepResults).orElse(emptyMap());
+        this.stepResultsSnapshot = ofNullable(stepResultsSnapshot).orElse(emptyMap());
+        this.scenarioContext = ofNullable(scenarioContext).orElse(emptyMap());
     }
 
     @Override

@@ -24,10 +24,7 @@ import static java.util.Optional.ofNullable;
 import com.chutneytesting.engine.domain.execution.engine.evaluation.EvaluationException;
 import com.chutneytesting.engine.domain.execution.engine.scenario.ScenarioContext;
 import com.chutneytesting.engine.domain.execution.engine.scenario.ScenarioContextImpl;
-import com.chutneytesting.engine.domain.execution.engine.step.jackson.ReportObjectMapperConfiguration;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Maps;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
