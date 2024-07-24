@@ -1,5 +1,49 @@
 # Changelog
 
+## [2.9.0.3](https://github.com/chutney-testing/chutney/tree/2.9.0.3)
+### 🚀 Implemented enhancements:
+* Scenario execute with parameters by @rbenyoussef in https://github.com/chutney-testing/chutney/pull/121
+### 🐛 Fixed bugs:
+* Campaign edition - JIRA filter not present by @boddissattva in https://github.com/chutney-testing/chutney/pull/119
+* Break long word in admin bdd search, fix overflow ng-multi… by @DelaunayAlex in https://github.com/chutney-testing/chutney/pull/120
+* Use 24h formats for moment calendar by @boddissattva in https://github.com/chutney-testing/chutney/pull/134
+* Purge empty campaigns' executions by @boddissattva in https://github.com/chutney-testing/chutney/pull/122
+* Does not allow empty campaign execution by @boddissattva in https://github.com/chutney-testing/chutney/pull/133
+* Responsive dataset select in campaign edition by @DelaunayAlex in https://github.com/chutney-testing/chutney/pull/139
+* Snapshot report's inputs/outputs in engine after each step execution by @DelaunayAlex in https://github.com/chutney-testing/chutney/pull/136
+* Fix CONTRIBUTING.md path by @GeVa2072 in https://github.com/chutney-testing/chutney/pull/138
+* Fix tag selection on scenarios list by @rbenyoussef in https://github.com/chutney-testing/chutney/pull/137
+### 👒 Dependencies:
+* Bump org.wiremock:wiremock-standalone from 3.6.0 to 3.8.0 in /chutney by @dependabot in https://github.com/chutney-testing/chutney/pull/125
+* Bump org.codehaus.mojo:build-helper-maven-plugin from 3.5.0 to 3.6.0 in /chutney by @dependabot in https://github.com/chutney-testing/chutney/pull/126
+* Bump sshd.version from 2.12.0 to 2.13.1 in /chutney by @dependabot in https://github.com/chutney-testing/chutney/pull/128
+* Bump org.springframework.boot:spring-boot-maven-plugin from 3.2.4 to 3.3.1 in /chutney by @dependabot in https://github.com/chutney-testing/chutney/pull/129
+* Bump commons-io:commons-io from 2.16.0 to 2.16.1 in /chutney by @dependabot in https://github.com/chutney-testing/chutney/pull/130
+* Bump org.apache.maven.plugins:maven-clean-plugin from 3.3.2 to 3.4.0 in /chutney by @dependabot in https://github.com/chutney-testing/chutney/pull/131
+* Bump org.apache.maven.plugins:maven-surefire-plugin from 3.2.5 to 3.3.0 in /chutney by @dependabot in https://github.com/chutney-testing/chutney/pull/132
+* Bump jqwik.version from 1.8.5 to 1.9.0 in /chutney by @dependabot in https://github.com/chutney-testing/chutney/pull/127
+
+**Full Changelog**: https://github.com/chutney-testing/chutney/compare/2.9.0.2...2.9.0.3
+
+## [2.9.0.2](https://github.com/chutney-testing/chutney/tree/2.9.0.2)
+
+### 🐛 Fixed bugs:
+* Content search only on activated scenario by @rbenyoussef in https://github.com/chutney-testing/chutney/pull/114
+* Fix campaign edition filters width by @rbenyoussef in https://github.com/chutney-testing/chutney/pull/115
+* Update campaigns when renaming environment by @DelaunayAlex in https://github.com/chutney-testing/chutney/pull/87
+* Fix campaign execution status by @boddissattva in https://github.com/chutney-testing/chutney/pull/116
+* Delete dataset module HTML title by @boddissattva in https://github.com/chutney-testing/chutney/pull/118
+* Use the id instead of the name for scenario dataset in cam… by @DelaunayAlex in https://github.com/chutney-testing/chutney/pull/117
+
+**Full Changelog**: https://github.com/chutney-testing/chutney/compare/2.9.0.1...2.9.0.2
+
+## [2.9.0.1](https://github.com/chutney-testing/chutney/tree/2.9.0.1)
+
+### 🐛 Fixed bugs:
+* Scenarios list refresh must be unsubscribed by @boddissattva in https://github.com/chutney-testing/chutney/pull/113
+
+**Full Changelog**: https://github.com/chutney-testing/chutney/compare/2.9.0...2.9.0.1
+
 ## [2.9.0](https://github.com/chutney-testing/chutney/tree/2.9.0)
 
 ### 🚀 Implemented enhancements:
