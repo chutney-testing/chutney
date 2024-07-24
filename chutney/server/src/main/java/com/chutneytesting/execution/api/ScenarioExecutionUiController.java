@@ -32,24 +32,15 @@ import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
-import com.chutneytesting.tools.ui.MyMixInForIgnoreType;
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import io.reactivex.rxjava3.core.BackpressureStrategy;
 import io.reactivex.rxjava3.core.Observable;
 import java.io.IOException;
 import java.util.Optional;
-import org.jdom2.Element;
-import org.jdom2.output.Format;
-import org.jdom2.output.XMLOutputter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
@@ -202,35 +193,10 @@ public class ScenarioExecutionUiController {
 
     // TODO - Use Spring serialization
     public ObjectMapper dtoReportObjectMapper() {
-        SimpleModule jdomElementModule = new SimpleModule();
-        jdomElementModule.addSerializer(Element.class, new JDomElementSerializer());
-
         return new ObjectMapper()
-            .addMixIn(Resource.class, MyMixInForIgnoreType.class)
             .setSerializationInclusion(JsonInclude.Include.NON_NULL)
             .disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
             .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS)
-            .registerModule(jdomElementModule)
             .findAndRegisterModules();
-    }
-
-    // TODO - To remove when Reporter will serialize itself
-    static class JDomElementSerializer extends StdSerializer<Element> {
-
-        private static final long serialVersionUID = 1L;
-
-        protected JDomElementSerializer() {
-            this(null);
-        }
-
-        protected JDomElementSerializer(Class<Element> t) {
-            super(t);
-        }
-
-        @Override
-        public void serialize(Element element, JsonGenerator jsonGenerator, SerializerProvider serializerProvider) throws IOException {
-            String xmlString = new XMLOutputter(Format.getCompactFormat()).outputString(element);
-            jsonGenerator.writeObject(xmlString);
-        }
     }
 }

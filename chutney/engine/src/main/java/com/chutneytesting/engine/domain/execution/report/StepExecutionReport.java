@@ -18,6 +18,7 @@ package com.chutneytesting.engine.domain.execution.report;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -41,9 +42,12 @@ public class StepExecutionReport implements Status.HavingStatus {
     public final String targetUrl;
     public final String strategy;
     public final Map<String, Object> evaluatedInputs;
+    public final Map<String, Object> evaluatedInputsSnapshot;
 
     @JsonIgnore
     public Map<String, Object> stepResults;
+    @JsonIgnore
+    public Map<String, Object> stepResultsSnapshot;
     @JsonIgnore
     public Map<String, Object> scenarioContext;
 
@@ -62,7 +66,7 @@ public class StepExecutionReport implements Status.HavingStatus {
                                String targetUrl,
                                String strategy
     ) {
-        this(executionId, name, environment, duration, startDate, status, information, errors, steps, type, targetName, targetUrl, strategy, null, null, null);
+        this(executionId, name, environment, duration, startDate, status, information, errors, steps, type, targetName, targetUrl, strategy, null, null, null, null, null);
     }
 
     public StepExecutionReport(Long executionId,
@@ -80,7 +84,9 @@ public class StepExecutionReport implements Status.HavingStatus {
                                String strategy,
                                Map<String, Object> evaluatedInputs,
                                Map<String, Object> stepResults,
-                               Map<String, Object> scenarioContext
+                               Map<String, Object> scenarioContext,
+                               Map<String, Object> evaluatedInputsSnapshot,
+                               Map<String, Object> stepResultsSnapshot
     ) {
         this.executionId = executionId;
         this.name = name;
@@ -95,9 +101,11 @@ public class StepExecutionReport implements Status.HavingStatus {
         this.targetName = targetName;
         this.targetUrl = targetUrl;
         this.strategy = strategy;
-        this.evaluatedInputs = evaluatedInputs != null ? evaluatedInputs : emptyMap();
-        this.stepResults = stepResults != null ? stepResults : emptyMap();
-        this.scenarioContext = scenarioContext != null ? scenarioContext : emptyMap();
+        this.evaluatedInputs = ofNullable(evaluatedInputs).orElse(emptyMap());
+        this.evaluatedInputsSnapshot = ofNullable(evaluatedInputsSnapshot).orElse(emptyMap());
+        this.stepResults = ofNullable(stepResults).orElse(emptyMap());
+        this.stepResultsSnapshot = ofNullable(stepResultsSnapshot).orElse(emptyMap());
+        this.scenarioContext = ofNullable(scenarioContext).orElse(emptyMap());
     }
 
     @Override

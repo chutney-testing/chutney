@@ -65,7 +65,6 @@ public class ExecutionConfiguration {
 
     private final SpelFunctions spelFunctions;
     private final Set<StepExecutionStrategy> stepExecutionStrategies;
-
     private final Long reporterTTL;
 
     public ExecutionConfiguration() {
@@ -104,6 +103,7 @@ public class ExecutionConfiguration {
     public ExecutionEngine executionEngine() {
         return executionEngine;
     }
+
 
     private ActionTemplateLoader createActionTemplateLoaderV2() {
         return new DefaultActionTemplateLoader<>(

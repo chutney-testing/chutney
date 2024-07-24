@@ -17,6 +17,7 @@
 package com.chutneytesting.engine.api.execution;
 
 import static java.util.Collections.EMPTY_MAP;
+import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.engine.domain.execution.report.Status;
 import com.chutneytesting.engine.domain.execution.report.StepExecutionReport;
@@ -38,7 +39,7 @@ class StepExecutionReportMapper {
             report.information,
             report.errors,
             report.steps.stream().map(StepExecutionReportMapper::toDto).collect(Collectors.toList()),
-            StepContextMapper.toDto(report.scenarioContext, report.evaluatedInputs, report.stepResults),
+            StepContextMapper.toDto(report.scenarioContext, report.evaluatedInputsSnapshot, report.stepResultsSnapshot),
             report.type,
             report.targetName,
             report.targetUrl,
@@ -49,11 +50,11 @@ class StepExecutionReportMapper {
     static class StepContextMapper {
 
         @SuppressWarnings("unchecked")
-        static StepExecutionReportDto.StepContextDto toDto(Map<String, Object> scenarioContext, Map<String, Object> evaluatedInput, Map<String, Object> stepResults) {
+        static StepExecutionReportDto.StepContextDto toDto(Map<String, Object> scenarioContext, Map<String, Object> evaluatedInputSnapshot, Map<String, Object> stepResultsSnapshot) {
             return new StepExecutionReportDto.StepContextDto(
-                scenarioContext != null ? scenarioContext : EMPTY_MAP,
-                evaluatedInput != null ? evaluatedInput : EMPTY_MAP,
-                stepResults != null ? stepResults : EMPTY_MAP
+                ofNullable(scenarioContext).orElse(EMPTY_MAP),
+                ofNullable(evaluatedInputSnapshot).orElse(EMPTY_MAP),
+                ofNullable(stepResultsSnapshot).orElse(EMPTY_MAP)
             );
         }
 

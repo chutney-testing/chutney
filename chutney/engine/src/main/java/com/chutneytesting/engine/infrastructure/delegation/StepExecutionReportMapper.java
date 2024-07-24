@@ -39,6 +39,8 @@ class StepExecutionReportMapper {
             .setEvaluatedInputs(reportDto.context.evaluatedInputs)
             .setScenarioContext(reportDto.context.scenarioContext)
             .setStepResults(reportDto.context.stepResults)
+            .setEvaluatedInputsSnapshot(reportDto.context.evaluatedInputs)
+            .setStepResultsSnapshot(reportDto.context.evaluatedInputs)
             .setType(reportDto.type)
             .setTargetName(reportDto.targetName)
             .setTargetUrl(reportDto.targetUrl)

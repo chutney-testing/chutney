@@ -144,6 +144,8 @@ public class Reporter {
                 .setSteps(step.subSteps().stream().map(subStep -> generateReport(subStep, Step::status, env)).collect(Collectors.toList()))
                 .setEvaluatedInputs(step.getEvaluatedInputs())
                 .setStepResults(step.getStepOutputs())
+                .setEvaluatedInputsSnapshot(step.getStepContextInputSnapshot())
+                .setStepResultsSnapshot(step.getStepContextOutputSnapshot())
                 .setScenarioContext(step.getScenarioContext())
                 .setType(step.type())
                 .setTarget(step.target())
