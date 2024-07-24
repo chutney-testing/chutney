@@ -100,3 +100,20 @@ fieldset legend {
     min-width:200px;
     display: inline-block;
 }
+
+::ng-deep ng-multiselect-dropdown .multiselect-dropdown .dropdown-btn  {
+    font-size: small;
+
+    .selected-item-container {
+        width: 95%;
+
+        .selected-item {
+            min-width: fit-content; 
+
+            span {
+                word-break: break-all;
+                padding-right: 10px;
+            }
+        }
+    }
+}
