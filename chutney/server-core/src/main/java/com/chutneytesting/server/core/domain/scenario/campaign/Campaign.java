@@ -27,7 +27,7 @@ public class Campaign {
     public final List<CampaignScenario> scenarios;
     public final boolean parallelRun;
     public final boolean retryAuto;
-    public final String externalDatasetId;
+    public String externalDatasetId;
     public final List<String> tags;
 
     private String environment;
@@ -54,6 +54,10 @@ public class Campaign {
 
     public void executionEnvironment(String environment) {
         this.environment = environment;
+    }
+
+    public void executionDataset(String dataset) {
+        this.externalDatasetId = dataset;
     }
 
     public String executionEnvironment() {

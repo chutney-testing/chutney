@@ -72,7 +72,7 @@ public class CampaignSchedulerTest {
 
         sut.executeScheduledCampaigns();
 
-        verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(0), "auto");
+        verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(0), null, null, "auto");
     }
 
     @ParameterizedTest()
@@ -157,14 +157,14 @@ public class CampaignSchedulerTest {
             .thenReturn(
                 periodicScheduledCampaigns
             );
-        when(campaignExecutionEngine.executeById(periodicScheduledCampaigns.get(0).campaignsId.get(0), SCHEDULER_EXECUTE_USER))
+        when(campaignExecutionEngine.executeById(periodicScheduledCampaigns.get(0).campaignsId.get(0), null, null, SCHEDULER_EXECUTE_USER))
             .thenThrow(new RuntimeException("campaignExecutionEngine.executeById"));
 
         Assertions.assertDoesNotThrow(
             () -> sut.executeScheduledCampaigns()
         );
 
-        verify(campaignExecutionEngine, times(periodicScheduledCampaigns.size())).executeById(any(), any());
+        verify(campaignExecutionEngine, times(periodicScheduledCampaigns.size())).executeById(any(), null, null, any());
     }
 
     @Test
@@ -180,9 +180,9 @@ public class CampaignSchedulerTest {
 
         sut.executeScheduledCampaigns();
 
-        inOrder.verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(0), "auto");
-        inOrder.verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(1), "auto");
-        verify(campaignExecutionEngine, times(2)).executeById(any(), any());
+        inOrder.verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(0), null, null, "auto");
+        inOrder.verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(1), null, null, "auto");
+        verify(campaignExecutionEngine, times(2)).executeById(any(), null, null, any());
     }
 
     private List<PeriodicScheduledCampaign> createPeriodicScheduledCampaigns(List<Frequency> frequencies) {
