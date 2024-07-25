@@ -5,12 +5,12 @@
  *
  */
 
-import { Component, inject, OnInit } from '@angular/core';
-import { Dataset } from '@core/model';
-import { DataSetService, EnvironmentService } from '@core/services';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
-import { TranslateService } from '@ngx-translate/core';
-import { EventManagerService } from '@shared';
+import { Component, inject, Input, OnInit } from "@angular/core";
+import { Dataset } from "@core/model";
+import { DataSetService, EnvironmentService } from "@core/services";
+import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { TranslateService } from "@ngx-translate/core";
+import { EventManagerService } from "@shared";
 
 
 @Component({
@@ -29,6 +29,8 @@ export class ScenarioExecuteModalComponent implements OnInit {
     selectedEnv: string = null;
     selectedDataset: Dataset = null;
     datasetDetails: Dataset = null;
+
+    @Input() executeCallback: (env: string, dataset: string) => void;
 
     isCollapsed = true;
 
@@ -57,7 +59,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
 
     execute() {
         if (this.selectedEnv) {
-            this.eventManagerService.broadcast({ name: 'execute', env: this.selectedEnv, dataset: this.selectedDataset?.id });
+            this.executeCallback(this.selectedEnv, this.selectedDataset?.id)
             this.activeModal.close();
         } else {
             this.translateService.get('scenarios.execution.errors.environment').subscribe((res: string) => {

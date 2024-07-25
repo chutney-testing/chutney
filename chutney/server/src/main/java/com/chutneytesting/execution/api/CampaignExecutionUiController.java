@@ -30,6 +30,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -72,9 +73,9 @@ public class CampaignExecutionUiController {
         List<CampaignExecution> reports;
         String userId = userService.currentUser().getId();
         if (environment.isPresent()) {
-            reports = campaignExecutionEngine.executeByName(campaignName, environment.get(), userId);
+            reports = campaignExecutionEngine.executeByName(campaignName, environment.get(), null, userId);
         } else {
-            reports = campaignExecutionEngine.executeByName(campaignName, userId);
+            reports = campaignExecutionEngine.executeByName(campaignName, null, null, userId);
         }
         return reports.stream()
             .map(CampaignExecutionReportMapper::toDto)
@@ -96,9 +97,9 @@ public class CampaignExecutionUiController {
         response.addHeader("Content-Disposition", "attachment; filename=\"surefire-report.zip\"");
         List<CampaignExecution> reports;
         if (environment.isPresent()) {
-            reports = campaignExecutionEngine.executeByName(campaignPattern, environment.get(), userId);
+            reports = campaignExecutionEngine.executeByName(campaignPattern, environment.get(), null, userId);
         } else {
-            reports = campaignExecutionEngine.executeByName(campaignPattern, userId);
+            reports = campaignExecutionEngine.executeByName(campaignPattern, null, null, userId);
         }
         return surefireCampaignExecutionReportBuilder.createReport(reports);
     }
@@ -113,14 +114,10 @@ public class CampaignExecutionUiController {
 
     @PreAuthorize("hasAuthority('CAMPAIGN_EXECUTE')")
     @GetMapping(path = {"/byID/{campaignId}", "/byID/{campaignId}/{env}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CampaignExecutionReportDto executeCampaignById(@PathVariable("campaignId") Long campaignId, @PathVariable("env") Optional<String> environment) {
+    public CampaignExecutionReportDto executeCampaignById(@PathVariable("campaignId") Long campaignId, @PathVariable("env") Optional<String> environment, @RequestParam("dataset") Optional<String> dataset) {
         String userId = userService.currentUser().getId();
         CampaignExecution report;
-        if (environment.isPresent()) {
-            report = campaignExecutionEngine.executeById(campaignId, environment.get(), userId);
-        } else {
-            report = campaignExecutionEngine.executeById(campaignId, userId);
-        }
+        report = campaignExecutionEngine.executeById(campaignId, environment.orElse(null), dataset.orElse(null), userId);
         return toDto(report);
     }
 }

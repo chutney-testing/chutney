@@ -88,8 +88,9 @@ export class CampaignService {
         return this.http.put<Campaign>(environment.backend + this.resourceUrl, copy);
     }
 
-    executeCampaign(campaignId: number, env: string): Observable<CampaignExecutionReport> {
-        return this.http.get<CampaignExecutionReport>(environment.backend + `${this.ressourceUrlExecution}/byID/${campaignId}/${env}`);
+    executeCampaign(campaignId: number, env: string, dataset?: string): Observable<CampaignExecutionReport> {
+        const datasetQueryParam = dataset == null ? "" : "?dataset=" + dataset;
+        return this.http.get<CampaignExecutionReport>(environment.backend + `${this.ressourceUrlExecution}/byID/${campaignId}/${env}` + datasetQueryParam);
     }
 
     stopExecution(campaignId: number, executionId: number): Observable<void> {

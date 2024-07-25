@@ -6,7 +6,7 @@
   -->
 
 @if (campaign) {
-    <chutney-campaign-execution-menu [campaign]="campaign"></chutney-campaign-execution-menu>
+    <chutney-campaign-execution-menu [campaign]="campaign" [canReplay]="canReplay"></chutney-campaign-execution-menu>
     @if (errors.length > 0) {
         <div class="alert alert-dismissible alert-danger mt-4">
             <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errors = []"></button>

@@ -98,25 +98,19 @@ public class CampaignExecutionEngine {
         return campaignExecutionRepository.getLastExecution(campaign.id);
     }
 
-    public List<CampaignExecution> executeByName(String campaignName, String userId) {
-        return executeByName(campaignName, null, userId);
-    }
-
-    public List<CampaignExecution> executeByName(String campaignName, String environment, String userId) {
+    public List<CampaignExecution> executeByName(String campaignName, String environment, String dataset, String userId) {
         List<Campaign> campaigns = campaignRepository.findByName(campaignName);
         return campaigns.stream()
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
+            .map(campaign -> selectExecutionDataset(campaign, dataset))
             .map(campaign -> executeScenarioInCampaign(campaign, userId))
             .collect(Collectors.toList());
     }
 
-    public CampaignExecution executeById(Long campaignId, String userId) {
-        return executeById(campaignId, null, userId);
-    }
-
-    public CampaignExecution executeById(Long campaignId, String environment, String userId) {
+    public CampaignExecution executeById(Long campaignId, String environment, String dataset, String userId) {
         return ofNullable(campaignRepository.findById(campaignId))
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
+            .map(campaign -> selectExecutionDataset(campaign, dataset))
             .map(campaign -> executeScenarioInCampaign(campaign, userId))
             .orElseThrow(() -> new CampaignNotFoundException(campaignId));
     }
@@ -143,6 +137,7 @@ public class CampaignExecutionEngine {
         }
         Campaign campaign = campaignRepository.findById(campaignExecution.campaignId);
         campaign.executionEnvironment(campaignExecution.executionEnvironment);
+        campaign.executionDataset(campaignExecution.dataSetId);
         return executeScenarioInCampaign(failedExecutions, campaign, userId);
     }
 
@@ -320,6 +315,11 @@ public class CampaignExecutionEngine {
 
     private Campaign selectExecutionEnvironment(Campaign campaign, String environment) {
         ofNullable(environment).ifPresent(campaign::executionEnvironment);
+        return campaign;
+    }
+
+    private Campaign selectExecutionDataset(Campaign campaign, String dataset) {
+        ofNullable(dataset).ifPresent(campaign::executionDataset);
         return campaign;
     }
 }

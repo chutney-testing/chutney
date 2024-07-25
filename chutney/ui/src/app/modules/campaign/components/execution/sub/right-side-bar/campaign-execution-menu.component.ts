@@ -5,7 +5,7 @@
  *
  */
 
-import { Component, Input, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { Component, Input, OnChanges, OnInit, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { combineLatest, identity, Observable, of, timer } from 'rxjs';
@@ -22,19 +22,29 @@ import { Authorization, Campaign, ScenarioIndex, TestCase } from '@model';
 import { EventManagerService } from '@shared';
 import { MenuItem } from '@shared/components/layout/menuItem';
 import { HttpErrorResponse } from '@angular/common/http';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { ScenarioExecuteModalComponent } from '@core/components/execution/execute-modal/scenario-execute-modal.component';
 
 @Component({
     selector: 'chutney-campaign-execution-menu',
     templateUrl: './campaign-execution-menu.component.html',
     styleUrls: ['./campaign-execution-menu.component.scss']
 })
-export class CampaignExecutionMenuComponent implements OnInit {
+export class CampaignExecutionMenuComponent implements OnInit, OnChanges {
 
+    @Input() canReplay: boolean;
     @Input() campaign: Campaign;
     rightMenuItems: MenuItem[] = [];
 
     private environments: Array<string> = [];
     private modalRef: BsModalRef;
+
+    executeLastMenuItem = {
+        label: 'global.actions.execute.last',
+        click: this.replay.bind(this),
+        iconClass: 'fa fa-play',
+        authorizations: [Authorization.CAMPAIGN_EXECUTE]
+    };
 
     @ViewChild('delete_modal') deleteModal: TemplateRef<any>;
 
@@ -48,7 +58,8 @@ export class CampaignExecutionMenuComponent implements OnInit {
         private jiraLinkService: JiraPluginService,
         private loginService: LoginService,
         private modalService: BsModalService,
-        private eventManagerService: EventManagerService) {
+        private eventManagerService: EventManagerService,
+        private ngbModalService: NgbModal) {
     }
 
     ngOnInit(): void {
@@ -60,6 +71,18 @@ export class CampaignExecutionMenuComponent implements OnInit {
         });
     }
 
+    ngOnChanges(changes: SimpleChanges) {
+        if (changes['canReplay']) {
+            if (!this.rightMenuItems?.find(item => item.label === 'global.actions.execute.last') && this.canReplay) {
+                this.rightMenuItems.splice(0, 0, this.executeLastMenuItem);
+            }
+        }
+    }
+
+    private replay() {
+        this.eventManagerService.broadcast({ name: 'executeLast' });
+    }
+
     private environments$(): Observable<string[]> {
         if (this.loginService.hasAuthorization(Authorization.CAMPAIGN_EXECUTE)) {
             return this.environmentService.names();
@@ -67,11 +90,17 @@ export class CampaignExecutionMenuComponent implements OnInit {
         return of([]);
     }
 
-    private executeCampaign(envName: string) {
-        this.broadcastCatchError(this.campaignService.executeCampaign(this.campaign.id, envName)).subscribe();
-        timer(1000).pipe(
-            switchMap(() => of(this.eventManagerService.broadcast({ name: 'execute', env: envName })))
-        ).subscribe();
+    private executeCampaign() {
+        const executeCallback = (env: string, dataset: string) => {
+            this.broadcastCatchError(this.campaignService.executeCampaign(this.campaign.id, env, dataset)).subscribe();
+            timer(1000).pipe(
+                switchMap(() => of(this.eventManagerService.broadcast({ name: 'execute', env: env })))
+            ).subscribe();
+        }
+
+        const modalRef = this.ngbModalService.open(ScenarioExecuteModalComponent, { centered: true });
+        modalRef.componentInstance.environments = this.environments;
+        modalRef.componentInstance.executeCallback = executeCallback;
     }
 
     private deleteCampaign() {
@@ -127,11 +156,8 @@ export class CampaignExecutionMenuComponent implements OnInit {
                 label: emptyCampaign ? 'campaigns.execution.error.empty' : 'global.actions.execute',
                 click: this.executeCampaign.bind(this),
                 iconClass: 'fa fa-play',
+                secondaryIconClass: 'fa-solid fa-gear fa-2xs',
                 authorizations: [Authorization.CAMPAIGN_EXECUTE],
-                options: this.environments.map(env => {
-                    return { id: env, label: env };
-                }),
-                disabled: emptyCampaign
             },
             {
                 label: 'global.actions.edit',
