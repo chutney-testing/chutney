@@ -41,6 +41,7 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
     campaignReports: CampaignReport[];
     activeTab: string = '0';
     tabs: CampaignReport[] = [];
+    canReplay = false;
 
     private campaignId: number;
     private _executionsFilters: Params = {};
@@ -85,6 +86,7 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
         return this.campaignService.find(this.campaignId).pipe(
             tap(campaign => this.campaign = campaign),
             tap(campaign => this.campaignReports = campaign.campaignExecutionReports.map(cer => new CampaignReport(cer))),
+            tap(campaign => this.canReplay = campaign.campaignExecutionReports.length > 0),
             tap(() => this.refreshOpenTabs()),
             tap(() => this.checkForRefresh())
         );

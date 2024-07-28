@@ -261,7 +261,7 @@ public class CampaignExecutionEngineTest {
     @Test
     public void should_throw_when_no_campaign_found_on_execute_by_id() {
         when(campaignRepository.findById(anyLong())).thenReturn(null);
-        assertThatThrownBy(() -> sut.executeById(generateId(), ""))
+        assertThatThrownBy(() -> sut.executeById(generateId(), null, null, ""))
             .isInstanceOf(CampaignNotFoundException.class);
     }
 
@@ -328,8 +328,8 @@ public class CampaignExecutionEngineTest {
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
 
         // When
-        sut.executeById(campaign.id, "");
-        sut.executeByName(campaign.title, "");
+        sut.executeById(campaign.id, null, null, "");
+        sut.executeByName(campaign.title, null, null, "");
 
         // Then
         verify(campaignRepository).findById(campaign.id);
@@ -386,11 +386,27 @@ public class CampaignExecutionEngineTest {
         // When
         String executionEnv = "executionEnv";
         String executionUser = "executionUser";
-        sut.executeById(campaign.id, executionEnv, executionUser);
+        sut.executeById(campaign.id, executionEnv, null, executionUser);
 
         // Then
         verify(campaignRepository).findById(campaign.id);
         assertThat(campaign.executionEnvironment()).isEqualTo(executionEnv);
+    }
+
+    @Test
+    public void should_execute_campaign_with_given_dataset_when_executed_by_id() {
+        // Given
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
+        when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
+
+        // When
+        String executionDataset = "executionDataset";
+        String executionUser = "executionUser";
+        sut.executeById(campaign.id, null, executionDataset, executionUser);
+
+        // Then
+        verify(campaignRepository).findById(campaign.id);
+        assertThat(campaign.externalDatasetId).isEqualTo(executionDataset);
     }
 
     @Test
@@ -402,11 +418,27 @@ public class CampaignExecutionEngineTest {
         // When
         String executionEnv = "executionEnv";
         String executionUser = "executionUser";
-        sut.executeByName(campaign.title, executionEnv, executionUser);
+        sut.executeByName(campaign.title, executionEnv, null, executionUser);
 
         // Then
         verify(campaignRepository).findByName(campaign.title);
         assertThat(campaign.executionEnvironment()).isEqualTo(executionEnv);
+    }
+
+    @Test
+    public void should_execute_campaign_with_given_dataset_when_executed_by_name() {
+        // Given
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
+        when(campaignRepository.findByName(anyString())).thenReturn(singletonList(campaign));
+
+        // When
+        String executionDataset = "executionDataset";
+        String executionUser = "executionUser";
+        sut.executeByName(campaign.title, null, executionDataset, executionUser);
+
+        // Then
+        verify(campaignRepository).findByName(campaign.title);
+        assertThat(campaign.externalDatasetId).isEqualTo(executionDataset);
     }
 
     @Test
@@ -446,7 +478,7 @@ public class CampaignExecutionEngineTest {
 
     @Test
     public void should_throw_when_execute_unknown_campaign_execution() {
-        assertThatThrownBy(() -> sut.executeById(generateId(), ""))
+        assertThatThrownBy(() -> sut.executeById(generateId(), null, null, ""))
             .isInstanceOf(CampaignNotFoundException.class);
     }
 
@@ -472,7 +504,7 @@ public class CampaignExecutionEngineTest {
         when(datasetRepository.findById(eq("campaignDataSet"))).thenReturn(DataSet.builder().withName("campaignDataSet").build());
 
         // When
-        sut.executeById(campaign.id, "user");
+        sut.executeById(campaign.id, null, null, "user");
 
         // Then
         ArgumentCaptor<ExecutionRequest> argumentCaptor = ArgumentCaptor.forClass(ExecutionRequest.class);
@@ -506,7 +538,7 @@ public class CampaignExecutionEngineTest {
         when(datasetRepository.findById(eq("scenarioInCampaignDataset"))).thenReturn(DataSet.builder().withName("scenarioInCampaignDataset").build());
 
         // When
-        sut.executeById(campaign.id, "user");
+        sut.executeById(campaign.id, null, null, "user");
 
         // Then
         ArgumentCaptor<ExecutionRequest> argumentCaptor = ArgumentCaptor.forClass(ExecutionRequest.class);
@@ -538,7 +570,7 @@ public class CampaignExecutionEngineTest {
         when(executionHistoryRepository.getExecution(any(), any())).thenReturn(executionWithId(gwtTestCase.id(), 42L));
 
         // When
-        sut.executeById(campaign.id, "user");
+        sut.executeById(campaign.id, null, null, "user");
 
         // Then
         ArgumentCaptor<ExecutionRequest> argumentCaptor = ArgumentCaptor.forClass(ExecutionRequest.class);
