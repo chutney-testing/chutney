@@ -14,6 +14,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -154,7 +155,7 @@ public class CampaignSchedulerTest {
             () -> sut.executeScheduledCampaigns()
         );
 
-        verify(campaignExecutionEngine, times(periodicScheduledCampaigns.size())).executeById(any(), null, null, any());
+        verify(campaignExecutionEngine, times(periodicScheduledCampaigns.size())).executeById(any(), any(), any(), any());
     }
 
     @Test
@@ -170,9 +171,9 @@ public class CampaignSchedulerTest {
 
         sut.executeScheduledCampaigns();
 
-        inOrder.verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(0), null, null, "auto");
-        inOrder.verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(1), null, null, "auto");
-        verify(campaignExecutionEngine, times(2)).executeById(any(), null, null, any());
+        inOrder.verify(campaignExecutionEngine).executeById(eq(periodicScheduledCampaign.get(0).campaignsId.get(0)), any(), any(), eq("auto"));
+        inOrder.verify(campaignExecutionEngine).executeById(eq(periodicScheduledCampaign.get(0).campaignsId.get(1)), any(), any(), eq("auto"));
+        verify(campaignExecutionEngine, times(2)).executeById(any(), any(), any(), any());
     }
 
     private List<PeriodicScheduledCampaign> createPeriodicScheduledCampaigns(List<Frequency> frequencies) {
