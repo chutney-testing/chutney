@@ -70,8 +70,13 @@ public class CampaignExecutionUiController {
     @PreAuthorize("hasAuthority('CAMPAIGN_EXECUTE')")
     @GetMapping(path = {"/{campaignName}", "/{campaignName}/{env}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CampaignExecutionReportDto> executeCampaignByName(@PathVariable("campaignName") String campaignName, @PathVariable("env") Optional<String> environment) {
+        List<CampaignExecution> reports;
         String userId = userService.currentUser().getId();
-        List<CampaignExecution> reports = campaignExecutionEngine.executeByName(campaignName, environment.orElse(null), userId);
+        if (environment.isPresent()) {
+            reports = campaignExecutionEngine.executeByNameWithEnv(campaignName, environment.get(), userId);
+        } else {
+            reports = campaignExecutionEngine.executeByName(campaignName, userId);
+        }
         return reports.stream()
             .map(CampaignExecutionReportMapper::toDto)
             .collect(Collectors.toList());
@@ -90,7 +95,12 @@ public class CampaignExecutionUiController {
     public byte[] executeCampaignsByPatternWithSurefireReport(HttpServletResponse response, @PathVariable("campaignPattern") String campaignPattern, @PathVariable("env") Optional<String> environment) {
         String userId = userService.currentUser().getId();
         response.addHeader("Content-Disposition", "attachment; filename=\"surefire-report.zip\"");
-        List<CampaignExecution> reports = campaignExecutionEngine.executeByName(campaignPattern, environment.orElse(null), userId);
+        List<CampaignExecution> reports;
+        if (environment.isPresent()) {
+            reports = campaignExecutionEngine.executeByNameWithEnv(campaignPattern, environment.get(), userId);
+        } else {
+            reports = campaignExecutionEngine.executeByName(campaignPattern, userId);
+        }
         return surefireCampaignExecutionReportBuilder.createReport(reports);
     }
 
@@ -107,7 +117,7 @@ public class CampaignExecutionUiController {
     public CampaignExecutionReportDto executeCampaignById(@PathVariable("campaignId") Long campaignId, @PathVariable("env") Optional<String> environment, @RequestParam("dataset") Optional<String> dataset) {
         String userId = userService.currentUser().getId();
         CampaignExecution report;
-        report = campaignExecutionEngine.executeById(campaignId, environment.orElse(null), dataset.orElse(null), userId);
+        report = campaignExecutionEngine.executeByIdWithEnvAndDataset(campaignId, environment.orElse(null), dataset.orElse(null), userId);
         return toDto(report);
     }
 }

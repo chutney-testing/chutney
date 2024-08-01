@@ -349,6 +349,38 @@ public class CampaignExecutionEngineTest {
     }
 
     @Test
+    public void should_execute_campaign_with_given_environment_when_executed_by_id() {
+        // Given
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
+        when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
+
+        // When
+        String executionEnv = "executionEnv";
+        String executionUser = "executionUser";
+        sut.executeByIdWithEnv(campaign.id, executionEnv, executionUser);
+
+        // Then
+        verify(campaignRepository).findById(campaign.id);
+        assertThat(campaign.executionEnvironment()).isEqualTo(executionEnv);
+    }
+
+    @Test
+    public void should_execute_campaign_with_given_dataset_when_executed_by_id() {
+        // Given
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
+        when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
+
+        // When
+        String executionDataset = "executionDataset";
+        String executionUser = "executionUser";
+        sut.executeByIdWithDataset(campaign.id, executionDataset, executionUser);
+
+        // Then
+        verify(campaignRepository).findById(campaign.id);
+        assertThat(campaign.executionDataset()).isEqualTo(executionDataset);
+    }
+
+    @Test
     public void should_execute_campaign_with_given_environment_when_executed_by_name() {
         // Given
         Campaign campaign = createCampaign(firstTestCase, secondTestCase);
@@ -357,11 +389,27 @@ public class CampaignExecutionEngineTest {
         // When
         String executionEnv = "executionEnv";
         String executionUser = "executionUser";
-        sut.executeByName(campaign.title, executionEnv, executionUser);
+        sut.executeByNameWithEnv(campaign.title, executionEnv, executionUser);
 
         // Then
         verify(campaignRepository).findByName(campaign.title);
         assertThat(campaign.executionEnvironment()).isEqualTo(executionEnv);
+    }
+
+    @Test
+    public void should_execute_campaign_with_given_dataset_when_executed_by_name() {
+        // Given
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
+        when(campaignRepository.findByName(anyString())).thenReturn(singletonList(campaign));
+
+        // When
+        String executionDataset = "executionDataset";
+        String executionUser = "executionUser";
+        sut.executeByNameWithDataset(campaign.title, executionDataset, executionUser);
+
+        // Then
+        verify(campaignRepository).findByName(campaign.title);
+        assertThat(campaign.executionDataset()).isEqualTo(executionDataset);
     }
 
     @Test
