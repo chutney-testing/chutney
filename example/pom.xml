@@ -155,6 +155,12 @@
                         <configuration>
                             <systemPropertyVariables>
                                 <chutney.engine.stepAsTest>false</chutney.engine.stepAsTest>
+                                <http.proxyHost>${http.proxyHost}</http.proxyHost>
+                                <http.proxyPort>${http.proxyHost}</http.proxyPort>
+                                <http.nonProxyHosts>${http.nonProxyHosts}</http.nonProxyHosts>
+                                <https.proxyHost>${https.proxyHost}</https.proxyHost>
+                                <https.proxyPort>${https.proxyHost}</https.proxyPort>
+                                <https.nonProxyHosts>${https.nonProxyHosts}</https.nonProxyHosts>
                             </systemPropertyVariables>
                         </configuration>
                     </execution>
