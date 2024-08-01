@@ -98,7 +98,7 @@ public class CampaignExecutionEngine {
         return campaignExecutionRepository.getLastExecution(campaign.id);
     }
 
-    public List<CampaignExecution> executeByName(String campaignName, String environment, String dataset, String userId) {
+    public List<CampaignExecution> executeByNameWithEnvAndDataset(String campaignName, String environment, String dataset, String userId) {
         List<Campaign> campaigns = campaignRepository.findByName(campaignName);
         return campaigns.stream()
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
@@ -107,12 +107,36 @@ public class CampaignExecutionEngine {
             .collect(Collectors.toList());
     }
 
-    public CampaignExecution executeById(Long campaignId, String environment, String dataset, String userId) {
+    public List<CampaignExecution> executeByNameWithDataset(String campaignName, String dataset, String userId) {
+        return executeByNameWithEnvAndDataset(campaignName, null, dataset, userId);
+    }
+
+    public List<CampaignExecution> executeByNameWithEnv(String campaignName, String environment, String userId) {
+        return executeByNameWithEnvAndDataset(campaignName, environment, null, userId);
+    }
+
+    public List<CampaignExecution> executeByName(String campaignName, String userId) {
+        return executeByNameWithEnvAndDataset(campaignName, null, null, userId);
+    }
+
+    public CampaignExecution executeByIdWithEnvAndDataset(Long campaignId, String environment, String dataset, String userId) {
         return ofNullable(campaignRepository.findById(campaignId))
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
             .map(campaign -> selectExecutionDataset(campaign, dataset))
             .map(campaign -> executeScenarioInCampaign(campaign, userId))
             .orElseThrow(() -> new CampaignNotFoundException(campaignId));
+    }
+
+    public CampaignExecution executeByIdWithDataset(Long campaignId, String dataset, String userId) {
+        return executeByIdWithEnvAndDataset(campaignId, null, dataset, userId);
+    }
+
+    public CampaignExecution executeByIdWithEnv(Long campaignId, String environment, String userId) {
+        return executeByIdWithEnvAndDataset(campaignId, environment, null, userId);
+    }
+
+    public CampaignExecution executeById(Long campaignId, String userId) {
+        return executeByIdWithEnvAndDataset(campaignId, null, null, userId);
     }
 
     public Optional<CampaignExecution> currentExecution(Long campaignId, String environment) {

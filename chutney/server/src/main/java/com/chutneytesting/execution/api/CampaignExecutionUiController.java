@@ -73,9 +73,9 @@ public class CampaignExecutionUiController {
         List<CampaignExecution> reports;
         String userId = userService.currentUser().getId();
         if (environment.isPresent()) {
-            reports = campaignExecutionEngine.executeByName(campaignName, environment.get(), null, userId);
+            reports = campaignExecutionEngine.executeByNameWithEnv(campaignName, environment.get(), userId);
         } else {
-            reports = campaignExecutionEngine.executeByName(campaignName, null, null, userId);
+            reports = campaignExecutionEngine.executeByName(campaignName, userId);
         }
         return reports.stream()
             .map(CampaignExecutionReportMapper::toDto)
@@ -97,9 +97,9 @@ public class CampaignExecutionUiController {
         response.addHeader("Content-Disposition", "attachment; filename=\"surefire-report.zip\"");
         List<CampaignExecution> reports;
         if (environment.isPresent()) {
-            reports = campaignExecutionEngine.executeByName(campaignPattern, environment.get(), null, userId);
+            reports = campaignExecutionEngine.executeByNameWithEnv(campaignPattern, environment.get(), userId);
         } else {
-            reports = campaignExecutionEngine.executeByName(campaignPattern, null, null, userId);
+            reports = campaignExecutionEngine.executeByName(campaignPattern, userId);
         }
         return surefireCampaignExecutionReportBuilder.createReport(reports);
     }
@@ -117,7 +117,7 @@ public class CampaignExecutionUiController {
     public CampaignExecutionReportDto executeCampaignById(@PathVariable("campaignId") Long campaignId, @PathVariable("env") Optional<String> environment, @RequestParam("dataset") Optional<String> dataset) {
         String userId = userService.currentUser().getId();
         CampaignExecution report;
-        report = campaignExecutionEngine.executeById(campaignId, environment.orElse(null), dataset.orElse(null), userId);
+        report = campaignExecutionEngine.executeByIdWithEnvAndDataset(campaignId, environment.orElse(null), dataset.orElse(null), userId);
         return toDto(report);
     }
 }

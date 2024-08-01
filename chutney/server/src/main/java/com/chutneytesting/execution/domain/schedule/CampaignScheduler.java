@@ -65,7 +65,7 @@ public class CampaignScheduler {
             campaignsId.forEach(campaignId -> {
                 try {
                     LOGGER.info("Execute campaign with id [{}]", campaignId);
-                    campaignExecutionEngine.executeById(campaignId, null, null, SCHEDULER_EXECUTE_USER);
+                    campaignExecutionEngine.executeById(campaignId, SCHEDULER_EXECUTE_USER);
                 } catch (Exception e) {
                     LOGGER.error("Error during campaign [{}] execution", campaignId, e);
                 }
