@@ -3,6 +3,7 @@ package blackbox
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
 import com.chutneytesting.kotlin.util.HttpClient
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.InstanceOfAssertFactories
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -34,7 +35,7 @@ class IntegrationTest {
             Files.copy(memAuthConfigFile.toPath(), tempDirectory.resolve("application-mem-auth.yml"))
 
             // Start server
-            chutneyServer = GenericContainer<Nothing>("ghcr.io/chutney-testing/chutney/server:latest")
+            chutneyServer = GenericContainer<Nothing>("ghcr.io/chutney-testing/chutney/chutney-server:latest")
                 .apply {
                     withStartupTimeout(Duration.ofSeconds(80))
                     withExposedPorts(8443)
@@ -42,9 +43,23 @@ class IntegrationTest {
                 }
             chutneyServer!!.start()
             adminServerInfo =
-                ChutneyServerInfo("https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}", "admin", "admin", null, null, null)
+                ChutneyServerInfo(
+                    "https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}",
+                    "admin",
+                    "admin",
+                    null,
+                    null,
+                    null
+                )
             userServerInfo =
-                ChutneyServerInfo("https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}", "user", "user", null, null, null)
+                ChutneyServerInfo(
+                    "https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}",
+                    "user",
+                    "user",
+                    null,
+                    null,
+                    null
+                )
 
             // Set authorizations
             val roles = IntegrationTest::class.java.getResource("/blackbox/roles.json")!!.path
@@ -112,7 +127,7 @@ class IntegrationTest {
                 "id": 1234,
                 "title": "My campaign",
                 "description": "",
-                "scenarioIds": ["$scenarioIdA"],
+                "scenarios": [{"scenarioId": "$scenarioIdA"}],
                 "environment": "DEFAULT",
                 "parallelRun": false,
                 "retryAuto": false,
@@ -123,7 +138,8 @@ class IntegrationTest {
         var result = HttpClient.post<HashMap<String, Any>>(adminServerInfo!!, "/api/ui/campaign/v1", body)
         assertThat(result)
             .containsEntry("id", 1234)
-            .containsEntry("scenarioIds", listOf(scenarioIdA))
+            .extractingByKey("scenarios").asInstanceOf(InstanceOfAssertFactories.LIST)
+            .first(InstanceOfAssertFactories.MAP).containsEntry("scenarioId", scenarioIdA)
 
         // Update campaign
         body = """
@@ -131,7 +147,7 @@ class IntegrationTest {
                 "id": 1234,
                 "title": "My new campaign",
                 "description": "My new campaign description",
-                "scenarioIds": ["$scenarioIdB"],
+                "scenarios": [{"scenarioId": "$scenarioIdB"}],
                 "environment": "DEFAULT",
                 "parallelRun": false,
                 "retryAuto": false,
@@ -142,7 +158,8 @@ class IntegrationTest {
         result = HttpClient.post<HashMap<String, Any>>(adminServerInfo!!, "/api/ui/campaign/v1", body)
         assertThat(result)
             .containsEntry("id", 1234)
-            .containsEntry("scenarioIds", listOf(scenarioIdB))
+            .extractingByKey("scenarios").asInstanceOf(InstanceOfAssertFactories.LIST)
+            .first(InstanceOfAssertFactories.MAP).containsEntry("scenarioId", scenarioIdB)
 
         // Then
         val resultRaw = HttpClient.get<Map<String, Any>>(userServerInfo!!, "/api/ui/campaign/v1/1234")
@@ -150,8 +167,9 @@ class IntegrationTest {
             .containsEntry("id", 1234)
             .containsEntry("title", "My new campaign")
             .containsEntry("description", "My new campaign description")
-            .containsEntry("scenarioIds", listOf(scenarioIdB))
             .containsEntry("tags", listOf("A_TAG"))
+            .extractingByKey("scenarios").asInstanceOf(InstanceOfAssertFactories.LIST)
+            .first(InstanceOfAssertFactories.MAP).containsEntry("scenarioId", scenarioIdB)
     }
 
     private fun createEmptyScenario(): String {

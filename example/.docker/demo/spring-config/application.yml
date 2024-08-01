@@ -1,5 +1,5 @@
 server:
-  instance-name: chutney demo
+  instance-name: DEMO
   port: 8443
   compression:
     enabled: true

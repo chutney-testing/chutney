@@ -1,7 +1,14 @@
-## Develop docker image
+## Develop the demo docker image
+
 * Use the demo java package to declare all required Chutney objects and synchronization functions.
 * Develop with the docker compose (cf. next paragraph).
-* Finish by deleting the bdd manually and run a synchronization on a fresh bdd before commit.
+* The database file commited should be a newly fresh database with synchronization done.
+
+> **Notes** :
+>
+> * The demo has scenario which use public apis. In order to have successful scenarios' executions, it could be required to set
+> a proxy on some demo targets.
+> * If changes have been made to the compose file, it should be mirrored to the Dockerfile.
 
 ## Demo server container using docker compose
 
@@ -11,15 +18,10 @@ docker-compose -f ./.docker/dev-docker-compose-demo.yml up -d
 // Stop
 docker-compose -f ./.docker/dev-docker-compose-demo.yml stop
 // Force
-docker-compose -f ./.docker/dev-docker-compose-demo.yml rm chutney-demo-server --force
+docker-compose -f ./.docker/dev-docker-compose-demo.yml rm server --force
 ```
 
-The Chutney web interface should be visible at https://localhost.
-
-> **Notes** :
->
-> In order to have successful scenarios' executions, it could be required to set a proxy on targets which use some
-> public endpoints.
+The Chutney web interface should be visible at http://localhost.
 
 ## Build docker image
 

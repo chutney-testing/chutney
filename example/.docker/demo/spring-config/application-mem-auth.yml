@@ -1,3 +1,6 @@
+# On passwords :
+#  * The password should be the same as user's name, with first letter uppercased.
+#  * The password value is hashed using BCrypt.
 chutney:
   security:
     users:

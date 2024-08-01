@@ -18,15 +18,16 @@ import java.time.Duration
 @Testcontainers
 class SeleniumTest {
 
-    val network = Network.newNetwork()
-    val chutneyServer = GenericContainer(DockerImageName.parse("ghcr.io/chutney-testing/chutney/server:latest"))
+    private val network = Network.newNetwork()
+    private val chutneyServer =
+        GenericContainer(DockerImageName.parse("ghcr.io/chutney-testing/chutney/chutney-server:latest"))
         .withImagePullPolicy(PullPolicy.alwaysPull())
         .withNetworkAliases("chutneyServer")
         .withExposedPorts(8443)
         .withNetwork(network)
         .withStartupTimeout(Duration.ofSeconds(80))
 
-    val webDriverContainer = BrowserWebDriverContainer()
+    private val webDriverContainer = BrowserWebDriverContainer()
         .withCapabilities(FirefoxOptions().setAcceptInsecureCerts(true))
         .withNetwork(network)
 

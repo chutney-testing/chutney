@@ -1,8 +1,5 @@
 # Chutney Testing Kotlin DSL
 
-[![Build](https://github.com/chutney-testing/chutney-kotlin-dsl/workflows/Build/badge.svg?branch=master)](https://github.com/chutney-testing/chutney-kotlin-dsl/actions)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.chutneytesting/chutney-kotlin-dsl/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.chutneytesting/chutney-kotlin-dsl)
-
 ## DO IT IN CODE {"NOT": "JSON"}
 
 This repository aims to add a kotlin flavor for writing and executing chutney scenarios.
