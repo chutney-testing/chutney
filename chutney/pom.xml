@@ -260,6 +260,15 @@
                 <scope>provided</scope>
             </dependency>
 
+            <!-- Override SpringBoot dependencies -->
+            <dependency>
+                <groupId>org.testcontainers</groupId>
+                <artifactId>testcontainers-bom</artifactId>
+                <version>${testcontainers.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- Spring dependencies -->
             <dependency>
                 <groupId>org.springframework.boot</groupId>
@@ -372,13 +381,6 @@
                 <artifactId>jqwik-time</artifactId>
                 <version>${jqwik.version}</version>
                 <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.testcontainers</groupId>
-                <artifactId>testcontainers-bom</artifactId>
-                <version>${testcontainers.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
             </dependency>
 
             <!-- Dependency Convergence -->
