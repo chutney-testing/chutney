@@ -1,4 +1,4 @@
-FROM openjdk:17-alpine
+FROM eclipse-temurin:17-jre
 VOLUME /config
 VOLUME /.chutney
 ARG JAR_PATH=packaging/local-dev/target
