@@ -16,9 +16,13 @@
 
 package com.chutneytesting.campaign.infra.jpa;
 
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetConstantsToString;
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetDatatableToString;
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.getExternalDataset;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -102,7 +106,7 @@ public class CampaignEntity implements Serializable {
             campaign.executionEnvironment(),
             campaign.parallelRun,
             campaign.retryAuto,
-            campaign.externalDatasetId,
+            ofNullable(campaign.externalDataset).map(ExternalDataset::getDatasetId).orElse(null),
             campaign.tags,
             version,
             CampaignScenarioEntity.fromDomain(campaign)
@@ -123,11 +127,11 @@ public class CampaignEntity implements Serializable {
             id,
             title,
             description,
-            campaignScenarios.stream().map(e -> new Campaign.CampaignScenario(e.scenarioId(), e.datasetId())).toList(),
+            campaignScenarios.stream().map(e -> new Campaign.CampaignScenario(e.scenarioId(), new ExternalDataset(e.datasetId()))).toList(),
             environment,
             parallelRun,
             retryAuto,
-            datasetId,
+            new ExternalDataset(datasetId),
             TagListMapper.tagsStringToList(tags)
         );
     }

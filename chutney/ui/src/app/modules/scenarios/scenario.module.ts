@@ -56,6 +56,7 @@ import { ScenarioJiraLinksModalComponent } from './components/scenario-jira-link
 import { ScenarioExecuteModalComponent } from '../../core/components/execution/execute-modal/scenario-execute-modal.component';
 import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import {DatasetModule} from "@modules/dataset/dataset.module";
 
 const ROUTES = [
     ...scenarioRoute
@@ -82,7 +83,8 @@ const ROUTES = [
         MoleculesModule,
         DropdownModule,
         FloatLabelModule,
-        RxFor
+        RxFor,
+        DatasetModule
     ],
     declarations: [
         ScenariosComponent,

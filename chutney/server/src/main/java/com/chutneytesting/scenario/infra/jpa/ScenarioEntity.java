@@ -23,6 +23,7 @@ import com.chutneytesting.execution.domain.GwtScenarioMarshaller;
 import com.chutneytesting.scenario.api.raw.mapper.GwtScenarioMapper;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadata;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.security.User;
@@ -168,7 +169,7 @@ public class ScenarioEntity {
             User.isAnonymous(testCase.metadata().author()) ? null : testCase.metadata().author(),
             testCase.metadata().updateDate(),
             testCase.metadata().version(),
-            testCase.metadata().defaultDataset()
+            ofNullable(testCase.metadata().defaultDataset()).map(ExternalDataset::getDatasetId).orElse(null)
         );
     }
 
@@ -183,7 +184,7 @@ public class ScenarioEntity {
                 .withAuthor(userId)
                 .withUpdateDate(Instant.ofEpochMilli(updateDate))
                 .withVersion(version)
-                .withDefaultDataset(defaultDataset)
+                .withDefaultDataset(new ExternalDataset(defaultDataset))
                 .build())
             .withScenario(ofNullable(content).map(c -> new GwtScenarioMapper().deserialize(title, description, c)).orElse(null))
             .build();
@@ -199,7 +200,7 @@ public class ScenarioEntity {
             .withAuthor(userId)
             .withUpdateDate(Instant.ofEpochMilli(updateDate))
             .withVersion(version)
-            .withDefaultDataset(defaultDataset)
+            .withDefaultDataset(new ExternalDataset(defaultDataset))
             .build();
     }
 }

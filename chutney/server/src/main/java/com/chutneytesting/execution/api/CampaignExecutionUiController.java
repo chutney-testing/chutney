@@ -20,6 +20,8 @@ import static com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper.
 
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper;
+import com.chutneytesting.dataset.api.DataSetDto;
+import com.chutneytesting.dataset.api.DataSetMapper;
 import com.chutneytesting.execution.api.report.surefire.SurefireCampaignExecutionReportBuilder;
 import com.chutneytesting.execution.api.report.surefire.SurefireScenarioExecutionReportBuilder;
 import com.chutneytesting.execution.domain.campaign.CampaignExecutionEngine;
@@ -123,10 +125,10 @@ public class CampaignExecutionUiController {
 
     @PreAuthorize("hasAuthority('CAMPAIGN_EXECUTE')")
     @GetMapping(path = {"/byID/{campaignId}", "/byID/{campaignId}/{env}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CampaignExecutionReportDto executeCampaignById(@PathVariable("campaignId") Long campaignId, @PathVariable("env") Optional<String> environment, @RequestParam("dataset") Optional<String> dataset) {
+    public CampaignExecutionReportDto executeCampaignById(@PathVariable("campaignId") Long campaignId, @PathVariable("env") Optional<String> environment, @RequestParam("dataset") Optional<DataSetDto> dataset) {
         String userId = userService.currentUser().getId();
         CampaignExecution report;
-        report = campaignExecutionEngine.executeByIdWithEnvAndDataset(campaignId, environment.orElse(null), dataset.orElse(null), userId);
+        report = campaignExecutionEngine.executeByIdWithEnvAndDataset(campaignId, environment.orElse(null), dataset.map(DataSetMapper::fromDto).orElse(null), userId);
         return toDto(report);
     }
 }

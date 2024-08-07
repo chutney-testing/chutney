@@ -145,7 +145,7 @@ public class CampaignControllerTest {
 
         // Then
         assertThat(receivedCampaign.getTitle()).isEqualTo(updatedTitle);
-        assertThat(receivedCampaign.getDatasetId()).isNull();
+        assertThat(receivedCampaign.getDataset()).isNull();
         assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("title", "datasetId").isEqualTo(existingCampaign);
     }
 
@@ -164,7 +164,7 @@ public class CampaignControllerTest {
 
         // Then
         assertThat(receivedCampaign.getScenarios()).isEmpty();
-        assertThat(receivedCampaign.getDatasetId()).isNull();
+        assertThat(receivedCampaign.getDataset()).isNull();
         assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("scenarios", "datasetId").isEqualTo(existingCampaign);
     }
 
@@ -183,7 +183,7 @@ public class CampaignControllerTest {
 
         // Then
         assertThat(receivedCampaign.getTags()).containsExactly("TAG");
-        assertThat(receivedCampaign.getDatasetId()).isNull();
+        assertThat(receivedCampaign.getDataset()).isNull();
         assertThat(receivedCampaign.getScenarios()).isEmpty();
         assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("scenarios", "tags", "datasetId").isEqualTo(existingCampaign);
     }

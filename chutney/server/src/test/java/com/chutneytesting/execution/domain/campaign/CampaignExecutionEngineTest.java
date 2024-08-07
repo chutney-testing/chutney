@@ -400,7 +400,7 @@ public class CampaignExecutionEngineTest {
         when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
 
         // When
-        String executionDataset = "executionDataset";
+        DataSet executionDataset = DataSet.builder().withName("executionDataset").withId("executionDataset").build();
         String executionUser = "executionUser";
         sut.executeByIdWithDataset(campaign.id, executionDataset, executionUser);
 
@@ -432,7 +432,7 @@ public class CampaignExecutionEngineTest {
         when(campaignRepository.findByName(anyString())).thenReturn(singletonList(campaign));
 
         // When
-        String executionDataset = "executionDataset";
+        DataSet executionDataset = DataSet.builder().withName("executionDataset").withId("executionDataset").build();
         String executionUser = "executionUser";
         sut.executeByNameWithDataset(campaign.title, executionDataset, executionUser);
 

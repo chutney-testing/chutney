@@ -33,7 +33,7 @@ public class CampaignDto {
     private String environment;
     private boolean parallelRun;
     private boolean retryAuto;
-    private String datasetId;
+    private ExternalDatasetDto dataset;
     private List<String> tags;
 
     public CampaignDto() {
@@ -47,7 +47,7 @@ public class CampaignDto {
                        String environment,
                        boolean parallelRun,
                        boolean retryAuto,
-                       String datasetId,
+                       ExternalDatasetDto dataset,
                        List<String> tags) {
         this.id = id;
         this.title = title;
@@ -57,7 +57,7 @@ public class CampaignDto {
         this.environment = environment;
         this.parallelRun = parallelRun;
         this.retryAuto = retryAuto;
-        this.datasetId = datasetId;
+        this.dataset = dataset;
         this.tags = ofNullable(tags).orElseGet(ArrayList::new);
     }
 
@@ -93,15 +93,15 @@ public class CampaignDto {
         return retryAuto;
     }
 
-    public String getDatasetId() {
-        return datasetId;
+    public ExternalDatasetDto getDataset() {
+        return dataset;
     }
 
     public List<String> getTags() {
         return tags;
     }
 
-    public record CampaignScenarioDto(String scenarioId, String datasetId) {
+    public record CampaignScenarioDto(String scenarioId, ExternalDatasetDto dataset) {
         public CampaignScenarioDto(String scenarioId) {
             this(scenarioId, null);
         }

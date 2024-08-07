@@ -406,7 +406,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .environment("env")
                 .addScenarioExecutionReport(scenarioExecutionOneReport)
                 .userId("user")
-                .dataSetId("ds287")
+                .externalDataset("ds287")
                 .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
@@ -442,7 +442,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .environment("env")
                 .addScenarioExecutionReport(scenarioExecutionOneReport)
                 .userId("user")
-                .dataSetId("ds287")
+                .externalDataset("ds287")
                 .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
