@@ -49,6 +49,11 @@ const ROUTES = [
         NgMultiSelectDropDownModule.forRoot(),
         AtomsModule
     ],
+    exports: [
+        DatasetEditionComponent,
+        FormsKeyValueComponent,
+        FormsDataGridComponent
+    ],
     declarations: [
         DatasetListComponent,
         DatasetEditionComponent,

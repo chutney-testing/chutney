@@ -12,6 +12,7 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.List;
@@ -28,7 +29,7 @@ public class CampaignMapper {
             campaign.executionEnvironment(),
             campaign.parallelRun,
             campaign.retryAuto,
-            campaign.executionDataset(),
+            externalDatasetToDto(campaign.externalDataset),
             campaign.tags);
     }
 
@@ -42,7 +43,7 @@ public class CampaignMapper {
             campaign.executionEnvironment(),
             campaign.parallelRun,
             campaign.retryAuto,
-            campaign.executionDataset(),
+            externalDatasetToDto(campaign.externalDataset),
             campaign.tags);
     }
 
@@ -55,17 +56,17 @@ public class CampaignMapper {
             dto.getEnvironment(),
             dto.isParallelRun(),
             dto.isRetryAuto(),
-            dto.getDatasetId(),
+            externalDatasetFromDto(dto.getDataset()),
             dto.getTags().stream().map(String::trim).map(String::toUpperCase).collect(toList())
         );
     }
 
     public static CampaignDto.CampaignScenarioDto toDto(Campaign.CampaignScenario campaignScenario) {
-        return new CampaignDto.CampaignScenarioDto(campaignScenario.scenarioId(), campaignScenario.datasetId());
+        return new CampaignDto.CampaignScenarioDto(campaignScenario.scenarioId(), externalDatasetToDto(campaignScenario.dataset()));
     }
 
     public static Campaign.CampaignScenario fromDto(CampaignDto.CampaignScenarioDto dto) {
-        return new Campaign.CampaignScenario(dto.scenarioId(), dto.datasetId());
+        return new Campaign.CampaignScenario(dto.scenarioId(), externalDatasetFromDto(dto.dataset()));
     }
 
     private static List<CampaignExecutionReportDto> reportToDto(List<CampaignExecution> campaignExecutions) {
@@ -76,7 +77,15 @@ public class CampaignMapper {
 
     private static List<Campaign.CampaignScenario> campaignScenariosFromDto(CampaignDto dto) {
         return ofNullable(dto.getScenarios()).filter(not(List::isEmpty))
-            .map(list -> list.stream().map(sc -> new Campaign.CampaignScenario(sc.scenarioId(), sc.datasetId())).toList())
+            .map(list -> list.stream().map(sc -> new Campaign.CampaignScenario(sc.scenarioId(), externalDatasetFromDto(sc.dataset()))).toList())
             .orElse(emptyList());
+    }
+
+    private static ExternalDatasetDto externalDatasetToDto(ExternalDataset externalDataset) {
+        return new ExternalDatasetDto(externalDataset.getDatasetId(), externalDataset.getConstants(), externalDataset.getDatatable());
+    }
+
+    private static ExternalDataset externalDatasetFromDto(ExternalDatasetDto externalDataset) {
+        return new ExternalDataset(externalDataset.getDatasetId(), externalDataset.getConstants(), externalDataset.getDatatable());
     }
 }

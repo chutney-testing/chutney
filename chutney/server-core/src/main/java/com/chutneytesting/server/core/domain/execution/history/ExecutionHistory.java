@@ -8,6 +8,7 @@
 package com.chutneytesting.server.core.domain.execution.history;
 
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.time.LocalDateTime;
@@ -42,7 +43,7 @@ public interface ExecutionHistory {
 
         String environment();
 
-        Optional<String> datasetId();
+        Optional<ExternalDataset> externalDataset();
 
         String user();
 

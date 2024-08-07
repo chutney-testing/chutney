@@ -15,10 +15,12 @@ import com.chutneytesting.scenario.domain.gwt.GwtScenario;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.security.infra.SpringUserService;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
+import com.chutneytesting.server.core.domain.dataset.InvalidExternalDatasetException;
 import com.chutneytesting.server.core.domain.execution.ExecutionRequest;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngine;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngineAsync;
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
@@ -174,11 +176,20 @@ public class ScenarioExecutionUiController {
     }
 
     private DataSet getDataSet(TestCase testCase) {
-        String defaultDatasetId = testCase.metadata().defaultDataset();
-        if (!defaultDatasetId.isEmpty()) {
-            return datasetRepository.findById(defaultDatasetId);
-        } else {
+        ExternalDataset defaultDataset = testCase.metadata().defaultDataset();
+        if (defaultDataset == null) {
             return DataSet.NO_DATASET;
+        }
+        if (defaultDataset.getDatasetId() != null) {
+            return datasetRepository.findById(defaultDataset.getDatasetId());
+        } else if (defaultDataset.getConstants() != null && !defaultDataset.getConstants().isEmpty() ||
+            defaultDataset.getDatatable() != null && !defaultDataset.getDatatable().isEmpty()) {
+            return DataSet.builder()
+                .withConstants(defaultDataset.getConstants())
+                .withDatatable(defaultDataset.getDatatable())
+                .build();
+        } else {
+            throw new InvalidExternalDatasetException();
         }
     }
 

@@ -15,6 +15,7 @@ import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.AggregatedRepository;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
 import java.util.List;
@@ -74,7 +75,7 @@ public class DatasetService {
                 tc -> testCaseRepository.save(
                     GwtTestCase.builder()
                         .from(tc)
-                        .withMetadata(TestCaseMetadataImpl.TestCaseMetadataBuilder.from(tc.metadata).withDefaultDataset(newId).build())
+                        .withMetadata(TestCaseMetadataImpl.TestCaseMetadataBuilder.from(tc.metadata).withDefaultDataset(new ExternalDataset(newId)).build())
                         .build()
                 ))
             );
@@ -82,11 +83,11 @@ public class DatasetService {
 
     private void updateCampaigns(String oldId, String newId) {
         campaignRepository.findAll().stream()
-            .filter(c -> oldId.equals(c.executionDataset()))
+            .filter(c -> oldId.equals(ofNullable(c.externalDataset).map(ExternalDataset::getDatasetId).orElse(null)))
             .forEach(c -> campaignRepository.createOrUpdate(
                 CampaignBuilder.builder()
                     .from(c)
-                    .setExternalDatasetId(newId)
+                    .setExternalDataset(new ExternalDataset(newId))
                     .build())
             );
     }

@@ -20,6 +20,7 @@ import com.chutneytesting.scenario.domain.gwt.GwtScenario;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.scenario.AggregatedRepository;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
@@ -73,9 +74,9 @@ class DatasetServiceTest {
 
     @Test
     void should_remove_deleted_dataset_from_campaigns_and_scenarios() {
-        String datasetId = "dataset_id";
+        ExternalDataset dataset = new ExternalDataset("dataset_id");
 
-        TestCaseMetadataImpl metadata = TestCaseMetadataImpl.builder().withDefaultDataset(datasetId).build();
+        TestCaseMetadataImpl metadata = TestCaseMetadataImpl.builder().withDefaultDataset(dataset).build();
         when(testCaseRepository.findAll()).thenReturn(List.of(metadata));
 
         GwtTestCase testCase = GwtTestCase.builder().withMetadata(metadata).withScenario(mock(GwtScenario.class)).build();
@@ -87,16 +88,16 @@ class DatasetServiceTest {
             .setDescription("")
             .setEnvironment("Env")
             .setTags(List.of())
-            .setExternalDatasetId(datasetId)
+            .setExternalDataset(dataset)
             .build();
         when(campaignRepository.findAll()).thenReturn(List.of(campaign));
 
         GwtTestCase expectedScenario = GwtTestCase.builder().from(testCase).withMetadata(
             TestCaseMetadataImpl.TestCaseMetadataBuilder.from(metadata).build()
         ).build();
-        Campaign expectedCampaign = CampaignBuilder.builder().from(campaign).setExternalDatasetId("").build();
+        Campaign expectedCampaign = CampaignBuilder.builder().from(campaign).setExternalDataset(new ExternalDataset("")).build();
 
-        sut.remove(datasetId);
+        sut.remove(dataset.getDatasetId());
 
         verify(testCaseRepository, times(1)).save(expectedScenario);
         verify(campaignRepository, times(1)).createOrUpdate(expectedCampaign);

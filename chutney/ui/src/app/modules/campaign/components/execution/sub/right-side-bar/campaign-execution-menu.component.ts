@@ -100,9 +100,15 @@ export class CampaignExecutionMenuComponent implements OnInit, OnChanges {
             ).subscribe();
         }
 
-        const modalRef = this.ngbModalService.open(ScenarioExecuteModalComponent, { centered: true });
+        let modalSize: "lg" | "xl" = "lg"
+        const changeModalSize = (size: "lg" | "xl") => {
+            modalSize = size;
+            modalRef.update({size: modalSize})
+        }
+        const modalRef = this.ngbModalService.open(ScenarioExecuteModalComponent, { centered: true, size: modalSize });
         modalRef.componentInstance.environments = this.environments;
         modalRef.componentInstance.executeCallback = executeCallback;
+        modalRef.componentInstance.changeModalSize = changeModalSize;
     }
 
     private deleteCampaign() {

@@ -24,12 +24,12 @@ public final class TestCaseMetadataImpl implements TestCaseMetadata {
     public final String description;
     public final List<String> tags;
     public final Instant creationDate;
-    public final String defaultDataset;
+    public final ExternalDataset defaultDataset;
     public final Instant updateDate;
     public final String author;
     public final Integer version;
 
-    private TestCaseMetadataImpl(String id, String title, String description, List<String> tags, Instant creationDate, String defaultDataset, Instant updateDate, String author, Integer version) {
+    private TestCaseMetadataImpl(String id, String title, String description, List<String> tags, Instant creationDate, ExternalDataset defaultDataset, Instant updateDate, String author, Integer version) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -48,7 +48,7 @@ public final class TestCaseMetadataImpl implements TestCaseMetadata {
     }
 
     @Override
-    public String defaultDataset() {
+    public ExternalDataset defaultDataset() {
         return defaultDataset;
     }
 
@@ -131,7 +131,7 @@ public final class TestCaseMetadataImpl implements TestCaseMetadata {
         private String description;
         private List<String> tags;
         private Instant creationDate;
-        private String defaultDataset;
+        private ExternalDataset defaultDataset;
         private Instant updateDate;
         private String author;
         private Integer version;
@@ -147,7 +147,7 @@ public final class TestCaseMetadataImpl implements TestCaseMetadata {
                 ofNullable(description).orElse(""),
                 ofNullable(tags).stream().flatMap(Collection::stream).filter(StringUtils::isNotBlank).map(String::toUpperCase).map(String::trim).collect(Collectors.toList()),
                 creationDate,
-                ofNullable(defaultDataset).orElse(""),
+                ofNullable(defaultDataset).orElse(null),
                 ofNullable(updateDate).orElse(creationDate),
                 ofNullable(author).orElseGet(() -> User.ANONYMOUS.id),
                 ofNullable(version).orElse(1));
@@ -158,7 +158,7 @@ public final class TestCaseMetadataImpl implements TestCaseMetadata {
             return this;
         }
 
-        public TestCaseMetadataBuilder withDefaultDataset(String defaultDataset) {
+        public TestCaseMetadataBuilder withDefaultDataset(ExternalDataset defaultDataset) {
             this.defaultDataset = defaultDataset;
             return this;
         }

@@ -7,6 +7,10 @@
 
 package com.chutneytesting.campaign.infra.jpa;
 
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetConstantsToString;
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetDatatableToString;
+
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,20 +41,30 @@ public class CampaignScenarioEntity {
     @Column(name = "DATASET_ID")
     private String datasetId;
 
+    @Column(name = "DATASET_CONSTANTS")
+    private String datasetConstants;
+
+    @Column(name = "DATASET_DATATABLE")
+    private String datasetDatatable;
+
     @Column(name = "RANK")
     private Integer rank;
 
     public CampaignScenarioEntity() {
     }
 
-    private CampaignScenarioEntity(String scenarioId, String datasetId, Integer rank) {
-        this(null, scenarioId, datasetId, rank);
+    private CampaignScenarioEntity(String scenarioId, ExternalDataset dataset, Integer rank) {
+        this(null, scenarioId, dataset, rank);
     }
 
-    public CampaignScenarioEntity(CampaignEntity campaign, String scenarioId, String datasetId, Integer rank) {
+    public CampaignScenarioEntity(CampaignEntity campaign, String scenarioId, ExternalDataset dataset, Integer rank) {
         this.campaign = campaign;
         this.scenarioId = scenarioId;
-        this.datasetId = datasetId;
+        if (dataset != null) {
+            this.datasetId = dataset.getDatasetId();
+            this.datasetConstants = datasetConstantsToString(dataset.getConstants());
+            this.datasetDatatable = datasetDatatableToString(dataset.getDatatable());
+        }
         this.rank = rank;
     }
 
@@ -66,13 +80,21 @@ public class CampaignScenarioEntity {
         return datasetId;
     }
 
+    public String datasetConstants() {
+        return datasetConstants;
+    }
+
+    public String datasetDatatable() {
+        return datasetDatatable;
+    }
+
     public void forCampaign(CampaignEntity campaign) {
         this.campaign = campaign;
     }
 
     public static List<CampaignScenarioEntity> fromDomain(Campaign campaign) {
         return IntStream.range(0, campaign.scenarios.size())
-            .mapToObj(idx -> new CampaignScenarioEntity(campaign.scenarios.get(idx).scenarioId(), campaign.scenarios.get(idx).datasetId(), idx))
+            .mapToObj(idx -> new CampaignScenarioEntity(campaign.scenarios.get(idx).scenarioId(), campaign.scenarios.get(idx).dataset(), idx))
             .toList();
     }
 }

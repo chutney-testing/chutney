@@ -20,6 +20,7 @@ import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus
 import com.chutneytesting.server.core.domain.execution.report.StepExecutionReportCore;
 import com.chutneytesting.server.core.domain.execution.state.ExecutionStateRepository;
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -126,7 +127,7 @@ public class ScenarioExecutionEngineAsync {
             .user(executionRequest.userId)
             .campaignReport(ofNullable(executionRequest.campaignExecution))
             .tags(new HashSet<>(executionRequest.tags))
-            .datasetId(ofNullable(executionRequest.dataset).map(ds -> ds.id))
+            .externalDataset(ofNullable(executionRequest.dataset).map(ds -> new ExternalDataset(ds.id, ds.constants, ds.datatable)))
             .build();
 
         return executionHistoryRepository.store(executionRequest.testCase.id(), detachedExecution);
@@ -238,7 +239,7 @@ public class ScenarioExecutionEngineAsync {
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
             .tags(new HashSet<>(executionRequest.tags))
-            .datasetId(ofNullable(executionRequest.dataset).map(ds -> ds.id))
+            .externalDataset(ofNullable(executionRequest.dataset).map(ds -> new ExternalDataset(ds.id, ds.constants, ds.datatable)))
             .build();
 
         ExecutionHistory.Execution execution = executionHistoryRepository.store(executionRequest.testCase.id(), detachedExecution);
@@ -288,7 +289,7 @@ public class ScenarioExecutionEngineAsync {
             .testCaseTitle(scenarioReport.scenarioName)
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
-            .datasetId(ofNullable(executionRequest.dataset).map(ds -> ds.id))
+            .externalDataset(ofNullable(executionRequest.dataset).map(ds -> new ExternalDataset(ds.id, ds.constants, ds.datatable)))
             .build();
     }
 

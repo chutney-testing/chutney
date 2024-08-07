@@ -415,6 +415,9 @@
     "dataset": {
         "error": {
             "duplicatedHeader": "Une ou plusieurs colonnes ont le même header"
+        },
+        "actions": {
+            "createDataset": "+ Editer un nouveau dataset"
         }
     },
     "global": {

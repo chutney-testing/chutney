@@ -7,10 +7,14 @@
 
 package com.chutneytesting.campaign.infra.jpa;
 
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetConstantsToString;
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetDatatableToString;
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.getExternalDataset;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
@@ -24,10 +28,12 @@ import jakarta.persistence.Version;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Entity(name = "CAMPAIGN_EXECUTIONS")
 public class CampaignExecutionEntity {
+
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -51,6 +57,12 @@ public class CampaignExecutionEntity {
     @Column(name = "DATASET_ID")
     private String datasetId;
 
+    @Column(name = "DATASET_CONSTANTS")
+    private String datasetConstants;
+
+    @Column(name = "DATASET_DATATABLE")
+    private String datasetDatatable;
+
     @Column(name = "VERSION")
     @Version
     private Integer version;
@@ -62,14 +74,18 @@ public class CampaignExecutionEntity {
         this(null, campaignId, null, null, environment, null, null, null);
     }
 
-    public CampaignExecutionEntity(Long id, Long campaignId, List<ScenarioExecutionEntity> scenarioExecutions, Boolean partial, String environment, String userId, String datasetId, Integer version) {
+    public CampaignExecutionEntity(Long id, Long campaignId, List<ScenarioExecutionEntity> scenarioExecutions, Boolean partial, String environment, String userId, ExternalDataset dataset, Integer version) {
         this.id = id;
         this.campaignId = campaignId;
         this.scenarioExecutions = scenarioExecutions;
         this.partial = ofNullable(partial).orElse(false);
         this.environment = environment;
         this.userId = userId;
-        this.datasetId = datasetId;
+        if (dataset != null) {
+            this.datasetId = dataset.getDatasetId() ;
+            this.datasetConstants = datasetConstantsToString(dataset.getConstants());
+            this.datasetDatatable = datasetDatatableToString(dataset.getDatatable());
+        }
         this.version = version;
     }
 
@@ -88,12 +104,14 @@ public class CampaignExecutionEntity {
     public String environment() { return environment;}
 
     public void updateFromDomain(CampaignExecution report, Iterable<ScenarioExecutionEntity> scenarioExecutions) {
-        //id = report.executionId;
-        //campaignId = report.campaignId;
         partial = report.partialExecution;
         environment = report.executionEnvironment;
         userId = report.userId;
-        datasetId = report.dataSetId;
+        if (report.externalDataset != null) {
+            datasetId = report.externalDataset.getDatasetId();
+            datasetConstants = datasetConstantsToString(report.externalDataset.getConstants());
+            datasetDatatable = datasetDatatableToString(report.externalDataset.getDatatable());
+        }
         this.scenarioExecutions.clear();
         scenarioExecutions.forEach(se -> {
             se.forCampaignExecution(this);
@@ -112,7 +130,7 @@ public class CampaignExecutionEntity {
             .campaignName(campaignTitle)
             .partialExecution(ofNullable(partial).orElse(false))
             .environment(environment)
-            .dataSetId(datasetId)
+            .externalDataset(getExternalDataset(datasetId, datasetConstants, datasetDatatable))
             .userId(userId);
 
         if (scenarioExecutionReports.isEmpty()) {
@@ -123,4 +141,6 @@ public class CampaignExecutionEntity {
 
         return campaignExecutionReportBuilder.build();
     }
+
+
 }

@@ -11,18 +11,22 @@ import static com.chutneytesting.campaign.api.CampaignController.BASE_URL;
 import static com.chutneytesting.campaign.api.dto.CampaignMapper.fromDto;
 import static com.chutneytesting.campaign.api.dto.CampaignMapper.toDto;
 import static com.chutneytesting.campaign.api.dto.CampaignMapper.toDtoWithoutReport;
+import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.api.dto.CampaignDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionFullReportDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper;
 import com.chutneytesting.campaign.api.dto.CampaignMapper;
+import com.chutneytesting.campaign.api.dto.ExternalDatasetDto;
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.dataset.domain.DatasetService;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
+import com.chutneytesting.server.core.domain.dataset.DataSetAlreadyExistException;
+import com.chutneytesting.server.core.domain.dataset.InvalidExternalDatasetException;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
@@ -30,8 +34,8 @@ import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -158,12 +162,28 @@ public class CampaignController {
     }
 
     private void validateDataset(CampaignDto campaign) {
-        Stream.concat(
-            Stream.of(campaign.getDatasetId()),
-            campaign.getScenarios().stream().map(CampaignDto.CampaignScenarioDto::datasetId)
-        )
-        .filter(StringUtils::isNotBlank)
-        .distinct()
-        .forEach(datasetService::findById);
+        validateExternalDataset(campaign.getDataset());
+        campaign.getScenarios()
+            .stream()
+            .map(scenario -> ofNullable(scenario.dataset()).map(ExternalDatasetDto::getDatasetId).orElse(null))
+            .filter(StringUtils::isNotBlank)
+            .distinct()
+            .forEach(datasetService::findById);
+    }
+
+    private void validateExternalDataset(ExternalDatasetDto externalDatasetDto) {
+        if (externalDatasetDto == null) {
+            return;
+        }
+        boolean datasetIdIsPresent = externalDatasetDto.getDatasetId() != null;
+        boolean constantsArePresent = ofNullable(externalDatasetDto.getConstants()).map(constants -> !constants.keySet().isEmpty()).orElse(false);
+        boolean datatableIsPresent = ofNullable(externalDatasetDto.getDatatable()).map(constants -> !constants.isEmpty()).orElse(false);
+        if (datasetIdIsPresent && (constantsArePresent || datatableIsPresent)) {
+            throw new InvalidExternalDatasetException(externalDatasetDto.getDatasetId());
+        }
+        if (!(datasetIdIsPresent || constantsArePresent || datatableIsPresent))
+        {
+            throw new InvalidExternalDatasetException();
+        }
     }
 }

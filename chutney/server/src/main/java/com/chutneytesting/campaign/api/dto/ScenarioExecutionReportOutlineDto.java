@@ -11,6 +11,7 @@ import static java.util.Collections.emptySet;
 
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -34,8 +35,8 @@ public class ScenarioExecutionReportOutlineDto {
         return scenarioId;
     }
 
-    public Optional<String> getDatasetId() {
-        return execution.datasetId();
+    public Optional<ExternalDataset> getDatasetId() {
+        return execution.externalDataset();
     }
 
     public Long getExecutionId() {

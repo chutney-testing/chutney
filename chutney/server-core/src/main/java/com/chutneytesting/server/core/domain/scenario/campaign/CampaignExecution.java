@@ -12,11 +12,11 @@ import static com.chutneytesting.server.core.domain.execution.report.ServerRepor
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
-import static java.util.function.Predicate.not;
 
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
@@ -37,7 +37,7 @@ public class CampaignExecution {
     public final String campaignName;
     public final boolean partialExecution;
     public final String executionEnvironment;
-    public final String dataSetId;
+    public final ExternalDataset externalDataset;
     public final String userId;
 
     // Not mandatory
@@ -53,7 +53,7 @@ public class CampaignExecution {
         boolean partialExecution,
         String executionEnvironment,
         String userId,
-        String dataSetId,
+        ExternalDataset externalDataset,
         LocalDateTime startDate,
         ServerReportStatus status,
         List<ScenarioExecutionCampaign> scenarioExecutions
@@ -63,7 +63,7 @@ public class CampaignExecution {
         this.campaignName = campaignName;
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
-        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank)).orElse(null);
+        this.externalDataset = externalDataset;
         this.userId = userId;
         this.scenarioExecutions = scenarioExecutions;
 
@@ -90,7 +90,7 @@ public class CampaignExecution {
                         .status(ServerReportStatus.NOT_EXECUTED)
                         .duration(0)
                         .environment(executionEnvironment)
-                        .datasetId(selectDatasetId(testCase))
+                        .externalDataset(selectDatasetId(testCase))
                         .user(userId)
                         .scenarioId(testCase.testcase().id())
                         .build())));
@@ -101,7 +101,7 @@ public class CampaignExecution {
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
                 return se.scenarioId().equals(testCaseDataset.testcase().id()) &&
-                    se.execution().datasetId().equals(selectDatasetId(testCaseDataset));
+                    se.execution().externalDataset().equals(selectDatasetId(testCaseDataset));
             })
             .findFirst();
         this.scenarioExecutions.set(indexOpt.getAsInt(),
@@ -115,7 +115,7 @@ public class CampaignExecution {
                     .status(RUNNING)
                     .duration(0)
                     .environment(executionEnvironment)
-                    .datasetId(selectDatasetId(testCaseDataset))
+                    .externalDataset(selectDatasetId(testCaseDataset))
                     .user(userId)
                     .scenarioId(testCaseDataset.testcase().id())
                     .tags(this.scenarioExecutions.get(indexOpt.getAsInt()).execution().tags())
@@ -127,7 +127,7 @@ public class CampaignExecution {
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
                 return se.scenarioId().equals(storedExecution.scenarioId()) &&
-                    se.execution().datasetId().equals(storedExecution.datasetId());
+                    se.execution().externalDataset().equals(storedExecution.externalDataset());
             })
             .findFirst();
         var scenarioExecution = this.scenarioExecutions.get(indexOpt.getAsInt()).execution();
@@ -141,8 +141,8 @@ public class CampaignExecution {
                     .build()));
     }
 
-    private Optional<String> selectDatasetId(TestCaseDataset testCaseDataset) {
-        return ofNullable(testCaseDataset.datasetId()).or(() -> ofNullable(dataSetId)).filter(not(String::isBlank));
+    private Optional<ExternalDataset> selectDatasetId(TestCaseDataset testCaseDataset) {
+        return ofNullable(testCaseDataset.dataset()).or(() -> ofNullable(externalDataset));
     }
 
     public void endScenarioExecution(ScenarioExecutionCampaign scenarioExecutionCampaign) throws UnsupportedOperationException {
@@ -230,7 +230,7 @@ public class CampaignExecution {
             .partialExecution(partialExecution)
             .campaignName(campaignName)
             .environment(executionEnvironment)
-            .dataSetId(dataSetId)
+            .externalDataset(externalDataset)
             .userId(userId)
             .startDate(startDate)
             .status(status)

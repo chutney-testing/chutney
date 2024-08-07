@@ -163,7 +163,7 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", campaignExecution.executionId)
                 .hasFieldOrPropertyWithValue("campaignName", campaignExecution.campaignName)
                 .hasFieldOrPropertyWithValue("partialExecution", campaignExecution.partialExecution)
-                .hasFieldOrPropertyWithValue("dataSetId", campaignExecution.dataSetId)
+                .hasFieldOrPropertyWithValue("externalDataset", campaignExecution.dataSetId)
                 .hasFieldOrPropertyWithValue("executionEnvironment", campaignExecution.executionEnvironment)
                 .hasFieldOrPropertyWithValue("userId", campaignExecution.userId)
             ;
@@ -210,7 +210,7 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", campaignExecution.executionId)
                 .hasFieldOrPropertyWithValue("campaignName", campaignExecution.campaignName)
                 .hasFieldOrPropertyWithValue("partialExecution", campaignExecution.partialExecution)
-                .hasFieldOrPropertyWithValue("dataSetId", campaignExecution.dataSetId)
+                .hasFieldOrPropertyWithValue("externalDataset", campaignExecution.dataSetId)
                 .hasFieldOrPropertyWithValue("executionEnvironment", campaignExecution.executionEnvironment)
                 .hasFieldOrPropertyWithValue("userId", campaignExecution.userId)
             ;
