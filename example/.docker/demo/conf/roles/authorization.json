@@ -1,0 +1,25 @@
+{
+  "roles" : [ {
+    "name" : "READER",
+    "rights" : [ "SCENARIO_READ", "CAMPAIGN_READ", "GLOBAL_VAR_READ", "DATASET_READ" ]
+  }, {
+    "name" : "EDITOR",
+    "rights" : [ "SCENARIO_READ", "SCENARIO_WRITE", "CAMPAIGN_READ", "CAMPAIGN_WRITE", "GLOBAL_VAR_READ", "GLOBAL_VAR_WRITE", "DATASET_READ", "DATASET_WRITE" ]
+  }, {
+    "name" : "EXECUTOR",
+    "rights" : [ "SCENARIO_READ", "CAMPAIGN_READ", "SCENARIO_EXECUTE", "CAMPAIGN_EXECUTE" ]
+  }, {
+    "name" : "GOD",
+    "rights" : [ "SCENARIO_READ", "SCENARIO_WRITE", "SCENARIO_EXECUTE", "CAMPAIGN_READ", "CAMPAIGN_WRITE", "CAMPAIGN_EXECUTE", "ENVIRONMENT_ACCESS", "GLOBAL_VAR_READ", "GLOBAL_VAR_WRITE", "DATASET_READ", "DATASET_WRITE", "ADMIN_ACCESS" ]
+  } ],
+  "authorizations" : [ {
+    "name" : "READER",
+    "users" : [ "reader" ]
+  }, {
+    "name" : "EDITOR",
+    "users" : [ "editor" ]
+  }, {
+    "name" : "EXECUTOR",
+    "users" : [ "executor" ]
+  } ]
+}

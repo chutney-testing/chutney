@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   server:
-    image: ghcr.io/chutney-testing/chutney/server:latest
+    image: ghcr.io/chutney-testing/chutney/chutney-server:latest
     container_name: server
     ports:
       - "8081:8443"
@@ -12,7 +12,7 @@ services:
       - ../server/.chutney/:/.chutney
       - ../packaging/local-dev/src/main/resources/:/config/
   ui:
-    image: ghcr.io/chutney-testing/chutney/ui:latest
+    image: ghcr.io/chutney-testing/chutney/chutney-ui:latest
     container_name: ui
     ports:
       - "80:80"

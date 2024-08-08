@@ -1,0 +1,12 @@
+######################
+# Maven
+######################
+.mvn/
+**/target/
+!.mvn/wrapper/maven-wrapper.properties
+!.mvn/wrapper/MavenWrapperDownloader.java
+
+######################
+# Chutney
+######################
+.chutney

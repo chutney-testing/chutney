@@ -59,4 +59,14 @@ jobs:
             WEBSITE=artifacts/chutney/ui/dist
             CONF=chutney/.docker/ui
 
-
+      - name: Build and push demo docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ${{ github.workspace }}
+          file: ${{ github.workspace }}/example/.docker/demo/Dockerfile
+          tags: |
+            ghcr.io/chutney-testing/chutney/chutney-demo:latest
+            ghcr.io/chutney-testing/chutney/chutney-demo:${{ inputs.version }}
+          push: true
+          build-args: |
+            CONF=example/.docker/demo

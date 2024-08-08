@@ -1,8 +1,5 @@
 # Chutney Testing Kotlin DSL
 
-[![Build](https://github.com/chutney-testing/chutney-kotlin-dsl/workflows/Build/badge.svg?branch=master)](https://github.com/chutney-testing/chutney-kotlin-dsl/actions)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.chutneytesting/chutney-kotlin-dsl/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.chutneytesting/chutney-kotlin-dsl)
-
 ## DO IT IN CODE {"NOT": "JSON"}
 
 This repository aims to add a kotlin flavor for writing and executing chutney scenarios.
@@ -77,7 +74,7 @@ How (k)ool is Kotlin? super (k)ool!
 
 # How to run Kotlin scenarios
 
-> Some examples are available in [example module](https://github.com/chutney-testing/chutney/tree/main/kotlin-dsl/example/src/main/kotlin/com/chutneytesting/example)
+> Some examples are available in [example module](https://github.com/chutney-testing/chutney/tree/main/example/src/main/kotlin/com/chutneytesting/example)
 
 You want to run Chutney scenarios from your local environment or on your CI/CD ?
 
@@ -263,7 +260,7 @@ A JUnit5 engine has been developed to execute Chutney scenarios.
 
 #### Annotation
 The annotation ```@ChutneyTest``` signals that a method is a JUnit5 testable element.
-This annotated method must have a ```ChutneyScenario``` as return type to be taken into account.
+This annotated method must have a ```ChutneyScenario``` or ```List<ChutneyScenario>``` as return type to be taken into account.
 The ```environment``` property could be used to specify a chutney environment to use.
 
 ```kotlin

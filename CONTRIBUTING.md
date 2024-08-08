@@ -85,7 +85,7 @@ It is forbidden to use _wildcard imports_ (e.g., `import static org.assertj.core
 
 ### Javadoc
 
-* Javadoc comments should be wrapped after 80 characters whenever possible.
+* Javadoc's comments should be wrapped after 80 characters whenever possible.
 * This first paragraph must be a single, concise sentence that ends with a period (".").
 * Place `<p>` on the same line as the first line in a new paragraph and precede `<p>` with a blank line.
 * Insert a blank line before at-clauses/tags.
@@ -333,8 +333,9 @@ git switch -c release/<RELEASE_VERSION>
 git add CHANGELOG.md (see Update Changelog file section)
 Update manually `chutneyVersion`  in [idea-plugin/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/idea-plugin/gradle.properties)
 Update manually `chutneyVersion`  in [kotlin-dsl/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/kotlin-dsl/gradle.properties)
-mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
-mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
+mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
+mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false -f example/pom.xml
 git add .
 git diff --staged
 git commit -m "chore: Release <RELEASE_VERSION>"
@@ -375,8 +376,11 @@ In order to effectively release artifacts :
 #### Prepare next development
 
 ```shell
-mvn versions:set -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false
-mvn versions:set-scm-tag -DnewTag=HEAD -DgenerateBackupPoms=false
+Update manually `chutneyVersion`  in [idea-plugin/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/idea-plugin/gradle.properties)
+Update manually `chutneyVersion`  in [kotlin-dsl/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/kotlin-dsl/gradle.properties)
+mvn versions:set -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
+mvn versions:set-scm-tag -DnewTag=HEAD -DgenerateBackupPoms=false -f chutney/pom.xml
+mvn versions:set -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false -f example/pom.xml
 git diff HEAD
 git add . && git commit -m "chore: Prepare next development <NEXT_DEV_VERSION>"
 git push origin
@@ -398,8 +402,9 @@ git switch -c release/<RELEASE_VERSION>
 git add CHANGELOG.md (see Update Changelog file section)
 Update manually `chutneyVersion`  in [idea-plugin/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/idea-plugin/gradle.properties)
 Update manually `chutneyVersion`  in [kotlin-dsl/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/kotlin-dsl/gradle.properties)
-mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
-mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false
+mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
+mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
+mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false -f example/pom.xml
 git add .
 git diff --staged
 git commit -m "chore: Release <RELEASE_VERSION>"

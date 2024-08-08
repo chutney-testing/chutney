@@ -141,6 +141,14 @@ jobs:
           goals: ${{steps.dsl-goals.outputs.DSL_GOALS}}
           cache-artifacts: ${{ inputs.cache-artifacts }}
 
+      - name: Build Example
+        if: ${{! inputs.release}}
+        id: build-example
+        uses: ./.github/actions/build-example
+        with:
+          goals: ${{steps.chutney-goals.outputs.CHUTNEY_GOALS}}
+          cache-artifacts: ${{ inputs.cache-artifacts }}
+
       - name: Resolve plugin gradle goal from inputs
         if: ${{! inputs.release}}
         id: plugin-goals

@@ -1,0 +1,14 @@
+services:
+  server:
+    image: ghcr.io/chutney-testing/chutney/chutney-server:latest
+    container_name: chutney-demo-server
+    ports:
+      - "80:8443"
+    environment:
+      SPRING_PROFILES_ACTIVE: mem-auth,db-sqlite-rw
+      SPRING_CONFIG_LOCATION: file:/config/
+      LOADER_PATH: /schema/*
+    volumes:
+      - ./demo/conf/:/.chutney
+      - ./demo/spring-config/:/config/
+      - ./demo/schema/:/schema/

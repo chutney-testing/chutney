@@ -1,0 +1,23 @@
+# On passwords :
+#  * The password should be the same as user's name, with first letter uppercased.
+#  * The password value is hashed using BCrypt.
+chutney:
+  security:
+    users:
+      -
+        id: reader
+        name: reader
+        password: $2a$10$NQq86wJ9a7INMNpvNQjDgeBqnKBMXj36Kwd/PYPKQ9oxDv3FKtkVC
+      -
+        id: editor
+        name: editor
+        password: $2a$10$0CMRDrs0/plrrmhQoK2RK.UgbLlvXK9yTL/YaKTv6O4zYXqDqrbAS
+      -
+        id: executor
+        name: executor
+        password: $2a$10$Au02UVod.BXfUMWI5kpMQusYv8S17W1fsdxidf005PErm/iHeaiWS
+      -
+        id: admin
+        password: $2a$10$SrqIkJ8QC9D34x2qiEKuLu6aQY7kHyDVJdTltO9ni2dqs1.imxP9e
+        roles:
+          - ADMIN

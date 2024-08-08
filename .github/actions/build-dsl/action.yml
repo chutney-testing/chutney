@@ -1,8 +1,8 @@
-name: 'build all projects'
-description: 'build all projects sequentially'
+name: 'build dsl'
+description: 'build dsl'
 inputs:
   goals:
-    default: "clean build :chutney-kotlin-dsl:publishToMavenLocal"
+    default: "clean build publishToMavenLocal"
     description: "Gradle goals to execute"
   cache-artifacts:
     default: ""
@@ -18,7 +18,7 @@ runs:
       run: |
         cd ./kotlin-dsl
         echo "Running: ${{inputs.goals}}"
-        ./gradlew ${{inputs.goals}} :chutney-kotlin-dsl:publishToMavenLocal 
+        ./gradlew ${{inputs.goals}} publishToMavenLocal 
         cd ..
 
     - name: Temporarily cache jar artifacts

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 Enedis
+ * Copyright 2017-2024 Enedis
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.ChannelSecurityConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
@@ -52,6 +53,9 @@ public class ChutneyWebSecurityConfig {
 
     @Value("${management.endpoints.web.base-path:/actuator}")
     String actuatorBaseUrl;
+
+    @Value("${server.ssl.enabled:true}")
+    Boolean sslEnabled;
 
     @Bean
     public AuthenticationService authenticationService(Authorizations authorizations) {
@@ -85,7 +89,7 @@ public class ChutneyWebSecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .exceptionHandling(httpSecurityExceptionHandlingConfigurer -> httpSecurityExceptionHandlingConfigurer.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-            .requiresChannel(channelRequestMatcherRegistry -> channelRequestMatcherRegistry.anyRequest().requiresSecure())
+            .requiresChannel(this.requireChannel())
             .formLogin(httpSecurityFormLoginConfigurer -> httpSecurityFormLoginConfigurer
                 .loginProcessingUrl(LOGIN_URL)
                 .successHandler(new HttpLoginSuccessHandler())
@@ -101,5 +105,13 @@ public class ChutneyWebSecurityConfig {
         anonymous.setName(User.ANONYMOUS.id);
         anonymous.grantAuthority("ANONYMOUS");
         return anonymous;
+    }
+
+    private Customizer<ChannelSecurityConfigurer<HttpSecurity>.ChannelRequestMatcherRegistry> requireChannel() {
+        if (sslEnabled) {
+            return channelRequestMatcherRegistry -> channelRequestMatcherRegistry.anyRequest().requiresSecure();
+        } else {
+            return channelRequestMatcherRegistry -> channelRequestMatcherRegistry.anyRequest().requiresInsecure();
+        }
     }
 }

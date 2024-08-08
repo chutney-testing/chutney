@@ -1,5 +1,5 @@
 /*
- * Copyright 2017-2023 Enedis
+ * Copyright 2017-2024 Enedis
  * Copyright (C) Atlassian
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
