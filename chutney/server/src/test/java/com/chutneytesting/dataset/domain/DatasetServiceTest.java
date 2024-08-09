@@ -20,7 +20,6 @@ import com.chutneytesting.scenario.domain.gwt.GwtScenario;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.scenario.AggregatedRepository;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
@@ -74,7 +73,7 @@ class DatasetServiceTest {
 
     @Test
     void should_remove_deleted_dataset_from_campaigns_and_scenarios() {
-        String datasetId = ("dataset_id");
+        String datasetId = "dataset_id";
 
         TestCaseMetadataImpl metadata = TestCaseMetadataImpl.builder().withDefaultDataset(datasetId).build();
         when(testCaseRepository.findAll()).thenReturn(List.of(metadata));

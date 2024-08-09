@@ -8,7 +8,6 @@
 package util.infra;
 
 import static java.time.Instant.now;
-import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.infra.jpa.CampaignEntity;
 import com.chutneytesting.campaign.infra.jpa.CampaignScenarioEntity;
@@ -16,7 +15,6 @@ import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
 import com.chutneytesting.scenario.infra.jpa.ScenarioEntity;
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import jakarta.persistence.EntityManager;
 import java.sql.Connection;

@@ -15,7 +15,6 @@ import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.AggregatedRepository;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
 import java.util.List;

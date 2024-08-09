@@ -48,7 +48,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -166,6 +165,10 @@ public class CampaignExecutionEngine {
         Campaign campaign = campaignRepository.findById(campaignExecution.campaignId);
         campaign.executionEnvironment(campaignExecution.executionEnvironment);
         return executeScenarioInCampaign(failedExecutions, campaign, userId, campaignExecution.externalDataset);
+    }
+
+    CampaignExecution executeScenarioInCampaign(Campaign campaign, String userId) {
+        return executeScenarioInCampaign(emptyList(), campaign, userId, null);
     }
 
     CampaignExecution executeScenarioInCampaign(Campaign campaign, String userId, ExternalDataset externalDataset) {

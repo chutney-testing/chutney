@@ -14,7 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.chutneytesting.campaign.domain.CampaignRepository;
 import com.chutneytesting.scenario.infra.jpa.ScenarioEntity;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -32,7 +32,6 @@ import java.util.stream.Collectors;
 
 @Entity(name = "CAMPAIGN_EXECUTIONS")
 public class CampaignExecutionEntity {
-
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -140,6 +139,4 @@ public class CampaignExecutionEntity {
 
         return campaignExecutionReportBuilder.build();
     }
-
-
 }

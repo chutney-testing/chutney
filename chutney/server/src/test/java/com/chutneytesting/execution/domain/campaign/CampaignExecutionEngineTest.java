@@ -192,7 +192,7 @@ public class CampaignExecutionEngineTest {
         // When
         AtomicReference<CampaignExecution> campaignExecutionReport = new AtomicReference<>();
 
-        Executors.newFixedThreadPool(1).submit(() -> campaignExecutionReport.set(sut.executeScenarioInCampaign(campaign, "user", null)));
+        Executors.newFixedThreadPool(1).submit(() -> campaignExecutionReport.set(sut.executeScenarioInCampaign(campaign, "user")));
 
         awaitDuring(500, MILLISECONDS);
         sut.stopExecution(0L);
@@ -221,7 +221,7 @@ public class CampaignExecutionEngineTest {
         when(executionHistoryRepository.getExecution(eq(secondTestCase.id()), or(eq(0L), eq(20L)))).thenReturn(failedExecutionWithId(20L));
 
         // When
-        sut.executeScenarioInCampaign(campaign, "user", null);
+        sut.executeScenarioInCampaign(campaign, "user");
 
         // Then
         verify(scenarioExecutionEngine, times(4)).execute(any(ExecutionRequest.class));
@@ -242,7 +242,7 @@ public class CampaignExecutionEngineTest {
         // When
         StopWatch watch = new StopWatch();
         watch.start();
-        sut.executeScenarioInCampaign(campaign, "user", null);
+        sut.executeScenarioInCampaign(campaign, "user");
         watch.stop();
 
         // Then
@@ -269,7 +269,7 @@ public class CampaignExecutionEngineTest {
         when(campaignExecutionRepository.currentExecutions(campaign.id)).thenReturn(List.of(mockReport));
 
         // When
-        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user", null))
+        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user"))
             .isInstanceOf(CampaignAlreadyRunningException.class);
     }
 
@@ -278,7 +278,7 @@ public class CampaignExecutionEngineTest {
         Campaign campaign = createCampaign();
 
         // When
-        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user", null))
+        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user"))
             .isInstanceOf(CampaignEmptyExecutionException.class);
     }
 
@@ -308,7 +308,7 @@ public class CampaignExecutionEngineTest {
         when(campaignExecutionRepository.currentExecutions(anyLong())).thenReturn(List.of(mockReport));
 
         // When
-        assertDoesNotThrow(() -> sut.executeScenarioInCampaign(campaign, "user", null));
+        assertDoesNotThrow(() -> sut.executeScenarioInCampaign(campaign, "user"));
     }
 
     @Test

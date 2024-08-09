@@ -77,13 +77,4 @@ public class ExternalDatasetEntityMapper {
             datasetDatatableFromString(datasetDatatable)
         );
     }
-
-    public static ExternalDataset getExternalDatasetFromDatasetId(String datasetId) {
-        return ofNullable(datasetId).map(ExternalDataset::new).orElse(null);
-    }
-
-    public static String getDatasetIdFromExternalDataset(ExternalDataset externalDataset) {
-        return ofNullable(externalDataset).map(ExternalDataset::getDatasetId).orElse(null);
-
-    }
 }

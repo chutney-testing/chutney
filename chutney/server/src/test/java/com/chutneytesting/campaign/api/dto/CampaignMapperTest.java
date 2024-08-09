@@ -10,7 +10,6 @@ package com.chutneytesting.campaign.api.dto;
 import static java.util.Collections.emptyList;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import java.util.List;
 import org.assertj.core.api.ThrowingConsumer;

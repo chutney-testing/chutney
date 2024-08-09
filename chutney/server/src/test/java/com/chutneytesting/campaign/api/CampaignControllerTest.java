@@ -23,7 +23,6 @@ import com.chutneytesting.WebConfiguration;
 import com.chutneytesting.campaign.api.dto.CampaignDto;
 import com.chutneytesting.campaign.api.dto.CampaignDto.CampaignScenarioDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
-import com.chutneytesting.campaign.api.dto.ExternalDatasetDto;
 import com.chutneytesting.campaign.api.dto.ScenarioExecutionReportOutlineDto;
 import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.campaign.infra.FakeCampaignRepository;

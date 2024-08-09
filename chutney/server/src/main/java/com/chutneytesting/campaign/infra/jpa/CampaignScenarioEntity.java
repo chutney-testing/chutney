@@ -7,9 +7,6 @@
 
 package com.chutneytesting.campaign.infra.jpa;
 
-import static java.util.Optional.ofNullable;
-
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

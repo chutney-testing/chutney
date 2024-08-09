@@ -14,7 +14,6 @@ import com.chutneytesting.execution.domain.GwtScenarioMarshaller;
 import com.chutneytesting.scenario.api.raw.mapper.GwtScenarioMapper;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadata;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.security.User;
