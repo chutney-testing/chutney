@@ -9,7 +9,6 @@ package com.chutneytesting.scenario.api.raw.dto;
 
 import static java.time.Instant.now;
 
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.security.User;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -38,7 +37,7 @@ public interface RawTestCaseDto {
 
     List<String> tags();
 
-    Optional<ExternalDataset> defaultDataset();
+    Optional<String> defaultDataset();
 
     @Value.Default()
     default Instant creationDate() {

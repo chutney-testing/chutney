@@ -25,7 +25,6 @@ import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.dataset.domain.DatasetService;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
 import com.chutneytesting.scenario.infra.TestCaseRepositoryAggregator;
-import com.chutneytesting.server.core.domain.dataset.DataSetAlreadyExistException;
 import com.chutneytesting.server.core.domain.dataset.InvalidExternalDatasetException;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
@@ -34,8 +33,8 @@ import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -162,24 +161,24 @@ public class CampaignController {
     }
 
     private void validateDataset(CampaignDto campaign) {
-        validateExternalDataset(campaign.getDataset());
-        campaign.getScenarios()
-            .stream()
-            .map(scenario -> ofNullable(scenario.dataset()).map(ExternalDatasetDto::getDatasetId).orElse(null))
+        Stream.concat(
+                Stream.of(campaign.getDatasetId()),
+                campaign.getScenarios().stream().map(CampaignDto.CampaignScenarioDto::datasetId)
+            )
             .filter(StringUtils::isNotBlank)
             .distinct()
             .forEach(datasetService::findById);
     }
 
-    private void validateExternalDataset(ExternalDatasetDto externalDatasetDto) {
+    private void validateExternalDataset(ExternalDatasetDto externalDatasetDto) { // TODO
         if (externalDatasetDto == null) {
             return;
         }
-        boolean datasetIdIsPresent = externalDatasetDto.getDatasetId() != null;
-        boolean constantsArePresent = ofNullable(externalDatasetDto.getConstants()).map(constants -> !constants.keySet().isEmpty()).orElse(false);
-        boolean datatableIsPresent = ofNullable(externalDatasetDto.getDatatable()).map(constants -> !constants.isEmpty()).orElse(false);
+        boolean datasetIdIsPresent = externalDatasetDto.datasetId() != null;
+        boolean constantsArePresent = ofNullable(externalDatasetDto.constants()).map(constants -> !constants.keySet().isEmpty()).orElse(false);
+        boolean datatableIsPresent = ofNullable(externalDatasetDto.datatable()).map(constants -> !constants.isEmpty()).orElse(false);
         if (datasetIdIsPresent && (constantsArePresent || datatableIsPresent)) {
-            throw new InvalidExternalDatasetException(externalDatasetDto.getDatasetId());
+            throw new InvalidExternalDatasetException(externalDatasetDto.datasetId());
         }
         if (!(datasetIdIsPresent || constantsArePresent || datatableIsPresent))
         {

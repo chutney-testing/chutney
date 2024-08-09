@@ -75,7 +75,7 @@ public class DatasetService {
                 tc -> testCaseRepository.save(
                     GwtTestCase.builder()
                         .from(tc)
-                        .withMetadata(TestCaseMetadataImpl.TestCaseMetadataBuilder.from(tc.metadata).withDefaultDataset(new ExternalDataset(newId)).build())
+                        .withMetadata(TestCaseMetadataImpl.TestCaseMetadataBuilder.from(tc.metadata).withDefaultDataset(newId).build())
                         .build()
                 ))
             );
@@ -83,11 +83,11 @@ public class DatasetService {
 
     private void updateCampaigns(String oldId, String newId) {
         campaignRepository.findAll().stream()
-            .filter(c -> oldId.equals(ofNullable(c.externalDataset).map(ExternalDataset::getDatasetId).orElse(null)))
+            .filter(c -> oldId.equals(c.externalDatasetId))
             .forEach(c -> campaignRepository.createOrUpdate(
                 CampaignBuilder.builder()
                     .from(c)
-                    .setExternalDataset(new ExternalDataset(newId))
+                    .setExternalDatasetId(newId)
                     .build())
             );
     }

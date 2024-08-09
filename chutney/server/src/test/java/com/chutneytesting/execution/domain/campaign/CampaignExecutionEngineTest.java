@@ -42,6 +42,7 @@ import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutio
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
@@ -118,7 +119,7 @@ public class CampaignExecutionEngineTest {
         when(scenarioExecutionEngine.execute(any(ExecutionRequest.class))).thenReturn(mock(ScenarioExecutionReport.class));
 
         // When
-        CampaignExecution cer = sut.executeScenarioInCampaign(campaign, "user");
+        CampaignExecution cer = sut.executeScenarioInCampaign(campaign, "user", null);
 
         ArgumentCaptor<ReportForJira> reportForJiraCaptor = ArgumentCaptor.forClass(ReportForJira.class);
         verify(jiraXrayPlugin).updateTestExecution(eq(campaign.id), eq(cer.executionId), eq(firstTestCase.metadata.id), eq(""), reportForJiraCaptor.capture());
@@ -135,7 +136,7 @@ public class CampaignExecutionEngineTest {
         when(scenarioExecutionEngine.execute(any(ExecutionRequest.class))).thenReturn(mock(ScenarioExecutionReport.class));
 
         // When
-        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(campaign, "user");
+        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(campaign, "user", null);
 
         // Then
         verify(testCaseRepository, times(2)).findExecutableById(anyString());
@@ -161,7 +162,7 @@ public class CampaignExecutionEngineTest {
         when(scenarioExecutionEngine.execute(any(ExecutionRequest.class))).thenReturn(mock(ScenarioExecutionReport.class));
 
         // When
-        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(singletonList(new ScenarioExecutionCampaign("2", secondTestCase.metadata.title, executionWithId("2", 2L).summary())), campaign, "user");
+        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(singletonList(new ScenarioExecutionCampaign("2", secondTestCase.metadata.title, executionWithId("2", 2L).summary())), campaign, "user", null);
 
         // Then
         verify(testCaseRepository).findExecutableById(anyString());
@@ -191,7 +192,7 @@ public class CampaignExecutionEngineTest {
         // When
         AtomicReference<CampaignExecution> campaignExecutionReport = new AtomicReference<>();
 
-        Executors.newFixedThreadPool(1).submit(() -> campaignExecutionReport.set(sut.executeScenarioInCampaign(campaign, "user")));
+        Executors.newFixedThreadPool(1).submit(() -> campaignExecutionReport.set(sut.executeScenarioInCampaign(campaign, "user", null)));
 
         awaitDuring(500, MILLISECONDS);
         sut.stopExecution(0L);
@@ -220,7 +221,7 @@ public class CampaignExecutionEngineTest {
         when(executionHistoryRepository.getExecution(eq(secondTestCase.id()), or(eq(0L), eq(20L)))).thenReturn(failedExecutionWithId(20L));
 
         // When
-        sut.executeScenarioInCampaign(campaign, "user");
+        sut.executeScenarioInCampaign(campaign, "user", null);
 
         // Then
         verify(scenarioExecutionEngine, times(4)).execute(any(ExecutionRequest.class));
@@ -241,7 +242,7 @@ public class CampaignExecutionEngineTest {
         // When
         StopWatch watch = new StopWatch();
         watch.start();
-        sut.executeScenarioInCampaign(campaign, "user");
+        sut.executeScenarioInCampaign(campaign, "user", null);
         watch.stop();
 
         // Then
@@ -268,7 +269,7 @@ public class CampaignExecutionEngineTest {
         when(campaignExecutionRepository.currentExecutions(campaign.id)).thenReturn(List.of(mockReport));
 
         // When
-        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user"))
+        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user", null))
             .isInstanceOf(CampaignAlreadyRunningException.class);
     }
 
@@ -277,7 +278,7 @@ public class CampaignExecutionEngineTest {
         Campaign campaign = createCampaign();
 
         // When
-        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user"))
+        assertThatThrownBy(() -> sut.executeScenarioInCampaign(campaign, "user", null))
             .isInstanceOf(CampaignEmptyExecutionException.class);
     }
 
@@ -307,7 +308,7 @@ public class CampaignExecutionEngineTest {
         when(campaignExecutionRepository.currentExecutions(anyLong())).thenReturn(List.of(mockReport));
 
         // When
-        assertDoesNotThrow(() -> sut.executeScenarioInCampaign(campaign, "user"));
+        assertDoesNotThrow(() -> sut.executeScenarioInCampaign(campaign, "user", null));
     }
 
     @Test
@@ -393,11 +394,11 @@ public class CampaignExecutionEngineTest {
         // When
         DataSet executionDataset = DataSet.builder().withName("executionDataset").withId("executionDataset").build();
         String executionUser = "executionUser";
-        sut.executeByIdWithDataset(campaign.id, executionDataset, executionUser);
+        CampaignExecution execution = sut.executeByIdWithDataset(campaign.id, executionDataset, executionUser);
 
         // Then
         verify(campaignRepository).findById(campaign.id);
-        assertThat(campaign.externalDatasetId).isEqualTo(executionDataset);
+        assertThat(execution.externalDataset.getDatasetId()).isEqualTo(executionDataset.id);
     }
 
     @Test
@@ -425,11 +426,12 @@ public class CampaignExecutionEngineTest {
         // When
         DataSet executionDataset = DataSet.builder().withName("executionDataset").withId("executionDataset").build();
         String executionUser = "executionUser";
-        sut.executeByNameWithDataset(campaign.title, executionDataset, executionUser);
+        List<CampaignExecution> campaignExecutions = sut.executeByNameWithDataset(campaign.title, executionDataset, executionUser);
 
         // Then
         verify(campaignRepository).findByName(campaign.title);
-        assertThat(campaign.externalDatasetId).isEqualTo(executionDataset);
+        assertThat(campaignExecutions).hasSize(1);
+        assertThat(campaignExecutions.get(0).externalDataset.getDatasetId()).isEqualTo(executionDataset.id);
     }
 
     @Test

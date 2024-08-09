@@ -17,10 +17,15 @@
 
 package com.chutneytesting.tools;
 
+import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
+import static java.util.Optional.ofNullable;
+
 import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +34,21 @@ public class ExternalDatasetEntityMapper {
     private static ObjectMapper mapper = new ObjectMapper();
 
     private static List<Map<String, String>> datasetDatatableFromString(String datasetDatatable) {
-        return mapper.convertValue(datasetDatatable, new TypeReference<>() {});
+        try {
+            return mapper.readValue(datasetDatatable, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            return emptyList();
+        }
     }
 
     private static Map<String, String> datasetConstantsFromString(String datasetConstants) {
-        return mapper.convertValue(datasetConstants, new TypeReference<>() {});
+        try {
+            return mapper.readValue(datasetConstants, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            return emptyMap();
+        }
     }
 
     public static String datasetDatatableToString(List<Map<String, String>> datatable) {
@@ -61,5 +76,14 @@ public class ExternalDatasetEntityMapper {
             datasetConstantsFromString(datasetConstants),
             datasetDatatableFromString(datasetDatatable)
         );
+    }
+
+    public static ExternalDataset getExternalDatasetFromDatasetId(String datasetId) {
+        return ofNullable(datasetId).map(ExternalDataset::new).orElse(null);
+    }
+
+    public static String getDatasetIdFromExternalDataset(ExternalDataset externalDataset) {
+        return ofNullable(externalDataset).map(ExternalDataset::getDatasetId).orElse(null);
+
     }
 }

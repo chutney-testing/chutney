@@ -1064,4 +1064,15 @@
             <where>DEFAULT_DATASET_ID = 'null'</where>
         </update>
     </changeSet>
+
+    <changeSet id="add-column-datatable-and-constants-for-scenario-and-campaign-executions" author="ICG">
+        <addColumn tableName="CAMPAIGN_EXECUTIONS">
+            <column name="DATASET_CONSTANTS" type="LONGTEXT" defaultValueComputed="NULL"/>
+            <column name="DATASET_DATATABLE" type="LONGTEXT" defaultValueComputed="NULL"/>
+        </addColumn>
+        <addColumn tableName="SCENARIO_EXECUTIONS">
+            <column name="DATASET_CONSTANTS" type="LONGTEXT" defaultValueComputed="NULL"/>
+            <column name="DATASET_DATATABLE" type="LONGTEXT" defaultValueComputed="NULL"/>
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

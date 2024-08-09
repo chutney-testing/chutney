@@ -176,20 +176,11 @@ public class ScenarioExecutionUiController {
     }
 
     private DataSet getDataSet(TestCase testCase) {
-        ExternalDataset defaultDataset = testCase.metadata().defaultDataset();
-        if (defaultDataset == null) {
-            return DataSet.NO_DATASET;
-        }
-        if (defaultDataset.getDatasetId() != null) {
-            return datasetRepository.findById(defaultDataset.getDatasetId());
-        } else if (defaultDataset.getConstants() != null && !defaultDataset.getConstants().isEmpty() ||
-            defaultDataset.getDatatable() != null && !defaultDataset.getDatatable().isEmpty()) {
-            return DataSet.builder()
-                .withConstants(defaultDataset.getConstants())
-                .withDatatable(defaultDataset.getDatatable())
-                .build();
+        String defaultDatasetId = testCase.metadata().defaultDataset();
+        if (!defaultDatasetId.isEmpty()) {
+            return datasetRepository.findById(defaultDatasetId);
         } else {
-            throw new InvalidExternalDatasetException();
+            return DataSet.NO_DATASET;
         }
     }
 

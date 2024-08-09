@@ -23,6 +23,7 @@ import com.chutneytesting.WebConfiguration;
 import com.chutneytesting.campaign.api.dto.CampaignDto;
 import com.chutneytesting.campaign.api.dto.CampaignDto.CampaignScenarioDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
+import com.chutneytesting.campaign.api.dto.ExternalDatasetDto;
 import com.chutneytesting.campaign.api.dto.ScenarioExecutionReportOutlineDto;
 import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.campaign.infra.FakeCampaignRepository;
@@ -136,7 +137,7 @@ public class CampaignControllerTest {
 
         // Then
         assertThat(receivedCampaign.getTitle()).isEqualTo(updatedTitle);
-        assertThat(receivedCampaign.getDataset()).isNull();
+        assertThat(receivedCampaign.getDatasetId()).isNull();
         assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("title", "datasetId").isEqualTo(existingCampaign);
     }
 
@@ -155,7 +156,7 @@ public class CampaignControllerTest {
 
         // Then
         assertThat(receivedCampaign.getScenarios()).isEmpty();
-        assertThat(receivedCampaign.getDataset()).isNull();
+        assertThat(receivedCampaign.getDatasetId()).isNull();
         assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("scenarios", "datasetId").isEqualTo(existingCampaign);
     }
 
@@ -174,7 +175,7 @@ public class CampaignControllerTest {
 
         // Then
         assertThat(receivedCampaign.getTags()).containsExactly("TAG");
-        assertThat(receivedCampaign.getDataset()).isNull();
+        assertThat(receivedCampaign.getDatasetId()).isNull();
         assertThat(receivedCampaign.getScenarios()).isEmpty();
         assertThat(receivedCampaign).usingRecursiveComparison().ignoringFields("scenarios", "tags", "datasetId").isEqualTo(existingCampaign);
     }

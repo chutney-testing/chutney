@@ -74,9 +74,9 @@ class DatasetServiceTest {
 
     @Test
     void should_remove_deleted_dataset_from_campaigns_and_scenarios() {
-        ExternalDataset dataset = new ExternalDataset("dataset_id");
+        String datasetId = ("dataset_id");
 
-        TestCaseMetadataImpl metadata = TestCaseMetadataImpl.builder().withDefaultDataset(dataset).build();
+        TestCaseMetadataImpl metadata = TestCaseMetadataImpl.builder().withDefaultDataset(datasetId).build();
         when(testCaseRepository.findAll()).thenReturn(List.of(metadata));
 
         GwtTestCase testCase = GwtTestCase.builder().withMetadata(metadata).withScenario(mock(GwtScenario.class)).build();
@@ -88,16 +88,16 @@ class DatasetServiceTest {
             .setDescription("")
             .setEnvironment("Env")
             .setTags(List.of())
-            .setExternalDataset(dataset)
+            .setExternalDatasetId(datasetId)
             .build();
         when(campaignRepository.findAll()).thenReturn(List.of(campaign));
 
         GwtTestCase expectedScenario = GwtTestCase.builder().from(testCase).withMetadata(
             TestCaseMetadataImpl.TestCaseMetadataBuilder.from(metadata).build()
         ).build();
-        Campaign expectedCampaign = CampaignBuilder.builder().from(campaign).setExternalDataset(new ExternalDataset("")).build();
+        Campaign expectedCampaign = CampaignBuilder.builder().from(campaign).setExternalDatasetId("").build();
 
-        sut.remove(dataset.getDatasetId());
+        sut.remove(datasetId);
 
         verify(testCaseRepository, times(1)).save(expectedScenario);
         verify(campaignRepository, times(1)).createOrUpdate(expectedCampaign);

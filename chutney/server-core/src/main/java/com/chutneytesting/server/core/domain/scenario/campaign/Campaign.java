@@ -18,6 +18,7 @@ public class Campaign {
     public final List<CampaignScenario> scenarios;
     public final boolean parallelRun;
     public final boolean retryAuto;
+    public ExternalDataset externalDataset;
     public final List<String> tags;
 
     private String environment;

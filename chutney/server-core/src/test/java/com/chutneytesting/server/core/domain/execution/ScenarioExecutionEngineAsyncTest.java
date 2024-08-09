@@ -30,6 +30,7 @@ import com.chutneytesting.server.core.domain.execution.report.StepExecutionRepor
 import com.chutneytesting.server.core.domain.execution.report.StepExecutionReportCoreBuilder;
 import com.chutneytesting.server.core.domain.execution.state.ExecutionStateRepository;
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
@@ -119,7 +120,7 @@ public class ScenarioExecutionEngineAsyncTest {
         verify(executionHistoryRepository).store(eq(scenarioId), argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().environment()).isEqualTo("Exec env");
         assertThat(argumentCaptor.getValue().user()).isEqualTo("Exec user");
-        assertThat(argumentCaptor.getValue().externalDataset()).hasValue(dataset.id);
+        assertThat(argumentCaptor.getValue().externalDataset().map(ExternalDataset::getDatasetId)).hasValue(dataset.id);
 
         // Wait for background computation
         verify(executionStateRepository, timeout(250)).notifyExecutionStart(scenarioId);
@@ -264,7 +265,7 @@ public class ScenarioExecutionEngineAsyncTest {
             .testCaseTitle(executionRequest.testCase.metadata().title())
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
-            .datasetId(executionRequest.dataset.id)
+            .externalDataset(new ExternalDataset(executionRequest.dataset.id, executionRequest.dataset.constants, executionRequest.dataset.datatable))
             .report("")
             .scenarioId("1234")
             .build();

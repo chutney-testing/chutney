@@ -29,7 +29,7 @@ public class CampaignMapper {
             campaign.executionEnvironment(),
             campaign.parallelRun,
             campaign.retryAuto,
-            externalDatasetToDto(campaign.externalDataset),
+            campaign.externalDatasetId,
             campaign.tags);
     }
 
@@ -43,7 +43,7 @@ public class CampaignMapper {
             campaign.executionEnvironment(),
             campaign.parallelRun,
             campaign.retryAuto,
-            externalDatasetToDto(campaign.externalDataset),
+            campaign.externalDatasetId,
             campaign.tags);
     }
 
@@ -56,17 +56,17 @@ public class CampaignMapper {
             dto.getEnvironment(),
             dto.isParallelRun(),
             dto.isRetryAuto(),
-            externalDatasetFromDto(dto.getDataset()),
+            dto.getDatasetId(),
             dto.getTags().stream().map(String::trim).map(String::toUpperCase).collect(toList())
         );
     }
 
     public static CampaignDto.CampaignScenarioDto toDto(Campaign.CampaignScenario campaignScenario) {
-        return new CampaignDto.CampaignScenarioDto(campaignScenario.scenarioId(), externalDatasetToDto(campaignScenario.dataset()));
+        return new CampaignDto.CampaignScenarioDto(campaignScenario.scenarioId(), campaignScenario.datasetId());
     }
 
     public static Campaign.CampaignScenario fromDto(CampaignDto.CampaignScenarioDto dto) {
-        return new Campaign.CampaignScenario(dto.scenarioId(), externalDatasetFromDto(dto.dataset()));
+        return new Campaign.CampaignScenario(dto.scenarioId(), dto.datasetId());
     }
 
     private static List<CampaignExecutionReportDto> reportToDto(List<CampaignExecution> campaignExecutions) {
@@ -77,7 +77,7 @@ public class CampaignMapper {
 
     private static List<Campaign.CampaignScenario> campaignScenariosFromDto(CampaignDto dto) {
         return ofNullable(dto.getScenarios()).filter(not(List::isEmpty))
-            .map(list -> list.stream().map(sc -> new Campaign.CampaignScenario(sc.scenarioId(), externalDatasetFromDto(sc.dataset()))).toList())
+            .map(list -> list.stream().map(sc -> new Campaign.CampaignScenario(sc.scenarioId(), sc.datasetId())).toList())
             .orElse(emptyList());
     }
 
@@ -86,6 +86,6 @@ public class CampaignMapper {
     }
 
     private static ExternalDataset externalDatasetFromDto(ExternalDatasetDto externalDataset) {
-        return new ExternalDataset(externalDataset.getDatasetId(), externalDataset.getConstants(), externalDataset.getDatatable());
+        return new ExternalDataset(externalDataset.datasetId(), externalDataset.constants(), externalDataset.datatable());
     }
 }
