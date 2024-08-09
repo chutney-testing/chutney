@@ -47,8 +47,8 @@ public class Campaign {
         this.environment = environment;
     }
 
-    public void executionDataset(String dataset) {
-        this.externalDatasetId = dataset;
+    public void executionDataset(String externalDatasetId) {
+        this.externalDatasetId = externalDatasetId;
     }
 
     public String executionEnvironment() {
