@@ -17,29 +17,18 @@
 
 package com.chutneytesting.campaign.api.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.util.List;
 import java.util.Map;
 
-public class ExternalDatasetDto {
-    private final String datasetId;
-    private final Map<String, String> constants;
-    private final List<Map<String, String>> datatable;
+@JsonIgnoreProperties(ignoreUnknown = true)
+public record ExternalDatasetDto(String datasetId, Map<String, String> constants, List<Map<String, String>> datatable) {
 
-    public ExternalDatasetDto(String datasetId, Map<String, String> constants, List<Map<String, String>> datatable) {
-        this.datasetId = datasetId;
-        this.constants = constants;
-        this.datatable = datatable;
+    public ExternalDatasetDto(String datasetId) {
+        this(datasetId, Map.of(), List.of());
     }
 
-    public String getDatasetId() {
-        return datasetId;
-    }
-
-    public Map<String, String> getConstants() {
-        return constants;
-    }
-
-    public List<Map<String, String>> getDatatable() {
-        return datatable;
+    public ExternalDatasetDto(Map<String, String> constants, List<Map<String, String>> datatable) {
+        this("", constants, datatable);
     }
 }

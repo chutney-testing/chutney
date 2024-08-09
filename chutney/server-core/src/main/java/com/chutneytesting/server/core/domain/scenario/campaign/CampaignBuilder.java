@@ -16,7 +16,6 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign.CampaignScenario;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class CampaignBuilder {
     private String environment;
     private boolean parallelRun;
     private boolean retryAuto;
-    private ExternalDataset externalDataset;
+    private String externalDatasetId;
     private List<String> tags;
 
     public static CampaignBuilder builder() {
@@ -73,8 +72,8 @@ public class CampaignBuilder {
         return this;
     }
 
-    public CampaignBuilder setExternalDataset(ExternalDataset externalDataset) {
-        this.externalDataset = externalDataset;
+    public CampaignBuilder setExternalDatasetId(String externalDatasetId) {
+        this.externalDatasetId = externalDatasetId;
         return this;
     }
 
@@ -91,13 +90,13 @@ public class CampaignBuilder {
         this.environment = campaign.executionEnvironment();
         this.parallelRun = campaign.parallelRun;
         this.retryAuto = campaign.retryAuto;
-        this.externalDataset = campaign.externalDataset;
+        this.externalDatasetId = campaign.externalDatasetId;
         this.tags = campaign.tags;
 
         return this;
     }
 
     public Campaign build() {
-        return new Campaign(id, title, description, campaignScenarios, environment, parallelRun, retryAuto, externalDataset, tags);
+        return new Campaign(id, title, description, campaignScenarios, environment, parallelRun, retryAuto, externalDatasetId, tags);
     }
 }

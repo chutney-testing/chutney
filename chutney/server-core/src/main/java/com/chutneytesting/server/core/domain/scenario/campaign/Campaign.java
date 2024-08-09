@@ -16,7 +16,6 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,7 +27,7 @@ public class Campaign {
     public final List<CampaignScenario> scenarios;
     public final boolean parallelRun;
     public final boolean retryAuto;
-    public ExternalDataset externalDataset;
+    public String externalDatasetId;
     public final List<String> tags;
 
     private String environment;
@@ -40,7 +39,7 @@ public class Campaign {
                     String environment,
                     boolean parallelRun,
                     boolean retryAuto,
-                    ExternalDataset externalDataset,
+                    String externalDatasetId,
                     List<String> tags) {
         this.id = id;
         this.title = title;
@@ -49,7 +48,7 @@ public class Campaign {
         this.parallelRun = parallelRun;
         this.retryAuto = retryAuto;
         this.environment = environment;
-        this.externalDataset = externalDataset;
+        this.externalDatasetId = externalDatasetId;
         this.tags = tags;
     }
 
@@ -57,8 +56,8 @@ public class Campaign {
         this.environment = environment;
     }
 
-    public void executionDataset(ExternalDataset externalDataset) {
-        this.externalDataset = externalDataset;
+    public void executionDataset(String dataset) {
+        this.externalDatasetId = dataset;
     }
 
     public String executionEnvironment() {
@@ -77,7 +76,7 @@ public class Campaign {
             parallelRun == campaign.parallelRun &&
             retryAuto == campaign.retryAuto &&
             environment.equals(campaign.environment) &&
-            externalDataset.equals(campaign.externalDataset) &&
+            externalDatasetId.equals(campaign.externalDatasetId) &&
             tags.equals(campaign.tags);
     }
 
@@ -88,7 +87,7 @@ public class Campaign {
         return new ArrayList<>();
     }
 
-    public record CampaignScenario(String scenarioId, ExternalDataset dataset) {
+    public record CampaignScenario(String scenarioId, String datasetId) {
         public CampaignScenario(String scenarioId) {
             this(scenarioId, null);
         }

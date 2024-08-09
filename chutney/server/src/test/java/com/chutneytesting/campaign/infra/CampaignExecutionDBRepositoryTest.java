@@ -172,7 +172,7 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", campaignExecution.executionId)
                 .hasFieldOrPropertyWithValue("campaignName", campaignExecution.campaignName)
                 .hasFieldOrPropertyWithValue("partialExecution", campaignExecution.partialExecution)
-                .hasFieldOrPropertyWithValue("externalDataset", campaignExecution.dataSetId)
+                .hasFieldOrPropertyWithValue("externalDataset", campaignExecution.externalDataset)
                 .hasFieldOrPropertyWithValue("executionEnvironment", campaignExecution.executionEnvironment)
                 .hasFieldOrPropertyWithValue("userId", campaignExecution.userId)
             ;
@@ -185,7 +185,7 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", scenarioExecution.id())
                 .hasFieldOrPropertyWithValue("status", scenarioExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioExecution.environment())
-                .hasFieldOrPropertyWithValue("datasetId", scenarioExecution.datasetId())
+                .hasFieldOrPropertyWithValue("externalDataset", scenarioExecution.datasetId())
             ;
         }
 
@@ -219,7 +219,7 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", campaignExecution.executionId)
                 .hasFieldOrPropertyWithValue("campaignName", campaignExecution.campaignName)
                 .hasFieldOrPropertyWithValue("partialExecution", campaignExecution.partialExecution)
-                .hasFieldOrPropertyWithValue("externalDataset", campaignExecution.dataSetId)
+                .hasFieldOrPropertyWithValue("externalDataset", campaignExecution.externalDataset)
                 .hasFieldOrPropertyWithValue("executionEnvironment", campaignExecution.executionEnvironment)
                 .hasFieldOrPropertyWithValue("userId", campaignExecution.userId)
             ;
@@ -233,7 +233,7 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", scenarioOneExecution.id())
                 .hasFieldOrPropertyWithValue("status", scenarioOneExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioOneExecution.environment())
-                .hasFieldOrPropertyWithValue("datasetId", scenarioOneExecution.datasetId())
+                .hasFieldOrPropertyWithValue("externalDataset", scenarioOneExecution.datasetId())
             ;
             assertThat(reports.get(0).scenarioExecutionReports()).element(1)
                 .hasFieldOrPropertyWithValue("scenarioId", scenarioEntityTwo.getId().toString())
@@ -242,7 +242,7 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", scenarioTwoExecution.id())
                 .hasFieldOrPropertyWithValue("status", scenarioTwoExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioTwoExecution.environment())
-                .hasFieldOrPropertyWithValue("datasetId", scenarioTwoExecution.datasetId())
+                .hasFieldOrPropertyWithValue("externalDataset", scenarioTwoExecution.datasetId())
             ;
         }
 

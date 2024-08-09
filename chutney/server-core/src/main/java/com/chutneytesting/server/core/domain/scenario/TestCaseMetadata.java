@@ -23,7 +23,7 @@ public interface TestCaseMetadata {
 
     String id(); // TODO - to extract
 
-    ExternalDataset defaultDataset();
+    String defaultDataset();
 
     String title();
 

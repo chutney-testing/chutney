@@ -45,6 +45,7 @@ import com.chutneytesting.server.core.domain.execution.report.ReportNotFoundExce
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.execution.report.StepExecutionReportCore;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
@@ -406,7 +407,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .environment("env")
                 .addScenarioExecutionReport(scenarioExecutionOneReport)
                 .userId("user")
-                .externalDataset("ds287")
+                .externalDataset(new ExternalDataset("ds287"))
                 .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
@@ -442,7 +443,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .environment("env")
                 .addScenarioExecutionReport(scenarioExecutionOneReport)
                 .userId("user")
-                .externalDataset("ds287")
+                .externalDataset(new ExternalDataset("ds287"))
                 .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
@@ -547,7 +548,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                     .report(report)
                     .testCaseTitle("Fake title")
                     .environment("")
-                    .datasetId("fake dataset id")
+                    .externalDataset(new ExternalDataset("fake dataset id"))
                     .user("")
                     .build();
             }
@@ -563,7 +564,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .report(buildReport())
                 .testCaseTitle("Fake title")
                 .environment("")
-                .datasetId("fake dataset id")
+                .externalDataset(new ExternalDataset("fake dataset id"))
                 .user("")
                 .tags(defaultScenarioTags())
                 .build();

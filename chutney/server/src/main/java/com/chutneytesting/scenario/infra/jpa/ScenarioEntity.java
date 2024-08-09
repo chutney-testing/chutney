@@ -169,7 +169,7 @@ public class ScenarioEntity {
             User.isAnonymous(testCase.metadata().author()) ? null : testCase.metadata().author(),
             testCase.metadata().updateDate(),
             testCase.metadata().version(),
-            ofNullable(testCase.metadata().defaultDataset()).map(ExternalDataset::getDatasetId).orElse(null)
+            testCase.metadata().defaultDataset()
         );
     }
 
@@ -184,7 +184,7 @@ public class ScenarioEntity {
                 .withAuthor(userId)
                 .withUpdateDate(Instant.ofEpochMilli(updateDate))
                 .withVersion(version)
-                .withDefaultDataset(new ExternalDataset(defaultDataset))
+                .withDefaultDataset(defaultDataset)
                 .build())
             .withScenario(ofNullable(content).map(c -> new GwtScenarioMapper().deserialize(title, description, c)).orElse(null))
             .build();
@@ -200,7 +200,7 @@ public class ScenarioEntity {
             .withAuthor(userId)
             .withUpdateDate(Instant.ofEpochMilli(updateDate))
             .withVersion(version)
-            .withDefaultDataset(new ExternalDataset(defaultDataset))
+            .withDefaultDataset(defaultDataset)
             .build();
     }
 }

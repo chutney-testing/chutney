@@ -40,7 +40,7 @@ public class CampaignEnvironmentUpdateHandler implements UpdateEnvironmentHandle
                     newName,
                     existingCampaign.parallelRun,
                     existingCampaign.retryAuto,
-                    existingCampaign.externalDataset,
+                    existingCampaign.externalDatasetId,
                     existingCampaign.tags
                 );
                 campaignRepository.createOrUpdate(campaign);
@@ -59,7 +59,7 @@ public class CampaignEnvironmentUpdateHandler implements UpdateEnvironmentHandle
                     null,
                     existingCampaign.parallelRun,
                     existingCampaign.retryAuto,
-                    existingCampaign.externalDataset,
+                    existingCampaign.externalDatasetId,
                     existingCampaign.tags
                 );
                 campaignRepository.createOrUpdate(campaign);
