@@ -49,7 +49,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
     editionDatasetValues?: Dataset;
 
 
-    @Input() executeCallback: (env: string, dataset: string) => void;
+    @Input() executeCallback: (env: string, dataset: Dataset) => void;
     @Input() changeModalSize: (size: "lg" | "xl") => void;
 
     isCollapsed = true;
@@ -115,7 +115,6 @@ export class ScenarioExecuteModalComponent implements OnInit {
                     }
                 })
             } else {
-                console.log(editedDataset)
                 this.execute(editedDataset)
             }
         } else {
@@ -125,7 +124,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
 
     execute(dataset: Dataset) {
         if (this.selectedEnv) {
-            this.executeCallback(this.selectedEnv, dataset?.id)
+            this.executeCallback(this.selectedEnv, dataset)
             this.activeModal.close();
         } else {
             this.translateService.get('scenarios.execution.errors.environment').subscribe((res: string) => {

@@ -135,6 +135,9 @@ public class CampaignExecutionEngine {
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
             .map(campaign -> {
                 ExternalDataset externalDataset = ofNullable(dataset).map(ds -> new ExternalDataset(ds.id, ds.constants, ds.datatable)).orElse(null);
+                if (externalDataset != null) {
+                    campaign.executionDataset(null);
+                }
                 return executeScenarioInCampaign(campaign, userId, externalDataset);
             })
             .orElseThrow(() -> new CampaignNotFoundException(campaignId));
@@ -339,6 +342,7 @@ public class CampaignExecutionEngine {
             }
             return DataSet
                 .builder()
+                .withName("")
                 .withDatatable(externalDataset.getDatatable())
                 .withConstants(externalDataset.getConstants())
                 .build();
@@ -346,6 +350,7 @@ public class CampaignExecutionEngine {
         if (dataset.isEmpty()) {
             dataset = ofNullable(campaignExecution.externalDataset).map(externalDataset -> DataSet.builder()
                     .withId(externalDataset.getDatasetId())
+                    .withName("")
                     .withConstants(externalDataset.getConstants())
                     .withDatatable(externalDataset.getDatatable())
                     .build());

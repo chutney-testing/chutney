@@ -34,6 +34,9 @@ public class ExternalDatasetEntityMapper {
     private static ObjectMapper mapper = new ObjectMapper();
 
     private static List<Map<String, String>> datasetDatatableFromString(String datasetDatatable) {
+        if (datasetDatatable == null) {
+            return null;
+        }
         try {
             return mapper.readValue(datasetDatatable, new TypeReference<>() {
             });
@@ -43,6 +46,9 @@ public class ExternalDatasetEntityMapper {
     }
 
     private static Map<String, String> datasetConstantsFromString(String datasetConstants) {
+        if (datasetConstants == null) {
+            return null;
+        }
         try {
             return mapper.readValue(datasetConstants, new TypeReference<>() {
             });
@@ -52,6 +58,9 @@ public class ExternalDatasetEntityMapper {
     }
 
     public static String datasetDatatableToString(List<Map<String, String>> datatable) {
+        if (datatable == null) {
+            return null;
+        }
         try {
             return mapper.writeValueAsString(datatable);
         } catch (JsonProcessingException e) {
@@ -60,6 +69,9 @@ public class ExternalDatasetEntityMapper {
     }
 
     public static String datasetConstantsToString(Map<String, String> constants) {
+        if (constants == null) {
+            return null;
+        }
         try {
             return mapper.writeValueAsString(constants);
         } catch (JsonProcessingException e) {
