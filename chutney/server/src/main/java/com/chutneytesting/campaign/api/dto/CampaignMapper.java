@@ -21,7 +21,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.function.Predicate.not;
 import static java.util.stream.Collectors.toList;
 
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.List;
@@ -88,13 +87,5 @@ public class CampaignMapper {
         return ofNullable(dto.getScenarios()).filter(not(List::isEmpty))
             .map(list -> list.stream().map(sc -> new Campaign.CampaignScenario(sc.scenarioId(), sc.datasetId())).toList())
             .orElse(emptyList());
-    }
-
-    private static ExternalDatasetDto externalDatasetToDto(ExternalDataset externalDataset) {
-        return new ExternalDatasetDto(externalDataset.getDatasetId(), externalDataset.getConstants(), externalDataset.getDatatable());
-    }
-
-    private static ExternalDataset externalDatasetFromDto(ExternalDatasetDto externalDataset) {
-        return new ExternalDataset(externalDataset.datasetId(), externalDataset.constants(), externalDataset.datatable());
     }
 }

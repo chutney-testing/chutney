@@ -16,15 +16,9 @@
 
 package com.chutneytesting.campaign.infra.jpa;
 
-import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetConstantsToString;
-import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetDatatableToString;
-import static com.chutneytesting.tools.ExternalDatasetEntityMapper.getDatasetIdFromExternalDataset;
-import static com.chutneytesting.tools.ExternalDatasetEntityMapper.getExternalDataset;
-import static com.chutneytesting.tools.ExternalDatasetEntityMapper.getExternalDatasetFromDatasetId;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
