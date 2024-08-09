@@ -53,9 +53,10 @@ import { ReportPreviewComponent } from './components/execution/preview/report-pr
 import { RxFor } from '@rx-angular/template/for';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ScenarioJiraLinksModalComponent } from './components/scenario-jira-links-modal/scenario-jira-links-modal.component';
-import { ScenarioExecuteModalComponent } from './components/execution/execute-modal/scenario-execute-modal.component';
+import { ScenarioExecuteModalComponent } from '../../core/components/execution/execute-modal/scenario-execute-modal.component';
 import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import {DatasetModule} from "@modules/dataset/dataset.module";
 
 const ROUTES = [
     ...scenarioRoute
@@ -82,7 +83,8 @@ const ROUTES = [
         MoleculesModule,
         DropdownModule,
         FloatLabelModule,
-        RxFor
+        RxFor,
+        DatasetModule
     ],
     declarations: [
         ScenariosComponent,

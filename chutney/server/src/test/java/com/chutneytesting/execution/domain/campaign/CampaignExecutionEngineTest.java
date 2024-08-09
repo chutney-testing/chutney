@@ -51,6 +51,7 @@ import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutio
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
@@ -127,7 +128,7 @@ public class CampaignExecutionEngineTest {
         when(scenarioExecutionEngine.execute(any(ExecutionRequest.class))).thenReturn(mock(ScenarioExecutionReport.class));
 
         // When
-        CampaignExecution cer = sut.executeScenarioInCampaign(campaign, "user");
+        CampaignExecution cer = sut.executeScenarioInCampaign(campaign, "user", null);
 
         ArgumentCaptor<ReportForJira> reportForJiraCaptor = ArgumentCaptor.forClass(ReportForJira.class);
         verify(jiraXrayPlugin).updateTestExecution(eq(campaign.id), eq(cer.executionId), eq(firstTestCase.metadata.id), reportForJiraCaptor.capture());
@@ -144,7 +145,7 @@ public class CampaignExecutionEngineTest {
         when(scenarioExecutionEngine.execute(any(ExecutionRequest.class))).thenReturn(mock(ScenarioExecutionReport.class));
 
         // When
-        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(campaign, "user");
+        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(campaign, "user", null);
 
         // Then
         verify(testCaseRepository, times(2)).findExecutableById(anyString());
@@ -170,7 +171,7 @@ public class CampaignExecutionEngineTest {
         when(scenarioExecutionEngine.execute(any(ExecutionRequest.class))).thenReturn(mock(ScenarioExecutionReport.class));
 
         // When
-        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(singletonList(new ScenarioExecutionCampaign("2", secondTestCase.metadata.title, executionWithId("2", 2L).summary())), campaign, "user");
+        CampaignExecution campaignExecution = sut.executeScenarioInCampaign(singletonList(new ScenarioExecutionCampaign("2", secondTestCase.metadata.title, executionWithId("2", 2L).summary())), campaign, "user", null);
 
         // Then
         verify(testCaseRepository).findExecutableById(anyString());
@@ -386,11 +387,27 @@ public class CampaignExecutionEngineTest {
         // When
         String executionEnv = "executionEnv";
         String executionUser = "executionUser";
-        sut.executeById(campaign.id, executionEnv, executionUser);
+        sut.executeByIdWithEnv(campaign.id, executionEnv, executionUser);
 
         // Then
         verify(campaignRepository).findById(campaign.id);
         assertThat(campaign.executionEnvironment()).isEqualTo(executionEnv);
+    }
+
+    @Test
+    public void should_execute_campaign_with_given_dataset_when_executed_by_id() {
+        // Given
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
+        when(campaignRepository.findById(campaign.id)).thenReturn(campaign);
+
+        // When
+        DataSet executionDataset = DataSet.builder().withName("executionDataset").withId("executionDataset").build();
+        String executionUser = "executionUser";
+        CampaignExecution execution = sut.executeByIdWithDataset(campaign.id, executionDataset, executionUser);
+
+        // Then
+        verify(campaignRepository).findById(campaign.id);
+        assertThat(execution.externalDataset.getDatasetId()).isEqualTo(executionDataset.id);
     }
 
     @Test
@@ -402,11 +419,28 @@ public class CampaignExecutionEngineTest {
         // When
         String executionEnv = "executionEnv";
         String executionUser = "executionUser";
-        sut.executeByName(campaign.title, executionEnv, executionUser);
+        sut.executeByNameWithEnv(campaign.title, executionEnv, executionUser);
 
         // Then
         verify(campaignRepository).findByName(campaign.title);
         assertThat(campaign.executionEnvironment()).isEqualTo(executionEnv);
+    }
+
+    @Test
+    public void should_execute_campaign_with_given_dataset_when_executed_by_name() {
+        // Given
+        Campaign campaign = createCampaign(firstTestCase, secondTestCase);
+        when(campaignRepository.findByName(anyString())).thenReturn(singletonList(campaign));
+
+        // When
+        DataSet executionDataset = DataSet.builder().withName("executionDataset").withId("executionDataset").build();
+        String executionUser = "executionUser";
+        List<CampaignExecution> campaignExecutions = sut.executeByNameWithDataset(campaign.title, executionDataset, executionUser);
+
+        // Then
+        verify(campaignRepository).findByName(campaign.title);
+        assertThat(campaignExecutions).hasSize(1);
+        assertThat(campaignExecutions.get(0).externalDataset.getDatasetId()).isEqualTo(executionDataset.id);
     }
 
     @Test

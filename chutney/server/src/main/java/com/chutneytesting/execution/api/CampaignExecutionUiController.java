@@ -17,18 +17,29 @@
 package com.chutneytesting.execution.api;
 
 import static com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper.toDto;
+import static com.chutneytesting.dataset.api.DataSetMapper.fromDto;
+import static com.chutneytesting.dataset.domain.DatasetService.hasNoDuplicatedHeaders;
+import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper;
+import com.chutneytesting.dataset.api.DataSetDto;
+import com.chutneytesting.dataset.api.DataSetMapper;
+import com.chutneytesting.dataset.api.ExternalDatasetDto;
+import com.chutneytesting.dataset.api.KeyValue;
 import com.chutneytesting.execution.api.report.surefire.SurefireCampaignExecutionReportBuilder;
 import com.chutneytesting.execution.api.report.surefire.SurefireScenarioExecutionReportBuilder;
 import com.chutneytesting.execution.domain.campaign.CampaignExecutionEngine;
 import com.chutneytesting.security.infra.SpringUserService;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.xml.crypto.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -38,7 +49,9 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -81,7 +94,7 @@ public class CampaignExecutionUiController {
         List<CampaignExecution> reports;
         String userId = userService.currentUser().getId();
         if (environment.isPresent()) {
-            reports = campaignExecutionEngine.executeByName(campaignName, environment.get(), userId);
+            reports = campaignExecutionEngine.executeByNameWithEnv(campaignName, environment.get(), userId);
         } else {
             reports = campaignExecutionEngine.executeByName(campaignName, userId);
         }
@@ -105,7 +118,7 @@ public class CampaignExecutionUiController {
         response.addHeader("Content-Disposition", "attachment; filename=\"surefire-report.zip\"");
         List<CampaignExecution> reports;
         if (environment.isPresent()) {
-            reports = campaignExecutionEngine.executeByName(campaignPattern, environment.get(), userId);
+            reports = campaignExecutionEngine.executeByNameWithEnv(campaignPattern, environment.get(), userId);
         } else {
             reports = campaignExecutionEngine.executeByName(campaignPattern, userId);
         }
@@ -121,15 +134,26 @@ public class CampaignExecutionUiController {
     }
 
     @PreAuthorize("hasAuthority('CAMPAIGN_EXECUTE')")
-    @GetMapping(path = {"/byID/{campaignId}", "/byID/{campaignId}/{env}"}, produces = MediaType.APPLICATION_JSON_VALUE)
-    public CampaignExecutionReportDto executeCampaignById(@PathVariable("campaignId") Long campaignId, @PathVariable("env") Optional<String> environment) {
+    @PostMapping(path = {"/byID/{campaignId}", "/byID/{campaignId}/{env}"}, produces = MediaType.APPLICATION_JSON_VALUE)
+    public CampaignExecutionReportDto executeCampaignById(
+            @PathVariable("campaignId") Long campaignId,
+            @PathVariable("env") Optional<String> environment,
+            @RequestBody ExternalDatasetDto externalDataset
+    ) {
         String userId = userService.currentUser().getId();
         CampaignExecution report;
-        if (environment.isPresent()) {
-            report = campaignExecutionEngine.executeById(campaignId, environment.get(), userId);
+        DataSet dataset;
+        if (externalDataset == null) {
+            dataset = null;
         } else {
-            report = campaignExecutionEngine.executeById(campaignId, userId);
+            dataset = DataSet.builder()
+                .withId(externalDataset.id().orElse(null))
+                .withName(externalDataset.id().orElse(""))
+                .withConstants(KeyValue.toMap(externalDataset.constants()))
+                .withDatatable(externalDataset.datatable().stream().map(KeyValue::toMap).toList())
+                .build();
         }
+        report = campaignExecutionEngine.executeByIdWithEnvAndDataset(campaignId, environment.orElse(null), dataset, userId);
         return toDto(report);
     }
 }

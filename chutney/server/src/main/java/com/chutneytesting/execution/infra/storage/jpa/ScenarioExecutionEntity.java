@@ -16,6 +16,9 @@
 
 package com.chutneytesting.execution.infra.storage.jpa;
 
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetConstantsToString;
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetDatatableToString;
+import static com.chutneytesting.tools.ExternalDatasetEntityMapper.getExternalDataset;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.infra.jpa.CampaignExecutionEntity;
@@ -23,6 +26,7 @@ import com.chutneytesting.scenario.infra.raw.TagListMapper;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -84,6 +88,12 @@ public class ScenarioExecutionEntity {
     @Column(name = "DATASET_ID")
     private String datasetId;
 
+    @Column(name = "DATASET_CONSTANTS")
+    private String datasetConstants;
+
+    @Column(name = "DATASET_DATATABLE")
+    private String datasetDatatable;
+
     @Column(name = "VERSION")
     @Version
     private Integer version;
@@ -103,7 +113,7 @@ public class ScenarioExecutionEntity {
         String scenarioTitle,
         String environment,
         String userId,
-        String datasetId,
+        ExternalDataset dataset,
         String tags,
         Integer version
     ) {
@@ -118,7 +128,11 @@ public class ScenarioExecutionEntity {
         this.scenarioTitle = scenarioTitle;
         this.environment = environment;
         this.userId = userId;
-        this.datasetId = datasetId;
+        if (dataset != null) {
+            this.datasetId = dataset.getDatasetId() ;
+            this.datasetConstants = datasetConstantsToString(dataset.getConstants());
+            this.datasetDatatable = datasetDatatableToString(dataset.getDatatable());
+        }
         this.tags = tags;
         this.version = version;
     }
@@ -183,8 +197,20 @@ public class ScenarioExecutionEntity {
         return datasetId;
     }
 
+    public String datasetConstants() {
+        return datasetConstants;
+    }
+
+    public String datasetDatatable() {
+        return datasetDatatable;
+    }
+
     public String tags() {
         return tags;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public static ScenarioExecutionEntity fromDomain(String scenarioId, ExecutionHistory.ExecutionProperties execution) {
@@ -204,7 +230,7 @@ public class ScenarioExecutionEntity {
             execution.testCaseTitle(),
             execution.environment(),
             execution.user(),
-            execution.datasetId().orElse(null),
+            execution.externalDataset().orElse(null),
             truncateExecutionTags(TagListMapper.tagsToString(execution.tags().orElse(null))),
             version
         );
@@ -224,7 +250,7 @@ public class ScenarioExecutionEntity {
             .error(ofNullable(error))
             .testCaseTitle(scenarioTitle)
             .environment(environment)
-            .datasetId(ofNullable(datasetId))
+            .externalDataset(ofNullable(getExternalDataset(datasetId, datasetConstants, datasetDatatable)))
             .user(userId)
             .campaignReport(ofNullable(campaignReport))
             .scenarioId(scenarioId)

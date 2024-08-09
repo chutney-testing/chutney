@@ -27,6 +27,7 @@ import static org.mockito.Mockito.when;
 
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
@@ -69,7 +70,7 @@ class CampaignServiceTest {
             .partialExecution(true)
             .campaignName("test name")
             .executionId(43L)
-            .dataSetId("dataset id test")
+            .externalDataset(new ExternalDataset("dataset id test"))
             .startDate(LocalDateTime.MAX)
             .addScenarioExecutionReport(scenarioExecutionReport1)
             .addScenarioExecutionReport(scenarioExecutionReport2)
