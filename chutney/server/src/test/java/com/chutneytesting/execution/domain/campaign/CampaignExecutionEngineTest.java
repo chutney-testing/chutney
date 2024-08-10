@@ -42,7 +42,6 @@ import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutio
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.instrument.ChutneyMetrics;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.TestCaseRepository;
@@ -53,6 +52,7 @@ import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecution
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Random;
 import java.util.concurrent.ExecutorService;
@@ -571,6 +571,97 @@ public class CampaignExecutionEngineTest {
         ExecutionRequest executionRequest = argumentCaptor.getValue();
         assertThat(executionRequest.dataset).isNull();
         assertThat(executionRequest.tags).containsExactly("TAG");
+    }
+
+    @Test
+    public void should_execute_by_id_with_inline_dataset() {
+        // Given
+        Long campaignId = 1L;
+        String env = "env";
+        var scenarios = Lists.list(firstTestCase.id()).stream().map(id -> new Campaign.CampaignScenario(id, null)).toList();
+        Campaign campaign = new Campaign(1L, "campaign1", null, scenarios, env, false, false, "UNKNOWN", List.of("TAG"));
+        var datatable = List.of(Map.of("HEADER", "VALUE"));
+        var constants = Map.of("HEADER", "VALUE");
+        DataSet dataSet = DataSet.builder().withName("").withDatatable(datatable).withConstants(constants).build();
+        when(campaignRepository.findById(eq(1L))).thenReturn(campaign);
+
+        // When
+        CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, dataSet, "USER");
+
+        // Then
+        assertThat(campaign.externalDatasetId).isNull();
+        assertThat(campaignExecution.externalDataset).isNotNull();
+        assertThat(campaignExecution.externalDataset.getDatasetId()).isNull();
+        assertThat(campaignExecution.externalDataset.getConstants()).isEqualTo(constants);
+        assertThat(campaignExecution.externalDataset.getDatatable()).isEqualTo(datatable);
+        assertThat(campaignExecution.scenarioExecutionReports()).isNotEmpty();
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset()).isPresent();
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset().get().getConstants()).isEqualTo(constants);
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset().get().getDatatable()).isEqualTo(datatable);
+    }
+
+    @Test
+    public void should_execute_by_id_with_known_dataset() {
+        // Given
+        Long campaignId = 1L;
+        String env = "env";
+        var scenarios = Lists.list(firstTestCase.id()).stream().map(id -> new Campaign.CampaignScenario(id, null)).toList();
+        Campaign campaign = new Campaign(1L, "campaign1", null, scenarios, env, false, false, "UNKNOWN", List.of("TAG"));
+        DataSet dataSet = DataSet.builder().withName("").withId("DATASET_ID").build();
+        when(campaignRepository.findById(eq(1L))).thenReturn(campaign);
+        when(datasetRepository.findById(eq("DATASET_ID"))).thenReturn(DataSet.builder().withName("DATASET_ID").withId("DATASET_ID").build());
+
+        // When
+        CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, dataSet, "USER");
+
+        // Then
+        assertThat(campaign.externalDatasetId).isNull();
+        assertThat(campaignExecution.externalDataset).isNotNull();
+        assertThat(campaignExecution.externalDataset.getConstants()).isEmpty();
+        assertThat(campaignExecution.externalDataset.getDatatable()).isEmpty();
+        assertThat(campaignExecution.externalDataset.getDatasetId()).isNotNull();
+        assertThat(campaignExecution.externalDataset.getDatasetId()).isEqualTo("DATASET_ID");
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset()).isPresent();
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset().get().getDatasetId()).isEqualTo("DATASET_ID");
+    }
+
+    @Test
+    public void should_execute_by_id_with_default_dataset() {
+        // Given
+        Long campaignId = 1L;
+        String env = "env";
+        var scenarios = Lists.list(firstTestCase.id()).stream().map(id -> new Campaign.CampaignScenario(id, null)).toList();
+        Campaign campaign = new Campaign(1L, "campaign1", null, scenarios, env, false, false, "DATASET_ID", List.of("TAG"));
+        when(campaignRepository.findById(eq(1L))).thenReturn(campaign);
+        when(datasetRepository.findById(eq("DATASET_ID"))).thenReturn(DataSet.builder().withName("DATASET_ID").withId("DATASET_ID").build());
+
+        // When
+        CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, null, "USER");
+
+        // Then
+        assertThat(campaign.externalDatasetId).isNotNull();
+        assertThat(campaignExecution.externalDataset).isNotNull();
+        assertThat(campaignExecution.externalDataset.getConstants()).isEmpty();
+        assertThat(campaignExecution.externalDataset.getDatatable()).isEmpty();
+        assertThat(campaignExecution.externalDataset.getDatasetId()).isNotNull();
+        assertThat(campaignExecution.externalDataset.getDatasetId()).isEqualTo("DATASET_ID");
+    }
+
+    @Test
+    public void should_execute_by_id_without_any_dataset() {
+        // Given
+        Long campaignId = 1L;
+        String env = "env";
+        var scenarios = Lists.list(firstTestCase.id()).stream().map(id -> new Campaign.CampaignScenario(id, null)).toList();
+        Campaign campaign = new Campaign(1L, "campaign1", null, scenarios, env, false, false, null, List.of("TAG"));
+        when(campaignRepository.findById(eq(1L))).thenReturn(campaign);
+
+        // When
+        CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, null, "USER");
+
+        // Then
+        assertThat(campaign.externalDatasetId).isNull();
+        assertThat(campaignExecution.externalDataset).isNull();
     }
 
     private final static Random campaignIdGenerator = new Random();

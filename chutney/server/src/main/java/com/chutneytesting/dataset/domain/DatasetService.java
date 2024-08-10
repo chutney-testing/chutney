@@ -11,7 +11,6 @@ import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 
 import com.chutneytesting.campaign.domain.CampaignRepository;
-import com.chutneytesting.dataset.api.DataSetDto;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
@@ -97,13 +96,6 @@ public class DatasetService {
         datasetRepository.removeById(datasetName);
         updateScenarios(datasetName, "");
         updateCampaigns(datasetName, "");
-    }
-
-    public static void hasNoDuplicatedHeaders(DataSetDto dataset) {
-        List<String> duplicates = dataset.duplicatedHeaders();
-        if (!duplicates.isEmpty()) {
-            throw new IllegalArgumentException( duplicates.size() + " column(s) have duplicated headers: [" + String.join(", ", duplicates) +"]");
-        }
     }
 
 }

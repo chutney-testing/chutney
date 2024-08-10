@@ -8,14 +8,9 @@
 package com.chutneytesting.execution.api;
 
 import static com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper.toDto;
-import static com.chutneytesting.dataset.api.DataSetMapper.fromDto;
-import static com.chutneytesting.dataset.domain.DatasetService.hasNoDuplicatedHeaders;
-import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper;
-import com.chutneytesting.dataset.api.DataSetDto;
-import com.chutneytesting.dataset.api.DataSetMapper;
 import com.chutneytesting.dataset.api.ExternalDatasetDto;
 import com.chutneytesting.dataset.api.KeyValue;
 import com.chutneytesting.execution.api.report.surefire.SurefireCampaignExecutionReportBuilder;
@@ -23,14 +18,11 @@ import com.chutneytesting.execution.api.report.surefire.SurefireScenarioExecutio
 import com.chutneytesting.execution.domain.campaign.CampaignExecutionEngine;
 import com.chutneytesting.security.infra.SpringUserService;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import javax.xml.crypto.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -42,7 +34,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
