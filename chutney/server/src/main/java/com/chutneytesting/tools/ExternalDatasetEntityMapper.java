@@ -19,13 +19,11 @@ package com.chutneytesting.tools;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
-import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -58,7 +56,7 @@ public class ExternalDatasetEntityMapper {
     }
 
     public static String datasetDatatableToString(List<Map<String, String>> datatable) {
-        if (datatable == null) {
+        if (datatable == null || datatable.isEmpty()) {
             return null;
         }
         try {
@@ -69,7 +67,7 @@ public class ExternalDatasetEntityMapper {
     }
 
     public static String datasetConstantsToString(Map<String, String> constants) {
-        if (constants == null) {
+        if (constants == null || constants.isEmpty()) {
             return null;
         }
         try {
