@@ -7,6 +7,7 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
+import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.compareExternalDataset;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.RUNNING;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static java.time.LocalDateTime.now;
@@ -127,7 +128,7 @@ public class CampaignExecution {
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
                 return se.scenarioId().equals(storedExecution.scenarioId()) &&
-                    se.execution().externalDataset().equals(storedExecution.externalDataset());
+                    compareExternalDataset(se.execution().externalDataset().orElse(null), storedExecution.externalDataset().orElse(null));
             })
             .findFirst();
         var scenarioExecution = this.scenarioExecutions.get(indexOpt.getAsInt()).execution();

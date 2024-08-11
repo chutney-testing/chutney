@@ -72,9 +72,15 @@ Feature:  Campaign execution
                 Take campaignId ${#jsonPath(#body, "$.id")}
                 Validate httpStatusCode_200 ${#status == 200}
         When this campaign is executed by id
-            Do http-get
+            Do http-post
                 On CHUTNEY_LOCAL
                 With uri /api/ui/campaign/execution/v1/byID/${#campaignId}
+                With body
+                """
+                {}
+                """
+                With headers
+                | Content-Type | application/json;charset=UTF-8 |
                 Take report ${#body}
                 Validate httpStatusCode_200 ${#status == 200}
         Then the execution report is returned
@@ -210,9 +216,15 @@ Feature:  Campaign execution
 
     Scenario: Execution by id of an unknown campaign
         When an unknown campaign is executed by id
-            Do http-get
+            Do http-post
                 On CHUTNEY_LOCAL
                 With uri /api/ui/campaign/execution/v1/byID/666/DEFAULT
+                With headers
+                | Content-Type | application/json;charset=UTF-8 |
+                With body
+                """
+                {}
+                """
         Then the campaign is not found
                 Validate httpStatusCode_404 ${#status == 404}
 

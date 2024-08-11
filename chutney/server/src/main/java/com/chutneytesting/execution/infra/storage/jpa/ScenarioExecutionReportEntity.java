@@ -7,7 +7,7 @@
 
 package com.chutneytesting.execution.infra.storage.jpa;
 
-import static com.chutneytesting.tools.ExternalDatasetEntityMapper.getExternalDataset;
+import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.getExternalDataset;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.scenario.infra.raw.TagListMapper;

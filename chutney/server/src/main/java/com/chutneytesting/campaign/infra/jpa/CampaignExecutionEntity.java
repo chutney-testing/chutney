@@ -7,9 +7,9 @@
 
 package com.chutneytesting.campaign.infra.jpa;
 
-import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetConstantsToString;
-import static com.chutneytesting.tools.ExternalDatasetEntityMapper.datasetDatatableToString;
-import static com.chutneytesting.tools.ExternalDatasetEntityMapper.getExternalDataset;
+import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.datasetConstantsToString;
+import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.datasetDatatableToString;
+import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.getExternalDataset;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;

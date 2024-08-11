@@ -18,6 +18,8 @@
 package com.chutneytesting.tools;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper;
 import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -57,6 +59,71 @@ public class ExternalDatasetEntityMapperTest {
         assertThat(externalDataset.getDatatable()).hasSize(2);
         assertThat(externalDataset.getDatatable().get(0)).containsAllEntriesOf(datatable.get(0));
         assertThat(externalDataset.getDatatable().get(1)).containsAllEntriesOf(datatable.get(1));
+    }
+
+    @Test
+    public void should_compare_same_external_dataset() {
+        //Given
+        ExternalDataset dataset1 = new ExternalDataset("DATASET_ID", Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+        ExternalDataset dataset2 = new ExternalDataset("DATASET_ID", Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+
+        // When
+        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+
+        // Then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    public void should_compare_external_dataset_with_different_id() {
+        //Given
+        ExternalDataset dataset1 = new ExternalDataset("DATASET_ID_1", Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+        ExternalDataset dataset2 = new ExternalDataset("DATASET_ID_2", Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+
+        // When
+        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+
+        // Then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void should_compare_external_dataset_with_different_constants() {
+        //Given
+        ExternalDataset dataset1 = new ExternalDataset(null, Map.of("HEADER", "DIFFERENT VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+        ExternalDataset dataset2 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+
+        // When
+        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+
+        // Then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void should_compare_external_dataset_with_different_datatable_different_length() {
+        //Given
+        ExternalDataset dataset1 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1")));
+        ExternalDataset dataset2 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+
+        // When
+        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+
+        // Then
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    public void should_compare_external_dataset_with_different_datatable_different_value() {
+        //Given
+        ExternalDataset dataset1 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+        ExternalDataset dataset2 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE_DIFF")));
+
+        // When
+        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+
+        // Then
+        assertThat(result).isFalse();
     }
 
     @Test
