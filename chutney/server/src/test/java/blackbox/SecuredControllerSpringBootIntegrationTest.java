@@ -122,8 +122,8 @@ public class SecuredControllerSpringBootIntegrationTest {
             {GET, "/api/ui/campaign/execution/v1/campaignPattern/surefire", "CAMPAIGN_EXECUTE", null, OK},
             {GET, "/api/ui/campaign/execution/v1/campaignPattern/surefire/DEFAULT", "CAMPAIGN_EXECUTE", null, OK},
             {POST, "/api/ui/campaign/execution/v1/666/stop", "CAMPAIGN_EXECUTE", "{}", NOT_FOUND},
-            {GET, "/api/ui/campaign/execution/v1/byID/666", "CAMPAIGN_EXECUTE", null, NOT_FOUND},
-            {GET, "/api/ui/campaign/execution/v1/byID/666/DEFAULT", "CAMPAIGN_EXECUTE", null, NOT_FOUND},
+            {POST, "/api/ui/campaign/execution/v1/byID/666", "CAMPAIGN_EXECUTE", "{}", NOT_FOUND},
+            {POST, "/api/ui/campaign/execution/v1/byID/666/DEFAULT", "CAMPAIGN_EXECUTE", "{}", NOT_FOUND},
             {GET, "/api/ui/campaign/v1/execution/1", "CAMPAIGN_READ", null, NOT_FOUND},
 
             {GET, "/api/v1/editions/testcases/testcaseId", "SCENARIO_READ", null, OK},
