@@ -12,6 +12,14 @@
 
     <artifactId>local-api-unsecure</artifactId>
 
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <properties>
         <ojdbc6.version>11.2.0.4</ojdbc6.version>
     </properties>

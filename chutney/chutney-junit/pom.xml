@@ -17,6 +17,14 @@
     <description>A junit 5 engine implementation for running glacio features.</description>
     <inceptionYear>2020</inceptionYear>
 
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <modules>
         <module>api</module>
         <module>engine</module>

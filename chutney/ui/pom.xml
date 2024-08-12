@@ -13,6 +13,14 @@
 
     <packaging>jar</packaging>
 
+    <licenses>
+        <license>
+            <name>Apache-2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
     <properties>
         <failOnMissingWebXml>false</failOnMissingWebXml>
         <node.version>v20.13.1</node.version>
