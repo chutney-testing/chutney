@@ -1,10 +1,15 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 package com.chutneytesting.kotlin.util
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import org.junitpioneer.jupiter.SetSystemProperty
-import java.util.*
 import java.util.Optional.empty
 import java.util.Optional.of
 

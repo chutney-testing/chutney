@@ -1,9 +1,15 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 package com.chutneytesting.idea.actions
 
 import com.chutneytesting.idea.ChutneyUtil.getChutneyScenarioIdFromFileName
 import com.chutneytesting.idea.settings.ChutneySettings
 import com.intellij.ide.BrowserUtil
-import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
 

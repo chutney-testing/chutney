@@ -1,8 +1,14 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 <component name="CopyrightManager">
   <settings default="apache2">
     <module2copyright>
-      <element module="ts" copyright="apache2" />
-      <element module="java" copyright="apache2" />
+      <element module="Project Files" copyright="apache2" />
     </module2copyright>
   </settings>
 </component>

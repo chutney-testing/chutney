@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 ## 1- Encrypt / Decrypt placeholders in configuration file:
 We are using [jasypt-spring-boot](https://github.com/ulisesbocchio/jasypt-spring-boot) to encrypt some properties in spring configuration files.
 

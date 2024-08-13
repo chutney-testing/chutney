@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 ## Develop the demo docker image
 
 * Use the demo java package to declare all required Chutney objects and synchronization functions.

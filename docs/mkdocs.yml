@@ -1,3 +1,6 @@
+#SPDX-FileCopyrightText: 2017-2024 Enedis
+#SPDX-License-Identifier: Apache-2.0
+
 # yaml-language-server: $schema=https://squidfunk.github.io/mkdocs-material/schema.json
 site_name: ''
 site_url: https://www.chutney-testing.com/

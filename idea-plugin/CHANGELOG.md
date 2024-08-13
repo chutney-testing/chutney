@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 <!-- Keep a Changelog guide -> https://keepachangelog.com -->
 
 # Chutney Idea Plugin Changelog

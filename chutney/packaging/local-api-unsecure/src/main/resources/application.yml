@@ -1,3 +1,6 @@
+#SPDX-FileCopyrightText: 2017-2024 Enedis
+#SPDX-License-Identifier: Apache-2.0
+
 server:
   instance-name: local api unsecure
   port: 8350

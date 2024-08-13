@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 When using Chutney to test your applications, you may need proprietary drivers, clients or use an obscure protocol not implemented by Chutney.
 
 **In order to do this, you have to make your own custom package.**

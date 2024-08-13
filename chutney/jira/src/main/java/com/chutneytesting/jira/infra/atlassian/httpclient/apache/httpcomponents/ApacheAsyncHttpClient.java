@@ -1,40 +1,62 @@
 /*
- * Copyright 2017-2024 Enedis
- * Copyright (C) Atlassian
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * SPDX-License-Identifier: Apache-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package com.chutneytesting.jira.infra.atlassian.httpclient.apache.httpcomponents;
 
+import static io.atlassian.util.concurrent.Promises.rejected;
+import static java.lang.String.format;
+import static java.util.Objects.requireNonNull;
+import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
+import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.TLS;
+import static org.apache.http.nio.conn.ssl.SSLIOSessionStrategy.getDefaultHostnameVerifier;
+
 import com.atlassian.event.api.EventPublisher;
+import com.atlassian.httpclient.apache.httpcomponents.BannedHostResolver;
+import com.atlassian.httpclient.apache.httpcomponents.BoundedHttpAsyncClient;
+import com.atlassian.httpclient.apache.httpcomponents.DefaultHostResolver;
+import com.atlassian.httpclient.apache.httpcomponents.DefaultResponse;
+import com.atlassian.httpclient.apache.httpcomponents.EntityTooLargeException;
+import com.atlassian.httpclient.apache.httpcomponents.RedirectStrategy;
+import com.atlassian.httpclient.apache.httpcomponents.RequestEntityEffect;
 import com.atlassian.httpclient.apache.httpcomponents.cache.FlushableHttpCacheStorage;
 import com.atlassian.httpclient.apache.httpcomponents.cache.FlushableHttpCacheStorageImpl;
 import com.atlassian.httpclient.apache.httpcomponents.cache.LoggingHttpCacheStorage;
-import com.atlassian.httpclient.apache.httpcomponents.proxy.ProxyConfigFactory;
-import com.atlassian.httpclient.apache.httpcomponents.proxy.ProxyCredentialsProvider;
-import com.atlassian.httpclient.api.*;
-// CHANGE - Begin
-//import com.atlassian.httpclient.api.factory.HttpClientOptions;
-// CHANGE - End
+import com.atlassian.httpclient.api.HostResolver;
+import com.atlassian.httpclient.api.HttpClient;
+import com.atlassian.httpclient.api.HttpStatus;
+import com.atlassian.httpclient.api.Request;
+import com.atlassian.httpclient.api.Response;
+import com.atlassian.httpclient.api.ResponsePromise;
+import com.atlassian.httpclient.api.ResponsePromises;
+import com.atlassian.httpclient.api.ResponseTooLargeException;
 import com.atlassian.httpclient.base.AbstractHttpClient;
 import com.atlassian.httpclient.base.event.HttpRequestCompletedEvent;
 import com.atlassian.httpclient.base.event.HttpRequestFailedEvent;
 import com.atlassian.sal.api.ApplicationProperties;
 import com.atlassian.sal.api.executor.ThreadLocalContextManager;
+import com.chutneytesting.jira.infra.atlassian.httpclient.api.factory.HttpClientOptions;
 import com.google.common.base.Throwables;
 import com.google.common.primitives.Ints;
 import io.atlassian.fugue.Suppliers;
 import io.atlassian.util.concurrent.ThreadFactories;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.security.GeneralSecurityException;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.regex.Pattern;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -42,16 +64,21 @@ import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpHead;
+import org.apache.http.client.methods.HttpOptions;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.methods.HttpTrace;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.routing.HttpRoute;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.ProxyAuthenticationStrategy;
 import org.apache.http.impl.client.cache.CacheConfig;
 import org.apache.http.impl.client.cache.CachingHttpAsyncClient;
 import org.apache.http.impl.conn.DefaultSchemePortResolver;
-import org.apache.http.impl.conn.SystemDefaultRoutePlanner;
 import org.apache.http.impl.nio.client.CloseableHttpAsyncClient;
 import org.apache.http.impl.nio.client.HttpAsyncClientBuilder;
 import org.apache.http.impl.nio.client.HttpAsyncClients;
@@ -70,39 +97,6 @@ import org.apache.http.util.TextUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.DisposableBean;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.security.GeneralSecurityException;
-import java.security.KeyManagementException;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
-import java.util.function.Supplier;
-import java.util.regex.Pattern;
-
-import static io.atlassian.util.concurrent.Promises.rejected;
-import static java.lang.String.format;
-import static java.util.Objects.requireNonNull;
-import static org.apache.commons.lang3.ObjectUtils.firstNonNull;
-import static org.apache.http.conn.ssl.SSLConnectionSocketFactory.TLS;
-import static org.apache.http.nio.conn.ssl.SSLIOSessionStrategy.getDefaultHostnameVerifier;
-
-// CHANGE - Begin
-import com.atlassian.httpclient.apache.httpcomponents.BannedHostResolver;
-import com.atlassian.httpclient.apache.httpcomponents.BoundedHttpAsyncClient;
-import com.atlassian.httpclient.apache.httpcomponents.DefaultHostResolver;
-import com.atlassian.httpclient.apache.httpcomponents.DefaultResponse;
-import com.atlassian.httpclient.apache.httpcomponents.EntityTooLargeException;
-import com.atlassian.httpclient.apache.httpcomponents.RedirectStrategy;
-import com.atlassian.httpclient.apache.httpcomponents.RequestEntityEffect;
-import com.chutneytesting.jira.infra.atlassian.httpclient.api.factory.HttpClientOptions;
 // CHANGE - End
 
 /**

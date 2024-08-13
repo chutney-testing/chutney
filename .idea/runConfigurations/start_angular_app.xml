@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2017-2024 Enedis
+SPDX-License-Identifier: Apache-2.0
+-->
+
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="start_angular_app" type="js.build_tools.npm">
     <package-json value="$PROJECT_DIR$/chutney/ui/package.json" />

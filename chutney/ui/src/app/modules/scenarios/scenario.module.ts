@@ -1,17 +1,8 @@
-/**
- * Copyright 2017-2024 Enedis
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * SPDX-License-Identifier: Apache-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 
 // Core
@@ -52,7 +43,9 @@ import {
 import { ReportPreviewComponent } from './components/execution/preview/report-preview.component';
 import { RxFor } from '@rx-angular/template/for';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
-import { ScenarioJiraLinksModalComponent } from './components/scenario-jira-links-modal/scenario-jira-links-modal.component';
+import {
+    ScenarioJiraLinksModalComponent
+} from './components/scenario-jira-links-modal/scenario-jira-links-modal.component';
 import { ScenarioExecuteModalComponent } from './components/execution/execute-modal/scenario-execute-modal.component';
 import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';

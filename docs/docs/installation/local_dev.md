@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 
 You can run scenarios without installing a Chutney server. This fits well within a CI or for a developer local setup.
 

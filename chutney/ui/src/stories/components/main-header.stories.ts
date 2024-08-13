@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { ChutneyMainHeaderComponent } from '@shared/components/layout/header/chutney-main-header.component';
 import { LoginService } from '@core/services';

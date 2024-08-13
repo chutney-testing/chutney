@@ -1,3 +1,10 @@
+<!--
+  - SPDX-FileCopyrightText: 2017-2024 Enedis
+  -
+  - SPDX-License-Identifier: Apache-2.0
+  -
+  -->
+
 <svg width="13" height="13" viewBox="0 0 13 13" fill="none" xmlns="http://www.w3.org/2000/svg">
     <g id="kotlin13">
         <path id="Vector" d="M12 12H1V1H8L2.6 6.5L8 12Z" fill="#40B6E0" fill-opacity=".7"/>

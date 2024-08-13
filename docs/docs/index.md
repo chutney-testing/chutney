@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 [![Build](https://github.com/chutney-testing/chutney/actions/workflows/build-all.yml/badge.svg?branch=main)](https://github.com/chutney-testing/chutney/actions/workflows/build-all.yml){:target="_blank"}
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.chutneytesting/server/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.chutneytesting/server){:target="_blank"}
 [![Zulip chat](https://img.shields.io/badge/zulip-join_chat-brightgreen.svg)](https://chutney-testing.zulipchat.com/){:target="_blank"}

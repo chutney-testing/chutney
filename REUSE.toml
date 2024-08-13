@@ -1,0 +1,44 @@
+#SPDX-FileCopyrightText: 2017-2024 Enedis
+#SPDX-License-Identifier: Apache-2.0
+
+version = 1
+
+# A simple glob of all files in resources/img/
+[[annotations]]
+path = ["**/*.img",
+    "**/*.png",
+    "**/*.svg",
+    "**/*.jpg",
+    "**/*.gif",
+    "**/*.ico",
+    "**/*.ttf",
+    "**/*.json",
+    "**/*.ft",
+    "**/*.db",
+    "**/*.db-*",
+    "**/*.jar",
+    "**/*.jar.*",
+    "**/*.txt",
+    "**/*.jks",
+    "**/*.pem",
+    "**/*.crt",
+    "**/*.key",
+    "**/authorized_keys",
+    "**/cacerts",
+    "**/apache2.xml",
+    "**/*.pub",
+    "**/*.md5",
+    "**/*.sha1",
+    "**/*.cmd",
+    "**/*.bat",
+    "**/*.target",
+    "**/*.MF",
+    "**/*.pom.*",
+    "**/*.feature",
+    "**/*.strategies",
+    "**/*.actions",
+    "**/*.functions",
+    "**/*.parsers",
+]
+SPDX-FileCopyrightText = "2017-2024 Enedis"
+SPDX-License-Identifier = "Apache-2.0"

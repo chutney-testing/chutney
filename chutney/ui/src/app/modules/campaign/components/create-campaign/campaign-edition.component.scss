@@ -1,3 +1,10 @@
+/*!
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 .create-campaign-container {
     display: grid;
     grid-template-columns: 1fr;
@@ -108,7 +115,7 @@ fieldset legend {
         width: 95%;
 
         .selected-item {
-            min-width: fit-content; 
+            min-width: fit-content;
 
             span {
                 word-break: break-all;

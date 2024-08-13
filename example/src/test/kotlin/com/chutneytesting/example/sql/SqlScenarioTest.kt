@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 package com.chutneytesting.example.sql
 
 import com.chutneytesting.example.scenario.SQL_TARGET_NAME

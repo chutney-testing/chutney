@@ -1,3 +1,8 @@
+<!--
+SPDX-FileCopyrightText: 2017-2024 Enedis
+SPDX-License-Identifier: Apache-2.0
+-->
+
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="server_unit_tests" type="JUnit" factoryName="JUnit">
     <module name="server" />

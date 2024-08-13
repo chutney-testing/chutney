@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 !!! info "[Browse implementation](https://github.com/chutney-testing/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/groovy/GroovyAction.java){:target="_blank"}"
 
 This action executes a [Groovy](https://groovy-lang.org/documentation.html){:target="_blank"} script.

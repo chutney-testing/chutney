@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 @if (message || backendError) {
   <div class="notification text-center text-white rounded" [ngClass]="backendError ? 'bg-danger' : 'bg-info'">
     @if (message) {
@@ -8,6 +15,7 @@
     }
   </div>
 }
+
 <div class="p-3">
   <ng-container [formGroup]="datasetForm">
     <div class="box2">

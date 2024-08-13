@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 This plugin provides support for working with Chutney scenarios files in IntelliJ IDEA based IDEs.
 # Installation
 

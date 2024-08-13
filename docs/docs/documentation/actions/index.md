@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 # Actions
 
 [^1]: [Here, you can see the code for all actions.](https://github.com/chutney-testing/chutney/tree/main/chutney/action-impl/src/main/java/com/chutneytesting/action)

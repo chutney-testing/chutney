@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+*/
+
+
 import com.chutneytesting.kotlin.dsl.ContextPutAction
 import com.chutneytesting.kotlin.dsl.HttpGetAction
 import com.chutneytesting.kotlin.dsl.JsonAssertAction

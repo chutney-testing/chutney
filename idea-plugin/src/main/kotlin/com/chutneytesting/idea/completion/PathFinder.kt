@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 package com.chutneytesting.idea.completion
 
 import com.intellij.json.psi.JsonArray
@@ -10,7 +17,6 @@ import com.intellij.psi.PsiNamedElement
 import java.util.*
 import java.util.function.Predicate
 import java.util.stream.Collectors
-import kotlin.collections.ArrayList
 
 class PathFinder {
     /*
