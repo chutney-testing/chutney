@@ -23,7 +23,7 @@ import { EventManagerService } from '@shared';
 import { MenuItem } from '@shared/components/layout/menuItem';
 import { HttpErrorResponse } from '@angular/common/http';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import { ScenarioExecuteModalComponent } from '@core/components/execution/execute-modal/scenario-execute-modal.component';
+import { ScenarioExecuteModalComponent } from '@shared/components/execute-modal/scenario-execute-modal.component';
 
 @Component({
     selector: 'chutney-campaign-execution-menu',

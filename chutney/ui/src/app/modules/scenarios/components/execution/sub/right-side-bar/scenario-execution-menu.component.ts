@@ -17,7 +17,7 @@ import { BsModalRef } from 'ngx-bootstrap/modal/bs-modal-ref.service';
 import { EventManagerService } from '@shared';
 import { MenuItem } from '@shared/components/layout/menuItem';
 import { EnvironmentService } from '@core/services/environment.service';
-import { ScenarioExecuteModalComponent } from '../../../../../../core/components/execution/execute-modal/scenario-execute-modal.component';
+import { ScenarioExecuteModalComponent } from '@shared/components/execute-modal/scenario-execute-modal.component';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
