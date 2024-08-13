@@ -89,8 +89,7 @@ export class CampaignService {
     }
 
     executeCampaign(campaignId: number, env: string, dataset?: string): Observable<CampaignExecutionReport> {
-        const datasetQueryParam = dataset == null ? "" : "?dataset=" + dataset;
-        return this.http.get<CampaignExecutionReport>(environment.backend + `${this.ressourceUrlExecution}/byID/${campaignId}/${env}` + datasetQueryParam);
+        return this.http.get<CampaignExecutionReport>(environment.backend + `${this.ressourceUrlExecution}/byID/${campaignId}/${env}`, {params: {dataset: dataset}});
     }
 
     stopExecution(campaignId: number, executionId: number): Observable<void> {
