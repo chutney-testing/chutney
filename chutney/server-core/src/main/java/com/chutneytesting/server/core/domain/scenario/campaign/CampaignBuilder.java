@@ -81,7 +81,7 @@ public class CampaignBuilder {
         this.environment = campaign.executionEnvironment();
         this.parallelRun = campaign.parallelRun;
         this.retryAuto = campaign.retryAuto;
-        this.externalDatasetId = campaign.externalDatasetId;
+        this.externalDatasetId = campaign.executionEnvironment();
         this.tags = campaign.tags;
 
         return this;

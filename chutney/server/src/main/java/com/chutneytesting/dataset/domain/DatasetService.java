@@ -82,7 +82,7 @@ public class DatasetService {
 
     private void updateCampaigns(String oldId, String newId) {
         campaignRepository.findAll().stream()
-            .filter(c -> oldId.equals(c.externalDatasetId))
+            .filter(c -> oldId.equals(c.executionDataset()))
             .forEach(c -> campaignRepository.createOrUpdate(
                 CampaignBuilder.builder()
                     .from(c)

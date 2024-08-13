@@ -93,7 +93,7 @@ public class CampaignEntity implements Serializable {
             campaign.executionEnvironment(),
             campaign.parallelRun,
             campaign.retryAuto,
-            campaign.externalDatasetId,
+            campaign.executionDataset(),
             campaign.tags,
             version,
             CampaignScenarioEntity.fromDomain(campaign)

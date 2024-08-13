@@ -397,7 +397,7 @@ public class CampaignExecutionEngineTest {
 
         // Then
         verify(campaignRepository).findById(campaign.id);
-        assertThat(campaign.externalDatasetId).isEqualTo(executionDataset);
+        assertThat(campaign.executionDataset()).isEqualTo(executionDataset);
     }
 
     @Test
@@ -429,7 +429,7 @@ public class CampaignExecutionEngineTest {
 
         // Then
         verify(campaignRepository).findByName(campaign.title);
-        assertThat(campaign.externalDatasetId).isEqualTo(executionDataset);
+        assertThat(campaign.executionDataset()).isEqualTo(executionDataset);
     }
 
     @Test

@@ -180,7 +180,7 @@ public class CampaignExecutionEngine {
             .campaignName(campaign.title)
             .partialExecution(!failedExecutions.isEmpty())
             .environment(campaign.executionEnvironment())
-            .dataSetId(isNotBlank(campaign.externalDatasetId) ? campaign.externalDatasetId : null)
+            .dataSetId(isNotBlank(campaign.executionDataset()) ? campaign.executionDataset() : null)
             .userId(userId)
             .build();
 
@@ -318,7 +318,7 @@ public class CampaignExecutionEngine {
     private ExecutionRequest buildExecutionRequest(Campaign campaign, TestCaseDataset testCaseDataset, CampaignExecution campaignExecution) {
         // TODO if dataset null should throw exception ?
         DataSet dataset = ofNullable(testCaseDataset.datasetId())
-            .or(() -> ofNullable(campaign.externalDatasetId))
+            .or(() -> ofNullable(campaign.executionDataset()))
             .map(datasetRepository::findById)
             .orElse(null);
         return new ExecutionRequest(testCaseDataset.testcase(), campaign.executionEnvironment(), campaignExecution.userId, dataset, campaignExecution, campaign.tags);
