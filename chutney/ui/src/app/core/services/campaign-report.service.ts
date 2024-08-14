@@ -54,8 +54,16 @@ export class CampaignReportService {
         pdf.setFontSize(pdfFontSize - 4);
         pdf.text(docRecap, 148, 30, { align: 'center' });
 
-        const dataHeader = [["id", "Scenario", "Status", "error"]];
-        const dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.error.toString()]);
+        let dataHeader, dataBody;
+        const hasDataset = report.scenarioExecutionReports.some(s => s.dataset);
+        if(hasDataset){
+            dataHeader = [["id", "Scenario", "Status", "Dataset", "error"]];
+            dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.dataset, s.error.toString()]);
+        } else {
+            dataHeader = [["id", "Scenario", "Status", "error"]];
+            dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.error.toString()]);
+        }
+        
         pdf.setFontSize(pdfFontSize - 2);
         autoTable(pdf, {
             body: dataBody,
@@ -83,17 +91,22 @@ export class CampaignReportService {
         const scenarioReportHeader = [["step", "Status", "error"]];
 
         report.scenarioExecutionReports
-            .map(s => this.buildExecutionReport(s))
-            .forEach((r, index) => {
+            .forEach((s, index) => {
+                let startY = 30;
                 if (index){
                     pdf.addPage();
                 }
+                let r = this.buildExecutionReport(s);
                 pdf.text(r.scenarioName, 15, 25);
+                if(s.dataset) {
+                    pdf.text(`${this.translate.instant('scenarios.execution.dataset.title')}: ${s.dataset}`, 15, startY);
+                    startY += 5;
+                }
                 const scenarioReportBody = r.report.steps.map(step => [step.name, step.status, this.buildErrorMessage(step)]);
                 autoTable(pdf, {
                     body: scenarioReportBody,
                     head: scenarioReportHeader,
-                    startY: 30,
+                    startY: startY,
                     theme: 'striped',
                     useCss: true,
                     didParseCell(data) {
