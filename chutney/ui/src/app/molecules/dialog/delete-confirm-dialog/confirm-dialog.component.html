@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 @if (type === 'trash-button') {
   <button type="button" class="btn {{btnSizeClass ? 'btn-' + btnSizeClass : ''}} btn-{{btnColor ? btnColor : 'danger'}} trash-btn"
     (click)="openModal(template)"
@@ -11,6 +18,7 @@
   <chutney-link [model]="label" (click)="openModal(template)">
   </chutney-link>
 }
+
 <ng-template #template>
   <div class="modal-body text-center">
     <p>{{dialogMessage  | translate }}</p>

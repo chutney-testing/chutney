@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 import com.chutneytesting.environment.domain.EnvironmentService
 import com.chutneytesting.environment.domain.exception.AlreadyExistingEnvironmentException
 import com.chutneytesting.environment.infra.JsonFilesEnvironmentRepository

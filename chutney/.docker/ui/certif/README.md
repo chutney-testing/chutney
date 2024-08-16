@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 ## Setting Up HTTPS for localhost
 ### STEP 1: generate self-signed certification
 ```SHELL

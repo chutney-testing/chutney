@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 # Chutney
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 6.0.7.

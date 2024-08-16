@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
+<!--
     from https://tools.oasis-open.org/version-control/browse/wsvn/cmis/trunk/SchemaProject/schema/ATOM.xsd
     with some changes :
      * xsd clean

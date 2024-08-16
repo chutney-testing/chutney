@@ -1,19 +1,24 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 package com.chutneytesting.kotlin.junit.engine.execution
 
 import com.chutneytesting.kotlin.ChutneyConfigurationParameters
+import com.chutneytesting.kotlin.ChutneyConfigurationParameters.*
 import com.chutneytesting.kotlin.execution.report.AnsiReportWriter
 import com.chutneytesting.kotlin.execution.report.JsonReportWriter
 import com.chutneytesting.kotlin.execution.report.SiteGenerator
-import com.chutneytesting.kotlin.util.SystemEnvConfigurationParameters
-import com.chutneytesting.kotlin.ChutneyConfigurationParameters.*
 import com.chutneytesting.kotlin.junit.engine.execution.ChutneyJUnitReportingKeys.REPORT_JSON_STRING
 import com.chutneytesting.kotlin.junit.engine.execution.ChutneyJUnitReportingKeys.REPORT_STEP_JSON_STRING
-import org.junit.platform.engine.ConfigurationParameters
+import com.chutneytesting.kotlin.util.SystemEnvConfigurationParameters
 import org.junit.platform.engine.reporting.ReportEntry
 import org.junit.platform.launcher.TestExecutionListener
 import org.junit.platform.launcher.TestIdentifier
 import org.junit.platform.launcher.TestPlan
-import java.util.Optional.ofNullable
 
 class ConsoleLogScenarioReportExecutionListener : EnabledTestExecutionListener(enabledProperty = CONFIG_SCENARIO_LOG) {
 

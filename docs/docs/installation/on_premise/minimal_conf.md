@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 !!! note "Packaging example"
     Maven module [local-dev](https://github.com/chutney-testing/chutney/tree/main/chutney/packaging/local-dev){:target="_blank"} shows one way of packaging Chutney.  
     Use it as an example to make your own package, custom to your needs.

@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 <templateSet group="Chutney">
     <template name="cht-context-put"
               value="{&#10;        &quot;gwtType&quot;: &quot;$GWT_TYPE$&quot;,&#10;        &quot;type&quot;: &quot;context-put&quot;,&#10;        &quot;inputs&quot;: {&#10;          &quot;entries&quot;: {&#10;            &quot;$KEY$&quot;: &quot;$VALUE$&quot;,&#10;             }&#10;        }&#10;}"

@@ -1,17 +1,8 @@
 /*
- * Copyright 2017-2024 Enedis
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * SPDX-License-Identifier: Apache-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 
 package com.chutneytesting.action.infra;
@@ -20,11 +11,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.chutneytesting.action.TestActionTemplateFactory.TestAction;
 import com.chutneytesting.action.TestActionTemplateFactory.TestAction3;
-import com.chutneytesting.action.domain.ParsingError;
-import com.chutneytesting.action.domain.ResultOrError;
 import com.chutneytesting.action.domain.ActionInstantiationFailureException;
 import com.chutneytesting.action.domain.ActionTemplate;
 import com.chutneytesting.action.domain.ActionTemplateParser;
+import com.chutneytesting.action.domain.ParsingError;
+import com.chutneytesting.action.domain.ResultOrError;
 import com.chutneytesting.action.domain.UnresolvableActionParameterException;
 import com.chutneytesting.action.domain.parameter.Parameter;
 import com.chutneytesting.action.domain.parameter.ParameterResolver;

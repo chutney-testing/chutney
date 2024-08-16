@@ -1,3 +1,10 @@
+<!--
+  - SPDX-FileCopyrightText: 2017-2024 Enedis
+  -
+  - SPDX-License-Identifier: Apache-2.0
+  -
+  -->
+
 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
     <g fill="none" fill-rule="evenodd">
         <polygon fill="#40B6E0" fill-opacity=".7" points="1 16 16 16 16 9 1 9"/>

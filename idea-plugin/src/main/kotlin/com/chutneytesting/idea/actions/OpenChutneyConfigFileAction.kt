@@ -1,8 +1,14 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 package com.chutneytesting.idea.actions
 
 import com.chutneytesting.idea.logger.EventDataLogger
 import com.intellij.ide.actions.RevealFileAction
-import com.intellij.ide.actions.ShowFilePathAction
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.PathManager

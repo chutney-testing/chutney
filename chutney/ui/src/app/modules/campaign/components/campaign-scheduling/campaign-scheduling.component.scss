@@ -1,12 +1,19 @@
+/*!
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 .scheduling-campaign-container {
-    display: grid; 
-    grid-template-columns: 1fr; 
-    grid-template-rows: auto auto 1fr; 
-    gap: 0px 0px; 
-    grid-template-areas: 
-      "."; 
-    justify-items: start; 
-    align-items: start; 
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr;
+    gap: 0px 0px;
+    grid-template-areas:
+      ".";
+    justify-items: start;
+    align-items: start;
 }
 
 .error-message{
@@ -14,7 +21,7 @@
     font-size: 0.8em;
 }
 
-:host ::ng-deep 
+:host ::ng-deep
 .cuppa-dropdown {
     border: none;
 

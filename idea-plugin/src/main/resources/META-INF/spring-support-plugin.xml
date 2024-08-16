@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 <idea-plugin>
     <id>com.chutneytesting.idea.chutney-idea-plugin.spring</id>
     <name>Chutney Spring SpEL Support</name>

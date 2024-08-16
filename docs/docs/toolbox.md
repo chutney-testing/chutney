@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 * [mkdocs.org](https://www.mkdocs.org/user-guide/){:target="_blank"}
 * [mkdocs-material](https://squidfunk.github.io/mkdocs-material/reference/){:target="_blank"}
 

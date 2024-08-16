@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { LoginComponent } from '@core/components/login/login.component';
 import { InfoService, LoginService } from '@core/services';

@@ -1,8 +1,16 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 @if (errorMessage) {
   <div class="row cursor-pointer" (click)="errorMessage = null">
     <chutney-error-panel [errorMessage]="errorMessage"></chutney-error-panel>
   </div>
 }
+
 <div class="ms-3 mb-3 d-flex justify-content-between">
   <chutney-forms-input-line [id]="'targetName'"
     [label]="'Name *'"

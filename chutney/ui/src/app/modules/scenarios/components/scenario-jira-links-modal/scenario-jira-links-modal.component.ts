@@ -1,9 +1,15 @@
-import { Component, inject, Input, OnInit } from "@angular/core";
-import { FormArray, FormBuilder, FormGroup } from "@angular/forms";
-import { JiraDatasetLinks, JiraScenarioLinks, ScenarioIndex } from "@core/model";
-import { JiraPluginService } from "@core/services";
-import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
 
+import { Component, inject, Input, OnInit } from '@angular/core';
+import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
+import { JiraDatasetLinks, JiraScenarioLinks, ScenarioIndex } from '@core/model';
+import { JiraPluginService } from '@core/services';
+import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({

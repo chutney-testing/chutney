@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 # Changelog
 
 ## [2.9.0](https://github.com/chutney-testing/chutney/tree/2.9.0)

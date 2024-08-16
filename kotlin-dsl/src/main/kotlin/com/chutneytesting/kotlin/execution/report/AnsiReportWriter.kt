@@ -1,18 +1,16 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 package com.chutneytesting.kotlin.execution.report
 
 import com.chutneytesting.engine.api.execution.StatusDto
-import com.chutneytesting.engine.api.execution.StatusDto.FAILURE
-import com.chutneytesting.engine.api.execution.StatusDto.NOT_EXECUTED
-import com.chutneytesting.engine.api.execution.StatusDto.STOPPED
-import com.chutneytesting.engine.api.execution.StatusDto.SUCCESS
-import com.chutneytesting.engine.api.execution.StatusDto.WARN
+import com.chutneytesting.engine.api.execution.StatusDto.*
 import com.chutneytesting.engine.api.execution.StepExecutionReportDto
-import com.chutneytesting.kotlin.execution.report.AnsiColor.BLUE
-import com.chutneytesting.kotlin.execution.report.AnsiColor.GREEN
-import com.chutneytesting.kotlin.execution.report.AnsiColor.MAGENTA
-import com.chutneytesting.kotlin.execution.report.AnsiColor.RED
-import com.chutneytesting.kotlin.execution.report.AnsiColor.RESET
-import com.chutneytesting.kotlin.execution.report.AnsiColor.YELLOW
+import com.chutneytesting.kotlin.execution.report.AnsiColor.*
 import java.io.OutputStream
 
 enum class AnsiColor(val color: String) {

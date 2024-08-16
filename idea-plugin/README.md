@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+
 # Chutney Plugin for IntelliJ IDEA-based IDEs
 <!-- Plugin description -->
 This plugin provides support for Writing/Running Chutney scenarios files in IntelliJ IDEA based IDEs.

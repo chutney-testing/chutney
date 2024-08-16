@@ -1,3 +1,10 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { Authorization, User } from '@model';
 import { SharedModule } from '@shared/shared.module';

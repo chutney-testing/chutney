@@ -1,3 +1,10 @@
+#
+# SPDX-FileCopyrightText: 2017-2024 Enedis
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+#
+
 com.chutneytesting.action.selenium.jackson.SeleniumModule
 com.chutneytesting.action.http.jackson.WiremockModule
 com.chutneytesting.action.jakarta.jackson.ActiveMQModule

@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 !!! warning
 
     Due to legacy naming, there might be confusion with `Records`, `Rows`, attributes `Records.rows` and `Records.records` and method like `Records.getRows()`, `Records.rows()` etc.  

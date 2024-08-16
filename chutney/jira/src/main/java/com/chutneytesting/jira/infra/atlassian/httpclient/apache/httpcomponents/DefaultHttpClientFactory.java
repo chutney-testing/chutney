@@ -1,40 +1,23 @@
 /*
- * Copyright 2017-2024 Enedis
- * Copyright (C) Atlassian
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * SPDX-License-Identifier: Apache-2.0
  *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
  */
 package com.chutneytesting.jira.infra.atlassian.httpclient.apache.httpcomponents;
 
-import com.atlassian.event.api.EventPublisher;
-import com.atlassian.httpclient.api.HttpClient;
-import com.atlassian.httpclient.api.factory.HttpClientFactory;
-// CHANGE - Begin
-//import com.atlassian.httpclient.api.factory.HttpClientOptions;
-// CHANGE - End
-import com.atlassian.sal.api.ApplicationProperties;
-import com.atlassian.sal.api.executor.ThreadLocalContextManager;
-import com.google.common.annotations.VisibleForTesting;
-import org.springframework.beans.factory.DisposableBean;
-
-import javax.annotation.Nonnull;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-
 import static com.google.common.base.Preconditions.checkNotNull;
 
-// CHANGE - Begin
+import com.atlassian.event.api.EventPublisher;
+import com.atlassian.httpclient.api.HttpClient;
+import com.atlassian.sal.api.ApplicationProperties;
+import com.atlassian.sal.api.executor.ThreadLocalContextManager;
 import com.chutneytesting.jira.infra.atlassian.httpclient.api.factory.HttpClientOptions;
+import com.google.common.annotations.VisibleForTesting;
+import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
+import javax.annotation.Nonnull;
+import org.springframework.beans.factory.DisposableBean;
 // CHANGE - End
 
 // CHANGE - Begin

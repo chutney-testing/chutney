@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 Now, in order to run your first scenario, you need to configure your project and build tool according to your preferences.
 
 Chutney Kotlin DSL provides a JUnit 5 Runner with annotations.

@@ -1,3 +1,10 @@
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+-->
+
 When you need a custom function which is not provided by Chutney, you can implement it and load it to your chutney server.
 
 # Implement your custom function
