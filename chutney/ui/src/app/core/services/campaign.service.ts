@@ -40,17 +40,17 @@ export class CampaignService {
 
     findAllScenarios(id: number): Observable<Array<ScenarioIndex>> {
         return this.http.get<Array<ScenarioIndex>>(environment.backend + this.resourceUrl + `/${id}/scenarios`)
-        .pipe(map((res: Array<any>) => {
-            return res.map(s => new ScenarioIndex(
-                s.metadata.id,
-                s.metadata.title,
-                s.metadata.description,
-                s.metadata.repositorySource,
-                s.metadata.creationDate,
-                s.metadata.tags,
-                s.metadata.executions
-            ));
-        }));
+            .pipe(map((res: Array<any>) => {
+                return res.map(s => new ScenarioIndex(
+                    s.metadata.id,
+                    s.metadata.title,
+                    s.metadata.description,
+                    s.metadata.repositorySource,
+                    s.metadata.creationDate,
+                    s.metadata.tags,
+                    s.metadata.executions
+                ));
+            }));
     }
 
     findAllCampaignsForScenario(id: number): Observable<Array<Campaign>> {
@@ -66,12 +66,12 @@ export class CampaignService {
 
     findExecution(id: number): Observable<CampaignExecutionFullReport> {
         return this.http.get<CampaignExecutionFullReport>(`${environment.backend}${this.resourceUrl}/execution/${id}`)
-        .pipe(
-            map(campaignExecutionFullReport => ({
-            ...campaignExecutionFullReport,
-            scenarioExecutionReports: Execution.deserializeExecutions(campaignExecutionFullReport.scenarioExecutionReports)
-            }))
-        );
+            .pipe(
+                map(campaignExecutionFullReport => ({
+                    ...campaignExecutionFullReport,
+                    scenarioExecutionReports: Execution.deserializeExecutions(campaignExecutionFullReport.scenarioExecutionReports)
+                }))
+            );
     }
 
     create(campaign: Campaign): Observable<Campaign> {
@@ -89,13 +89,14 @@ export class CampaignService {
     }
 
     executeCampaign(campaignId: number, env: string, dataset?: string): Observable<CampaignExecutionReport> {
-        return this.http.get<CampaignExecutionReport>(environment.backend + `${this.ressourceUrlExecution}/byID/${campaignId}/${env}`, {params: {dataset: dataset}});
+        const params = dataset ? { params: { dataset: dataset } } : {};
+        return this.http.get<CampaignExecutionReport>(`${environment.backend}${this.ressourceUrlExecution}/byID/${campaignId}/${env}`, params);
     }
 
     stopExecution(campaignId: number, executionId: number): Observable<void> {
         return this.http.post(environment.backend +
             `${this.ressourceUrlExecution}/${executionId}/stop`, {}).pipe(map((res: Response) => {
-        }));
+            }));
     }
 
     replayFailedScenario(executionId: number): Observable<Object> {
