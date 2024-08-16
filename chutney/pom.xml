@@ -406,7 +406,7 @@
             <dependency>
                 <groupId>io.opentelemetry</groupId>
                 <artifactId>opentelemetry-sdk-logs</artifactId>
-                <version>1.31.0</version>
+                <version>1.41.0</version>
             </dependency>
             <dependency>
                 <groupId>io.opentelemetry</groupId>
