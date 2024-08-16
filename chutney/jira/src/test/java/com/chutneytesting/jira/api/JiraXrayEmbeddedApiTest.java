@@ -44,7 +44,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -107,7 +106,7 @@ class JiraXrayEmbeddedApiTest {
         ReportForJira report = new ReportForJira(Instant.parse("2021-05-19T11:22:33.00Z"), 10000L, "SUCCESS", rootStep, "env");
 
         //W
-        jiraXrayEmbeddedApi.updateTestExecution(20L, 1L, "1", Optional.empty(), report);
+        jiraXrayEmbeddedApi.updateTestExecution(20L, 1L, "1", "", report);
 
         //T
         ArgumentCaptor<Xray> xrayArgumentCaptor = ArgumentCaptor.forClass(Xray.class);
@@ -135,7 +134,7 @@ class JiraXrayEmbeddedApiTest {
         //W
         when(jiraXrayApiMock.isTestPlan("JIRA-20")).thenReturn(true);
         when(jiraXrayApiMock.createTestExecution("JIRA-20")).thenReturn("JIRA-22");
-        jiraXrayEmbeddedApi.updateTestExecution(20L, 1L, "1", Optional.empty(), report);
+        jiraXrayEmbeddedApi.updateTestExecution(20L, 1L, "1", "", report);
 
         //T
         ArgumentCaptor<Xray> xrayArgumentCaptor = ArgumentCaptor.forClass(Xray.class);
@@ -148,7 +147,7 @@ class JiraXrayEmbeddedApiTest {
 
     @Test
     @DisplayName("Given an execution report, When we want to send the result to jira xray using not linked dataset scenario, Then jira test exec not updated")
-    void doNotupdateTestExecutionWhenUsingNotLinkedDatasetScenario() {
+    void doNotUpdateTestExecutionWhenUsingNotLinkedDatasetScenario() {
         // G
         jiraRepository.saveForCampaign("20", "JIRA-20");
         jiraRepository.saveDatasetForScenario("1", Map.of("dataset-01", "Test-1"));
@@ -159,18 +158,16 @@ class JiraXrayEmbeddedApiTest {
         //W
         when(jiraXrayApiMock.isTestPlan("JIRA-20")).thenReturn(true);
         when(jiraXrayApiMock.createTestExecution("JIRA-20")).thenReturn("JIRA-22");
-        jiraXrayEmbeddedApi.updateTestExecution(20L, 1L, "1", Optional.of("dataset-02"), report);
+        jiraXrayEmbeddedApi.updateTestExecution(20L, 1L, "1", "dataset-02", report);
 
         //T
-        ArgumentCaptor<Xray> xrayArgumentCaptor = ArgumentCaptor.forClass(Xray.class);
-        verify(jiraXrayApiMock, times(0)).updateRequest(xrayArgumentCaptor.capture());
-
+        verify(jiraXrayApiMock, times(0)).updateRequest(any());
     }
 
     @ParameterizedTest
     @MethodSource("datatableListParameters")
     @DisplayName("Given an execution report, When we want to send the result to jira xray using dataset scenario link id, Then jira id linked to dataset and scenario are used")
-    void updateTestExecutionUsingDatasetScenarioLink(String scenarioJiraId, Map<String, String> datasetJiraIdMap, Optional<String> datasetUsed, String expectedTestKey) {
+    void updateTestExecutionUsingDatasetScenarioLink(String scenarioJiraId, Map<String, String> datasetJiraIdMap, String datasetUsed, String expectedTestKey) {
         // G
         jiraRepository.saveForCampaign("20", "JIRA-20");
         jiraRepository.saveForScenario("1", scenarioJiraId);
@@ -197,25 +194,25 @@ class JiraXrayEmbeddedApiTest {
             new Object[]{
                 "SCE-1",//scenarioJiraId
                 Map.of("dataset-01", "Test-1"),//datasetJiraIdMap,
-                Optional.of("dataset-01"),//datasetUsed
+                "dataset-01",//datasetUsed
                 "Test-1"//expectedTestKey
             },
             new Object[]{
                 "SCE-1",//scenarioJiraId
                 Map.of("dataset-01", "Test-1"),//datasetJiraIdMap,
-                Optional.empty(),//datasetUsed
+                "",//datasetUsed
                 "SCE-1"//expectedTestKey
             },
             new Object[]{
                 "SCE-1",//scenarioJiraId
                 Map.of("dataset-01", "Test-1"),//datasetJiraIdMap,
-                Optional.of("dataset-02"),//datasetUsed
+                "dataset-02",//datasetUsed
                 "SCE-1"//expectedTestKey
             },
             new Object[]{
                 "",//scenarioJiraId
                 Map.of("dataset-01", "Test-1"),//datasetJiraIdMap,
-                Optional.of("dataset-01"),//datasetUsed
+                "dataset-01",//datasetUsed
                 "Test-1"//expectedTestKey
             }
         };

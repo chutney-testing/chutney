@@ -21,7 +21,6 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import com.chutneytesting.jira.domain.JiraXrayService;
 import com.chutneytesting.jira.xrayapi.XrayTestExecTest;
 import java.util.List;
-import java.util.Optional;
 
 public class JiraXrayEmbeddedApi {
 
@@ -31,7 +30,7 @@ public class JiraXrayEmbeddedApi {
         this.jiraXrayService = jiraXrayService;
     }
 
-    public void updateTestExecution(Long campaignId, Long campaignExecutionId, String scenarioId, Optional<String> datasetId, ReportForJira report) {
+    public void updateTestExecution(Long campaignId, Long campaignExecutionId, String scenarioId, String datasetId, ReportForJira report) {
         if (report != null && isNotEmpty(scenarioId) && campaignId != null) {
             jiraXrayService.updateTestExecution(campaignId, campaignExecutionId, scenarioId, datasetId, report);
         }
