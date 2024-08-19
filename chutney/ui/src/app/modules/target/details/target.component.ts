@@ -102,7 +102,7 @@ export class TargetComponent implements OnInit {
         const environment = this.targets[index].environment;
         this.environmentService.importTarget(file, environment).subscribe({
             next: target => {
-                this.router.navigate(['targets', target.name]);
+                this.targets[index] = target;
             },
             error: err => this.errorMessage = err.error
         })

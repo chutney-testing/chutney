@@ -112,7 +112,7 @@ export class EnvironmentService {
     importTarget(file: File, environment: string): Observable<Target> {
         const formData = new FormData();
         formData.append('file', file);
-        return this.http.post<Target>(server.backend + this.envBaseUrl + '/' + environment + '/targets/', formData);
+        return this.http.post<Target>(server.backend + this.envBaseUrl + '/' + environment + '/targets', formData);
     }
 
 
