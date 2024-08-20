@@ -72,10 +72,12 @@ export class CampaignExecutionMenuComponent implements OnInit, OnChanges {
     }
 
     ngOnChanges(changes: SimpleChanges) {
-        if (changes['canReplay']) {
-            if (!this.rightMenuItems?.find(item => item.label === 'global.actions.execute.last') && this.canReplay) {
-                this.rightMenuItems.splice(0, 0, this.executeLastMenuItem);
-            }
+        this.addReplayButtonIfNecessary()
+    }
+
+    private addReplayButtonIfNecessary() {
+        if (!this.rightMenuItems?.find(item => item.label === 'global.actions.execute.last') && this.canReplay) {
+            this.rightMenuItems.splice(0, 0, this.executeLastMenuItem);
         }
     }
 
@@ -178,6 +180,7 @@ export class CampaignExecutionMenuComponent implements OnInit, OnChanges {
                 authorizations: [Authorization.CAMPAIGN_WRITE]
             }
         ];
+        this.addReplayButtonIfNecessary()
     }
 
     private broadcastError(errorMessage: string) {
