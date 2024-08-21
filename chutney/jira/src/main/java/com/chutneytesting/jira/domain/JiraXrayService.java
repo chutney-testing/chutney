@@ -43,11 +43,14 @@ public class JiraXrayService {
         loadJiraServerConfiguration();
     }
 
-    public void updateTestExecution(Long campaignId, Long campaignExecutionId, String scenarioId, ReportForJira report) {
+    public void updateTestExecution(Long campaignId, Long campaignExecutionId, String scenarioId, String datasetId, ReportForJira report) {
         JiraXrayApi jiraXrayApi = createHttpJiraXrayImpl();
 
-        String testKey = jiraRepository.getByScenarioId(scenarioId);
         String testExecutionKey = jiraRepository.getByCampaignId(campaignId.toString());
+        String testKey = jiraRepository.getAllLinkedScenariosWithDataset()
+            .getOrDefault(scenarioId, Collections.emptyMap())
+            .getOrDefault(datasetId, jiraRepository.getByScenarioId(scenarioId));
+
         if (jiraXrayApi.isTestPlan(testExecutionKey)) {
             String newTestExecutionKey = jiraRepository.getByCampaignExecutionId(campaignExecutionId.toString());
             if (newTestExecutionKey.isEmpty()) {

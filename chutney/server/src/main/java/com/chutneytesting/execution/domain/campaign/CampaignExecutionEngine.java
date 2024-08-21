@@ -259,7 +259,7 @@ public class CampaignExecutionEngine {
 
     private void updateJira(Campaign campaign, CampaignExecution campaignExecution, ScenarioExecutionCampaign serc, ExecutionHistory.Execution execution) {
         try {
-            jiraXrayEmbeddedApi.updateTestExecution(campaign.id, campaignExecution.executionId, serc.scenarioId(), JiraReportMapper.from(execution.report(), objectMapper));
+            jiraXrayEmbeddedApi.updateTestExecution(campaign.id, campaignExecution.executionId, serc.scenarioId(), serc.execution().datasetId().orElse(""), JiraReportMapper.from(execution.report(), objectMapper));
         } catch (NoJiraConfigurationException e) { // Silent
         } catch (Exception e) {
             LOGGER.warn("Update JIRA failed", e);
