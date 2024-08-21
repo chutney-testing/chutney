@@ -189,7 +189,7 @@ public class CampaignExecutionEngine {
             .campaignName(campaign.title)
             .partialExecution(!failedExecutions.isEmpty())
             .environment(campaign.executionEnvironment())
-            .externalDataset(ofNullable(externalDataset).orElse(ofNullable(campaign.externalDatasetId).map(ExternalDataset::new).orElse(null)))
+            .externalDataset(ofNullable(externalDataset).orElse(ofNullable(campaign.executionDataset()).map(ExternalDataset::new).orElse(null)))
             .userId(userId)
             .build();
 

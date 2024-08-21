@@ -9,7 +9,14 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import { Campaign, CampaignExecutionFullReport, CampaignExecutionReport, Execution, ScenarioIndex } from '@model';
+import {
+    Campaign,
+    CampaignExecutionFullReport,
+    CampaignExecutionReport,
+    Dataset,
+    Execution,
+    ScenarioIndex
+} from '@model';
 import { HttpClient } from '@angular/common/http';
 import { distinct } from '@shared/tools';
 
@@ -88,9 +95,8 @@ export class CampaignService {
         return this.http.put<Campaign>(environment.backend + this.resourceUrl, copy);
     }
 
-    executeCampaign(campaignId: number, env: string, dataset?: string): Observable<CampaignExecutionReport> {
-        const params = dataset ? { params: { dataset: dataset } } : {};
-        return this.http.get<CampaignExecutionReport>(`${environment.backend}${this.ressourceUrlExecution}/byID/${campaignId}/${env}`, params);
+    executeCampaign(campaignId: number, env: string, dataset?: Dataset): Observable<CampaignExecutionReport> {
+        return this.http.post<CampaignExecutionReport>(environment.backend + `${this.ressourceUrlExecution}/byID/${campaignId}/${env}`, dataset != null ? dataset : {});
     }
 
     stopExecution(campaignId: number, executionId: number): Observable<void> {

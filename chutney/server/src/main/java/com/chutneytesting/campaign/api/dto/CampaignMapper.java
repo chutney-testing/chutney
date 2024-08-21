@@ -28,7 +28,7 @@ public class CampaignMapper {
             campaign.executionEnvironment(),
             campaign.parallelRun,
             campaign.retryAuto,
-            campaign.externalDatasetId,
+            campaign.executionDataset(),
             campaign.tags);
     }
 
@@ -42,7 +42,7 @@ public class CampaignMapper {
             campaign.executionEnvironment(),
             campaign.parallelRun,
             campaign.retryAuto,
-            campaign.externalDatasetId,
+            campaign.executionDataset(),
             campaign.tags);
     }
 

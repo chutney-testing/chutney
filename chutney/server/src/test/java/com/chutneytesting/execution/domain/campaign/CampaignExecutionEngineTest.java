@@ -589,7 +589,7 @@ public class CampaignExecutionEngineTest {
         CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, dataSet, "USER");
 
         // Then
-        assertThat(campaign.externalDatasetId).isNull();
+        assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.externalDataset).isNotNull();
         assertThat(campaignExecution.externalDataset.getDatasetId()).isNull();
         assertThat(campaignExecution.externalDataset.getConstants()).isEqualTo(constants);
@@ -615,7 +615,7 @@ public class CampaignExecutionEngineTest {
         CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, dataSet, "USER");
 
         // Then
-        assertThat(campaign.externalDatasetId).isNull();
+        assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.externalDataset).isNotNull();
         assertThat(campaignExecution.externalDataset.getConstants()).isEmpty();
         assertThat(campaignExecution.externalDataset.getDatatable()).isEmpty();
@@ -639,7 +639,7 @@ public class CampaignExecutionEngineTest {
         CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, null, "USER");
 
         // Then
-        assertThat(campaign.externalDatasetId).isNotNull();
+        assertThat(campaign.executionDataset()).isNotNull();
         assertThat(campaignExecution.externalDataset).isNotNull();
         assertThat(campaignExecution.externalDataset.getConstants()).isEmpty();
         assertThat(campaignExecution.externalDataset.getDatatable()).isEmpty();
@@ -660,7 +660,7 @@ public class CampaignExecutionEngineTest {
         CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, null, "USER");
 
         // Then
-        assertThat(campaign.externalDatasetId).isNull();
+        assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.externalDataset).isNull();
     }
 
