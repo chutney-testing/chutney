@@ -46,7 +46,6 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { ScenarioJiraLinksModalComponent } from './components/scenario-jira-links-modal/scenario-jira-links-modal.component';
 import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import {DatasetModule} from "@modules/dataset/dataset.module";
 
 const ROUTES = [
     ...scenarioRoute
@@ -73,8 +72,7 @@ const ROUTES = [
         MoleculesModule,
         DropdownModule,
         FloatLabelModule,
-        RxFor,
-        DatasetModule
+        RxFor
     ],
     declarations: [
         ScenariosComponent,

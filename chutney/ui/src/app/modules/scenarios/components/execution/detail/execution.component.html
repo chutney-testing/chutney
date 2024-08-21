@@ -115,7 +115,7 @@
             </div>
         </div>
     </div>
-    @if (execution.dataset) {
+    @if (execution.externalDataset) {
         <div class="row mb-2">
             <div class="col justify-content-center">
                 <div class="hr-fa float-start align-self-center cursor-pointer" (click)="toggleDatasetVariables()">
@@ -123,7 +123,7 @@
                        [ngClass]="collapseDataset ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
                 </div>
                 <hr class="hr-text cursor-pointer"
-                    attr.data-content="{{'scenarios.execution.dataset.title' | translate}}: {{execution.dataset}}"
+                    attr.data-content="{{'scenarios.execution.dataset.title' | translate}}: {{execution.externalDataset.datasetId}}"
                     (click)="toggleDatasetVariables()">
                 <div [ngbCollapse]="collapseDataset" [animation]="false">
                     @if (scenarioExecutionReport?.datatable) {

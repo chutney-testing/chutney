@@ -15,6 +15,7 @@ import { EMPTY, Observable, of, Subscription, zip } from 'rxjs';
 import { ScenarioService } from '@core/services';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { AlertService, EventManagerService } from '@shared';
+import {ExternalDataset} from "@core/model/external-dataset.model";
 
 @Component({
     selector: 'chutney-scenario-executions-history',
@@ -264,7 +265,7 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
         this.scenarioExecution$ = this.eventManagerService.subscribe('execute', (data) => this.executeScenario(data.env, data.dataset));
     }
 
-    private executeScenario(env: string, dataset: string = null) {
+    private executeScenario(env: string, dataset: ExternalDataset = null) {
         this.scenarioExecutionService
             .executeScenarioAsync(this.scenarioId, env, dataset)
             .pipe(
@@ -297,7 +298,7 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
 
     replay(executionId: number) {
         const execution = this.executions.find(exec => exec.executionId === executionId);
-        this.executeScenario(execution.environment, execution.dataset)
+        this.executeScenario(execution.environment, execution.externalDataset)
     }
 
     deleteExecution(executionId: number) {

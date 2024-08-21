@@ -22,12 +22,6 @@ import { DatasetRoute } from './dataset.routes';
 import { MoleculesModule } from 'src/app/molecules/molecules.module';
 import { DatasetEditionComponent } from './components/dataset-edition/dataset-edition.component';
 import { AtomsModule } from '../../atoms/atoms.module';
-import {
-    FormsKeyValueComponent
-} from '@modules/dataset/components/dataset-edition/forms-key-value/forms-key-value.component';
-import {
-    FormsDataGridComponent
-} from '@modules/dataset/components/dataset-edition/forms-data-grid/forms-data-grid.component';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 
 
@@ -51,14 +45,10 @@ const ROUTES = [
     ],
     exports: [
         DatasetEditionComponent,
-        FormsKeyValueComponent,
-        FormsDataGridComponent
     ],
     declarations: [
         DatasetListComponent,
         DatasetEditionComponent,
-        FormsKeyValueComponent,
-        FormsDataGridComponent
     ]
 })
 export class DatasetModule {

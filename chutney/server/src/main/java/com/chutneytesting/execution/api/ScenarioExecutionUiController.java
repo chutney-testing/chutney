@@ -7,6 +7,8 @@
 
 package com.chutneytesting.execution.api;
 
+import com.chutneytesting.dataset.api.ExternalDatasetDto;
+import com.chutneytesting.dataset.api.KeyValue;
 import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.environment.api.environment.EmbeddedEnvironmentApi;
 import com.chutneytesting.execution.domain.GwtScenarioMarshaller;
@@ -19,6 +21,7 @@ import com.chutneytesting.server.core.domain.execution.ExecutionRequest;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngine;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngineAsync;
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
+import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
@@ -103,12 +106,21 @@ public class ScenarioExecutionUiController {
     }
 
     @PreAuthorize("hasAuthority('SCENARIO_EXECUTE')")
-    @PostMapping(path = {"/api/ui/scenario/executionasync/v1/{scenarioId}/{env}", "/api/ui/scenario/executionasync/v1/{scenarioId}/{env}/{dataset}"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env, @PathVariable(value = "dataset", required = false) Optional<String> dataset) {
+    @PostMapping(path = {"/api/ui/scenario/executionasync/v1/{scenarioId}/{env}", "/api/ui/scenario/executionasync/v1/{scenarioId}/{env}"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env, @RequestBody(required = false) Optional<ExternalDatasetDto> externalDataset) {
         LOGGER.debug("execute async scenario '{}'", scenarioId);
         TestCase testCase = testCaseRepository.findExecutableById(scenarioId).orElseThrow(() -> new ScenarioNotFoundException(scenarioId));
         String userId = userService.currentUser().getId();
-        DataSet execDataset = dataset.map(datasetRepository::findById).orElseGet(() -> getDataSet(testCase));
+        DataSet execDataset = externalDataset.map(eds -> {
+            if (eds.id().isPresent()) {
+                return datasetRepository.findById(eds.id().get());
+            }
+            return DataSet.builder()
+                .withName(eds.id().orElse(""))
+                .withConstants(KeyValue.toMap(eds.constants()))
+                .withDatatable(eds.datatable().stream().map(KeyValue::toMap).toList())
+                .build();
+        }).orElseGet(() -> getDataSet(testCase));
         return executionEngineAsync.execute(new ExecutionRequest(testCase, env, userId, execDataset)).toString();
     }
 

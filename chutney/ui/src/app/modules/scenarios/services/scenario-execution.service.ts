@@ -12,6 +12,7 @@ import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { Execution, KeyValue, ScenarioExecutionReport } from '@model';
 import { HttpClient } from '@angular/common/http';
+import {ExternalDataset} from "@core/model/external-dataset.model";
 
 @Injectable()
 export class ScenarioExecutionService {
@@ -35,10 +36,9 @@ export class ScenarioExecutionService {
                 map((res: Execution) => Execution.deserialize(res)));
     }
 
-    executeScenarioAsync(scenarioId: string, env: string, dataset:string = null): Observable<string> {
+    executeScenarioAsync(scenarioId: string, env: string, dataset:ExternalDataset = null): Observable<string> {
         const envPathParam = !!env ? `/${env}` : '';
-        const datasetPathParam = !!dataset ? `/${dataset}` : '';
-        return this.http.post<string>(environment.backend + `${this.resourceUrl}/executionasync/v1/${scenarioId}${envPathParam}${datasetPathParam}`, {});
+        return this.http.post<string>(environment.backend + `${this.resourceUrl}/executionasync/v1/${scenarioId}${envPathParam}`, dataset);
     }
 
     observeScenarioExecution(scenarioId: string, executionId: number): Observable<ScenarioExecutionReport> {

@@ -91,7 +91,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
         this.environments = [...new Set(this.executions.map(exec => exec.environment))].map(env => this.toSelectOption(env));
-        this.datasets = [...new Set(this.executions.map(exec => exec.dataset).filter(ds=> !!ds))].map(ds => this.toSelectOption(ds));
+        this.datasets = [...new Set(this.executions.map(exec => exec.externalDataset).filter(ds=> !!ds))].map(ds => ds.datasetId ? ds.datasetId : "INLINE DATASET").map(ds => this.toSelectOption(ds));
         this.executors = [...new Set(this.executions.map(exec => exec.user))].map(user => this.toSelectOption(user));
         this.campaigns = [...new Set(this.executions.filter(exec => !!exec.campaignReport).map(exec => exec.campaignReport.campaignName))].map(camp => this.toSelectOption(camp));
         this.tags = [...new Set(this.executions.flatMap(exec => exec.tags))].map(tag => this.toSelectOption(tag));
@@ -239,7 +239,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
 
         let datasetMatch = true;
         if (filters.datasets && filters.datasets.length) {
-            datasetMatch = !!filters.datasets.find((ds:ListItem) => ds.id === exec.dataset);
+            datasetMatch = !!filters.datasets.find((ds:ListItem) => exec.externalDataset !! && ds.id === exec.externalDataset.datasetId);
         }
 
         let campaignMatch = true;
