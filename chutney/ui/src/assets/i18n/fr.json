@@ -67,6 +67,14 @@
             }
         },
         "execution": {
+            "modal": {
+                "error": {
+                    "datasetEmptyName": "Le nom du dataset est vide",
+                    "invalidDataset": "Le dataset est vide ou invalid"
+                },
+                "saveDatasetCheckbox": "Sauvegarder le dataset",
+                "saveDatasetInputPlaceholder": "Nom du dataset"
+            },
             "history": {
                 "title": "Historique des exécutions",
                 "time": "Aujourd'hui à",

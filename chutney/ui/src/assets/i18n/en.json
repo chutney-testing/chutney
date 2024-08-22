@@ -67,6 +67,14 @@
             }
         },
         "execution": {
+            "modal": {
+                "error": {
+                    "datasetEmptyName": "Dataset name is empty",
+                    "invalidDataset": "Dataset is empty or invalid"
+                },
+                "saveDatasetCheckbox": "Save dataset",
+                "saveDatasetInputPlaceholder": "Dataset name"
+            },
             "history": {
                 "title": "Executions' history",
                 "time": "Today at",

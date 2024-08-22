@@ -65,7 +65,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
         })).subscribe();
 
         this.datasetForm = this.formBuilder.group({
-            saveDatasetName: new FormControl(),
+            saveDatasetName: new FormControl({ value: '', disabled: true }),
             saveDatasetCheckbox: [false, Validators.required],
             keyValues: new FormControl(),
             multiKeyValues: new FormControl()
@@ -94,10 +94,19 @@ export class ScenarioExecuteModalComponent implements OnInit {
         if (this.editionDataset) {
             const editedDataset = this.buildDataset();
             if (this.validateDatasetCreation(editedDataset)) {
-                this.errorMessage = "TOTOTOTOTOT" // TODO
+                this.translateService.get("scenarios.execution.modal.error.invalidDataset").subscribe(res => {
+                    this.errorMessage = res
+                })
                 return;
             }
             if (this.datasetForm.get("saveDatasetCheckbox").value) {
+                const datasetName = editedDataset.name
+                if (!datasetName || datasetName.trim() === '') {
+                    this.translateService.get("scenarios.execution.modal.error.datasetEmptyName").subscribe(res => {
+                        this.errorMessage = res
+                    })
+                    return;
+                }
                 this.saveDataset(editedDataset).subscribe(dataset => {
                     if (dataset) {
                         this.execute(dataset)
