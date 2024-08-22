@@ -8,7 +8,7 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { catchError, delay, switchMap, tap } from 'rxjs/operators';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import {Dataset, Execution, GwtTestCase} from '@model';
+import {Dataset, Execution, GwtTestCase, KeyValue} from '@model';
 import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
 import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { EMPTY, Observable, of, Subscription, zip } from 'rxjs';
@@ -298,7 +298,13 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
 
     replay(executionId: number) {
         const execution = this.executions.find(exec => exec.executionId === executionId);
-        const dataset = execution.externalDataset ? new Dataset(execution.externalDataset.datasetId, "", [], new Date(), execution.externalDataset.constants, execution.externalDataset.datatable, execution.externalDataset.datasetId) : null;
+        const datatable: Array<Array<KeyValue>> = execution.externalDataset.datatable.map(obj =>
+            Object.entries(obj).map(([key, value]) => ({ key, value }))
+        ) as Array<Array<KeyValue>>;
+        const constants: Array<KeyValue>  = Object.entries(execution.externalDataset.constants).map(([key, value]) => {
+            return { key, value };
+        }) as Array<KeyValue>;
+        const dataset = execution.externalDataset ? new Dataset(execution.externalDataset.datasetId, "", [], new Date(), constants, datatable, execution.externalDataset.datasetId) : null;
         this.executeScenario(execution.environment, dataset)
     }
 

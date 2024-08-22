@@ -95,7 +95,7 @@ export class ScenarioExecutionMenuComponent implements OnInit, OnChanges {
             modalSize = size;
             modalRef.update({size: modalSize})
         }
-        const modalRef = this.ngbModalService.open(ScenarioExecuteModalComponent, { centered: true });
+        const modalRef = this.ngbModalService.open(ScenarioExecuteModalComponent, { centered: true, size: modalSize });
         modalRef.componentInstance.environments = this.environments;
         modalRef.componentInstance.executeCallback = executeCallback;
         modalRef.componentInstance.changeModalSize = changeModalSize;

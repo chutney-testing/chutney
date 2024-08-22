@@ -48,7 +48,7 @@
               }
               @if ( createDataset != selectedDataset ) {
                 <div class="ms-1 px-1 my-auto">
-                  <p-button class="bi bi-pencil-fill" (click)="this.editDataset(selectedDataset)" [rounded]="true" [text]="true" severity="secondary" />
+                  <p-button class="bi bi-pencil-fill" (click)="this.editDataset($event, selectedDataset)" [rounded]="true" [text]="true" severity="secondary" />
                 </div>
               }
             </div>
@@ -93,19 +93,7 @@
 
     @if (editionDataset) {
     <ng-container [formGroup]="datasetForm">
-        <div class="d-flex flex-row justify-content-evenly m-3">
-            <div class="me-3 align-content-center">
-                <label class="form-check-label me-2">Save Dataset</label>
-                <input type="checkbox" class="form-check-input" formControlName="saveDatasetCheckbox"/>
-            </div>
-            <div class="d-flex flex-column">
-                <input type="text" class="form-control" [ngClass]="{ 'is-invalid': datasetFormControl.saveDatasetName.errors?.required }" id="saveDatasetName" formControlName="saveDatasetName" placeholder="Dataset name"/>
-                <div class="invalid-feedback">
-                    Looks good!
-                </div>
-            </div>
-        </div>
-        <div>
+        <div class="m-3">
             <div>
                 <ul class="nav nav-tabs">
                     <li class="nav-item cursor-pointer">
@@ -120,11 +108,23 @@
 
                 <div class="tab-content clearfix">
                     <div class="tab-pane" id="keyValue" [ngClass]="{ 'active':activeTab==='keyValue'}">
-                        <chutney-forms-key-value formControlName="keyValues"></chutney-forms-key-value>
+                        <chutney-forms-key-value formControlName="keyValues" [enableImportExport]="false"></chutney-forms-key-value>
                     </div>
                     <div class="tab-pane" id="mulitKeyValue" [ngClass]="{ 'active':activeTab==='multiKeyValue'}">
-                        <chutney-forms-data-grid formControlName="multiKeyValues"></chutney-forms-data-grid>
+                        <chutney-forms-data-grid formControlName="multiKeyValues" [enableImportExport]="false"></chutney-forms-data-grid>
                     </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-row justify-content-end m-3">
+            <div class="me-3 align-content-center">
+                <label class="form-check-label me-2">Save Dataset</label>
+                <input type="checkbox" class="form-check-input" formControlName="saveDatasetCheckbox"/>
+            </div>
+            <div class="d-flex flex-column">
+                <input type="text" class="form-control" [ngClass]="{ 'is-invalid': datasetFormControl.saveDatasetName.errors?.required }" id="saveDatasetName" formControlName="saveDatasetName" placeholder="Dataset name" disabled/>
+                <div class="invalid-feedback">
+                    Looks good!
                 </div>
             </div>
         </div>

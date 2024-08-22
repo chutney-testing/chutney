@@ -65,10 +65,10 @@
 
           <div class="tab-content clearfix">
             <div class="tab-pane" id="keyValue" [ngClass]="{ 'active':activeTab==='keyValue'}">
-              <chutney-forms-key-value formControlName="keyValues"></chutney-forms-key-value>
+              <chutney-forms-key-value formControlName="keyValues" [enableImportExport]="false"></chutney-forms-key-value>
             </div>
             <div class="tab-pane" id="mulitKeyValue" [ngClass]="{ 'active':activeTab==='multiKeyValue'}">
-              <chutney-forms-data-grid formControlName="multiKeyValues"></chutney-forms-data-grid>
+              <chutney-forms-data-grid formControlName="multiKeyValues" [enableImportExport]="false"></chutney-forms-data-grid>
             </div>
           </div>
         </div>

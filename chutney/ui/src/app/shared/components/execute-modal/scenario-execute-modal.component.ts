@@ -10,8 +10,7 @@ import {Dataset, KeyValue} from "@core/model";
 import { DataSetService, EnvironmentService } from "@core/services";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { TranslateService } from "@ngx-translate/core";
-import { EventManagerService } from "@shared";
-import {catchError, map, switchMap} from "rxjs/operators";
+import {catchError, map} from "rxjs/operators";
 import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
 import {Observable, of} from "rxjs";
 
@@ -50,7 +49,6 @@ export class ScenarioExecuteModalComponent implements OnInit {
     constructor(
         private datasetService: DataSetService,
         private environmentService: EnvironmentService,
-        private eventManagerService: EventManagerService,
         private formBuilder: FormBuilder,
         private translateService: TranslateService){
     }
@@ -85,7 +83,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
 
     selectedDatasetChanged() {
         if (this.selectedDataset == this.createDataset) {
-            this.editDataset(this.selectedDataset, true);
+            this.editDataset(null, this.selectedDataset, true);
         } else {
             this.editionDataset = false;
             this.changeModalSize("lg")
@@ -181,7 +179,10 @@ export class ScenarioExecuteModalComponent implements OnInit {
         this.isCollapsed = !this.isCollapsed;
     }
 
-    editDataset(dataset: Dataset, forceEditionDataset? : boolean) {
+    editDataset(event: any, dataset: Dataset, forceEditionDataset? : boolean) {
+        if (event) {
+            event.stopPropagation();
+        }
         this.editionDataset = forceEditionDataset || !this.editionDataset
         if (this.editionDataset) {
             this.changeModalSize("xl")
