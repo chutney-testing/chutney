@@ -44,11 +44,14 @@ import { StateService } from './state/state.service';
 import { ChutneyEditorComponent } from '@shared/components/chutney-editor/chutney-editor.component';
 import { HjsonParserService } from '@shared/hjson-parser/hjson-parser.service';
 
-import { NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
+import { NgbModule, NgbDropdownModule, NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { ChutneyMainHeaderComponent } from '@shared/components/layout/header/chutney-main-header.component';
 import { ChutneyLeftMenuComponent } from '@shared/components/layout/left-menu/chutney-left-menu.component';
 import { ChutneyRightMenuComponent } from '@shared/components/layout/right-menu/chutney-right-menu.component';
 import { DistinctPipe } from './pipes/distinct.pipe';
+import { ScenarioExecuteModalComponent } from './components/execute-modal/scenario-execute-modal.component';
+import { DropdownModule } from 'primeng/dropdown';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @NgModule({
     imports: [
@@ -58,8 +61,11 @@ import { DistinctPipe } from './pipes/distinct.pipe';
         ReactiveFormsModule,
         RouterModule,
         TranslateModule,
+        NgbModule,
         NgbTooltipModule,
-        NgbDropdownModule
+        NgbDropdownModule,
+        DropdownModule,
+        FloatLabelModule,
     ],
     declarations: [
         ComponentSearchPipe,
@@ -89,6 +95,7 @@ import { DistinctPipe } from './pipes/distinct.pipe';
         ChutneyLeftMenuComponent,
         ChutneyRightMenuComponent,
         DistinctPipe,
+        ScenarioExecuteModalComponent
     ],
     exports: [
         ComponentSearchPipe,
@@ -116,6 +123,7 @@ import { DistinctPipe } from './pipes/distinct.pipe';
         ChutneyEditorComponent,
         ChutneyRightMenuComponent,
         DistinctPipe,
+        ScenarioExecuteModalComponent
     ],
     providers: [
         {

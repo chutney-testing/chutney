@@ -98,27 +98,29 @@ public class CampaignExecutionEngine {
         return campaignExecutionRepository.getLastExecution(campaign.id);
     }
 
-    public List<CampaignExecution> executeByName(String campaignName, String userId) {
-        return executeByName(campaignName, null, userId);
-    }
-
-    public List<CampaignExecution> executeByName(String campaignName, String environment, String userId) {
+    public List<CampaignExecution> executeByName(String campaignName, String environment, String dataset, String userId) {
         List<Campaign> campaigns = campaignRepository.findByName(campaignName);
         return campaigns.stream()
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
+            .map(campaign -> selectExecutionDataset(campaign, dataset))
             .map(campaign -> executeScenarioInCampaign(campaign, userId))
             .collect(Collectors.toList());
     }
 
-    public CampaignExecution executeById(Long campaignId, String userId) {
-        return executeById(campaignId, null, userId);
+    public List<CampaignExecution> executeByName(String campaignName, String environment, String userId) {
+        return executeByName(campaignName, environment, null, userId);
     }
 
-    public CampaignExecution executeById(Long campaignId, String environment, String userId) {
+    public CampaignExecution executeById(Long campaignId, String environment, String dataset, String userId) {
         return ofNullable(campaignRepository.findById(campaignId))
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
+            .map(campaign -> selectExecutionDataset(campaign, dataset))
             .map(campaign -> executeScenarioInCampaign(campaign, userId))
             .orElseThrow(() -> new CampaignNotFoundException(campaignId));
+    }
+
+    public CampaignExecution executeById(Long campaignId, String userId) {
+        return executeById(campaignId, null, null, userId);
     }
 
     public Optional<CampaignExecution> currentExecution(Long campaignId, String environment) {
@@ -127,7 +129,6 @@ public class CampaignExecutionEngine {
             .filter(exec -> exec.executionEnvironment.equals(environment))
             .findAny();
     }
-
 
     public void stopExecution(Long executionId) {
         LOGGER.trace("Stop requested for {}", executionId);
@@ -143,6 +144,7 @@ public class CampaignExecutionEngine {
         }
         Campaign campaign = campaignRepository.findById(campaignExecution.campaignId);
         campaign.executionEnvironment(campaignExecution.executionEnvironment);
+        campaign.executionDataset(campaignExecution.dataSetId);
         return executeScenarioInCampaign(failedExecutions, campaign, userId);
     }
 
@@ -161,7 +163,7 @@ public class CampaignExecutionEngine {
             .campaignName(campaign.title)
             .partialExecution(!failedExecutions.isEmpty())
             .environment(campaign.executionEnvironment())
-            .dataSetId(isNotBlank(campaign.externalDatasetId) ? campaign.externalDatasetId : null)
+            .dataSetId(isNotBlank(campaign.executionDataset()) ? campaign.executionDataset() : null)
             .userId(userId)
             .build();
 
@@ -299,7 +301,7 @@ public class CampaignExecutionEngine {
     private ExecutionRequest buildExecutionRequest(Campaign campaign, TestCaseDataset testCaseDataset, CampaignExecution campaignExecution) {
         // TODO if dataset null should throw exception ?
         DataSet dataset = ofNullable(testCaseDataset.datasetId())
-            .or(() -> ofNullable(campaign.externalDatasetId))
+            .or(() -> ofNullable(campaign.executionDataset()))
             .map(datasetRepository::findById)
             .orElse(null);
         return new ExecutionRequest(testCaseDataset.testcase(), campaign.executionEnvironment(), campaignExecution.userId, dataset, campaignExecution, campaign.tags);
@@ -320,6 +322,11 @@ public class CampaignExecutionEngine {
 
     private Campaign selectExecutionEnvironment(Campaign campaign, String environment) {
         ofNullable(environment).ifPresent(campaign::executionEnvironment);
+        return campaign;
+    }
+
+    private Campaign selectExecutionDataset(Campaign campaign, String dataset) {
+        ofNullable(dataset).ifPresent(campaign::executionDataset);
         return campaign;
     }
 }

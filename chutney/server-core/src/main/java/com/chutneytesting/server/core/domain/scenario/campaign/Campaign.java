@@ -18,10 +18,10 @@ public class Campaign {
     public final List<CampaignScenario> scenarios;
     public final boolean parallelRun;
     public final boolean retryAuto;
-    public final String externalDatasetId;
     public final List<String> tags;
 
     private String environment;
+    private String externalDatasetId;
 
     public Campaign(Long id,
                     String title,
@@ -47,8 +47,16 @@ public class Campaign {
         this.environment = environment;
     }
 
+    public void executionDataset(String dataset) {
+        this.externalDatasetId = dataset;
+    }
+
     public String executionEnvironment() {
         return this.environment;
+    }
+
+    public String executionDataset() {
+        return this.externalDatasetId;
     }
 
     @Override

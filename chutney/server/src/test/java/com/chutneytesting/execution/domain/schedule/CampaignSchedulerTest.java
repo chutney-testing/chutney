@@ -14,6 +14,7 @@ import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -170,8 +171,8 @@ public class CampaignSchedulerTest {
 
         sut.executeScheduledCampaigns();
 
-        inOrder.verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(0), "auto");
-        inOrder.verify(campaignExecutionEngine).executeById(periodicScheduledCampaign.get(0).campaignsId.get(1), "auto");
+        inOrder.verify(campaignExecutionEngine).executeById(eq(periodicScheduledCampaign.get(0).campaignsId.get(0)), eq("auto"));
+        inOrder.verify(campaignExecutionEngine).executeById(eq(periodicScheduledCampaign.get(0).campaignsId.get(1)), eq("auto"));
         verify(campaignExecutionEngine, times(2)).executeById(any(), any());
     }
 

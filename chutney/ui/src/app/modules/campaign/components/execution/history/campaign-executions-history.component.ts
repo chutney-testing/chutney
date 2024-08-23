@@ -32,6 +32,7 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
     campaignReports: CampaignReport[];
     activeTab: string = '0';
     tabs: CampaignReport[] = [];
+    canReplay = false;
 
     private campaignId: number;
     private _executionsFilters: Params = {};
@@ -41,6 +42,7 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
     private onErrorSubscription: Subscription;
     private onReplaySubscription: Subscription;
     private refreshSubscription: Subscription;
+    private campaignExecutionLast: Subscription;
 
     constructor(private route: ActivatedRoute,
                 private router: Router,
@@ -63,6 +65,7 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
         this.onExecuteSubscription = this.eventManagerService.subscribe('execute', () => this.refreshCampaign());
         this.onErrorSubscription = this.eventManagerService.subscribe('error', (event) => this.onMenuError(event));
         this.onReplaySubscription = this.eventManagerService.subscribe('replay', () => this.refreshCampaign());
+        this.campaignExecutionLast = this.eventManagerService.subscribe('executeLast', () => this.replay());
     }
 
     ngOnDestroy(): void {
@@ -76,6 +79,7 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
         return this.campaignService.find(this.campaignId).pipe(
             tap(campaign => this.campaign = campaign),
             tap(campaign => this.campaignReports = campaign.campaignExecutionReports.map(cer => new CampaignReport(cer))),
+            tap(campaign => this.canReplay = campaign.campaignExecutionReports.length > 0),
             tap(() => this.refreshOpenTabs()),
             tap(() => this.checkForRefresh())
         );
@@ -91,6 +95,12 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
 
     private loadJiraUrl() {
         this.jiraPluginConfigurationService.getUrl().subscribe(url => this.jiraUrl = url);
+    }
+
+    private replay() {
+        const lastReport = this.campaignReports[0]
+        this.campaignService.executeCampaign(this.campaign.id, lastReport.report.executionEnvironment).subscribe()
+        this.refreshCampaign()
     }
 
     private checkForRefresh() {
