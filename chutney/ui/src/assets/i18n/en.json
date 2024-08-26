@@ -72,7 +72,7 @@
                     "datasetEmptyName": "Dataset name is empty",
                     "invalidDataset": "Dataset is empty or invalid"
                 },
-                "saveDatasetCheckbox": "Save dataset",
+                "saveDatasetCheckbox": "Save new dataset",
                 "saveDatasetInputPlaceholder": "Dataset name"
             },
             "history": {
@@ -224,7 +224,8 @@
                     "date": "Date",
                     "status": "Status",
                     "env": "Environment",
-                    "executor": "User"
+                    "executor": "User",
+                    "dataset": "Dataset"
                 },
                 "empty": "No executions"
             },

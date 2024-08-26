@@ -37,6 +37,11 @@
             </th>
             <th scope="col">
               <div class="cursor-pointer d-flex justify-content-center">
+                <span>{{ 'campaigns.execution.history.header.dataset' | translate }}</span>
+              </div>
+            </th>
+            <th scope="col">
+              <div class="cursor-pointer d-flex justify-content-center">
                 <span>{{ 'campaigns.execution.history.header.executor' | translate }}</span>
               </div>
             </th>
@@ -65,6 +70,13 @@
                 [formControl]="getFormControl('environments')"
                 [settings]="dropdownSettings"
                 [data]="environments">
+              </ng-multiselect-dropdown>
+            </th>
+            <th class="fw-normal">
+              <ng-multiselect-dropdown
+                [formControl]="getFormControl('datasets')"
+                [settings]="dropdownSettings"
+                [data]="datasets">
               </ng-multiselect-dropdown>
             </th>
             <th class="fw-normal">
@@ -163,6 +175,10 @@
               </td>
               <td>
                 <ngb-highlight [result]="execution.report.executionEnvironment"
+                [term]="filtersForm.get('keyword').value"></ngb-highlight>
+              </td>
+              <td>
+                <ngb-highlight [result]="getDataset(execution)"
                 [term]="filtersForm.get('keyword').value"></ngb-highlight>
               </td>
               <td>

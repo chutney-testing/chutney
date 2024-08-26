@@ -94,7 +94,6 @@ export class CampaignExecutionMenuComponent implements OnInit, OnChanges {
 
     private executeCampaign() {
         const executeCallback = (env: string, dataset: Dataset) => {
-            console.log(dataset)
             this.broadcastCatchError(this.campaignService.executeCampaign(this.campaign.id, env, dataset)).subscribe();
             timer(1000).pipe(
                 switchMap(() => of(this.eventManagerService.broadcast({ name: 'execute', env: env })))

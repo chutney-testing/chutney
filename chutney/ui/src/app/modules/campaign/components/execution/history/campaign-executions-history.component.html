@@ -25,7 +25,7 @@
           {{ 'campaigns.execution.history.title' | translate }}
         </a>
         <ng-template ngbNavContent>
-          <chutney-campaign-executions [executions]="campaignReports" [(filters)]="executionsFilters"
+          <chutney-campaign-executions [executions]="campaignReports" [campaign]="campaign" [(filters)]="executionsFilters"
             (onExecutionSelect)="openReport($event)">
           </chutney-campaign-executions>
         </ng-template>

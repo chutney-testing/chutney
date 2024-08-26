@@ -72,7 +72,7 @@
                     "datasetEmptyName": "Le nom du dataset est vide",
                     "invalidDataset": "Le dataset est vide ou invalid"
                 },
-                "saveDatasetCheckbox": "Sauvegarder le dataset",
+                "saveDatasetCheckbox": "Sauvegarder le nouveau dataset",
                 "saveDatasetInputPlaceholder": "Nom du dataset"
             },
             "history": {
@@ -224,7 +224,8 @@
                     "date": "Date",
                     "status": "Statut",
                     "env": "Environnement",
-                    "executor": "Utilisateur"
+                    "executor": "Utilisateur",
+                    "dataset": "Dataset"
                 },
                 "empty": "Aucune exécution"
             },

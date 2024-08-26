@@ -129,8 +129,8 @@ public class CampaignExecutionUiController {
             dataset = null;
         } else {
             dataset = DataSet.builder()
-                .withId(externalDataset.id().orElse(null))
-                .withName(externalDataset.id().orElse(""))
+                .withId(externalDataset.datasetId().orElse(null))
+                .withName(externalDataset.datasetId().orElse(""))
                 .withConstants(KeyValue.toMap(externalDataset.constants()))
                 .withDatatable(externalDataset.datatable().stream().map(KeyValue::toMap).toList())
                 .build();

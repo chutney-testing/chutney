@@ -33,7 +33,7 @@ import org.immutables.value.Value;
 @Value.Style(jdkOnly = true)
 @JsonIgnoreProperties(ignoreUnknown = true)
 public interface ExternalDatasetDto {
-    Optional<String> id();
+    Optional<String> datasetId();
 
     @Value.Default()
     @JsonProperty("uniqueValues")

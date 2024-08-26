@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { Execution } from '@model';
+import { Execution, GwtTestCase } from '@model';
 import { Params, Router } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -49,6 +49,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     private readonly iso_Date_Delimiter = '-';
 
     @Input() executions: Execution[] = [];
+    @Input() scenario: GwtTestCase;
     @Output() onExecutionSelect = new EventEmitter<{ execution: Execution, focus: boolean }>();
     @Input() filters: Params;
     @Output() filtersChange = new EventEmitter<Params>();
@@ -91,7 +92,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
         this.environments = [...new Set(this.executions.map(exec => exec.environment))].map(env => this.toSelectOption(env));
-        this.datasets = [...new Set(this.executions.map(exec => exec.externalDataset).filter(ds=> !!ds))].map(ds => ds.datasetId ? ds.datasetId : "INLINE DATASET").map(ds => this.toSelectOption(ds));
+        this.datasets = [...new Set(this.executions.map(exec => exec.externalDataset).filter(ds=> !!ds))].map(ds => ds.datasetId ? ds.datasetId : "Custom").map(ds => this.toSelectOption(ds));
         this.executors = [...new Set(this.executions.map(exec => exec.user))].map(user => this.toSelectOption(user));
         this.campaigns = [...new Set(this.executions.filter(exec => !!exec.campaignReport).map(exec => exec.campaignReport.campaignName))].map(camp => this.toSelectOption(camp));
         this.tags = [...new Set(this.executions.flatMap(exec => exec.tags))].map(tag => this.toSelectOption(tag));
@@ -129,6 +130,15 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
             .subscribe();
     }
 
+    protected getDatasetFromExecution(execution: Execution) {
+        if (execution.externalDataset) {
+            if (execution.externalDataset?.datasetId) {
+                return execution.externalDataset?.datasetId
+            }
+            return 'Custom'
+        }
+        return this.scenario.defaultDataset;
+    }
 
     private selectedOptionsFromUri(param: string, labelResolver?: (param) => string) {
         if (param) {

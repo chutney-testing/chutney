@@ -111,11 +111,11 @@ public class ScenarioExecutionUiController {
         TestCase testCase = testCaseRepository.findExecutableById(scenarioId).orElseThrow(() -> new ScenarioNotFoundException(scenarioId));
         String userId = userService.currentUser().getId();
         DataSet execDataset = Optional.ofNullable(externalDataset).map(eds -> {
-            if (eds.id().isPresent()) {
-                return datasetRepository.findById(eds.id().get());
+            if (eds.datasetId().isPresent()) {
+                return datasetRepository.findById(eds.datasetId().get());
             }
             return DataSet.builder()
-                .withName(eds.id().orElse(""))
+                .withName(eds.datasetId().orElse(""))
                 .withConstants(KeyValue.toMap(eds.constants()))
                 .withDatatable(eds.datatable().stream().map(KeyValue::toMap).toList())
                 .build();

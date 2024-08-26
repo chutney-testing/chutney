@@ -49,7 +49,7 @@ export class DataSetService {
 
     save(dataset: Dataset, oldId?: string): Observable<Dataset> {
         DataSetService.cleanTags(dataset);
-        if (dataset.id && dataset.id.length > 0) {
+        if (dataset.datasetId && dataset.datasetId.length > 0) {
             return this.httpClient.put<Dataset>(environment.backend + this.resourceUrl, dataset, {params: {oldId}})
                 .pipe(
                     map(dto => this.fromDto(dto))
