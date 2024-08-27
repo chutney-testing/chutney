@@ -32,7 +32,7 @@ export class DataSetService {
                     dto.lastUpdated,
                     dto.uniqueValues,
                     dto.multipleValues,
-                    dto.id
+                    dto.datasetId
                 ));
 
                 return res;
@@ -74,7 +74,7 @@ export class DataSetService {
             dto.lastUpdated,
             dto.uniqueValues.map(o => new KeyValue(o.key, o.value)),
             dto.multipleValues.map(l => l.map(o => new KeyValue(o.key, o.value))),
-            dto.id);
+            dto.datasetId);
     }
 
     private static cleanTags(dataset: Dataset) {

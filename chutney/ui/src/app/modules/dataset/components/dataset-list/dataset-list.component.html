@@ -47,14 +47,14 @@
           </tr>
         </thead>
         <tbody>
-          @for (dataset of (datasets |  dataSetSearch : selectedTags | searchTextPipe  : dataSetFilter : ['name', 'description']); track dataset.id) {
+          @for (dataset of (datasets |  dataSetSearch : selectedTags | searchTextPipe  : dataSetFilter : ['name', 'description']); track dataset.datasetId) {
             <tr
               (click)="showPreview(dataset)"
               class="cursor-pointer">
               <td class="align-items-center">
                 <button *hasAuthorization="[Authorization.DATASET_WRITE]"
                   type="button" class="btn btn-primary btn-sm"
-                  [routerLink]="['/dataset', dataset.id, 'edition']">
+                  [routerLink]="['/dataset', dataset.datasetId, 'edition']">
                   <span class="fa fa-pencil-alt"
                   aria-hidden="true"></span> {{ 'global.actions.edit' | translate }}
                 </button>
