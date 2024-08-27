@@ -14,6 +14,7 @@ import com.chutneytesting.kotlin.asResource
 import com.chutneytesting.kotlin.dsl.ForStrategy
 import com.chutneytesting.kotlin.dsl.Scenario
 import com.chutneytesting.kotlin.dsl.SuccessAction
+import com.chutneytesting.kotlin.execution.report.AnsiReportWriter
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.Test
@@ -109,8 +110,7 @@ class ExecutionServiceTest {
         )
         val scenario = Scenario(title = "scenario with for") {
             When("<i> step description - \${#key1} - \${#key2}", strategy = ForStrategy()) {
-                SuccessAction(
-                )
+                SuccessAction()
             }
         }
         val sut = ExecutionService()

@@ -49,10 +49,17 @@ object JsonReportWriter {
         reportPath.mkdirs()
         File(
             reportPath,
-            report.name.split(" ")
+            report.name
+                .removeForbiddenChars()
+                .split(" ")
                 .joinToString("", postfix = "." + formatter.format(Instant.now()) + ".json") { it.replaceFirstChar(Char::titlecase) }
         )
             .bufferedWriter()
             .use { it.write(reportAsJson(report, pretty)) }
+    }
+
+    fun String.removeForbiddenChars(): String {
+        val forbiddenChars = setOf('<', '>', ':', '"', '/', '\\', '|', '?', '*')
+        return this.filter { it !in forbiddenChars }
     }
 }

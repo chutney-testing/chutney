@@ -79,6 +79,10 @@ class AnsiReportWriter(private val withColor: Boolean = true) {
             builder.appendLine().append(it)
         }
 
+        outputs(step, indent).takeIf { it.isNotBlank() }?.let {
+            builder.appendLine().append(it)
+        }
+
         if (step.steps.isNotEmpty()) {
             step.steps.forEach {
                 builder.appendLine()
@@ -137,6 +141,13 @@ class AnsiReportWriter(private val withColor: Boolean = true) {
                 } else {
                     "$indent  >> $it"
                 }
+            }
+    }
+
+    private fun outputs(step: StepExecutionReportDto, indent: String): String {
+        return step.context.stepResults.entries
+            .joinToString("\n") {
+                MAGENTA.bright() +"$indent  >> $it"
             }
     }
 }

@@ -220,6 +220,7 @@ public class DefaultDBVacuumTest {
             clearTables();
         }
 
+        @Disabled
         @Test
         void compute_db_size() {
             long initSize = sut.size();

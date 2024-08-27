@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test
 import org.testcontainers.containers.BindMode
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.utility.MountableFile
 import util.WSLUtil
 import java.io.File
 import java.nio.file.Files
@@ -46,7 +47,10 @@ class IntegrationTest {
                 .apply {
                     withStartupTimeout(Duration.ofSeconds(80))
                     withExposedPorts(8443)
-                    withFileSystemBind(WSLUtil.wslPath(tempDirectory), "/config", BindMode.READ_WRITE)
+                    withCopyFileToContainer(
+                        MountableFile.forClasspathResource("/blackbox/"),
+                        "/config"
+                    )
                 }
             chutneyServer!!.start()
             adminServerInfo =
