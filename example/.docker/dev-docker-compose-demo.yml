@@ -1,10 +1,11 @@
 #SPDX-FileCopyrightText: 2017-2024 Enedis
 #SPDX-License-Identifier: Apache-2.0
-
+name: chutney-testing
 services:
   server:
     image: ghcr.io/chutney-testing/chutney/chutney-server:latest
     container_name: chutney-demo-server
+    restart: unless-stopped
     ports:
       - "80:8443"
     environment:
@@ -15,3 +16,26 @@ services:
       - ./demo/conf/:/.chutney
       - ./demo/spring-config/:/config/
       - ./demo/schema/:/schema/
+
+  prometheus:
+    image: ubuntu/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    depends_on:
+      - server
+    ports:
+      - 9090:9090
+    volumes:
+      - "./supervision/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml"
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    volumes:
+      - ./supervision/grafana/grafana.db:/var/lib/grafana/grafana.db
+

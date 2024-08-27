@@ -1,0 +1,18 @@
+#SPDX-FileCopyrightText: 2017-2024 Enedis
+#SPDX-License-Identifier: Apache-2.0
+
+# cat /etc/prometheus/prometheus.yml
+scrape_configs:
+  - job_name: "prometheus"
+    static_configs:
+      - targets: ["localhost:9090"]
+
+  - job_name: 'spring-actuator'
+    metrics_path: '/actuator/prometheus'
+    basic_auth:
+      username: "admin"
+      password: "Admin"
+    static_configs:
+      - targets: [ 'chutney-demo-server:8443' ]
+        labels:
+          group: 'production'

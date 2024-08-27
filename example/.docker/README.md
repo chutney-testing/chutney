@@ -20,15 +20,19 @@
 ## Demo server container using docker compose
 
 ```shell
+// from example project folder
 // Run
 docker-compose -f ./.docker/dev-docker-compose-demo.yml up -d
 // Stop
 docker-compose -f ./.docker/dev-docker-compose-demo.yml stop
-// Force
-docker-compose -f ./.docker/dev-docker-compose-demo.yml rm server --force
+// Remove
+docker-compose -f ./.docker/dev-docker-compose-demo.yml rm
 ```
-
-The Chutney web interface should be visible at http://localhost.
+> **Notes**:
+> * The Chutney web interface should be visible at http://localhost. Try to execute some scenarios and campaigns to generate some data that will be used in dashboards bellow.
+> * The Grafana web interface should be visible at http://localhost:3000/dashboards. Some dashboards examples are already done by the team:
+>   * Chutney [jvm](http://localhost:3000/d/cdw2ubi8bk1kwc/jvm-micrometer?orgId=1&refresh=30s&from=now-1h&to=now) and [scenarios executions](http://localhost:3000/d/edw39vvnep88wa/scenarios-executions?orgId=1&from=now-1h&to=now&refresh=30s).
+>   * Prometheus [stats](http://localhost:3000/d/UDdpyzz7z/prometheus-2-0-stats?orgId=1&refresh=1m).
 
 ## Build docker image
 
