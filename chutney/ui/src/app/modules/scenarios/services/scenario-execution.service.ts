@@ -10,9 +10,8 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
-import {Dataset, Execution, KeyValue, ScenarioExecutionReport} from '@model';
+import { Dataset, Execution, KeyValue, ScenarioExecutionReport } from '@model';
 import { HttpClient } from '@angular/common/http';
-import {ExternalDataset} from "@core/model/external-dataset.model";
 
 @Injectable()
 export class ScenarioExecutionService {

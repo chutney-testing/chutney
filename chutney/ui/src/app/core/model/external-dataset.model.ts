@@ -6,7 +6,7 @@
  */
 
 import {ExecutionStatus} from "@core/model/scenario/execution-status";
-import {CampaignExecutionReport, KeyValue} from "@core/model/index";
+import { CampaignExecutionReport, KeyValue } from "@core/model/index";
 
 export interface ExternalDataset {
     constants: Array<KeyValue>,

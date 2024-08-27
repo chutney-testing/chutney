@@ -22,8 +22,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureService } from '@core/feature/feature.service';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { RouterModule } from '@angular/router';
-import {FormsDataGridComponent} from "@shared/components/dataset/forms-data-grid/forms-data-grid.component";
-import {FormsKeyValueComponent} from "@shared/components/dataset/forms-key-value/forms-key-value.component";
+import { FormsDataGridComponent } from "@shared/components/dataset/forms-data-grid/forms-data-grid.component";
+import { FormsKeyValueComponent } from "@shared/components/dataset/forms-key-value/forms-key-value.component";
 
 describe('DatasetEditionComponent', () => {
 

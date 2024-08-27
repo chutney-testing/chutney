@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Inject, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import {Campaign, CampaignExecutionReport, CampaignReport} from '@model';
+import { Campaign, CampaignExecutionReport, CampaignReport } from '@model';
 import { Params } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';

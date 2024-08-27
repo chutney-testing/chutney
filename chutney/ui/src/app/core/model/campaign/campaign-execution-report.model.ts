@@ -8,7 +8,7 @@
 import { ScenarioExecutionReportOutline } from '.';
 import { Execution } from '../scenario';
 import { ExecutionStatus } from '../scenario/execution-status';
-import {ExternalDataset} from "@core/model/external-dataset.model";
+import { ExternalDataset } from "@core/model/external-dataset.model";
 
 export interface CampaignExecutionReport {
     executionId?: number,

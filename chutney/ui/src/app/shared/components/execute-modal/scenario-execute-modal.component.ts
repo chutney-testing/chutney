@@ -6,13 +6,13 @@
  */
 
 import { Component, inject, Input, OnInit } from "@angular/core";
-import {Dataset, KeyValue} from "@core/model";
+import { Dataset, KeyValue } from "@core/model";
 import { DataSetService, EnvironmentService } from "@core/services";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
 import { TranslateService } from "@ngx-translate/core";
-import {catchError, map} from "rxjs/operators";
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {Observable, of} from "rxjs";
+import { catchError, map } from "rxjs/operators";
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { Observable, of } from "rxjs";
 
 
 @Component({

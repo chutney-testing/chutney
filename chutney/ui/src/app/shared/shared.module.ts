@@ -52,8 +52,8 @@ import { DistinctPipe } from './pipes/distinct.pipe';
 import { ScenarioExecuteModalComponent } from './components/execute-modal/scenario-execute-modal.component';
 import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import {FormsDataGridComponent} from "@shared/components/dataset/forms-data-grid/forms-data-grid.component";
-import {FormsKeyValueComponent} from "@shared/components/dataset/forms-key-value/forms-key-value.component";
+import { FormsDataGridComponent } from "@shared/components/dataset/forms-data-grid/forms-data-grid.component";
+import { FormsKeyValueComponent } from "@shared/components/dataset/forms-key-value/forms-key-value.component";
 
 @NgModule({
     imports: [

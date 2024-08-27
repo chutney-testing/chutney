@@ -7,7 +7,7 @@
 
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { CampaignExecutionReport } from '@core/model';
-import {ExternalDataset} from "@core/model/external-dataset.model";
+import { ExternalDataset } from "@core/model/external-dataset.model";
 
 export class Execution {
 

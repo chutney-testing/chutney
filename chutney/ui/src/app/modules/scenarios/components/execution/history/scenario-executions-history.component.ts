@@ -8,14 +8,13 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { catchError, delay, switchMap, tap } from 'rxjs/operators';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import {Dataset, Execution, GwtTestCase, KeyValue} from '@model';
+import { Dataset, Execution, GwtTestCase, KeyValue } from '@model';
 import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
 import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { EMPTY, Observable, of, Subscription, zip } from 'rxjs';
 import { ScenarioService } from '@core/services';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { AlertService, EventManagerService } from '@shared';
-import {ExternalDataset} from "@core/model/external-dataset.model";
 
 @Component({
     selector: 'chutney-scenario-executions-history',

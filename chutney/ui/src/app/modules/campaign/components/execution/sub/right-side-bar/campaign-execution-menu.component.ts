@@ -18,7 +18,7 @@ import { FileSaverService } from 'ngx-filesaver';
 import * as JSZip from 'jszip';
 
 import { CampaignService, EnvironmentService, JiraPluginService, LoginService, ScenarioService } from '@core/services';
-import {Authorization, Campaign, Dataset, ScenarioIndex, TestCase} from '@model';
+import { Authorization, Campaign, Dataset, ScenarioIndex, TestCase } from '@model';
 import { EventManagerService } from '@shared';
 import { MenuItem } from '@shared/components/layout/menuItem';
 import { HttpErrorResponse } from '@angular/common/http';
