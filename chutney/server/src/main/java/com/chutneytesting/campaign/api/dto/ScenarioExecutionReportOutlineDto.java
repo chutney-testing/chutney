@@ -35,7 +35,7 @@ public class ScenarioExecutionReportOutlineDto {
         return scenarioId;
     }
 
-    public Optional<ExternalDataset> getDatasetId() {
+    public Optional<ExternalDataset> getDataset() {
         return execution.externalDataset();
     }
 

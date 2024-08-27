@@ -116,17 +116,19 @@
                 </div>
             </div>
         </div>
-        <div class="d-flex flex-row justify-content-end m-3">
-            <div class="me-3 align-content-center">
+        <div class="d-flex flex-column align-items-end m-3">
+            <div class="d-flex me-3 align-content-center me-2">
                 <label class="form-check-label me-2">{{ "scenarios.execution.modal.saveDatasetCheckbox" | translate }}</label>
                 <input type="checkbox" class="form-check-input" formControlName="saveDatasetCheckbox"/>
             </div>
-            <div class="d-flex flex-column">
-                <input type="text" class="form-control" [ngClass]="{ 'is-invalid': datasetFormControl.saveDatasetName.errors?.required }" id="saveDatasetName" formControlName="saveDatasetName" placeholder="{{ 'scenarios.execution.modal.saveDatasetInputPlaceholder' | translate }}"/>
-                <div class="invalid-feedback">
-                    {{ "scenarios.execution.modal.error.datasetEmptyName" | translate }}
+            @if (datasetForm.get('saveDatasetCheckbox').value) {
+                <div class="d-flex flex-column justify-content-end m-2">
+                    <input type="text" class="form-control" [ngClass]="{ 'is-invalid': datasetFormControl.saveDatasetName.errors?.required }" id="saveDatasetName" formControlName="saveDatasetName" placeholder="{{ 'scenarios.execution.modal.saveDatasetInputPlaceholder' | translate }}"/>
+                    <div class="invalid-feedback">
+                        {{ "scenarios.execution.modal.error.datasetEmptyName" | translate }}
+                    </div>
                 </div>
-            </div>
+            }
         </div>
     </ng-container>
     }

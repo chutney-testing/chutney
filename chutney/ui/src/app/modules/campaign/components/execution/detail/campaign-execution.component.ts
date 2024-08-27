@@ -72,6 +72,16 @@ export class CampaignExecutionComponent implements OnInit {
         }
     }
 
+    protected getDataset(execution: ScenarioExecutionReportOutline) {
+        if (execution.dataset) {
+            if (execution.dataset?.datasetId) {
+                return execution.dataset?.datasetId
+            }
+            return 'Custom'
+        }
+        return ''
+    }
+
     private jiraTestExecutionScenarios$(): Observable<JiraTestExecutionScenarios> {
         return this.jiraLinkService.findByCampaignId(this.campaignId).pipe(
             switchMap((jiraId) => { // TODO - Why this condition ? don't understand it !!
