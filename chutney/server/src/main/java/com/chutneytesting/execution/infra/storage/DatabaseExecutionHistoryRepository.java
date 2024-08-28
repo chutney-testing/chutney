@@ -73,7 +73,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
         List<String> validScenariosIds = scenariosIds.stream().filter(id -> !invalidScenarioId(id)).toList();
         List<Long> executionsIds = scenarioExecutionsJpaRepository.findLastByStatusAndScenariosIds(validScenariosIds, ServerReportStatus.RUNNING)
             .stream().map(t -> t.get(0, Long.class)).toList();
-        Iterable<ScenarioExecutionEntity> lastExecutions = scenarioExecutionsJpaRepository.findAllById(executionsIds );
+        Iterable<ScenarioExecutionEntity> lastExecutions = scenarioExecutionsJpaRepository.findAllById(executionsIds);
         return StreamSupport.stream(lastExecutions.spliterator(), true)
             .collect(Collectors.toMap(ScenarioExecutionEntity::scenarioId, ScenarioExecutionEntity::toDomain));
     }
@@ -197,8 +197,21 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     @Override
     @Transactional
     public void deleteExecutions(Set<Long> executionsIds) {
+        Set<Long> campaignExecutionsIds = getCampaignExecutionsWithOneScenarioExecution(executionsIds);
+
         scenarioExecutionsJpaRepository.deleteAllByIdInBatch(executionsIds);
         scenarioExecutionReportJpaRepository.deleteAllById(executionsIds);
+        campaignExecutionJpaRepository.deleteAllByIdInBatch(campaignExecutionsIds);
+    }
+
+    private Set<Long> getCampaignExecutionsWithOneScenarioExecution(Set<Long> executionsIds) {
+        return executionsIds.stream()
+            .map(this::getExecutionSummary)
+            .map(ExecutionSummary::campaignReport)
+            .flatMap(Optional::stream)
+            .filter(campaignExecution -> campaignExecution.scenarioExecutionReports().size() == 1)
+            .map(campaignExecution -> campaignExecution.executionId)
+            .collect(Collectors.toSet());
     }
 
     private void updateExecutionsToKO(List<ExecutionSummary> executions) {
@@ -234,7 +247,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
                 LOGGER.error("Unexpected error while deserializing report for execution id " + executionSummary.executionId(), exception);
                 return "";
             }
-          }).orElseGet(() -> {
+        }).orElseGet(() -> {
             LOGGER.warn("Report not found for execution id {}", executionSummary.executionId());
             return "";
         });

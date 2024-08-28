@@ -189,12 +189,17 @@
               <td>
                 <ngb-highlight [result]="execution.user" [term]="filtersForm.get('keyword').value"></ngb-highlight>
               </td>
-                <td>
-                    <button class="btn btn-sm btn-primary me-2" (click)="replay(execution, $event)"
-                            [ngbTooltip]="'global.actions.replay' | translate" placement="left">
-                        <i  class="bi bi-repeat" ></i>
-                    </button>
-                </td>
+              <td>
+                <div class="float-end d-flex">
+                  <button class="btn btn-sm btn-primary me-2" (click)="replay(execution, $event)"
+                          [ngbTooltip]="'global.actions.replay' | translate" placement="left">
+                      <i  class="bi bi-repeat" ></i>
+                  </button>
+                  <button class="btn btn-sm btn-primary me-2" (click)="deleteExecution(execution, $event)">
+                      <i  class="bi bi-trash" ></i>
+                  </button>
+                </div>
+              </td>
             </tr>
           }
           @if (!filteredExecutions.length) {

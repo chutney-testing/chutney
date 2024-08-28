@@ -51,6 +51,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     @Input() filters: Params;
     @Output() filtersChange = new EventEmitter<Params>();
     @Output() onReplay = new EventEmitter<number>();
+    @Output() onDelete = new EventEmitter<number>();
 
     constructor(private router: Router,
                 private formBuilder: FormBuilder,
@@ -262,5 +263,10 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     replay(execution: Execution, event: MouseEvent) {
         event.stopPropagation();
         this.onReplay.emit(execution.executionId);
+    }
+
+    deleteExecution(execution: Execution, event: MouseEvent) {
+        event.stopPropagation();
+        this.onDelete.emit(execution.executionId);
     }
 }

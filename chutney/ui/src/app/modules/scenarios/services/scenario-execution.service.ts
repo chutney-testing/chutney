@@ -74,6 +74,11 @@ export class ScenarioExecutionService {
         }));
     }
 
+    deleteExecution(executionId: number): Observable<Object> {
+        return this.http.delete(environment.backend + 
+            `${this.resourceUrl}/execution/${executionId}`);
+    }
+
     private createScenarioExecutionObservable(url: string) {
         return new Observable<ScenarioExecutionReport>(obs => {
             let es;
