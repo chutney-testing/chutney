@@ -61,7 +61,7 @@ class CampaignServiceTest {
             .partialExecution(true)
             .campaignName("test name")
             .executionId(43L)
-            .externalDataset(new ExternalDataset("dataset id test"))
+            .dataset(new ExternalDataset("dataset id test"))
             .startDate(LocalDateTime.MAX)
             .addScenarioExecutionReport(scenarioExecutionReport1)
             .addScenarioExecutionReport(scenarioExecutionReport2)

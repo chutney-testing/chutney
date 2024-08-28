@@ -1327,7 +1327,7 @@ public class PurgeServiceTest {
             .partialExecution(partialExecution)
             .scenarioExecutionReport(scenarioExecutionsForCampaign)
             .userId(firsScenarioExecution.user())
-            .externalDataset(firsScenarioExecution.externalDataset().orElse(null))
+            .dataset(firsScenarioExecution.dataset().orElse(null))
             .build();
     }
 }

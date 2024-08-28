@@ -120,22 +120,22 @@ public class CampaignExecutionUiController {
     public CampaignExecutionReportDto executeCampaignById(
             @PathVariable("campaignId") Long campaignId,
             @PathVariable("env") Optional<String> environment,
-            @RequestBody ExternalDatasetDto externalDataset
+            @RequestBody ExternalDatasetDto dataset
     ) {
         String userId = userService.currentUser().getId();
         CampaignExecution report;
-        DataSet dataset;
-        if (externalDataset == null) {
-            dataset = null;
+        DataSet ds;
+        if (dataset == null) {
+            ds = null;
         } else {
-            dataset = DataSet.builder()
-                .withId(externalDataset.datasetId().orElse(null))
-                .withName(externalDataset.datasetId().orElse(""))
-                .withConstants(KeyValue.toMap(externalDataset.constants()))
-                .withDatatable(externalDataset.datatable().stream().map(KeyValue::toMap).toList())
+            ds = DataSet.builder()
+                .withId(dataset.datasetId().orElse(null))
+                .withName(dataset.datasetId().orElse(""))
+                .withConstants(KeyValue.toMap(dataset.constants()))
+                .withDatatable(dataset.datatable().stream().map(KeyValue::toMap).toList())
                 .build();
         }
-        report = campaignExecutionEngine.executeByIdWithEnvAndDataset(campaignId, environment.orElse(null), dataset, userId);
+        report = campaignExecutionEngine.executeByIdWithEnvAndDataset(campaignId, environment.orElse(null), ds, userId);
         return toDto(report);
     }
 }

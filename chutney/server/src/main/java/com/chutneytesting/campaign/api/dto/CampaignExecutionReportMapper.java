@@ -29,7 +29,7 @@ public class CampaignExecutionReportMapper {
             campaignReport.status(),
             campaignReport.partialExecution,
             campaignReport.executionEnvironment,
-            externalDatasetToDto(campaignReport.externalDataset),
+            externalDatasetToDto(campaignReport.dataset),
             campaignReport.userId,
             campaignReport.getDuration());
     }
@@ -47,19 +47,19 @@ public class CampaignExecutionReportMapper {
             campaignReport.getDuration());
     }
 
-    public static ExternalDatasetDto externalDatasetToDto(ExternalDataset externalDataset) {
-        if (externalDataset == null) {
+    public static ExternalDatasetDto externalDatasetToDto(ExternalDataset dataset) {
+        if (dataset == null) {
             return null;
         }
         ImmutableExternalDatasetDto.Builder externalDatasetBuilder = ImmutableExternalDatasetDto.builder();
-        if (externalDataset.getDatasetId() != null) {
-            externalDatasetBuilder.datasetId(externalDataset.getDatasetId());
+        if (dataset.getDatasetId() != null) {
+            externalDatasetBuilder.datasetId(dataset.getDatasetId());
         }
-        if (externalDataset.getConstants() != null) {
-            externalDatasetBuilder.constants(KeyValue.fromMap(externalDataset.getConstants()));
+        if (dataset.getConstants() != null) {
+            externalDatasetBuilder.constants(KeyValue.fromMap(dataset.getConstants()));
         }
-        if (externalDataset.getDatatable() != null) {
-            externalDatasetBuilder.datatable(externalDataset.getDatatable().stream().map(KeyValue::fromMap).toList());
+        if (dataset.getDatatable() != null) {
+            externalDatasetBuilder.datatable(dataset.getDatatable().stream().map(KeyValue::fromMap).toList());
         }
         return externalDatasetBuilder.build();
     }

@@ -32,11 +32,11 @@ public record ScenarioExecutionCampaign(
         if (o == null || getClass() != o.getClass()) return false;
         ScenarioExecutionCampaign that = (ScenarioExecutionCampaign) o;
         return Objects.equals(scenarioId, that.scenarioId) &&
-            Objects.equals(execution.externalDataset(), that.execution.externalDataset());
+            Objects.equals(execution.dataset(), that.execution.dataset());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(scenarioId, execution.externalDataset());
+        return Objects.hash(scenarioId, execution.dataset());
     }
 }

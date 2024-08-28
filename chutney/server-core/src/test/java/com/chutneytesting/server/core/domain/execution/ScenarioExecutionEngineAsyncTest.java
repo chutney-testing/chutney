@@ -120,7 +120,7 @@ public class ScenarioExecutionEngineAsyncTest {
         verify(executionHistoryRepository).store(eq(scenarioId), argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().environment()).isEqualTo("Exec env");
         assertThat(argumentCaptor.getValue().user()).isEqualTo("Exec user");
-        assertThat(argumentCaptor.getValue().externalDataset().map(ExternalDataset::getDatasetId)).hasValue(dataset.id);
+        assertThat(argumentCaptor.getValue().dataset().map(ExternalDataset::getDatasetId)).hasValue(dataset.id);
 
         // Wait for background computation
         verify(executionStateRepository, timeout(250)).notifyExecutionStart(scenarioId);
@@ -265,7 +265,7 @@ public class ScenarioExecutionEngineAsyncTest {
             .testCaseTitle(executionRequest.testCase.metadata().title())
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
-            .externalDataset(new ExternalDataset(executionRequest.dataset.id, executionRequest.dataset.constants, executionRequest.dataset.datatable))
+            .dataset(new ExternalDataset(executionRequest.dataset.id, executionRequest.dataset.constants, executionRequest.dataset.datatable))
             .report("")
             .scenarioId("1234")
             .build();

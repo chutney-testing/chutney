@@ -471,8 +471,8 @@ public class CampaignControllerTest {
 
     @JsonIgnoreProperties("scenarioExecutionReports")
     static class CampaignExecutionReportDtoTest extends CampaignExecutionReportDto {
-        public CampaignExecutionReportDtoTest(Long executionId, List<ScenarioExecutionReportOutlineDto> scenarioExecutionReports, String campaignName, LocalDateTime startDate, ServerReportStatus status, boolean partialExecution, String executionEnvironment, String userId, Long duration, ExternalDatasetDto externalDataset) {
-            super(executionId, scenarioExecutionReports, campaignName, startDate, status, partialExecution, executionEnvironment, externalDataset, userId, duration);
+        public CampaignExecutionReportDtoTest(Long executionId, List<ScenarioExecutionReportOutlineDto> scenarioExecutionReports, String campaignName, LocalDateTime startDate, ServerReportStatus status, boolean partialExecution, String executionEnvironment, String userId, Long duration, ExternalDatasetDto dataset) {
+            super(executionId, scenarioExecutionReports, campaignName, startDate, status, partialExecution, executionEnvironment, dataset, userId, duration);
         }
     }
 }

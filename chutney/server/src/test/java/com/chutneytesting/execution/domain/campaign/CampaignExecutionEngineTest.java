@@ -398,7 +398,7 @@ public class CampaignExecutionEngineTest {
 
         // Then
         verify(campaignRepository).findById(campaign.id);
-        assertThat(execution.externalDataset.getDatasetId()).isEqualTo(executionDataset.id);
+        assertThat(execution.dataset.getDatasetId()).isEqualTo(executionDataset.id);
     }
 
     @Test
@@ -431,7 +431,7 @@ public class CampaignExecutionEngineTest {
         // Then
         verify(campaignRepository).findByName(campaign.title);
         assertThat(campaignExecutions).hasSize(1);
-        assertThat(campaignExecutions.get(0).externalDataset.getDatasetId()).isEqualTo(executionDataset.id);
+        assertThat(campaignExecutions.get(0).dataset.getDatasetId()).isEqualTo(executionDataset.id);
     }
 
     @Test
@@ -590,14 +590,14 @@ public class CampaignExecutionEngineTest {
 
         // Then
         assertThat(campaign.executionDataset()).isNull();
-        assertThat(campaignExecution.externalDataset).isNotNull();
-        assertThat(campaignExecution.externalDataset.getDatasetId()).isNull();
-        assertThat(campaignExecution.externalDataset.getConstants()).isEqualTo(constants);
-        assertThat(campaignExecution.externalDataset.getDatatable()).isEqualTo(datatable);
+        assertThat(campaignExecution.dataset).isNotNull();
+        assertThat(campaignExecution.dataset.getDatasetId()).isNull();
+        assertThat(campaignExecution.dataset.getConstants()).isEqualTo(constants);
+        assertThat(campaignExecution.dataset.getDatatable()).isEqualTo(datatable);
         assertThat(campaignExecution.scenarioExecutionReports()).isNotEmpty();
-        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset()).isPresent();
-        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset().get().getConstants()).isEqualTo(constants);
-        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset().get().getDatatable()).isEqualTo(datatable);
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset()).isPresent();
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset().get().getConstants()).isEqualTo(constants);
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset().get().getDatatable()).isEqualTo(datatable);
     }
 
     @Test
@@ -616,13 +616,13 @@ public class CampaignExecutionEngineTest {
 
         // Then
         assertThat(campaign.executionDataset()).isNull();
-        assertThat(campaignExecution.externalDataset).isNotNull();
-        assertThat(campaignExecution.externalDataset.getConstants()).isEmpty();
-        assertThat(campaignExecution.externalDataset.getDatatable()).isEmpty();
-        assertThat(campaignExecution.externalDataset.getDatasetId()).isNotNull();
-        assertThat(campaignExecution.externalDataset.getDatasetId()).isEqualTo("DATASET_ID");
-        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset()).isPresent();
-        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().externalDataset().get().getDatasetId()).isEqualTo("DATASET_ID");
+        assertThat(campaignExecution.dataset).isNotNull();
+        assertThat(campaignExecution.dataset.getConstants()).isEmpty();
+        assertThat(campaignExecution.dataset.getDatatable()).isEmpty();
+        assertThat(campaignExecution.dataset.getDatasetId()).isNotNull();
+        assertThat(campaignExecution.dataset.getDatasetId()).isEqualTo("DATASET_ID");
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset()).isPresent();
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset().get().getDatasetId()).isEqualTo("DATASET_ID");
     }
 
     @Test
@@ -640,11 +640,11 @@ public class CampaignExecutionEngineTest {
 
         // Then
         assertThat(campaign.executionDataset()).isNotNull();
-        assertThat(campaignExecution.externalDataset).isNotNull();
-        assertThat(campaignExecution.externalDataset.getConstants()).isEmpty();
-        assertThat(campaignExecution.externalDataset.getDatatable()).isEmpty();
-        assertThat(campaignExecution.externalDataset.getDatasetId()).isNotNull();
-        assertThat(campaignExecution.externalDataset.getDatasetId()).isEqualTo("DATASET_ID");
+        assertThat(campaignExecution.dataset).isNotNull();
+        assertThat(campaignExecution.dataset.getConstants()).isEmpty();
+        assertThat(campaignExecution.dataset.getDatatable()).isEmpty();
+        assertThat(campaignExecution.dataset.getDatasetId()).isNotNull();
+        assertThat(campaignExecution.dataset.getDatasetId()).isEqualTo("DATASET_ID");
     }
 
     @Test
@@ -661,7 +661,7 @@ public class CampaignExecutionEngineTest {
 
         // Then
         assertThat(campaign.executionDataset()).isNull();
-        assertThat(campaignExecution.externalDataset).isNull();
+        assertThat(campaignExecution.dataset).isNull();
     }
 
     private final static Random campaignIdGenerator = new Random();

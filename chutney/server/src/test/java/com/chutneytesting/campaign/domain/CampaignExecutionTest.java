@@ -135,7 +135,7 @@ class CampaignExecutionTest {
         void start_scenario_execution() {
             // Given
             CampaignExecution campaignReport = CampaignExecutionReportBuilder.builder()
-                .externalDataset(new ExternalDataset("ds551"))
+                .dataset(new ExternalDataset("ds551"))
                 .userId("user")
                 .build();
             TestCase testCase = buildTestCase("1", "title");
@@ -155,7 +155,7 @@ class CampaignExecutionTest {
                     assertThat(executionSummary.time()).isAfter(beforeStartExecution);
                     assertThat(executionSummary.status()).isEqualTo(NOT_EXECUTED);
                     assertThat(executionSummary.environment()).isEqualTo("env");
-                    assertThat(executionSummary.externalDataset()).hasValue(campaignReport.externalDataset);
+                    assertThat(executionSummary.dataset()).hasValue(campaignReport.dataset);
                     assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
                 });
             });
@@ -174,7 +174,7 @@ class CampaignExecutionTest {
                     assertThat(executionSummary.status()).isEqualTo(RUNNING);
                     assertThat(executionSummary.environment()).isEqualTo("env");
                     assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
-                    assertThat(executionSummary.externalDataset()).hasValue(campaignReport.externalDataset);
+                    assertThat(executionSummary.dataset()).hasValue(campaignReport.dataset);
                 });
             });
 
@@ -183,7 +183,7 @@ class CampaignExecutionTest {
             when(scenarioExecution.scenarioId()).thenReturn(testCase.metadata().id());
             when(scenarioExecution.testCaseTitle()).thenReturn(testCase.metadata().title());
             when(scenarioExecution.executionId()).thenReturn(666L);
-            when(scenarioExecution.externalDataset()).thenReturn(Optional.of(campaignReport.externalDataset));
+            when(scenarioExecution.dataset()).thenReturn(Optional.of(campaignReport.dataset));
 
             campaignReport.updateScenarioExecutionId(scenarioExecution);
 
@@ -198,7 +198,7 @@ class CampaignExecutionTest {
                     assertThat(executionSummary.status()).isEqualTo(RUNNING);
                     assertThat(executionSummary.environment()).isEqualTo("env");
                     assertThat(executionSummary.user()).isEqualTo(campaignReport.userId);
-                    assertThat(executionSummary.externalDataset()).hasValue(campaignReport.externalDataset);
+                    assertThat(executionSummary.dataset()).hasValue(campaignReport.dataset);
                 });
             });
         }
@@ -357,7 +357,7 @@ class CampaignExecutionTest {
         assertThat(sut.failedScenarioExecutions()).hasSize(1).singleElement()
             .isInstanceOf(ScenarioExecutionCampaign.class)
             .hasFieldOrPropertyWithValue("scenarioId", "2")
-            .returns(Optional.of("dataset_2"), sec -> sec.execution().externalDataset().map(ExternalDataset::getDatasetId));
+            .returns(Optional.of("dataset_2"), sec -> sec.execution().dataset().map(ExternalDataset::getDatasetId));
     }
 
     @Test
@@ -417,7 +417,7 @@ class CampaignExecutionTest {
     private ScenarioExecutionCampaign buildScenarioReportFromMockedExecution(String scenarioId, ExternalDataset dataset, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
         ExecutionHistory.ExecutionSummary execution = mock(ExecutionHistory.ExecutionSummary.class);
         when(execution.status()).thenReturn(scenarioExecutionStatus);
-        when(execution.externalDataset()).thenReturn(Optional.ofNullable(dataset));
+        when(execution.dataset()).thenReturn(Optional.ofNullable(dataset));
         when(execution.time()).thenReturn(LocalDateTime.now());
         return new ScenarioExecutionCampaign(scenarioId, scenarioTitle, execution);
     }

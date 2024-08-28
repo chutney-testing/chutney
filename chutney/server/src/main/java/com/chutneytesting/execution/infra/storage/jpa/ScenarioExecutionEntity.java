@@ -221,7 +221,7 @@ public class ScenarioExecutionEntity {
             execution.testCaseTitle(),
             execution.environment(),
             execution.user(),
-            execution.externalDataset().orElse(null),
+            execution.dataset().orElse(null),
             truncateExecutionTags(TagListMapper.tagsToString(execution.tags().orElse(null))),
             version
         );
@@ -241,7 +241,7 @@ public class ScenarioExecutionEntity {
             .error(ofNullable(error))
             .testCaseTitle(scenarioTitle)
             .environment(environment)
-            .externalDataset(ofNullable(getExternalDataset(datasetId, datasetConstants, datasetDatatable)))
+            .dataset(ofNullable(getExternalDataset(datasetId, datasetConstants, datasetDatatable)))
             .user(userId)
             .campaignReport(ofNullable(campaignReport))
             .scenarioId(scenarioId)

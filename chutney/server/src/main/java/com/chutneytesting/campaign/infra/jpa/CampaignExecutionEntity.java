@@ -105,10 +105,10 @@ public class CampaignExecutionEntity {
         partial = report.partialExecution;
         environment = report.executionEnvironment;
         userId = report.userId;
-        if (report.externalDataset != null) {
-            datasetId = report.externalDataset.getDatasetId();
-            datasetConstants = datasetConstantsToString(report.externalDataset.getConstants());
-            datasetDatatable = datasetDatatableToString(report.externalDataset.getDatatable());
+        if (report.dataset != null) {
+            datasetId = report.dataset.getDatasetId();
+            datasetConstants = datasetConstantsToString(report.dataset.getConstants());
+            datasetDatatable = datasetDatatableToString(report.dataset.getDatatable());
         }
         this.scenarioExecutions.clear();
         scenarioExecutions.forEach(se -> {
@@ -128,7 +128,7 @@ public class CampaignExecutionEntity {
             .campaignName(campaignTitle)
             .partialExecution(ofNullable(partial).orElse(false))
             .environment(environment)
-            .externalDataset(getExternalDataset(datasetId, datasetConstants, datasetDatatable))
+            .dataset(getExternalDataset(datasetId, datasetConstants, datasetDatatable))
             .userId(userId);
 
         if (scenarioExecutionReports.isEmpty()) {

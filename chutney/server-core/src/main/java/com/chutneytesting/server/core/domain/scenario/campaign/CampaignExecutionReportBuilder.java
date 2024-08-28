@@ -19,7 +19,7 @@ public class CampaignExecutionReportBuilder {
     private String campaignName;
     private boolean partialExecution;
     private String executionEnvironment;
-    private ExternalDataset externalDataset;
+    private ExternalDataset dataset;
     private String userId;
 
     // Optional fields
@@ -66,8 +66,8 @@ public class CampaignExecutionReportBuilder {
         return this;
     }
 
-    public CampaignExecutionReportBuilder externalDataset(ExternalDataset externalDataset) {
-        this.externalDataset = externalDataset;
+    public CampaignExecutionReportBuilder dataset(ExternalDataset dataset) {
+        this.dataset = dataset;
         return this;
     }
 
@@ -99,7 +99,7 @@ public class CampaignExecutionReportBuilder {
             partialExecution,
             executionEnvironment,
             userId,
-            externalDataset,
+            dataset,
             startDate,
             status,
             scenarioExecutionReports

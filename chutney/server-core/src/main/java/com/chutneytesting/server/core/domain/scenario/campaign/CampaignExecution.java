@@ -38,7 +38,7 @@ public class CampaignExecution {
     public final String campaignName;
     public final boolean partialExecution;
     public final String executionEnvironment;
-    public final ExternalDataset externalDataset;
+    public final ExternalDataset dataset;
     public final String userId;
 
     // Not mandatory
@@ -54,7 +54,7 @@ public class CampaignExecution {
         boolean partialExecution,
         String executionEnvironment,
         String userId,
-        ExternalDataset externalDataset,
+        ExternalDataset dataset,
         LocalDateTime startDate,
         ServerReportStatus status,
         List<ScenarioExecutionCampaign> scenarioExecutions
@@ -64,7 +64,7 @@ public class CampaignExecution {
         this.campaignName = campaignName;
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
-        this.externalDataset = externalDataset;
+        this.dataset = dataset;
         this.userId = userId;
         this.scenarioExecutions = scenarioExecutions;
 
@@ -91,7 +91,7 @@ public class CampaignExecution {
                         .status(ServerReportStatus.NOT_EXECUTED)
                         .duration(0)
                         .environment(executionEnvironment)
-                        .externalDataset(selectDatasetId(testCase))
+                        .dataset(selectDatasetId(testCase))
                         .user(userId)
                         .scenarioId(testCase.testcase().id())
                         .build())));
@@ -102,7 +102,7 @@ public class CampaignExecution {
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
                 return se.scenarioId().equals(testCaseDataset.testcase().id()) &&
-                    se.execution().externalDataset().equals(selectDatasetId(testCaseDataset));
+                    se.execution().dataset().equals(selectDatasetId(testCaseDataset));
             })
             .findFirst();
         this.scenarioExecutions.set(indexOpt.getAsInt(),
@@ -116,7 +116,7 @@ public class CampaignExecution {
                     .status(RUNNING)
                     .duration(0)
                     .environment(executionEnvironment)
-                    .externalDataset(selectDatasetId(testCaseDataset))
+                    .dataset(selectDatasetId(testCaseDataset))
                     .user(userId)
                     .scenarioId(testCaseDataset.testcase().id())
                     .tags(this.scenarioExecutions.get(indexOpt.getAsInt()).execution().tags())
@@ -128,7 +128,7 @@ public class CampaignExecution {
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
                 return se.scenarioId().equals(storedExecution.scenarioId()) &&
-                    compareExternalDataset(se.execution().externalDataset().orElse(null), storedExecution.externalDataset().orElse(null));
+                    compareExternalDataset(se.execution().dataset().orElse(null), storedExecution.dataset().orElse(null));
             })
             .findFirst();
         var scenarioExecution = this.scenarioExecutions.get(indexOpt.getAsInt()).execution();
@@ -143,7 +143,7 @@ public class CampaignExecution {
     }
 
     private Optional<ExternalDataset> selectDatasetId(TestCaseDataset testCaseDataset) {
-        return ofNullable(testCaseDataset.dataset()).or(() -> ofNullable(externalDataset));
+        return ofNullable(testCaseDataset.dataset()).or(() -> ofNullable(dataset));
     }
 
     public void endScenarioExecution(ScenarioExecutionCampaign scenarioExecutionCampaign) throws UnsupportedOperationException {
@@ -231,7 +231,7 @@ public class CampaignExecution {
             .partialExecution(partialExecution)
             .campaignName(campaignName)
             .environment(executionEnvironment)
-            .externalDataset(externalDataset)
+            .dataset(dataset)
             .userId(userId)
             .startDate(startDate)
             .status(status)

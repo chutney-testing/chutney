@@ -38,17 +38,17 @@ public class ExternalDatasetEntityMapperTest {
         );
 
         // When
-        ExternalDataset externalDataset = ExternalDatasetEntityMapper.getExternalDataset(datasetIdString, constantsString, datatableString);
+        ExternalDataset dataset = ExternalDatasetEntityMapper.getExternalDataset(datasetIdString, constantsString, datatableString);
 
         // Then
-        assertThat(externalDataset.getDatasetId()).isNotNull();
-        assertThat(externalDataset.getDatasetId()).isEqualTo("DATASET_ID");
-        assertThat(externalDataset.getConstants()).isNotNull();
-        assertThat(externalDataset.getConstants()).containsAllEntriesOf(constants);
-        assertThat(externalDataset.getDatatable()).isNotNull();
-        assertThat(externalDataset.getDatatable()).hasSize(2);
-        assertThat(externalDataset.getDatatable().get(0)).containsAllEntriesOf(datatable.get(0));
-        assertThat(externalDataset.getDatatable().get(1)).containsAllEntriesOf(datatable.get(1));
+        assertThat(dataset.getDatasetId()).isNotNull();
+        assertThat(dataset.getDatasetId()).isEqualTo("DATASET_ID");
+        assertThat(dataset.getConstants()).isNotNull();
+        assertThat(dataset.getConstants()).containsAllEntriesOf(constants);
+        assertThat(dataset.getDatatable()).isNotNull();
+        assertThat(dataset.getDatatable()).hasSize(2);
+        assertThat(dataset.getDatatable().get(0)).containsAllEntriesOf(datatable.get(0));
+        assertThat(dataset.getDatatable().get(1)).containsAllEntriesOf(datatable.get(1));
     }
 
     @Test

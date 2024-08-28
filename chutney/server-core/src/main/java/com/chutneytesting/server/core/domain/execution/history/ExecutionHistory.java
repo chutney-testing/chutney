@@ -43,7 +43,7 @@ public interface ExecutionHistory {
 
         String environment();
 
-        Optional<ExternalDataset> externalDataset();
+        Optional<ExternalDataset> dataset();
 
         String user();
 

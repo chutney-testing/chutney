@@ -72,7 +72,7 @@ public class ScenarioExecutionReportEntity {
             .testCaseTitle(scenarioExecution.scenarioTitle())
             .environment(scenarioExecution.environment())
             .user(scenarioExecution.userId())
-            .externalDataset(ofNullable(getExternalDataset(scenarioExecution.datasetId(), scenarioExecution.datasetConstants(), scenarioExecution.datasetDatatable())))
+            .dataset(ofNullable(getExternalDataset(scenarioExecution.datasetId(), scenarioExecution.datasetConstants(), scenarioExecution.datasetDatatable())))
             .scenarioId(scenarioExecution.scenarioId())
             .tags(TagListMapper.tagsStringToSet(scenarioExecution.tags()))
             .build();

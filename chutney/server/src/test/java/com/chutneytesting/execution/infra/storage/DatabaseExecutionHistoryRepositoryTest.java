@@ -399,7 +399,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .environment("env")
                 .addScenarioExecutionReport(scenarioExecutionOneReport)
                 .userId("user")
-                .externalDataset(new ExternalDataset("ds287"))
+                .dataset(new ExternalDataset("ds287"))
                 .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
@@ -435,7 +435,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .environment("env")
                 .addScenarioExecutionReport(scenarioExecutionOneReport)
                 .userId("user")
-                .externalDataset(new ExternalDataset("ds287"))
+                .dataset(new ExternalDataset("ds287"))
                 .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
@@ -610,7 +610,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                     .report(report)
                     .testCaseTitle("Fake title")
                     .environment("")
-                    .externalDataset(new ExternalDataset("fake dataset id"))
+                    .dataset(new ExternalDataset("fake dataset id"))
                     .user("")
                     .build();
             }
@@ -626,7 +626,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .report(buildReport())
                 .testCaseTitle("Fake title")
                 .environment("")
-                .externalDataset(new ExternalDataset("fake dataset id"))
+                .dataset(new ExternalDataset("fake dataset id"))
                 .user("")
                 .tags(defaultScenarioTags())
                 .build();
