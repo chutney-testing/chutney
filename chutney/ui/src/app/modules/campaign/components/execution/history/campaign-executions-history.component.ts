@@ -99,6 +99,7 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
 
     private replay() {
         const lastReport = this.campaignReports[0]
+        console.log(lastReport)
         this.campaignService.executeCampaign(this.campaign.id, lastReport.report.executionEnvironment).subscribe()
         this.refreshCampaign()
     }

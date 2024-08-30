@@ -297,13 +297,13 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
 
     replay(executionId: number) {
         const execution = this.executions.find(exec => exec.executionId === executionId);
-        const datatable: Array<Array<KeyValue>> = execution.externalDataset.datatable.map(obj =>
+        const datatable: Array<Array<KeyValue>> = execution.dataset.multipleValues.map(obj =>
             Object.entries(obj).map(([key, value]) => ({ key, value }))
         ) as Array<Array<KeyValue>>;
-        const constants: Array<KeyValue>  = Object.entries(execution.externalDataset.constants).map(([key, value]) => {
+        const constants: Array<KeyValue>  = Object.entries(execution.dataset.uniqueValues).map(([key, value]) => {
             return { key, value };
         }) as Array<KeyValue>;
-        const dataset = execution.externalDataset ? new Dataset(execution.externalDataset.datasetId, "", [], new Date(), constants, datatable, execution.externalDataset.datasetId) : null;
+        const dataset = execution.dataset ? new Dataset(execution.dataset.id, "", [], new Date(), constants, datatable, execution.dataset.id) : null;
         this.executeScenario(execution.environment, dataset)
     }
 

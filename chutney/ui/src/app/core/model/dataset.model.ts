@@ -15,7 +15,7 @@ export class Dataset {
         public lastUpdated: Date,
         public uniqueValues: Array<KeyValue>,
         public multipleValues: Array<Array<KeyValue>>,
-        public datasetId?: string) {
+        public id?: string) {
     }
 
     getMultipleValueHeader(): Array<string> {

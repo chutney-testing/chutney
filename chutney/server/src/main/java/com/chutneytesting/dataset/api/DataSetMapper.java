@@ -14,7 +14,7 @@ public class DataSetMapper {
 
     public static DataSetDto toDto(DataSet dataSet) {
         return ImmutableDataSetDto.builder()
-            .datasetId(dataSet.id)
+            .id(dataSet.id)
             .name(dataSet.name)
             .description(dataSet.description)
             .lastUpdated(dataSet.creationDate)
@@ -26,7 +26,7 @@ public class DataSetMapper {
 
     public static DataSet fromDto(DataSetDto dto) {
         return DataSet.builder()
-            .withId(dto.datasetId().orElse(null))
+            .withId(dto.id().orElse(null))
             .withName(dto.name())
             .withDescription(dto.description())
             .withCreationDate(dto.lastUpdated())

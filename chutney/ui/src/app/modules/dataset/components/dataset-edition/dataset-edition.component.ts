@@ -112,11 +112,11 @@ export class DatasetEditionComponent extends CanDeactivatePage implements OnInit
     save() {
         const dataset = this.createDataset();
         this.errorDuplicateHeader = false;
-        this.dataSetService.save(dataset, this.previousDataSet.datasetId)
+        this.dataSetService.save(dataset, this.previousDataSet.id)
             .subscribe({
                 next: (res) => {
                     this.setCurrentDataSet(res);
-                    this.location.replaceState('/dataset/' + this.dataset.datasetId + '/edition');
+                    this.location.replaceState('/dataset/' + this.dataset.id + '/edition');
                     this.notify(this.savedMessage, null);
                     this.modificationsSaved = true;
                 },
@@ -156,7 +156,7 @@ export class DatasetEditionComponent extends CanDeactivatePage implements OnInit
     }
 
     deleteDataset() {
-        this.dataSetService.delete(this.dataset.datasetId).subscribe(
+        this.dataSetService.delete(this.dataset.id).subscribe(
             () => {
                 this.modificationsSaved = true;
                 this.router.navigateByUrl('/dataset');
@@ -176,7 +176,7 @@ export class DatasetEditionComponent extends CanDeactivatePage implements OnInit
         const mkv = this.datasetForm.controls['multiKeyValues'] as FormArray;
         const multiKeyValues = mkv.value ? mkv.value.map(a => a.map((p) => new KeyValue(p.key, p.value))) : [];
 
-        const id = this.dataset.datasetId ? this.dataset.datasetId : null;
+        const id = this.dataset.id ? this.dataset.id : null;
 
         return new Dataset(
             name,
@@ -190,7 +190,7 @@ export class DatasetEditionComponent extends CanDeactivatePage implements OnInit
     }
 
     private dataSetNameFocus(): void {
-        if (this.dataset.datasetId == null || this.dataset.datasetId.length === 0) {
+        if (this.dataset.id == null || this.dataset.id.length === 0) {
             this.dataSetName.nativeElement.focus();
         }
     }

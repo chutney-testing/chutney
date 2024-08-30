@@ -78,7 +78,7 @@ export class ScenarioJiraLinksModalComponent implements OnInit {
     }
 
     selectDataset(dataset: string,index: number) {
-        this.datasetForm["controls"][index].get("datasetId").setValue(dataset);
+        this.datasetForm["controls"][index].get("id").setValue(dataset);
     }
 
     getJiraLink(id: string) {

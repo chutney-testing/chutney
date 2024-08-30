@@ -87,14 +87,14 @@ class DatasetServiceTest {
             .setDescription("")
             .setEnvironment("Env")
             .setTags(List.of())
-            .setExternalDatasetId(datasetId)
+            .setDatasetId(datasetId)
             .build();
         when(campaignRepository.findAll()).thenReturn(List.of(campaign));
 
         GwtTestCase expectedScenario = GwtTestCase.builder().from(testCase).withMetadata(
             TestCaseMetadataImpl.TestCaseMetadataBuilder.from(metadata).build()
         ).build();
-        Campaign expectedCampaign = CampaignBuilder.builder().from(campaign).setExternalDatasetId("").build();
+        Campaign expectedCampaign = CampaignBuilder.builder().from(campaign).setDatasetId("").build();
 
         sut.remove(datasetId);
 

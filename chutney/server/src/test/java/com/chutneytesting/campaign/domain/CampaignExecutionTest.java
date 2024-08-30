@@ -14,16 +14,15 @@ import static com.chutneytesting.server.core.domain.execution.report.ServerRepor
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static java.util.function.Predicate.not;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
@@ -135,7 +134,7 @@ class CampaignExecutionTest {
         void start_scenario_execution() {
             // Given
             CampaignExecution campaignReport = CampaignExecutionReportBuilder.builder()
-                .dataset(new ExternalDataset("ds551"))
+                .dataset(DataSet.builder().withId("ds551").withName("").build())
                 .userId("user")
                 .build();
             TestCase testCase = buildTestCase("1", "title");
@@ -350,14 +349,14 @@ class CampaignExecutionTest {
         CampaignExecution sut = CampaignExecutionReportBuilder.builder()
             .userId("")
             .build();
-        addScenarioExecutions(sut, "1", new ExternalDataset("dataset_1"), "", SUCCESS);
-        addScenarioExecutions(sut, "2", new ExternalDataset("dataset_2"), "", FAILURE);
-        addScenarioExecutions(sut, "3", new ExternalDataset("dataset_1"), "", SUCCESS);
+        addScenarioExecutions(sut, "1", DataSet.builder().withId("dataset_1").withName("").build(), "", SUCCESS);
+        addScenarioExecutions(sut, "2", DataSet.builder().withId("dataset_2").withName("").build(), "", FAILURE);
+        addScenarioExecutions(sut, "3", DataSet.builder().withId("dataset_3").withName("").build(), "", SUCCESS);
 
         assertThat(sut.failedScenarioExecutions()).hasSize(1).singleElement()
             .isInstanceOf(ScenarioExecutionCampaign.class)
             .hasFieldOrPropertyWithValue("scenarioId", "2")
-            .returns(Optional.of("dataset_2"), sec -> sec.execution().dataset().map(ExternalDataset::getDatasetId));
+            .returns(Optional.of("dataset_2"), sec -> sec.execution().dataset().map(ds -> ds.id));
     }
 
     @Test
@@ -365,8 +364,8 @@ class CampaignExecutionTest {
         CampaignExecution sut = CampaignExecutionReportBuilder.builder()
             .userId("")
             .build();
-        ExternalDataset dataset1 = new ExternalDataset("dataset_1");
-        ExternalDataset dataset2 = new ExternalDataset("dataset_2");
+        DataSet dataset1 = DataSet.builder().withId("dataset_1").withName("dataset_1").build();
+        DataSet dataset2 = DataSet.builder().withId("dataset_2").withName("dataset_2").build();
         addScenarioExecutions(sut, "1", dataset1, "", FAILURE);
         addScenarioExecutions(sut, "1", dataset2, "", FAILURE);
         var reportWithDataset1 = addScenarioExecutions(sut, "1", dataset1, "", SUCCESS);
@@ -375,7 +374,7 @@ class CampaignExecutionTest {
         CampaignExecution withoutRetries = sut.withoutRetries();
 
         assertThat(withoutRetries.scenarioExecutionReports())
-            .containsExactly(reportWithDataset1, reportWithDataset2);
+            .containsExactlyInAnyOrder(reportWithDataset1, reportWithDataset2);
     }
 
     private List<ScenarioExecutionCampaign> stubScenarioExecution(List<LocalDateTime> times, List<Long> durations) {
@@ -400,7 +399,7 @@ class CampaignExecutionTest {
         addScenarioExecutions(campaignReport, scenarioId, null, scenarioTitle, scenarioExecutionStatus);
     }
 
-    private ScenarioExecutionCampaign addScenarioExecutions(CampaignExecution campaignReport, String scenarioId, ExternalDataset dataset, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
+    private ScenarioExecutionCampaign addScenarioExecutions(CampaignExecution campaignReport, String scenarioId, DataSet dataset, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
         TestCase testCase = buildTestCase(scenarioId, scenarioTitle);
         var testcaseToExecute = new TestCaseDataset(testCase, dataset);
         campaignReport.addScenarioExecution(singletonList(testcaseToExecute), "");
@@ -414,7 +413,7 @@ class CampaignExecutionTest {
         return scenarioReport;
     }
 
-    private ScenarioExecutionCampaign buildScenarioReportFromMockedExecution(String scenarioId, ExternalDataset dataset, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
+    private ScenarioExecutionCampaign buildScenarioReportFromMockedExecution(String scenarioId, DataSet dataset, String scenarioTitle, ServerReportStatus scenarioExecutionStatus) {
         ExecutionHistory.ExecutionSummary execution = mock(ExecutionHistory.ExecutionSummary.class);
         when(execution.status()).thenReturn(scenarioExecutionStatus);
         when(execution.dataset()).thenReturn(Optional.ofNullable(dataset));

@@ -7,8 +7,8 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,7 @@ public class CampaignExecutionReportBuilder {
     private String campaignName;
     private boolean partialExecution;
     private String executionEnvironment;
-    private ExternalDataset dataset;
+    private DataSet dataset;
     private String userId;
 
     // Optional fields
@@ -66,7 +66,7 @@ public class CampaignExecutionReportBuilder {
         return this;
     }
 
-    public CampaignExecutionReportBuilder dataset(ExternalDataset dataset) {
+    public CampaignExecutionReportBuilder dataset(DataSet dataset) {
         this.dataset = dataset;
         return this;
     }

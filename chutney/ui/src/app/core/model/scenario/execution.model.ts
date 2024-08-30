@@ -6,8 +6,7 @@
  */
 
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
-import { CampaignExecutionReport } from '@core/model';
-import { ExternalDataset } from "@core/model/external-dataset.model";
+import {CampaignExecutionReport, Dataset} from '@core/model';
 
 export class Execution {
 
@@ -27,7 +26,7 @@ export class Execution {
     public error?: string,
     public scenarioId?: string,
     public campaignReport?: CampaignExecutionReport,
-    public externalDataset?: ExternalDataset,
+    public dataset?: Dataset,
 
   ) { }
 
@@ -50,7 +49,7 @@ export class Execution {
       jsonObject.error,
       jsonObject.scenarioId,
       jsonObject.campaignReport,
-      jsonObject.externalDataset
+      jsonObject.dataset
     );
   }
 }

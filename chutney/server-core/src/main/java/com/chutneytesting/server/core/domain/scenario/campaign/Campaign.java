@@ -21,7 +21,7 @@ public class Campaign {
     public final List<String> tags;
 
     private String environment;
-    private String externalDatasetId;
+    private String datasetId;
 
     public Campaign(Long id,
                     String title,
@@ -30,7 +30,7 @@ public class Campaign {
                     String environment,
                     boolean parallelRun,
                     boolean retryAuto,
-                    String externalDatasetId,
+                    String datasetId,
                     List<String> tags) {
         this.id = id;
         this.title = title;
@@ -39,7 +39,7 @@ public class Campaign {
         this.parallelRun = parallelRun;
         this.retryAuto = retryAuto;
         this.environment = environment;
-        this.externalDatasetId = externalDatasetId;
+        this.datasetId = datasetId;
         this.tags = tags;
     }
 
@@ -47,8 +47,8 @@ public class Campaign {
         this.environment = environment;
     }
 
-    public void executionDataset(String externalDatasetId) {
-        this.externalDatasetId = externalDatasetId;
+    public void executionDataset(String datasetId) {
+        this.datasetId = datasetId;
     }
 
     public String executionEnvironment() {
@@ -56,7 +56,7 @@ public class Campaign {
     }
 
     public String executionDataset() {
-        return this.externalDatasetId;
+        return this.datasetId;
     }
 
     @Override
@@ -71,7 +71,7 @@ public class Campaign {
             parallelRun == campaign.parallelRun &&
             retryAuto == campaign.retryAuto &&
             environment.equals(campaign.environment) &&
-            externalDatasetId.equals(campaign.externalDatasetId) &&
+            datasetId.equals(campaign.datasetId) &&
             tags.equals(campaign.tags);
     }
 

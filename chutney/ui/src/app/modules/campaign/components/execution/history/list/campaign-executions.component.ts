@@ -85,7 +85,7 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.report.status))].map(status => this.toSelectOption(status,  this.translateService.instant(ExecutionStatus.toString(status))));
         this.environments = [...new Set(this.executions.map(exec => exec.report.executionEnvironment))].map(env => this.toSelectOption(env));
-        this.datasets = [...new Set(this.executions.map(exec => exec.report.dataset))].map(dataset => dataset ? this.toSelectOption(dataset.datasetId ? dataset.datasetId : "Custom") : null);
+        this.datasets = [...new Set(this.executions.map(exec => exec.report.dataset))].map(dataset => dataset ? this.toSelectOption(dataset.id ? dataset.id : "Custom") : null);
         this.executors = [...new Set(this.executions.map(exec => exec.report.user))].map(user => this.toSelectOption(user));
     }
 
@@ -110,8 +110,8 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
 
     protected getDataset(execution: CampaignReport) {
         if (execution.report.dataset) {
-            if (execution.report.dataset?.datasetId) {
-                return execution.report.dataset?.datasetId
+            if (execution.report.dataset?.id) {
+                return execution.report.dataset?.id
             }
             return 'Custom'
         }

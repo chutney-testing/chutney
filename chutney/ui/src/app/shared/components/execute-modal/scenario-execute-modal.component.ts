@@ -174,7 +174,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
 
     getDatasetDetails() {
         if (this.selectedDataset) {
-            this.datasetService.findById(this.selectedDataset?.datasetId).subscribe((res: Dataset) => {
+            this.datasetService.findById(this.selectedDataset?.id).subscribe((res: Dataset) => {
                 this.datasetDetails = res;
             });
         } else {

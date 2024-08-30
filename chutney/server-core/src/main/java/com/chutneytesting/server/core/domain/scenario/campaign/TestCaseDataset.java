@@ -7,14 +7,11 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
-import static java.util.Optional.ofNullable;
-import static java.util.function.Predicate.not;
-
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
 import java.util.Objects;
 
-public record TestCaseDataset(TestCase testcase, ExternalDataset dataset) {
+public record TestCaseDataset(TestCase testcase, DataSet dataset) {
 
     @Override
     public boolean equals(Object o) {
@@ -24,9 +21,9 @@ public record TestCaseDataset(TestCase testcase, ExternalDataset dataset) {
         return Objects.equals(testcase.id(), that.testcase.id()) &&
             ((dataset == null && that.dataset == null) ||
                 (dataset != null && that.dataset != null &&
-                    (Objects.equals(dataset.getDatasetId(), that.dataset().getDatasetId()) &&
-                        Objects.equals(dataset.getConstants(), that.dataset().getConstants()) &&
-                        Objects.equals(dataset.getDatatable(), that.dataset().getDatatable())
+                    (Objects.equals(dataset.id, that.dataset().id) &&
+                        Objects.equals(dataset.constants, that.dataset().constants) &&
+                        Objects.equals(dataset.datatable, that.dataset().datatable)
                     )
                 )
             );

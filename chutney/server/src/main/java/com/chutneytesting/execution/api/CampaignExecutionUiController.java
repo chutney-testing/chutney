@@ -8,10 +8,11 @@
 package com.chutneytesting.execution.api;
 
 import static com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper.toDto;
+import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper;
-import com.chutneytesting.dataset.api.ExternalDatasetDto;
+import com.chutneytesting.dataset.api.ExecutionDatasetDto;
 import com.chutneytesting.dataset.api.KeyValue;
 import com.chutneytesting.execution.api.report.surefire.SurefireCampaignExecutionReportBuilder;
 import com.chutneytesting.execution.api.report.surefire.SurefireScenarioExecutionReportBuilder;
@@ -120,19 +121,17 @@ public class CampaignExecutionUiController {
     public CampaignExecutionReportDto executeCampaignById(
             @PathVariable("campaignId") Long campaignId,
             @PathVariable("env") Optional<String> environment,
-            @RequestBody ExternalDatasetDto dataset
+            @RequestBody ExecutionDatasetDto dataset
     ) {
         String userId = userService.currentUser().getId();
         CampaignExecution report;
-        DataSet ds;
-        if (dataset == null) {
-            ds = null;
-        } else {
+        DataSet ds = null;
+        if (dataset != null) {
             ds = DataSet.builder()
-                .withId(dataset.datasetId().orElse(null))
-                .withName(dataset.datasetId().orElse(""))
-                .withConstants(KeyValue.toMap(dataset.constants()))
-                .withDatatable(dataset.datatable().stream().map(KeyValue::toMap).toList())
+                .withId(dataset.getId())
+                .withName("")
+                .withConstants(ofNullable(dataset.getConstants()).map(KeyValue::toMap).orElse(null))
+                .withDatatable(ofNullable(dataset.getDatatable()).map(datatable -> datatable.stream().map(KeyValue::toMap).toList()).orElse(null))
                 .build();
         }
         report = campaignExecutionEngine.executeByIdWithEnvAndDataset(campaignId, environment.orElse(null), ds, userId);

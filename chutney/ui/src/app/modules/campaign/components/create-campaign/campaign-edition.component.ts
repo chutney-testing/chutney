@@ -99,7 +99,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         this.loadAllScenarios();
         this.datasetService.findAll().subscribe((res: Array<Dataset>) => {
             this.datasets = res.map(dataset => {
-                return {"id": dataset.datasetId, "text": dataset.name}
+                return {"id": dataset.id, "text": dataset.name}
             });
         });
         this.dropdownDatasetSettings = {...this.dropdownSettings, singleSelection: true}

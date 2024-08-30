@@ -7,7 +7,7 @@
 
 package com.chutneytesting.execution.api;
 
-import com.chutneytesting.dataset.api.ExternalDatasetDto;
+import com.chutneytesting.dataset.api.DataSetDto;
 import com.chutneytesting.dataset.api.KeyValue;
 import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.environment.api.environment.EmbeddedEnvironmentApi;
@@ -106,16 +106,16 @@ public class ScenarioExecutionUiController {
 
     @PreAuthorize("hasAuthority('SCENARIO_EXECUTE')")
     @PostMapping(path = {"/api/ui/scenario/executionasync/v1/{scenarioId}/{env}", "/api/ui/scenario/executionasync/v1/{scenarioId}/{env}"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env, @RequestBody(required = false) ExternalDatasetDto dataset) {
+    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env, @RequestBody(required = false) DataSetDto dataset) {
         LOGGER.debug("execute async scenario '{}'", scenarioId);
         TestCase testCase = testCaseRepository.findExecutableById(scenarioId).orElseThrow(() -> new ScenarioNotFoundException(scenarioId));
         String userId = userService.currentUser().getId();
         DataSet execDataset = Optional.ofNullable(dataset).map(eds -> {
-            if (eds.datasetId().isPresent()) {
-                return datasetRepository.findById(eds.datasetId().get());
+            if (eds.id().isPresent()) {
+                return datasetRepository.findById(eds.id().get());
             }
             return DataSet.builder()
-                .withName(eds.datasetId().orElse(""))
+                .withName(eds.id().orElse(""))
                 .withConstants(KeyValue.toMap(eds.constants()))
                 .withDatatable(eds.datatable().stream().map(KeyValue::toMap).toList())
                 .build();

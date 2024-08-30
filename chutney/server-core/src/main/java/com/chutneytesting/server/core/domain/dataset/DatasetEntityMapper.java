@@ -10,7 +10,6 @@ package com.chutneytesting.server.core.domain.dataset;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
 
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ExternalDatasetEntityMapper {
+public class DatasetEntityMapper {
 
     private static ObjectMapper mapper = new ObjectMapper();
 
@@ -68,29 +67,27 @@ public class ExternalDatasetEntityMapper {
         }
     }
 
-    public static ExternalDataset getExternalDataset(String datasetId, String datasetConstants, String datasetDatatable) {
+    public static DataSet getDataset(String datasetId, String datasetConstants, String datasetDatatable) {
         if (datasetId == null && (datasetConstants == null || datasetConstants.isEmpty()) && (datasetDatatable == null || datasetDatatable.isEmpty())) {
             return null;
         }
-        return new ExternalDataset(
-            datasetId,
-            datasetConstantsFromString(datasetConstants),
-            datasetDatatableFromString(datasetDatatable)
-        );
+        return DataSet.builder()
+            .withId(datasetId)
+            .withName("")
+            .withConstants(datasetConstantsFromString(datasetConstants))
+            .withDatatable(datasetDatatableFromString(datasetDatatable))
+            .build();
     }
 
-    public static boolean compareExternalDataset(ExternalDataset dataset1, ExternalDataset dataset2) {
+    public static boolean compareDataset(DataSet dataset1, DataSet dataset2) {
         if (dataset1 == null && dataset2 == null) {
             return true;
         } else if (dataset1 == null || dataset2 == null) {
             return false;
-        } else if (dataset1.getDatasetId() != null) {
-            return dataset1.getDatasetId().equals(dataset2.getDatasetId());
-        } else if (compareConstantsDataset(dataset2.getConstants(), dataset1.getConstants()) &&
-            compareDatatableDataset(dataset2.getDatatable(), dataset1.getDatatable())) {
-            return true;
-        }
-        return false;
+        } else if (dataset1.id != null) {
+            return dataset1.id.equals(dataset2.id);
+        } else return compareConstantsDataset(dataset2.constants, dataset1.constants) &&
+            compareDatatableDataset(dataset2.datatable, dataset1.datatable);
     }
 
     private static boolean compareConstantsDataset(Map<String, String> constant1, Map<String, String> constant2) {

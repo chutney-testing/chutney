@@ -27,7 +27,7 @@ import org.immutables.value.Value;
 @Value.Style(jdkOnly = true)
 public interface DataSetDto {
 
-    Optional<String> datasetId();
+    Optional<String> id();
     String name();
 
     @Value.Default()

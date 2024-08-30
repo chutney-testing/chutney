@@ -398,7 +398,7 @@ public class CampaignExecutionEngineTest {
 
         // Then
         verify(campaignRepository).findById(campaign.id);
-        assertThat(execution.dataset.getDatasetId()).isEqualTo(executionDataset.id);
+        assertThat(execution.dataset.id).isEqualTo(executionDataset.id);
     }
 
     @Test
@@ -431,7 +431,7 @@ public class CampaignExecutionEngineTest {
         // Then
         verify(campaignRepository).findByName(campaign.title);
         assertThat(campaignExecutions).hasSize(1);
-        assertThat(campaignExecutions.get(0).dataset.getDatasetId()).isEqualTo(executionDataset.id);
+        assertThat(campaignExecutions.get(0).dataset.id).isEqualTo(executionDataset.id);
     }
 
     @Test
@@ -591,13 +591,13 @@ public class CampaignExecutionEngineTest {
         // Then
         assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.dataset).isNotNull();
-        assertThat(campaignExecution.dataset.getDatasetId()).isNull();
-        assertThat(campaignExecution.dataset.getConstants()).isEqualTo(constants);
-        assertThat(campaignExecution.dataset.getDatatable()).isEqualTo(datatable);
+        assertThat(campaignExecution.dataset.id).isNull();
+        assertThat(campaignExecution.dataset.constants).isEqualTo(constants);
+        assertThat(campaignExecution.dataset.datatable).isEqualTo(datatable);
         assertThat(campaignExecution.scenarioExecutionReports()).isNotEmpty();
         assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset()).isPresent();
-        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset().get().getConstants()).isEqualTo(constants);
-        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset().get().getDatatable()).isEqualTo(datatable);
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset().get().constants).isEqualTo(constants);
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset().get().datatable).isEqualTo(datatable);
     }
 
     @Test
@@ -617,12 +617,12 @@ public class CampaignExecutionEngineTest {
         // Then
         assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.dataset).isNotNull();
-        assertThat(campaignExecution.dataset.getConstants()).isEmpty();
-        assertThat(campaignExecution.dataset.getDatatable()).isEmpty();
-        assertThat(campaignExecution.dataset.getDatasetId()).isNotNull();
-        assertThat(campaignExecution.dataset.getDatasetId()).isEqualTo("DATASET_ID");
+        assertThat(campaignExecution.dataset.constants).isEmpty();
+        assertThat(campaignExecution.dataset.datatable).isEmpty();
+        assertThat(campaignExecution.dataset.id).isNotNull();
+        assertThat(campaignExecution.dataset.id).isEqualTo("DATASET_ID");
         assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset()).isPresent();
-        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset().get().getDatasetId()).isEqualTo("DATASET_ID");
+        assertThat(campaignExecution.scenarioExecutionReports().get(0).execution().dataset().get().id).isEqualTo("DATASET_ID");
     }
 
     @Test
@@ -641,10 +641,10 @@ public class CampaignExecutionEngineTest {
         // Then
         assertThat(campaign.executionDataset()).isNotNull();
         assertThat(campaignExecution.dataset).isNotNull();
-        assertThat(campaignExecution.dataset.getConstants()).isEmpty();
-        assertThat(campaignExecution.dataset.getDatatable()).isEmpty();
-        assertThat(campaignExecution.dataset.getDatasetId()).isNotNull();
-        assertThat(campaignExecution.dataset.getDatasetId()).isEqualTo("DATASET_ID");
+        assertThat(campaignExecution.dataset.constants).isEmpty();
+        assertThat(campaignExecution.dataset.datatable).isEmpty();
+        assertThat(campaignExecution.dataset.id).isNotNull();
+        assertThat(campaignExecution.dataset.id).isEqualTo("DATASET_ID");
     }
 
     @Test

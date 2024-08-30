@@ -5,7 +5,7 @@
  *
  */
 
-import { ExternalDataset } from "@core/model/external-dataset.model";
+import {Dataset} from "@core/model";
 
 export class ScenarioExecutionReportOutline {
     constructor(
@@ -17,6 +17,6 @@ export class ScenarioExecutionReportOutline {
         public startDate?: Date,
         public info: Array<string> = [],
         public error: Array<string> = [],
-        public dataset?: ExternalDataset
+        public dataset?: Dataset
     ) {}
 }

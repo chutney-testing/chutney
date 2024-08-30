@@ -18,7 +18,7 @@ public class CampaignBuilder {
     private String environment;
     private boolean parallelRun;
     private boolean retryAuto;
-    private String externalDatasetId;
+    private String datasetId;
     private List<String> tags;
 
     public static CampaignBuilder builder() {
@@ -63,8 +63,8 @@ public class CampaignBuilder {
         return this;
     }
 
-    public CampaignBuilder setExternalDatasetId(String externalDatasetId) {
-        this.externalDatasetId = externalDatasetId;
+    public CampaignBuilder setDatasetId(String datasetId) {
+        this.datasetId = datasetId;
         return this;
     }
 
@@ -81,13 +81,13 @@ public class CampaignBuilder {
         this.environment = campaign.executionEnvironment();
         this.parallelRun = campaign.parallelRun;
         this.retryAuto = campaign.retryAuto;
-        this.externalDatasetId = campaign.executionDataset() ;
+        this.datasetId = campaign.executionDataset() ;
         this.tags = campaign.tags;
 
         return this;
     }
 
     public Campaign build() {
-        return new Campaign(id, title, description, campaignScenarios, environment, parallelRun, retryAuto, externalDatasetId, tags);
+        return new Campaign(id, title, description, campaignScenarios, environment, parallelRun, retryAuto, datasetId, tags);
     }
 }

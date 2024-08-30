@@ -7,7 +7,7 @@
 
 package com.chutneytesting.execution.infra.storage.jpa;
 
-import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.getExternalDataset;
+import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.getDataset;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
@@ -72,7 +72,7 @@ public class ScenarioExecutionReportEntity {
             .testCaseTitle(scenarioExecution.scenarioTitle())
             .environment(scenarioExecution.environment())
             .user(scenarioExecution.userId())
-            .dataset(ofNullable(getExternalDataset(scenarioExecution.datasetId(), scenarioExecution.datasetConstants(), scenarioExecution.datasetDatatable())))
+            .dataset(ofNullable(getDataset(scenarioExecution.datasetId(), scenarioExecution.datasetConstants(), scenarioExecution.datasetDatatable())))
             .scenarioId(scenarioExecution.scenarioId())
             .tags(TagListMapper.tagsStringToSet(scenarioExecution.tags()))
             .build();

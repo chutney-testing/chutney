@@ -7,7 +7,7 @@
 
 package com.chutneytesting.campaign.api.dto;
 
-import com.chutneytesting.dataset.api.ExternalDatasetDto;
+import com.chutneytesting.dataset.api.DataSetDto;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,7 +24,7 @@ public class CampaignExecutionReportDto {
     private final List<ScenarioExecutionReportOutlineDto> scenarioExecutionReports;
     private final boolean partialExecution;
     private final String executionEnvironment;
-    private final ExternalDatasetDto dataset;
+    private final DataSetDto dataset;
     @JsonProperty("user")
     private final String userId;
     private final Long duration;
@@ -36,7 +36,7 @@ public class CampaignExecutionReportDto {
                                       ServerReportStatus status,
                                       boolean partialExecution,
                                       String executionEnvironment,
-                                      ExternalDatasetDto dataset,
+                                      DataSetDto dataset,
                                       String userId,
                                       Long duration) {
         this.executionId = executionId;
@@ -94,7 +94,7 @@ public class CampaignExecutionReportDto {
         return userId;
     }
 
-    public ExternalDatasetDto getDataset() {
+    public DataSetDto getDataset() {
         return dataset;
     }
 }

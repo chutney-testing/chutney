@@ -46,10 +46,10 @@ export class CampaignReportService {
         pdf.text(docRecap, 148, 30, { align: 'center' });
 
         let dataHeader, dataBody;
-        const hasDataset = report.scenarioExecutionReports.some(s => s.externalDataset);
+        const hasDataset = report.scenarioExecutionReports.some(s => s.dataset);
         if(hasDataset){
             dataHeader = [["id", "Scenario", "Status", "Dataset", "error"]];
-            dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.externalDataset, s.error.toString()]);
+            dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.dataset, s.error.toString()]);
         } else {
             dataHeader = [["id", "Scenario", "Status", "error"]];
             dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.error.toString()]);
@@ -89,8 +89,8 @@ export class CampaignReportService {
                 }
                 let r = this.buildExecutionReport(s);
                 pdf.text(r.scenarioName, 15, 25);
-                if(s.externalDataset) {
-                    pdf.text(`${this.translate.instant('scenarios.execution.dataset.title')}: ${s.externalDataset}`, 15, startY);
+                if(s.dataset) {
+                    pdf.text(`${this.translate.instant('scenarios.execution.dataset.title')}: ${s.dataset}`, 15, startY);
                     startY += 5;
                 }
                 const scenarioReportBody = r.report.steps.map(step => [step.name, step.status, this.buildErrorMessage(step)]);

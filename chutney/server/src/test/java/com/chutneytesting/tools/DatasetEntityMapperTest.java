@@ -9,8 +9,8 @@ package com.chutneytesting.tools;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
+import com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +18,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 
 
-public class ExternalDatasetEntityMapperTest {
+public class DatasetEntityMapperTest {
 
     @Test
     public void should_map_external_dataset() {
@@ -38,27 +38,27 @@ public class ExternalDatasetEntityMapperTest {
         );
 
         // When
-        ExternalDataset dataset = ExternalDatasetEntityMapper.getExternalDataset(datasetIdString, constantsString, datatableString);
+        DataSet dataset = DatasetEntityMapper.getDataset(datasetIdString, constantsString, datatableString);
 
         // Then
-        assertThat(dataset.getDatasetId()).isNotNull();
-        assertThat(dataset.getDatasetId()).isEqualTo("DATASET_ID");
-        assertThat(dataset.getConstants()).isNotNull();
-        assertThat(dataset.getConstants()).containsAllEntriesOf(constants);
-        assertThat(dataset.getDatatable()).isNotNull();
-        assertThat(dataset.getDatatable()).hasSize(2);
-        assertThat(dataset.getDatatable().get(0)).containsAllEntriesOf(datatable.get(0));
-        assertThat(dataset.getDatatable().get(1)).containsAllEntriesOf(datatable.get(1));
+        assertThat(dataset.id).isNotNull();
+        assertThat(dataset.id).isEqualTo("DATASET_ID");
+        assertThat(dataset.constants).isNotNull();
+        assertThat(dataset.constants).containsAllEntriesOf(constants);
+        assertThat(dataset.datatable).isNotNull();
+        assertThat(dataset.datatable).hasSize(2);
+        assertThat(dataset.datatable.get(0)).containsAllEntriesOf(datatable.get(0));
+        assertThat(dataset.datatable.get(1)).containsAllEntriesOf(datatable.get(1));
     }
 
     @Test
     public void should_compare_same_external_dataset() {
         //Given
-        ExternalDataset dataset1 = new ExternalDataset("DATASET_ID", Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
-        ExternalDataset dataset2 = new ExternalDataset("DATASET_ID", Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+        DataSet dataset1 = DataSet.builder().withName("").withId("DATASET_ID").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
+        DataSet dataset2 = DataSet.builder().withName("").withId("DATASET_ID").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
 
         // When
-        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
 
         // Then
         assertThat(result).isTrue();
@@ -67,11 +67,11 @@ public class ExternalDatasetEntityMapperTest {
     @Test
     public void should_compare_external_dataset_with_different_id() {
         //Given
-        ExternalDataset dataset1 = new ExternalDataset("DATASET_ID_1", Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
-        ExternalDataset dataset2 = new ExternalDataset("DATASET_ID_2", Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+        DataSet dataset1 = DataSet.builder().withName("").withId("DATASET_ID_1").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
+        DataSet dataset2 = DataSet.builder().withName("").withId("DATASET_ID_2").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
 
         // When
-        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
 
         // Then
         assertThat(result).isFalse();
@@ -80,11 +80,11 @@ public class ExternalDatasetEntityMapperTest {
     @Test
     public void should_compare_external_dataset_with_different_constants() {
         //Given
-        ExternalDataset dataset1 = new ExternalDataset(null, Map.of("HEADER", "DIFFERENT VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
-        ExternalDataset dataset2 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+        DataSet dataset1 = DataSet.builder().withId(null).withName("").withConstants(Map.of("HEADER", "DIFFERENT VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
+        DataSet dataset2 = DataSet.builder().withId(null).withName("").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
 
         // When
-        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
 
         // Then
         assertThat(result).isFalse();
@@ -93,11 +93,11 @@ public class ExternalDatasetEntityMapperTest {
     @Test
     public void should_compare_external_dataset_with_different_datatable_different_length() {
         //Given
-        ExternalDataset dataset1 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1")));
-        ExternalDataset dataset2 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
+        DataSet dataset1 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"))).build();
+        DataSet dataset2 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
 
         // When
-        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
 
         // Then
         assertThat(result).isFalse();
@@ -106,11 +106,11 @@ public class ExternalDatasetEntityMapperTest {
     @Test
     public void should_compare_external_dataset_with_different_datatable_different_value() {
         //Given
-        ExternalDataset dataset1 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2")));
-        ExternalDataset dataset2 = new ExternalDataset(null, Map.of("HEADER", "VALUE"), List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE_DIFF")));
+        DataSet dataset1 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
+        DataSet dataset2 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE_DIFF"))).build();
 
         // When
-        boolean result = ExternalDatasetEntityMapper.compareExternalDataset(dataset1, dataset2);
+        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
 
         // Then
         assertThat(result).isFalse();
@@ -125,7 +125,7 @@ public class ExternalDatasetEntityMapperTest {
         constants.put("HEADER3", "VALUE3");
 
         // When
-        String constantsString = ExternalDatasetEntityMapper.datasetConstantsToString(constants);
+        String constantsString = DatasetEntityMapper.datasetConstantsToString(constants);
 
         // Then
         assertThat(constantsString).isEqualTo("{\"HEADER3\":\"VALUE3\",\"HEADER1\":\"VALUE1\",\"HEADER2\":\"VALUE2\"}");
@@ -137,7 +137,7 @@ public class ExternalDatasetEntityMapperTest {
         Map<String, String> constants = Map.of();
 
         // When
-        String constantsString = ExternalDatasetEntityMapper.datasetConstantsToString(constants);
+        String constantsString = DatasetEntityMapper.datasetConstantsToString(constants);
 
         // Then
         assertThat(constantsString).isNull();
@@ -146,7 +146,7 @@ public class ExternalDatasetEntityMapperTest {
     @Test
     public void should_return_null_when_dataset_constants_is_null() {
         // When
-        String constantsString = ExternalDatasetEntityMapper.datasetConstantsToString(null);
+        String constantsString = DatasetEntityMapper.datasetConstantsToString(null);
 
         // Then
         assertThat(constantsString).isNull();
@@ -166,7 +166,7 @@ public class ExternalDatasetEntityMapperTest {
         datatable.add(row2);
 
         // When
-        String constantsString = ExternalDatasetEntityMapper.datasetDatatableToString(datatable);
+        String constantsString = DatasetEntityMapper.datasetDatatableToString(datatable);
 
         // Then
         assertThat(constantsString).isEqualTo("[{\"HEADER1\":\"VALUE1\",\"HEADER2\":\"VALUE2\"},{\"HEADER1\":\"VALUE3\",\"HEADER2\":\"VALUE4\"}]");
@@ -178,7 +178,7 @@ public class ExternalDatasetEntityMapperTest {
         List<Map<String, String>> datatable = List.of();
 
         // When
-        String constantsString = ExternalDatasetEntityMapper.datasetDatatableToString(datatable);
+        String constantsString = DatasetEntityMapper.datasetDatatableToString(datatable);
 
         // Then
         assertThat(constantsString).isNull();
@@ -187,7 +187,7 @@ public class ExternalDatasetEntityMapperTest {
     @Test
     public void should_return_null_when_dataset_datatable_is_null() {
         // When
-        String constantsString = ExternalDatasetEntityMapper.datasetDatatableToString(null);
+        String constantsString = DatasetEntityMapper.datasetDatatableToString(null);
 
         // Then
         assertThat(constantsString).isNull();

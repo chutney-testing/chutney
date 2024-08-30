@@ -7,17 +7,17 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
-import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.compareExternalDataset;
+import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.compareDataset;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.RUNNING;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
 
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
@@ -38,7 +38,7 @@ public class CampaignExecution {
     public final String campaignName;
     public final boolean partialExecution;
     public final String executionEnvironment;
-    public final ExternalDataset dataset;
+    public final DataSet dataset;
     public final String userId;
 
     // Not mandatory
@@ -54,7 +54,7 @@ public class CampaignExecution {
         boolean partialExecution,
         String executionEnvironment,
         String userId,
-        ExternalDataset dataset,
+        DataSet dataset,
         LocalDateTime startDate,
         ServerReportStatus status,
         List<ScenarioExecutionCampaign> scenarioExecutions
@@ -128,7 +128,7 @@ public class CampaignExecution {
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
                 return se.scenarioId().equals(storedExecution.scenarioId()) &&
-                    compareExternalDataset(se.execution().dataset().orElse(null), storedExecution.dataset().orElse(null));
+                    compareDataset(se.execution().dataset().orElse(null), storedExecution.dataset().orElse(null));
             })
             .findFirst();
         var scenarioExecution = this.scenarioExecutions.get(indexOpt.getAsInt()).execution();
@@ -142,7 +142,7 @@ public class CampaignExecution {
                     .build()));
     }
 
-    private Optional<ExternalDataset> selectDatasetId(TestCaseDataset testCaseDataset) {
+    private Optional<DataSet> selectDatasetId(TestCaseDataset testCaseDataset) {
         return ofNullable(testCaseDataset.dataset()).or(() -> ofNullable(dataset));
     }
 

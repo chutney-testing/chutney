@@ -61,8 +61,8 @@ export class DatasetListComponent implements OnInit, OnDestroy {
     }
 
     showPreview(dataset: Dataset) {
-        if (this.preview == null || this.preview.datasetId !== dataset.datasetId) {
-            this.dataSetService.findById(dataset.datasetId).subscribe(
+        if (this.preview == null || this.preview.id !== dataset.id) {
+            this.dataSetService.findById(dataset.id).subscribe(
                 (res) => {
                     this.preview = res;
                 },

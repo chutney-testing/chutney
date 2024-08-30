@@ -32,7 +32,7 @@ export class DataSetService {
                     dto.lastUpdated,
                     dto.uniqueValues,
                     dto.multipleValues,
-                    dto.datasetId
+                    dto.id
                 ));
 
                 return res;
@@ -49,7 +49,7 @@ export class DataSetService {
 
     save(dataset: Dataset, oldId?: string): Observable<Dataset> {
         DataSetService.cleanTags(dataset);
-        if (dataset.datasetId && dataset.datasetId.length > 0) {
+        if (dataset.id && dataset.id.length > 0) {
             return this.httpClient.put<Dataset>(environment.backend + this.resourceUrl, dataset, {params: {oldId}})
                 .pipe(
                     map(dto => this.fromDto(dto))
@@ -74,7 +74,7 @@ export class DataSetService {
             dto.lastUpdated,
             dto.uniqueValues.map(o => new KeyValue(o.key, o.value)),
             dto.multipleValues.map(l => l.map(o => new KeyValue(o.key, o.value))),
-            dto.datasetId);
+            dto.id);
     }
 
     private static cleanTags(dataset: Dataset) {

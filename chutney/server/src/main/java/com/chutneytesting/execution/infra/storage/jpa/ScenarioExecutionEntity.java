@@ -7,17 +7,17 @@
 
 package com.chutneytesting.execution.infra.storage.jpa;
 
-import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.datasetConstantsToString;
-import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.datasetDatatableToString;
-import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.getExternalDataset;
+import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.datasetConstantsToString;
+import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.datasetDatatableToString;
+import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.getDataset;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.infra.jpa.CampaignExecutionEntity;
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -104,7 +104,7 @@ public class ScenarioExecutionEntity {
         String scenarioTitle,
         String environment,
         String userId,
-        ExternalDataset dataset,
+        DataSet dataset,
         String tags,
         Integer version
     ) {
@@ -120,9 +120,9 @@ public class ScenarioExecutionEntity {
         this.environment = environment;
         this.userId = userId;
         if (dataset != null) {
-            this.datasetId = dataset.getDatasetId() ;
-            this.datasetConstants = datasetConstantsToString(dataset.getConstants());
-            this.datasetDatatable = datasetDatatableToString(dataset.getDatatable());
+            this.datasetId = dataset.id;
+            this.datasetConstants = datasetConstantsToString(dataset.constants);
+            this.datasetDatatable = datasetDatatableToString(dataset.datatable);
         }
         this.tags = tags;
         this.version = version;
@@ -241,7 +241,7 @@ public class ScenarioExecutionEntity {
             .error(ofNullable(error))
             .testCaseTitle(scenarioTitle)
             .environment(environment)
-            .dataset(ofNullable(getExternalDataset(datasetId, datasetConstants, datasetDatatable)))
+            .dataset(ofNullable(getDataset(datasetId, datasetConstants, datasetDatatable)))
             .user(userId)
             .campaignReport(ofNullable(campaignReport))
             .scenarioId(scenarioId)

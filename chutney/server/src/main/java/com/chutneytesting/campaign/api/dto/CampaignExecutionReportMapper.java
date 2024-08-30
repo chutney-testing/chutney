@@ -7,11 +7,11 @@
 
 package com.chutneytesting.campaign.api.dto;
 
-import com.chutneytesting.dataset.api.ExternalDatasetDto;
-import com.chutneytesting.dataset.api.ImmutableExternalDatasetDto;
+import com.chutneytesting.dataset.api.DataSetDto;
+import com.chutneytesting.dataset.api.ImmutableDataSetDto;
 import com.chutneytesting.dataset.api.KeyValue;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,7 +29,7 @@ public class CampaignExecutionReportMapper {
             campaignReport.status(),
             campaignReport.partialExecution,
             campaignReport.executionEnvironment,
-            externalDatasetToDto(campaignReport.dataset),
+            datasetToDto(campaignReport.dataset),
             campaignReport.userId,
             campaignReport.getDuration());
     }
@@ -47,20 +47,20 @@ public class CampaignExecutionReportMapper {
             campaignReport.getDuration());
     }
 
-    public static ExternalDatasetDto externalDatasetToDto(ExternalDataset dataset) {
+    public static DataSetDto datasetToDto(DataSet dataset) {
         if (dataset == null) {
             return null;
         }
-        ImmutableExternalDatasetDto.Builder externalDatasetBuilder = ImmutableExternalDatasetDto.builder();
-        if (dataset.getDatasetId() != null) {
-            externalDatasetBuilder.datasetId(dataset.getDatasetId());
+        ImmutableDataSetDto.Builder datasetBuilder = ImmutableDataSetDto.builder().name("");
+        if (dataset.id != null) {
+            datasetBuilder.id(dataset.id);
         }
-        if (dataset.getConstants() != null) {
-            externalDatasetBuilder.constants(KeyValue.fromMap(dataset.getConstants()));
+        if (dataset.constants != null) {
+            datasetBuilder.constants(KeyValue.fromMap(dataset.constants));
         }
-        if (dataset.getDatatable() != null) {
-            externalDatasetBuilder.datatable(dataset.getDatatable().stream().map(KeyValue::fromMap).toList());
+        if (dataset.datatable != null) {
+            datasetBuilder.datatable(dataset.datatable.stream().map(KeyValue::fromMap).toList());
         }
-        return externalDatasetBuilder.build();
+        return datasetBuilder.build();
     }
 }

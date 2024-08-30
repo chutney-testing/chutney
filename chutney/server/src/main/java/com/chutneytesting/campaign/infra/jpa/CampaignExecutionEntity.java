@@ -7,14 +7,14 @@
 
 package com.chutneytesting.campaign.infra.jpa;
 
-import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.datasetConstantsToString;
-import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.datasetDatatableToString;
-import static com.chutneytesting.server.core.domain.dataset.ExternalDatasetEntityMapper.getExternalDataset;
+import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.datasetConstantsToString;
+import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.datasetDatatableToString;
+import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.getDataset;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
-import com.chutneytesting.server.core.domain.scenario.ExternalDataset;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecutionReportBuilder;
 import com.chutneytesting.server.core.domain.scenario.campaign.ScenarioExecutionCampaign;
@@ -72,7 +72,7 @@ public class CampaignExecutionEntity {
         this(null, campaignId, null, null, environment, null, null, null);
     }
 
-    public CampaignExecutionEntity(Long id, Long campaignId, List<ScenarioExecutionEntity> scenarioExecutions, Boolean partial, String environment, String userId, ExternalDataset dataset, Integer version) {
+    public CampaignExecutionEntity(Long id, Long campaignId, List<ScenarioExecutionEntity> scenarioExecutions, Boolean partial, String environment, String userId, DataSet dataset, Integer version) {
         this.id = id;
         this.campaignId = campaignId;
         this.scenarioExecutions = scenarioExecutions;
@@ -80,9 +80,9 @@ public class CampaignExecutionEntity {
         this.environment = environment;
         this.userId = userId;
         if (dataset != null) {
-            this.datasetId = dataset.getDatasetId() ;
-            this.datasetConstants = datasetConstantsToString(dataset.getConstants());
-            this.datasetDatatable = datasetDatatableToString(dataset.getDatatable());
+            this.datasetId = dataset.id;
+            this.datasetConstants = datasetConstantsToString(dataset.constants);
+            this.datasetDatatable = datasetDatatableToString(dataset.datatable);
         }
         this.version = version;
     }
@@ -106,9 +106,9 @@ public class CampaignExecutionEntity {
         environment = report.executionEnvironment;
         userId = report.userId;
         if (report.dataset != null) {
-            datasetId = report.dataset.getDatasetId();
-            datasetConstants = datasetConstantsToString(report.dataset.getConstants());
-            datasetDatatable = datasetDatatableToString(report.dataset.getDatatable());
+            datasetId = report.dataset.id;
+            datasetConstants = datasetConstantsToString(report.dataset.constants);
+            datasetDatatable = datasetDatatableToString(report.dataset.datatable);
         }
         this.scenarioExecutions.clear();
         scenarioExecutions.forEach(se -> {
@@ -128,7 +128,7 @@ public class CampaignExecutionEntity {
             .campaignName(campaignTitle)
             .partialExecution(ofNullable(partial).orElse(false))
             .environment(environment)
-            .dataset(getExternalDataset(datasetId, datasetConstants, datasetDatatable))
+            .dataset(getDataset(datasetId, datasetConstants, datasetDatatable))
             .userId(userId);
 
         if (scenarioExecutionReports.isEmpty()) {
