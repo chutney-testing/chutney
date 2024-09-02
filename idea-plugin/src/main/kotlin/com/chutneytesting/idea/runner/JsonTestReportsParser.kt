@@ -53,6 +53,7 @@ data class Report(
     val scenarioName: String,
     val environment: String,
     val contextVariables: Map<String, Any>,
+    val tags: Set<String>,
     val report: Base
 )
 
