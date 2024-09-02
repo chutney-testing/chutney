@@ -10,150 +10,128 @@ import org.jetbrains.changelog.markdownToHTML
 fun properties(key: String) = project.findProperty(key).toString()
 
 plugins {
-    // Java support
-    id("java")
-    // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.8.22"
-    // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "1.13.3"
-    // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "1.3.1"
+  // Java support
+  id("java")
+  // Kotlin support
+  id("org.jetbrains.kotlin.jvm") version "1.9.25"
+  // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
+  id("org.jetbrains.intellij.platform") version "2.0.1"
+  id("org.jetbrains.intellij.platform.migration") version "2.0.1"
+  // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
+  id("org.jetbrains.changelog") version "2.2.1"
 }
 
 configurations.all {
-    exclude("org.sl4j")
-    resolutionStrategy {
-        failOnVersionConflict()
-    }
+  exclude("org.sl4j")
+  resolutionStrategy {
+    failOnVersionConflict()
+  }
 }
 configurations.runtimeOnly {
-    shouldResolveConsistentlyWith(configurations.implementation.get())
+  shouldResolveConsistentlyWith(configurations.implementation.get())
 }
 
 group = properties("pluginGroup")
 version = properties("chutneyVersion")
 
+// Set the JVM language level used to build the project.
+kotlin {
+  jvmToolchain(17)
+}
+
 repositories {
-    mavenLocal()
-    mavenCentral()
-    maven {
-        url = uri("https://repo1.maven.org/maven2")
-    }
+  mavenLocal()
+  mavenCentral()
+  intellijPlatform {
+    defaultRepositories()
+  }
 }
 
 dependencies {
-    implementation(enforcedPlatform("com.chutneytesting:chutney-parent:${properties["chutneyVersion"]}"))
-    implementation("com.chutneytesting", "chutney-kotlin-dsl", properties("chutneyVersion"))
-    implementation("com.chutneytesting", "chutney-kotlin-dsl", properties("chutneyVersion")) {
-      isTransitive = false
-    }
-    // Runtime for kotlin-dsl dependency (server info && Http client)
-    runtimeOnly("com.fasterxml.jackson.module", "jackson-module-kotlin")
-    runtimeOnly("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310")
-    runtimeOnly("com.fasterxml.jackson.module", "jackson-module-paranamer")
-    runtimeOnly("org.apache.httpcomponents.client5", "httpclient5") {
-      exclude("org.slf4j")
-    }
-    runtimeOnly("org.apache.httpcomponents.core5", "httpcore5")
-    implementation("com.google.guava", "guava")
-    implementation("org.hjson", "hjson")
-    implementation("org.apache.commons", "commons-text")
-    implementation("com.fasterxml.jackson.core", "jackson-core")
-    implementation("com.fasterxml.jackson.core", "jackson-databind")
-    implementation("com.fasterxml.jackson.core", "jackson-annotations")
-    implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml")
-    implementation("org.jetbrains:annotations") {
-        version { strictly("24.0.0") }
-    }
+  implementation(enforcedPlatform("com.chutneytesting:chutney-parent:${properties["chutneyVersion"]}"))
+  implementation("com.chutneytesting", "chutney-kotlin-dsl", properties("chutneyVersion")) {
+    isTransitive = false
+  }
+  // Runtime for kotlin-dsl dependency (server info && Http client)
+  runtimeOnly("com.fasterxml.jackson.module", "jackson-module-kotlin")
+  runtimeOnly("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310")
+  runtimeOnly("com.fasterxml.jackson.module", "jackson-module-paranamer")
+  runtimeOnly("org.apache.httpcomponents.client5", "httpclient5") {
+    exclude("org.slf4j")
+  }
+  runtimeOnly("org.apache.httpcomponents.core5", "httpcore5")
+  implementation("com.google.guava", "guava")
+  implementation("org.hjson", "hjson")
+  implementation("org.apache.commons", "commons-text")
+  implementation("com.fasterxml.jackson.core", "jackson-core")
+  implementation("com.fasterxml.jackson.core", "jackson-databind")
+  implementation("com.fasterxml.jackson.core", "jackson-annotations")
+  implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml")
+  implementation("org.jetbrains:annotations") {
+    version { strictly("24.0.0") }
+  }
 
-    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-script-util
-    implementation("org.jetbrains.kotlin:kotlin-script-util:1.8.22")
+  // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-script-util
+  implementation("org.jetbrains.kotlin:kotlin-script-util:1.8.22")
 
-    implementation("me.andrz.jackson", "jackson-json-reference-core", "0.3.2") {
-        // exclude("org.sl4j") does not exclude
-        isTransitive = false // this exclude "org.sl4j"
-    }
-    runtimeOnly("com.chutneytesting", "local-api-unsecure", properties("chutneyVersion"), ext = "jar") {
-        isTransitive = false
-    }
+  implementation("me.andrz.jackson", "jackson-json-reference-core", "0.3.2") {
+    // exclude("org.sl4j") does not exclude
+    isTransitive = false // this exclude "org.sl4j"
+  }
+  runtimeOnly("com.chutneytesting", "local-api-unsecure", properties("chutneyVersion"), ext = "jar") {
+    isTransitive = false
+  }
+
+  intellijPlatform {
+    create(properties("platformType"), properties("platformVersion"))
+    bundledPlugins(properties("platformBundledPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+    instrumentationTools()
+    pluginVerifier()
+  }
 
 }
 
 // See https://github.com/JetBrains/gradle-intellij-plugin/
-intellij {
-    pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
-    type.set(properties("platformType"))
-    downloadSources.set(properties("platformDownloadSources").toBoolean())
-    updateSinceUntilBuild.set(true)
+intellijPlatform {
+  buildSearchableOptions = false
+  pluginConfiguration {
+    name = properties("pluginName")
+    version = properties("chutneyVersion")
+    description = File(projectDir, "README.md").readText().lines().run {
+      val start = "<!-- Plugin description -->"
+      val end = "<!-- Plugin description end -->"
 
-    // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
-
-    tasks{
-        buildSearchableOptions {
-            enabled = false
-        }
-
-        runIde {
-            maxHeapSize = "2g"
-        }
+      if (!containsAll(listOf(start, end))) {
+        throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
+      }
+      subList(indexOf(start) + 1, indexOf(end))
+    }.joinToString("\n").run { markdownToHTML(this) }
+    changeNotes = provider { changelog.getLatest().toHTML() }
+    ideaVersion {
+      sinceBuild = providers.gradleProperty("pluginSinceBuild")
+      untilBuild = providers.gradleProperty("pluginUntilBuild")
     }
-}
-configure<JavaPluginExtension> {
-    sourceCompatibility = JavaVersion.VERSION_17
-}
+  }
 
-// Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-changelog {
-    version.set(properties("chutneyVersion"))
-    groups.set(emptyList())
-}
-
-
-tasks {
-    // Set the compatibility versions to 17
-    withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
+  pluginVerification {
+    ides {
+      recommended()
     }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
+  }
+
+  publishing {
+    token = System.getenv("PUBLISH_TOKEN")
+    channels = listOf(properties("chutneyVersion").split('-').getOrElse(1) { "default" }.split('.').first())
+  }
+  tasks {
+    wrapper {
+      gradleVersion = properties("gradleVersion")
     }
-
-
-    patchPluginXml {
-        version.set(properties("chutneyVersion"))
-        sinceBuild.set(properties("pluginSinceBuild"))
-        untilBuild.set(properties("pluginUntilBuild"))
-
-        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        pluginDescription.set(
-            File(projectDir, "README.md").readText().lines().run {
-                val start = "<!-- Plugin description -->"
-                val end = "<!-- Plugin description end -->"
-
-                if (!containsAll(listOf(start, end))) {
-                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
-                }
-                subList(indexOf(start) + 1, indexOf(end))
-            }.joinToString("\n").run { markdownToHTML(this) }
-        )
-
-        // Get the latest available change notes from the changelog file
-        changeNotes.set(provider { changelog.getLatest().toHTML() })
+    runIde {
+      maxHeapSize = "2g"
     }
-
-    runPluginVerifier {
-        ideVersions.set(properties("pluginVerifierIdeVersions").split(',').map(String::trim).filter(String::isNotEmpty))
-    }
-
     publishPlugin {
-        dependsOn("patchChangelog")
-        token.set(System.getenv("PUBLISH_TOKEN"))
-        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
-        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
-        // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(listOf(properties("chutneyVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
+      dependsOn(patchChangelog)
     }
+  }
 }
