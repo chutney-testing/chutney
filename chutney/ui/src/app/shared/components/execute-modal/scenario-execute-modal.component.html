@@ -122,7 +122,7 @@
                 <input type="checkbox" class="form-check-input" formControlName="saveDatasetCheckbox"/>
             </div>
             @if (datasetForm.get('saveDatasetCheckbox').value) {
-                <div class="d-flex flex-column justify-content-end m-2">
+                <div class="d-flex flex-column justify-content-end m-2 w-50">
                     <input type="text" class="form-control" [ngClass]="{ 'is-invalid': datasetFormControl.saveDatasetName.errors?.required }" id="saveDatasetName" formControlName="saveDatasetName" placeholder="{{ 'scenarios.execution.modal.saveDatasetInputPlaceholder' | translate }}"/>
                     <div class="invalid-feedback">
                         {{ "scenarios.execution.modal.error.datasetEmptyName" | translate }}

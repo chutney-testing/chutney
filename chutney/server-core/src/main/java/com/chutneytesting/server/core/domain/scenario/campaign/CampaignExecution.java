@@ -18,6 +18,7 @@ import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
+import com.chutneytesting.server.core.domain.tools.DatasetUtils;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Comparator;
@@ -102,7 +103,7 @@ public class CampaignExecution {
             .filter(i -> {
                 var se = this.scenarioExecutions.get(i);
                 return se.scenarioId().equals(testCaseDataset.testcase().id()) &&
-                    se.execution().dataset().equals(selectDatasetId(testCaseDataset));
+                    DatasetUtils.compareDataset(se.execution().dataset().orElse(null), selectDatasetId(testCaseDataset).orElse(null));
             })
             .findFirst();
         this.scenarioExecutions.set(indexOpt.getAsInt(),

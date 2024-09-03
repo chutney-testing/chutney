@@ -300,9 +300,6 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
         this.scenarioExecutionService.findExecutionReport(execution.scenarioId, execution.executionId).pipe(
             map(scenarioExecutionReport => {
                 const dataset = scenarioExecutionReport.datasetId || scenarioExecutionReport.constants || scenarioExecutionReport.datatable ? new Dataset("", "", [], new Date(), scenarioExecutionReport.constants, scenarioExecutionReport.datatable, scenarioExecutionReport.datasetId) : null;
-                console.log("###########")
-                console.log(scenarioExecutionReport.datatable)
-                console.log(scenarioExecutionReport.constants)
                 this.executeScenario(execution.environment, dataset)
             })
         ).subscribe()

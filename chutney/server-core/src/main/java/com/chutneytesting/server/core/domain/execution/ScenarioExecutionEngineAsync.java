@@ -126,7 +126,7 @@ public class ScenarioExecutionEngineAsync {
             .user(executionRequest.userId)
             .campaignReport(ofNullable(executionRequest.campaignExecution))
             .tags(new HashSet<>(executionRequest.tags))
-            .dataset(executionRequest.dataset)
+            .dataset(ofNullable(executionRequest.dataset))
             .build();
 
         return executionHistoryRepository.store(executionRequest.testCase.id(), detachedExecution);
@@ -288,7 +288,7 @@ public class ScenarioExecutionEngineAsync {
             .testCaseTitle(scenarioReport.scenarioName)
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
-            .dataset(executionRequest.dataset)
+            .dataset(ofNullable(executionRequest.dataset))
             .build();
     }
 
