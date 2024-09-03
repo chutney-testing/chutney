@@ -345,9 +345,4 @@ public class CampaignExecutionEngine {
         ofNullable(environment).ifPresent(campaign::executionEnvironment);
         return campaign;
     }
-
-    private Campaign selectExecutionDataset(Campaign campaign, String dataset) {
-        ofNullable(dataset).ifPresent(campaign::executionDataset);
-        return campaign;
-    }
 }

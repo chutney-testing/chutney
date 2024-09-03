@@ -9,6 +9,7 @@ package com.chutneytesting.server.core.domain.scenario.campaign;
 
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
+import com.chutneytesting.server.core.domain.tools.DatasetUtils;
 import java.util.Objects;
 
 public record TestCaseDataset(TestCase testcase, DataSet dataset) {
@@ -18,15 +19,7 @@ public record TestCaseDataset(TestCase testcase, DataSet dataset) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TestCaseDataset that = (TestCaseDataset) o;
-        return Objects.equals(testcase.id(), that.testcase.id()) &&
-            ((dataset == null && that.dataset == null) ||
-                (dataset != null && that.dataset != null &&
-                    (Objects.equals(dataset.id, that.dataset().id) &&
-                        Objects.equals(dataset.constants, that.dataset().constants) &&
-                        Objects.equals(dataset.datatable, that.dataset().datatable)
-                    )
-                )
-            );
+        return Objects.equals(testcase.id(), that.testcase.id()) && DatasetUtils.compareDataset(dataset, that.dataset());
     }
 
     @Override

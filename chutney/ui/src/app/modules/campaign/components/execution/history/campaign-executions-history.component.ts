@@ -9,7 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
 import { EMPTY, Observable, of, Subscription, zip } from 'rxjs';
-import {delay, map, repeat, switchMap, tap} from 'rxjs/operators';
+import { delay, map, repeat, switchMap, tap } from 'rxjs/operators';
 import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 
 import { Campaign, CampaignReport } from '@model';

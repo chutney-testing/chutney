@@ -6,7 +6,7 @@
  */
 
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
-import {CampaignExecutionReport, Dataset} from '@core/model';
+import { CampaignExecutionReport, Dataset } from '@core/model';
 
 export class Execution {
 

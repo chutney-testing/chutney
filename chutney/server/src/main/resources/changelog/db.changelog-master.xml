@@ -1070,9 +1070,5 @@
             <column name="DATASET_CONSTANTS" type="LONGTEXT" defaultValueComputed="NULL"/>
             <column name="DATASET_DATATABLE" type="LONGTEXT" defaultValueComputed="NULL"/>
         </addColumn>
-        <addColumn tableName="SCENARIO_EXECUTIONS">
-            <column name="DATASET_CONSTANTS" type="LONGTEXT" defaultValueComputed="NULL"/>
-            <column name="DATASET_DATATABLE" type="LONGTEXT" defaultValueComputed="NULL"/>
-        </addColumn>
     </changeSet>
 </databaseChangeLog>

@@ -5,7 +5,7 @@
  *
  */
 
-import {Dataset} from "@core/model";
+import { Dataset } from "@core/model";
 
 export class ScenarioExecutionReportOutline {
     constructor(

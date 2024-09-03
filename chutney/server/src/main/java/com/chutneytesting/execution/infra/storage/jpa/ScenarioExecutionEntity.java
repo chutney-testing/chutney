@@ -213,11 +213,11 @@ public class ScenarioExecutionEntity {
             .error(ofNullable(error))
             .testCaseTitle(scenarioTitle)
             .environment(environment)
+            .dataset(ofNullable(dataset))
             .user(userId)
             .campaignReport(ofNullable(campaignReport))
             .scenarioId(scenarioId)
             .tags(TagListMapper.tagsStringToSet(tags))
-            .dataset(ofNullable(dataset))
             .build();
     }
 
