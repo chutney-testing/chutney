@@ -195,7 +195,7 @@
                           [ngbTooltip]="'global.actions.replay' | translate" placement="left">
                       <i  class="bi bi-repeat" ></i>
                   </button>
-                  <button class="btn btn-sm btn-primary me-2" (click)="deleteExecution(execution, $event)">
+                  <button class="btn btn-sm btn-primary me-2" (click)="openDeleteModal(execution.executionId, $event)">
                       <i  class="bi bi-trash" ></i>
                   </button>
                 </div>
@@ -226,13 +226,11 @@
   </div>
 }
 
-
-
-
-
-
-
-
-
-
-
+<ng-template #delete_modal>
+  <div class="modal-body text-center">
+    <p>{{'scenarios.execution.actions.remove-execution' | translate}}</p>
+    <button type="button" class="btn btn-default" (click)="confirm()">{{'global.confirm.yes' | translate}}</button>
+    <button id="no-btn" type="button" class="btn btn-primary" name="decline"
+    (click)="decline()">{{'global.confirm.no' | translate}}</button>
+  </div>
+</ng-template>

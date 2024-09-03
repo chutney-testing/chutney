@@ -197,14 +197,14 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
     @Override
     @Transactional
     public void deleteExecutions(Set<Long> executionsIds) {
-        Set<Long> campaignExecutionsIds = getCampaignExecutionsWithOneScenarioExecution(executionsIds);
+        Set<Long> campaignExecutionsIds = getCampaignExecutionsWithOnlyOneScenarioExecution(executionsIds);
 
-        scenarioExecutionsJpaRepository.deleteAllByIdInBatch(executionsIds);
-        scenarioExecutionReportJpaRepository.deleteAllById(executionsIds);
         campaignExecutionJpaRepository.deleteAllByIdInBatch(campaignExecutionsIds);
+        scenarioExecutionReportJpaRepository.deleteAllById(executionsIds);
+        scenarioExecutionsJpaRepository.deleteAllByIdInBatch(executionsIds);
     }
 
-    private Set<Long> getCampaignExecutionsWithOneScenarioExecution(Set<Long> executionsIds) {
+    private Set<Long> getCampaignExecutionsWithOnlyOneScenarioExecution(Set<Long> executionsIds) {
         return executionsIds.stream()
             .map(this::getExecutionSummary)
             .map(ExecutionSummary::campaignReport)

@@ -464,68 +464,73 @@ public class DatabaseExecutionHistoryRepositoryTest {
             ).isInstanceOf(ReportNotFoundException.class));
         }
 
-        @Test
-        void campaign_execution_must_be_deleted_when_last_scenario_execution_is_deleted() {
-            // GIVEN
-            ScenarioEntity scenarioEntity = givenScenario();
-            CampaignEntity campaign = givenCampaign(scenarioEntity);
-            ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
-            ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
+        @Nested
+        @NestedTestConfiguration(NestedTestConfiguration.EnclosingConfiguration.OVERRIDE)
+        @DisplayName("Delete associated campaign execution when scenario execution is the only one left")
+        class scenarioExecutionDelete {
 
-            Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
-                .executionId(campaignExecutionId)
-                .campaignId(campaign.id())
-                .campaignName(campaign.title())
-                .partialExecution(true)
-                .environment("env")
-                .addScenarioExecutionReport(scenarioExecutionOneReport)
-                .userId("user")
-                .dataSetId("ds287")
-                .build();
-            campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
+            @Test
+            void campaign_execution_with_only_one_scenario_execution() {
+                // GIVEN
+                ScenarioEntity scenarioEntity = givenScenario();
+                CampaignEntity campaign = givenCampaign(scenarioEntity);
+                ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
+                ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
 
-            // WHEN
-            sut.deleteExecutions(Set.of(scenarioExecutionOne.toDomain().executionId()));
+                Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "env");
+                CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
+                    .executionId(campaignExecutionId)
+                    .campaignId(campaign.id())
+                    .campaignName(campaign.title())
+                    .environment("env")
+                    .addScenarioExecutionReport(scenarioExecutionOneReport)
+                    .userId("user")
+                    .build();
+                campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
-            // THEN
-            assertThatThrownBy(() -> campaignExecutionDBRepository.getCampaignExecutionById(campaignExecutionId))
-                .isInstanceOf(CampaignExecutionNotFoundException.class);
-        }
+                // WHEN
+                sut.deleteExecutions(Set.of(scenarioExecutionOne.toDomain().executionId()));
 
-        @Test
-        void campaign_execution_must_not_be_deleted_when_scenario_execution_is_deleted() {
-            // GIVEN
-            ScenarioEntity scenarioEntity = givenScenario();
-            CampaignEntity campaign = givenCampaign(scenarioEntity);
-            ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
-            ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
-            ScenarioExecutionEntity scenarioExecutionTwo = givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
-            ScenarioExecutionCampaign scenarioExecutionTwoReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionTwo.toDomain());
+                // THEN
+                assertThatThrownBy(() -> campaignExecutionDBRepository.getCampaignExecutionById(campaignExecutionId))
+                    .isInstanceOf(CampaignExecutionNotFoundException.class);
+            }
 
-            Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "executionEnv");
-            CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
-                .executionId(campaignExecutionId)
-                .campaignId(campaign.id())
-                .campaignName(campaign.title())
-                .partialExecution(true)
-                .environment("env")
-                .addScenarioExecutionReport(scenarioExecutionOneReport)
-                .addScenarioExecutionReport(scenarioExecutionTwoReport)
-                .userId("user")
-                .dataSetId("ds287")
-                .build();
-            campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
+            @Test
+            void campaign_execution_with_many_scenario_execution() {
+                // GIVEN
+                ScenarioEntity scenarioEntity = givenScenario();
+                CampaignEntity campaign = givenCampaign(scenarioEntity);
+                ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
+                ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
+                ScenarioExecutionEntity scenarioExecutionTwo = givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
+                ScenarioExecutionCampaign scenarioExecutionTwoReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionTwo.toDomain());
 
-            // WHEN
-            sut.deleteExecutions(Set.of(scenarioExecutionOne.id()));
+                Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "env");
+                CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
+                    .executionId(campaignExecutionId)
+                    .campaignId(campaign.id())
+                    .campaignName(campaign.title())
+                    .partialExecution(true)
+                    .environment("env")
+                    .addScenarioExecutionReport(scenarioExecutionOneReport)
+                    .addScenarioExecutionReport(scenarioExecutionTwoReport)
+                    .userId("user")
+                    .dataSetId("ds287")
+                    .build();
+                campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
-            // THEN
-            List.of(scenarioExecutionOne.id()).forEach(executionId -> assertThatThrownBy(() -> sut.getExecutionSummary(executionId))
-                .isInstanceOf(ReportNotFoundException.class));
+                // WHEN
+                sut.deleteExecutions(Set.of(scenarioExecutionOne.id()));
 
-            assertThat(campaignExecutionDBRepository.getCampaignExecutionById(campaignExecutionId).scenarioExecutionReports().size()).isEqualTo(1);
-            assertThat(campaignExecutionDBRepository.getCampaignExecutionById(campaignExecutionId).scenarioExecutionReports().get(0).execution().executionId()).isEqualTo(scenarioExecutionTwo.id());
+                // THEN
+                List.of(scenarioExecutionOne.id()).forEach(executionId -> assertThatThrownBy(() -> sut.getExecutionSummary(executionId))
+                    .isInstanceOf(ReportNotFoundException.class));
+
+                assertThat(campaignExecutionDBRepository.getCampaignExecutionById(campaignExecutionId).scenarioExecutionReports().size()).isEqualTo(1);
+                assertThat(campaignExecutionDBRepository.getCampaignExecutionById(campaignExecutionId).scenarioExecutionReports().get(0).execution().executionId()).isEqualTo(scenarioExecutionTwo.id());
+
+            }
 
         }
 
