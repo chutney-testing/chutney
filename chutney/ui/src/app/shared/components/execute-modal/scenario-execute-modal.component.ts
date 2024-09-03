@@ -5,7 +5,7 @@
  *
  */
 
-import { Component, inject, Input, OnInit } from "@angular/core";
+import {ChangeDetectorRef, Component, inject, Input, OnInit} from "@angular/core";
 import { Dataset, KeyValue } from "@core/model";
 import { DataSetService, EnvironmentService } from "@core/services";
 import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
@@ -25,6 +25,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
     activeModal = inject(NgbActiveModal);
 
     environments: string[];
+    environmentsLoaded = false;
     datasets: Array<Dataset>;
     filteredDatasets: Array<Dataset>;
 
@@ -50,7 +51,8 @@ export class ScenarioExecuteModalComponent implements OnInit {
         private datasetService: DataSetService,
         private environmentService: EnvironmentService,
         private formBuilder: FormBuilder,
-        private translateService: TranslateService){
+        private translateService: TranslateService,
+        private changeDetectorRef: ChangeDetectorRef){
     }
 
 
@@ -76,6 +78,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
             if (this.environments.length === 1) {
                 this.selectedEnv = this.environments[0];
             }
+            this.environmentsLoaded = true;
         });
 
         this.saveDatasetCheckboxChanged();
@@ -208,11 +211,13 @@ export class ScenarioExecuteModalComponent implements OnInit {
             const saveDatasetName = this.datasetForm.get('saveDatasetName');
             if (enable) {
                 saveDatasetName?.enable()
+                saveDatasetName.markAsUntouched()
                 saveDatasetName.setValidators([Validators.required])
             } else {
                 saveDatasetName?.disable();
                 saveDatasetName.setValidators([])
             }
+            this.changeDetectorRef.detectChanges()
         });
     }
 

@@ -123,7 +123,7 @@
             </div>
             @if (datasetForm.get('saveDatasetCheckbox').value) {
                 <div class="d-flex flex-column justify-content-end m-2 w-50">
-                    <input type="text" class="form-control" [ngClass]="{ 'is-invalid': datasetFormControl.saveDatasetName.errors?.required }" id="saveDatasetName" formControlName="saveDatasetName" placeholder="{{ 'scenarios.execution.modal.saveDatasetInputPlaceholder' | translate }}"/>
+                    <input type="text" class="form-control" [ngClass]="{ 'is-invalid': datasetFormControl.saveDatasetName.invalid && datasetFormControl.saveDatasetName.touched }" id="saveDatasetName" formControlName="saveDatasetName" placeholder="{{ 'scenarios.execution.modal.saveDatasetInputPlaceholder' | translate }}"/>
                     <div class="invalid-feedback">
                         {{ "scenarios.execution.modal.error.datasetEmptyName" | translate }}
                     </div>
@@ -135,6 +135,6 @@
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-light" (click)="activeModal.dismiss('cancel click')">{{ "global.actions.cancel" | translate }}</button>
-  <button type="button" class="btn btn-primary" (click)="executeModal()">{{ "global.actions.execute" | translate }}</button>
+  <button type="button" class="btn btn-primary" (click)="executeModal()" [disabled]="!environmentsLoaded">{{ "global.actions.execute" | translate }}</button>
 </div>
 </div>

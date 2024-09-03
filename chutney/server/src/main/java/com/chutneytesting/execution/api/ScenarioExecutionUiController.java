@@ -7,7 +7,9 @@
 
 package com.chutneytesting.execution.api;
 
-import com.chutneytesting.dataset.api.DataSetDto;
+import static java.util.Optional.ofNullable;
+
+import com.chutneytesting.dataset.api.ExecutionDatasetDto;
 import com.chutneytesting.dataset.api.KeyValue;
 import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.environment.api.environment.EmbeddedEnvironmentApi;
@@ -106,18 +108,18 @@ public class ScenarioExecutionUiController {
 
     @PreAuthorize("hasAuthority('SCENARIO_EXECUTE')")
     @PostMapping(path = {"/api/ui/scenario/executionasync/v1/{scenarioId}/{env}", "/api/ui/scenario/executionasync/v1/{scenarioId}/{env}"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env, @RequestBody(required = false) DataSetDto dataset) {
+    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env, @RequestBody(required = false) ExecutionDatasetDto dataset) {
         LOGGER.debug("execute async scenario '{}'", scenarioId);
         TestCase testCase = testCaseRepository.findExecutableById(scenarioId).orElseThrow(() -> new ScenarioNotFoundException(scenarioId));
         String userId = userService.currentUser().getId();
-        DataSet execDataset = Optional.ofNullable(dataset).map(eds -> {
-            if (eds.id().isPresent()) {
-                return datasetRepository.findById(eds.id().get());
+        DataSet execDataset = ofNullable(dataset).map(eds -> {
+            if (eds.getId() != null) {
+                return datasetRepository.findById(eds.getId());
             }
             return DataSet.builder()
-                .withName(eds.id().orElse(""))
-                .withConstants(KeyValue.toMap(eds.constants()))
-                .withDatatable(eds.datatable().stream().map(KeyValue::toMap).toList())
+                .withName("")
+                .withConstants(KeyValue.toMap(eds.getConstants()))
+                .withDatatable(ofNullable(eds.getDatatable()).map(datatable -> datatable.stream().map(KeyValue::toMap).toList()).orElse(null))
                 .build();
         }).orElseGet(() -> getDataSet(testCase));
         return executionEngineAsync.execute(new ExecutionRequest(testCase, env, userId, execDataset)).toString();
