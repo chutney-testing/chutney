@@ -19,8 +19,8 @@ import {
     TemplateRef,
     ViewChild
 } from '@angular/core';
-import { Location } from '@angular/common';
-import { fromEvent, merge, Observable, Subscription, timer } from 'rxjs';
+import {Location} from '@angular/common';
+import {fromEvent, merge, Observable, Subscription, timer} from 'rxjs';
 import {
     auditTime,
     debounceTime,
@@ -32,15 +32,15 @@ import {
     throttleTime,
     timestamp
 } from 'rxjs/operators';
-import { FileSaverService } from 'ngx-filesaver';
-import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
-import { NGX_MONACO_EDITOR_CONFIG } from 'ngx-monaco-editor-v2';
+import {FileSaverService} from 'ngx-filesaver';
+import {NgbOffcanvas} from '@ng-bootstrap/ng-bootstrap';
+import {NGX_MONACO_EDITOR_CONFIG} from 'ngx-monaco-editor-v2';
 
-import { Authorization, Execution, GwtTestCase, ScenarioExecutionReport, StepExecutionReport } from '@model';
-import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
-import { ExecutionStatus } from '@core/model/scenario/execution-status';
-import { StringifyPipe } from '@shared/pipes';
-import { findScrollContainer } from '@shared/tools';
+import {Authorization, Execution, GwtTestCase, ScenarioExecutionReport, StepExecutionReport} from '@model';
+import {ScenarioExecutionService} from '@modules/scenarios/services/scenario-execution.service';
+import {ExecutionStatus} from '@core/model/scenario/execution-status';
+import {StringifyPipe} from '@shared/pipes';
+import {findScrollContainer} from '@shared/tools';
 
 @Component({
     selector: 'chutney-scenario-execution',
@@ -192,6 +192,18 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
             timer(500).subscribe(() => {
                 this.selectStep(failedStep[0], true);
             });
+        }
+    }
+
+    protected getDataset(execution: ScenarioExecutionReport) {
+        if (!execution) {
+            return ''
+        } else if (execution.datasetId) {
+            return execution.datasetId
+        } else if ((execution.datatable && execution.datatable.length > 0) || (execution.constants && execution.constants.length > 0)) {
+            return 'Custom'
+        } else{
+            return ''
         }
     }
 
