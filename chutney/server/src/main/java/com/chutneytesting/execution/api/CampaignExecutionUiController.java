@@ -74,13 +74,8 @@ public class CampaignExecutionUiController {
     @PreAuthorize("hasAuthority('CAMPAIGN_EXECUTE')")
     @GetMapping(path = {"/{campaignName}", "/{campaignName}/{env}"}, produces = MediaType.APPLICATION_JSON_VALUE)
     public List<CampaignExecutionReportDto> executeCampaignByName(@PathVariable("campaignName") String campaignName, @PathVariable("env") Optional<String> environment) {
-        List<CampaignExecution> reports;
         String userId = userService.currentUser().getId();
-        if (environment.isPresent()) {
-            reports = campaignExecutionEngine.executeByNameWithEnv(campaignName, environment.get(), userId);
-        } else {
-            reports = campaignExecutionEngine.executeByName(campaignName, userId);
-        }
+        List<CampaignExecution> reports = campaignExecutionEngine.executeByName(campaignName, environment.orElse(null), userId);
         return reports.stream()
             .map(CampaignExecutionReportMapper::toDto)
             .collect(Collectors.toList());
@@ -99,12 +94,7 @@ public class CampaignExecutionUiController {
     public byte[] executeCampaignsByPatternWithSurefireReport(HttpServletResponse response, @PathVariable("campaignPattern") String campaignPattern, @PathVariable("env") Optional<String> environment) {
         String userId = userService.currentUser().getId();
         response.addHeader("Content-Disposition", "attachment; filename=\"surefire-report.zip\"");
-        List<CampaignExecution> reports;
-        if (environment.isPresent()) {
-            reports = campaignExecutionEngine.executeByNameWithEnv(campaignPattern, environment.get(), userId);
-        } else {
-            reports = campaignExecutionEngine.executeByName(campaignPattern, userId);
-        }
+        List<CampaignExecution> reports = campaignExecutionEngine.executeByName(campaignPattern, environment.orElse(null), userId);
         return surefireCampaignExecutionReportBuilder.createReport(reports);
     }
 
@@ -134,7 +124,7 @@ public class CampaignExecutionUiController {
                 .withDatatable(ofNullable(dataset.getDatatable()).map(datatable -> datatable.stream().map(KeyValue::toMap).toList()).orElse(null))
                 .build();
         }
-        report = campaignExecutionEngine.executeByIdWithEnvAndDataset(campaignId, environment.orElse(null), ds, userId);
+        report = campaignExecutionEngine.executeById(campaignId, environment.orElse(null), ds, userId);
         return toDto(report);
     }
 }

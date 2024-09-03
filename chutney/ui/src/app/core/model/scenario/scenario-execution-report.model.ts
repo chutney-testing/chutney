@@ -22,6 +22,7 @@ export class ScenarioExecutionReport {
         public error?: string,
         public contextVariables?: Map<string, Object>,
         public constants?: Array<KeyValue>,
-        public datatable?: Array<Array<KeyValue>>
+        public datatable?: Array<Array<KeyValue>>,
+        public datasetId?: string
     ) { }
 }

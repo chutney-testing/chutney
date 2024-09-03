@@ -7,12 +7,14 @@
 
 package com.chutneytesting.execution.infra.storage.jpa;
 
-import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.getDataset;
 import static java.util.Optional.ofNullable;
 
+import com.chutneytesting.engine.domain.execution.engine.step.jackson.ReportObjectMapperConfiguration;
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
+import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,6 +24,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Version;
+import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
 
@@ -72,9 +75,26 @@ public class ScenarioExecutionReportEntity {
             .testCaseTitle(scenarioExecution.scenarioTitle())
             .environment(scenarioExecution.environment())
             .user(scenarioExecution.userId())
-            .dataset(ofNullable(getDataset(scenarioExecution.datasetId(), scenarioExecution.datasetConstants(), scenarioExecution.datasetDatatable())))
+            .dataset(ofNullable(getDatasetFromReport(report)))
             .scenarioId(scenarioExecution.scenarioId())
             .tags(TagListMapper.tagsStringToSet(scenarioExecution.tags()))
             .build();
+    }
+
+    private DataSet getDatasetFromReport(String report) {
+        try {
+            ScenarioExecutionReport scenarioExecutionReport = ReportObjectMapperConfiguration.reportObjectMapper().readValue(report, ScenarioExecutionReport.class);
+            if (scenarioExecutionReport.datasetId == null && scenarioExecutionReport.constants == null && scenarioExecutionReport.datatable == null) {
+                return null;
+            }
+            return DataSet.builder()
+                .withName("")
+                .withConstants(scenarioExecutionReport.constants)
+                .withDatatable(scenarioExecutionReport.datatable)
+                .withId(scenarioExecutionReport.datasetId)
+                .build();
+        } catch (IOException e) {
+            return null;
+        }
     }
 }

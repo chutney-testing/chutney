@@ -35,10 +35,6 @@ public class ScenarioExecutionReportOutlineDto {
         return scenarioId;
     }
 
-    public Optional<DataSet> getDataset() {
-        return execution.dataset();
-    }
-
     public Long getExecutionId() {
         return execution.executionId();
     }

@@ -9,7 +9,7 @@ import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-e
 import { environment } from '@env/environment';
 import { of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
-import { Dataset } from "@model"; // replace with your service's path
+import { Dataset } from "@model";
 
 describe('ScenarioService', () => {
     let service: ScenarioExecutionService;

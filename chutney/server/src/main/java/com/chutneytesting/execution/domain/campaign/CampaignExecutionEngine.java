@@ -1,3 +1,4 @@
+
 /*
  * SPDX-FileCopyrightText: 2017-2024 Enedis
  *
@@ -97,7 +98,7 @@ public class CampaignExecutionEngine {
         return campaignExecutionRepository.getLastExecution(campaign.id);
     }
 
-    public List<CampaignExecution> executeByNameWithEnvAndDataset(String campaignName, String environment, DataSet dataset, String userId) {
+    public List<CampaignExecution> executeByName(String campaignName, String environment, DataSet dataset, String userId) {
         List<Campaign> campaigns = campaignRepository.findByName(campaignName);
         return campaigns.stream()
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
@@ -105,19 +106,11 @@ public class CampaignExecutionEngine {
             .collect(Collectors.toList());
     }
 
-    public List<CampaignExecution> executeByNameWithDataset(String campaignName, DataSet dataset, String userId) {
-        return executeByNameWithEnvAndDataset(campaignName, null, dataset, userId);
+    public List<CampaignExecution> executeByName(String campaignName, String environment, String userId) {
+        return executeByName(campaignName, environment, null, userId);
     }
 
-    public List<CampaignExecution> executeByNameWithEnv(String campaignName, String environment, String userId) {
-        return executeByNameWithEnvAndDataset(campaignName, environment, null, userId);
-    }
-
-    public List<CampaignExecution> executeByName(String campaignName, String userId) {
-        return executeByNameWithEnvAndDataset(campaignName, null, null, userId);
-    }
-
-    public CampaignExecution executeByIdWithEnvAndDataset(Long campaignId, String environment, DataSet dataset, String userId) {
+    public CampaignExecution executeById(Long campaignId, String environment, DataSet dataset, String userId) {
         return ofNullable(campaignRepository.findById(campaignId))
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
             .map(campaign -> {
@@ -129,16 +122,8 @@ public class CampaignExecutionEngine {
             .orElseThrow(() -> new CampaignNotFoundException(campaignId));
     }
 
-    public CampaignExecution executeByIdWithDataset(Long campaignId, DataSet dataset, String userId) {
-        return executeByIdWithEnvAndDataset(campaignId, null, dataset, userId);
-    }
-
-    public CampaignExecution executeByIdWithEnv(Long campaignId, String environment, String userId) {
-        return executeByIdWithEnvAndDataset(campaignId, environment, null, userId);
-    }
-
     public CampaignExecution executeById(Long campaignId, String userId) {
-        return executeByIdWithEnvAndDataset(campaignId, null, null, userId);
+        return executeById(campaignId, null, null, userId);
     }
 
     public Optional<CampaignExecution> currentExecution(Long campaignId, String environment) {
@@ -325,7 +310,11 @@ public class CampaignExecutionEngine {
 
     private ExecutionRequest buildExecutionRequest(Campaign campaign, TestCaseDataset testCaseDataset, CampaignExecution campaignExecution) {
         // TODO if dataset null should throw exception ?
-        Optional<DataSet> dataset = ofNullable(testCaseDataset.dataset()).map(ds -> {
+        Optional<DataSet> dataset = ofNullable(testCaseDataset.dataset()); // We first get the dataset of the scenario in campaign
+        if (dataset.isEmpty()) {
+            dataset = ofNullable(campaignExecution.dataset); // If empty we get the scenario from the campaign (precised earlier if default dataset or inline dataset)
+        }
+        Optional<DataSet> datasetFull = dataset.map(ds -> {
             if (ds.id != null) {
                 return datasetRepository.findById(ds.id);
             }
@@ -336,15 +325,7 @@ public class CampaignExecutionEngine {
                 .withConstants(ds.constants)
                 .build();
         });
-        if (dataset.isEmpty()) {
-            dataset = ofNullable(campaignExecution.dataset).map(ds -> DataSet.builder()
-                    .withId(ds.id)
-                    .withName("")
-                    .withConstants(ds.constants)
-                    .withDatatable(ds.datatable)
-                    .build());
-        }
-        return new ExecutionRequest(testCaseDataset.testcase(), campaign.executionEnvironment(), campaignExecution.userId, dataset.orElse(null), campaignExecution, campaign.tags);
+        return new ExecutionRequest(testCaseDataset.testcase(), campaign.executionEnvironment(), campaignExecution.userId, datasetFull.orElse(null), campaignExecution, campaign.tags);
     }
 
     private void verifyNotAlreadyRunning(Campaign campaign) {
@@ -362,6 +343,11 @@ public class CampaignExecutionEngine {
 
     private Campaign selectExecutionEnvironment(Campaign campaign, String environment) {
         ofNullable(environment).ifPresent(campaign::executionEnvironment);
+        return campaign;
+    }
+
+    private Campaign selectExecutionDataset(Campaign campaign, String dataset) {
+        ofNullable(dataset).ifPresent(campaign::executionDataset);
         return campaign;
     }
 }

@@ -107,12 +107,14 @@ export class ScenarioExecutionService {
         let contextVariables;
         let constants;
         let datatable;
+        let datasetId;
         if(jsonResponse?.report) {
             let parse = JSON.parse(jsonResponse.report);
             report = parse.report;
             contextVariables = parse.contextVariables;
             constants = parse.constants &&  Object.keys(parse.constants).map(key => new KeyValue(key,parse.constants[key]));
             datatable = parse.datatable?.map(line => Object.keys(line).map(key => new KeyValue(key, line[key])))
+            datasetId = parse.datasetId;
         }
         return new ScenarioExecutionReport(
             jsonResponse.executionId,
@@ -126,7 +128,8 @@ export class ScenarioExecutionService {
             jsonResponse.error,
             contextVariables,
             constants,
-            datatable
+            datatable,
+            datasetId
         );
     }
 

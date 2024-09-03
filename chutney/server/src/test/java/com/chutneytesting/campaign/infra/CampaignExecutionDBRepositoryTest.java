@@ -176,7 +176,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", scenarioExecution.id())
                 .hasFieldOrPropertyWithValue("status", scenarioExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioExecution.environment())
-                .hasFieldOrPropertyWithValue("dataset", scenarioExecution.datasetId())
             ;
         }
 
@@ -224,7 +223,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", scenarioOneExecution.id())
                 .hasFieldOrPropertyWithValue("status", scenarioOneExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioOneExecution.environment())
-                .hasFieldOrPropertyWithValue("dataset", scenarioOneExecution.datasetId())
             ;
             assertThat(reports.get(0).scenarioExecutionReports()).element(1)
                 .hasFieldOrPropertyWithValue("scenarioId", scenarioEntityTwo.getId().toString())
@@ -233,7 +231,6 @@ public class CampaignExecutionDBRepositoryTest {
                 .hasFieldOrPropertyWithValue("executionId", scenarioTwoExecution.id())
                 .hasFieldOrPropertyWithValue("status", scenarioTwoExecution.status())
                 .hasFieldOrPropertyWithValue("environment", scenarioTwoExecution.environment())
-                .hasFieldOrPropertyWithValue("dataset", scenarioTwoExecution.datasetId())
             ;
         }
 

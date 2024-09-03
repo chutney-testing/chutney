@@ -85,7 +85,7 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.report.status))].map(status => this.toSelectOption(status,  this.translateService.instant(ExecutionStatus.toString(status))));
         this.environments = [...new Set(this.executions.map(exec => exec.report.executionEnvironment))].map(env => this.toSelectOption(env));
-        this.datasets = [...new Set(this.executions.map(exec => exec.report.dataset))].map(dataset => dataset ? this.toSelectOption(dataset.id ? dataset.id : "Custom") : null);
+        this.datasets = [...new Set(this.executions.map(exec => exec.report.dataset))].map(dataset => dataset ? this.toSelectOption(dataset.id ? dataset.id : "Custom") : null).filter(ds => ds);
         this.executors = [...new Set(this.executions.map(exec => exec.report.user))].map(user => this.toSelectOption(user));
     }
 
@@ -100,6 +100,7 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
             date: this.formBuilder.control(this.toNgbDate(this.filters['date'])),
             status: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['status'],  (status) => this.translateService.instant(ExecutionStatus.toString(status)))),
             environments: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['env'])),
+            dataset: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['dataset'])),
             executors: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['exec']))
         });
     }

@@ -5,12 +5,11 @@
  *
  */
 
-package com.chutneytesting.tools;
+package com.chutneytesting.execution.infra.execution;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.chutneytesting.server.core.domain.dataset.DataSet;
-import com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -49,71 +48,6 @@ public class DatasetEntityMapperTest {
         assertThat(dataset.datatable).hasSize(2);
         assertThat(dataset.datatable.get(0)).containsAllEntriesOf(datatable.get(0));
         assertThat(dataset.datatable.get(1)).containsAllEntriesOf(datatable.get(1));
-    }
-
-    @Test
-    public void should_compare_same_external_dataset() {
-        //Given
-        DataSet dataset1 = DataSet.builder().withName("").withId("DATASET_ID").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
-        DataSet dataset2 = DataSet.builder().withName("").withId("DATASET_ID").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
-
-        // When
-        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
-
-        // Then
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    public void should_compare_external_dataset_with_different_id() {
-        //Given
-        DataSet dataset1 = DataSet.builder().withName("").withId("DATASET_ID_1").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
-        DataSet dataset2 = DataSet.builder().withName("").withId("DATASET_ID_2").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
-
-        // When
-        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
-
-        // Then
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    public void should_compare_external_dataset_with_different_constants() {
-        //Given
-        DataSet dataset1 = DataSet.builder().withId(null).withName("").withConstants(Map.of("HEADER", "DIFFERENT VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
-        DataSet dataset2 = DataSet.builder().withId(null).withName("").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
-
-        // When
-        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
-
-        // Then
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    public void should_compare_external_dataset_with_different_datatable_different_length() {
-        //Given
-        DataSet dataset1 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"))).build();
-        DataSet dataset2 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
-
-        // When
-        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
-
-        // Then
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    public void should_compare_external_dataset_with_different_datatable_different_value() {
-        //Given
-        DataSet dataset1 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
-        DataSet dataset2 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE_DIFF"))).build();
-
-        // When
-        boolean result = DatasetEntityMapper.compareDataset(dataset1, dataset2);
-
-        // Then
-        assertThat(result).isFalse();
     }
 
     @Test

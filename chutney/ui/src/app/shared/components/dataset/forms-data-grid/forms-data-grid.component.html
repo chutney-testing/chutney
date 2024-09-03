@@ -14,7 +14,6 @@
       {{ 'global.actions.add' | translate }} <span class="fa fa-grip-lines-vertical" aria-hidden="true"></span>
     </button>
       @if (enableImportExport) {
-          {{enableImportExport}}
         <div class="float-end">
           <button type="button" class="btn btn-info" (click)="exportMultiKeyValue()">
             <span class="fa fa-file-csv" aria-hidden="true"></span> {{ 'global.actions.export' | translate }}

@@ -321,7 +321,7 @@ public class CampaignExecutionEngineTest {
 
         // When
         sut.executeById(campaign.id, "");
-        sut.executeByName(campaign.title, "");
+        sut.executeByName(campaign.title, null, "");
 
         // Then
         verify(campaignRepository).findById(campaign.id);
@@ -378,7 +378,7 @@ public class CampaignExecutionEngineTest {
         // When
         String executionEnv = "executionEnv";
         String executionUser = "executionUser";
-        sut.executeByIdWithEnv(campaign.id, executionEnv, executionUser);
+        sut.executeById(campaign.id, executionEnv, null, executionUser);
 
         // Then
         verify(campaignRepository).findById(campaign.id);
@@ -394,7 +394,7 @@ public class CampaignExecutionEngineTest {
         // When
         DataSet executionDataset = DataSet.builder().withName("executionDataset").withId("executionDataset").build();
         String executionUser = "executionUser";
-        CampaignExecution execution = sut.executeByIdWithDataset(campaign.id, executionDataset, executionUser);
+        CampaignExecution execution = sut.executeById(campaign.id, null, executionDataset, executionUser);
 
         // Then
         verify(campaignRepository).findById(campaign.id);
@@ -410,7 +410,7 @@ public class CampaignExecutionEngineTest {
         // When
         String executionEnv = "executionEnv";
         String executionUser = "executionUser";
-        sut.executeByNameWithEnv(campaign.title, executionEnv, executionUser);
+        sut.executeByName(campaign.title, executionEnv, null, executionUser);
 
         // Then
         verify(campaignRepository).findByName(campaign.title);
@@ -426,7 +426,7 @@ public class CampaignExecutionEngineTest {
         // When
         DataSet executionDataset = DataSet.builder().withName("executionDataset").withId("executionDataset").build();
         String executionUser = "executionUser";
-        List<CampaignExecution> campaignExecutions = sut.executeByNameWithDataset(campaign.title, executionDataset, executionUser);
+        List<CampaignExecution> campaignExecutions = sut.executeByName(campaign.title, null, executionDataset, executionUser);
 
         // Then
         verify(campaignRepository).findByName(campaign.title);
@@ -586,7 +586,7 @@ public class CampaignExecutionEngineTest {
         when(campaignRepository.findById(eq(1L))).thenReturn(campaign);
 
         // When
-        CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, dataSet, "USER");
+        CampaignExecution campaignExecution = sut.executeById(campaignId, env, dataSet, "USER");
 
         // Then
         assertThat(campaign.executionDataset()).isNull();
@@ -612,7 +612,7 @@ public class CampaignExecutionEngineTest {
         when(datasetRepository.findById(eq("DATASET_ID"))).thenReturn(DataSet.builder().withName("DATASET_ID").withId("DATASET_ID").build());
 
         // When
-        CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, dataSet, "USER");
+        CampaignExecution campaignExecution = sut.executeById(campaignId, env, dataSet, "USER");
 
         // Then
         assertThat(campaign.executionDataset()).isNull();
@@ -636,7 +636,7 @@ public class CampaignExecutionEngineTest {
         when(datasetRepository.findById(eq("DATASET_ID"))).thenReturn(DataSet.builder().withName("DATASET_ID").withId("DATASET_ID").build());
 
         // When
-        CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, null, "USER");
+        CampaignExecution campaignExecution = sut.executeById(campaignId, env, null, "USER");
 
         // Then
         assertThat(campaign.executionDataset()).isNotNull();
@@ -657,7 +657,7 @@ public class CampaignExecutionEngineTest {
         when(campaignRepository.findById(eq(1L))).thenReturn(campaign);
 
         // When
-        CampaignExecution campaignExecution = sut.executeByIdWithEnvAndDataset(campaignId, env, null, "USER");
+        CampaignExecution campaignExecution = sut.executeById(campaignId, env, null, "USER");
 
         // Then
         assertThat(campaign.executionDataset()).isNull();

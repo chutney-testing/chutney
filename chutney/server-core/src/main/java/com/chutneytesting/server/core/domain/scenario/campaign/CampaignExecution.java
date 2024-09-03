@@ -7,9 +7,9 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
-import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.compareDataset;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.RUNNING;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
+import static com.chutneytesting.server.core.domain.tools.DatasetUtils.compareDataset;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;

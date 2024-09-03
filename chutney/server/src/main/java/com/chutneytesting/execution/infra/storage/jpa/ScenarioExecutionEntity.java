@@ -7,9 +7,6 @@
 
 package com.chutneytesting.execution.infra.storage.jpa;
 
-import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.datasetConstantsToString;
-import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.datasetDatatableToString;
-import static com.chutneytesting.server.core.domain.dataset.DatasetEntityMapper.getDataset;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.infra.jpa.CampaignExecutionEntity;
@@ -76,15 +73,6 @@ public class ScenarioExecutionEntity {
     @Column(name = "TAGS")
     private String tags;
 
-    @Column(name = "DATASET_ID")
-    private String datasetId;
-
-    @Column(name = "DATASET_CONSTANTS")
-    private String datasetConstants;
-
-    @Column(name = "DATASET_DATATABLE")
-    private String datasetDatatable;
-
     @Column(name = "VERSION")
     @Version
     private Integer version;
@@ -104,7 +92,6 @@ public class ScenarioExecutionEntity {
         String scenarioTitle,
         String environment,
         String userId,
-        DataSet dataset,
         String tags,
         Integer version
     ) {
@@ -119,11 +106,6 @@ public class ScenarioExecutionEntity {
         this.scenarioTitle = scenarioTitle;
         this.environment = environment;
         this.userId = userId;
-        if (dataset != null) {
-            this.datasetId = dataset.id;
-            this.datasetConstants = datasetConstantsToString(dataset.constants);
-            this.datasetDatatable = datasetDatatableToString(dataset.datatable);
-        }
         this.tags = tags;
         this.version = version;
     }
@@ -184,18 +166,6 @@ public class ScenarioExecutionEntity {
         return userId;
     }
 
-    public String datasetId() {
-        return datasetId;
-    }
-
-    public String datasetConstants() {
-        return datasetConstants;
-    }
-
-    public String datasetDatatable() {
-        return datasetDatatable;
-    }
-
     public String tags() {
         return tags;
     }
@@ -221,7 +191,6 @@ public class ScenarioExecutionEntity {
             execution.testCaseTitle(),
             execution.environment(),
             execution.user(),
-            execution.dataset().orElse(null),
             truncateExecutionTags(TagListMapper.tagsToString(execution.tags().orElse(null))),
             version
         );
@@ -232,6 +201,9 @@ public class ScenarioExecutionEntity {
     }
 
     public ExecutionHistory.ExecutionSummary toDomain(CampaignExecution campaignReport) {
+        return toDomain(campaignReport, null);
+    }
+    public ExecutionHistory.ExecutionSummary toDomain(CampaignExecution campaignReport, DataSet dataset) {
         return ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(id)
             .time(Instant.ofEpochMilli(executionTime).atZone(ZoneId.systemDefault()).toLocalDateTime())
@@ -241,11 +213,11 @@ public class ScenarioExecutionEntity {
             .error(ofNullable(error))
             .testCaseTitle(scenarioTitle)
             .environment(environment)
-            .dataset(ofNullable(getDataset(datasetId, datasetConstants, datasetDatatable)))
             .user(userId)
             .campaignReport(ofNullable(campaignReport))
             .scenarioId(scenarioId)
             .tags(TagListMapper.tagsStringToSet(tags))
+            .dataset(ofNullable(dataset))
             .build();
     }
 
