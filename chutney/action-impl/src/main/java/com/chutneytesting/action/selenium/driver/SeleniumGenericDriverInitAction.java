@@ -22,7 +22,7 @@ public class SeleniumGenericDriverInitAction extends AbstractSeleniumDriverInitA
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final String seleniumConfigurationAsJson;
-    protected SeleniumGenericDriverInitAction(FinallyActionRegistry finallyActionRegistry,
+    public SeleniumGenericDriverInitAction(FinallyActionRegistry finallyActionRegistry,
                                               Logger logger,
                                               @Input("hub") String hubUrl,
                                               @Input("jsonConfiguration") String seleniumConfigurationAsJson) {
