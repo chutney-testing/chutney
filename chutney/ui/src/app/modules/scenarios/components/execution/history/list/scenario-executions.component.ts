@@ -5,7 +5,7 @@
  *
  */
 
-import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
 import { Execution } from '@model';
 import { Params, Router } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
@@ -17,6 +17,7 @@ import { DateFormatPipe } from 'ngx-moment';
 import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { TranslateService } from '@ngx-translate/core';
 import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
     selector: 'chutney-scenario-executions',
@@ -43,6 +44,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     };
 
     private filters$: Subscription;
+    private executionIdToDelete :number = null;
 
     private readonly iso_Date_Delimiter = '-';
 
@@ -51,11 +53,16 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     @Input() filters: Params;
     @Output() filtersChange = new EventEmitter<Params>();
     @Output() onReplay = new EventEmitter<number>();
+    @Output() onDelete = new EventEmitter<number>();
+
+    @ViewChild('delete_modal') deleteModal: TemplateRef<any>;
+    modalRef: BsModalRef;
 
     constructor(private router: Router,
                 private formBuilder: FormBuilder,
                 private datePipe: DateFormatPipe,
-                private translateService: TranslateService) {
+                private translateService: TranslateService,
+                private modalService: BsModalService) {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -80,7 +87,6 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     ngOnDestroy(): void {
         this.filters$.unsubscribe();
     }
-
 
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
@@ -262,5 +268,25 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     replay(execution: Execution, event: MouseEvent) {
         event.stopPropagation();
         this.onReplay.emit(execution.executionId);
+    }
+
+    emitDeleteExecutionEvent() {
+        this.onDelete.emit(this.executionIdToDelete);
+    }
+
+    openDeleteModal(executionId: number, event: MouseEvent) {
+        event.stopPropagation();
+        this.executionIdToDelete = executionId;
+        this.modalRef = this.modalService.show(this.deleteModal, { class: 'modal-sm' });
+    }
+
+    confirm(): void {
+        this.modalRef.hide();
+        this.emitDeleteExecutionEvent();
+    }
+
+    decline(): void {
+        this.modalRef.hide();
+        this.executionIdToDelete = null;
     }
 }

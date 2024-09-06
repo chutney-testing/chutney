@@ -29,7 +29,8 @@
           <chutney-scenario-executions [executions]="executions"
             [(filters)]="executionsFilters"
           (onExecutionSelect)="openReport($event)"
-          (onReplay)="replay($event)"></chutney-scenario-executions>
+          (onReplay)="replay($event)"
+          (onDelete)="deleteExecution($event)"></chutney-scenario-executions>
         </ng-template>
       </li>
       @for (exec of tabs; track exec.executionId) {

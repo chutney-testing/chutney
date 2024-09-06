@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.catchThrowable;
 
 import com.chutneytesting.campaign.infra.CampaignExecutionDBRepository;
 import com.chutneytesting.campaign.infra.jpa.CampaignEntity;
+import com.chutneytesting.execution.domain.campaign.CampaignExecutionNotFoundException;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionReportEntity;
 import com.chutneytesting.scenario.infra.jpa.ScenarioEntity;
@@ -465,6 +466,76 @@ public class DatabaseExecutionHistoryRepositoryTest {
 
         @Nested
         @NestedTestConfiguration(NestedTestConfiguration.EnclosingConfiguration.OVERRIDE)
+        @DisplayName("Delete associated campaign execution when scenario execution is the only one left")
+        class scenarioExecutionDelete {
+
+            @Test
+            void campaign_execution_with_only_one_scenario_execution() {
+                // GIVEN
+                ScenarioEntity scenarioEntity = givenScenario();
+                CampaignEntity campaign = givenCampaign(scenarioEntity);
+                ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
+                ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
+
+                Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "env");
+                CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
+                    .executionId(campaignExecutionId)
+                    .campaignId(campaign.id())
+                    .campaignName(campaign.title())
+                    .environment("env")
+                    .addScenarioExecutionReport(scenarioExecutionOneReport)
+                    .userId("user")
+                    .build();
+                campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
+
+                // WHEN
+                sut.deleteExecutions(Set.of(scenarioExecutionOne.toDomain().executionId()));
+
+                // THEN
+                assertThatThrownBy(() -> campaignExecutionDBRepository.getCampaignExecutionById(campaignExecutionId))
+                    .isInstanceOf(CampaignExecutionNotFoundException.class);
+            }
+
+            @Test
+            void campaign_execution_with_many_scenario_execution() {
+                // GIVEN
+                ScenarioEntity scenarioEntity = givenScenario();
+                CampaignEntity campaign = givenCampaign(scenarioEntity);
+                ScenarioExecutionEntity scenarioExecutionOne = givenScenarioExecution(scenarioEntity.getId(), FAILURE);
+                ScenarioExecutionCampaign scenarioExecutionOneReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionOne.toDomain());
+                ScenarioExecutionEntity scenarioExecutionTwo = givenScenarioExecution(scenarioEntity.getId(), SUCCESS);
+                ScenarioExecutionCampaign scenarioExecutionTwoReport = new ScenarioExecutionCampaign(scenarioEntity.getId().toString(), scenarioEntity.getTitle(), scenarioExecutionTwo.toDomain());
+
+                Long campaignExecutionId = campaignExecutionDBRepository.generateCampaignExecutionId(campaign.id(), "env");
+                CampaignExecution campaignExecution = CampaignExecutionReportBuilder.builder()
+                    .executionId(campaignExecutionId)
+                    .campaignId(campaign.id())
+                    .campaignName(campaign.title())
+                    .partialExecution(true)
+                    .environment("env")
+                    .addScenarioExecutionReport(scenarioExecutionOneReport)
+                    .addScenarioExecutionReport(scenarioExecutionTwoReport)
+                    .userId("user")
+                    .dataSetId("ds287")
+                    .build();
+                campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
+
+                // WHEN
+                sut.deleteExecutions(Set.of(scenarioExecutionOne.id()));
+
+                // THEN
+                List.of(scenarioExecutionOne.id()).forEach(executionId -> assertThatThrownBy(() -> sut.getExecutionSummary(executionId))
+                    .isInstanceOf(ReportNotFoundException.class));
+
+                assertThat(campaignExecutionDBRepository.getCampaignExecutionById(campaignExecutionId).scenarioExecutionReports().size()).isEqualTo(1);
+                assertThat(campaignExecutionDBRepository.getCampaignExecutionById(campaignExecutionId).scenarioExecutionReports().get(0).execution().executionId()).isEqualTo(scenarioExecutionTwo.id());
+
+            }
+
+        }
+
+        @Nested
+        @NestedTestConfiguration(NestedTestConfiguration.EnclosingConfiguration.OVERRIDE)
         @DisplayName("Find scenario execution with report match")
         class ScenarioExecutionReportMatch {
             @AfterEach
@@ -565,7 +636,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 stepReport("root step Title", -1L, SUCCESS,
                     stepReport("step 1", 24L, PAUSED,
                         stepReport("step1.1", 23L, RUNNING)));
-            DataSet dataSet = DataSet.builder().withId("id").withName("ds").withConstants(Map.of("key", "value")).withDatatable(List.of(Map.of("A", "A1", "B","B1"))).build();
+            DataSet dataSet = DataSet.builder().withId("id").withName("ds").withConstants(Map.of("key", "value")).withDatatable(List.of(Map.of("A", "A1", "B", "B1"))).build();
             try {
                 return objectMapper.writeValueAsString(new ScenarioExecutionReport(1L, "scenario name", "", "", null, dataSet, successStepReport));
             } catch (JsonProcessingException exception) {

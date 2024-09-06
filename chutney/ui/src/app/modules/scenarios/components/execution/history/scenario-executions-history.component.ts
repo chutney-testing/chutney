@@ -82,6 +82,10 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
     closeReport(event: MouseEvent, executionId: number) {
         event.preventDefault();
         event.stopImmediatePropagation();
+        this.closeReportTab(executionId);
+    }
+
+    private closeReportTab(executionId: number) {
         const openTabs = this.tabs.filter(exec => exec.executionId !== executionId);
         this.tabFilters['open'] = openTabs.map(exec => exec.executionId).toString();
 
@@ -294,5 +298,19 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
     replay(executionId: number) {
         const execution = this.executions.find(exec => exec.executionId === executionId);
         this.executeScenario(execution.environment, execution.dataset)
+    }
+
+    deleteExecution(executionId: number) {
+        this.scenarioExecutionService.deleteExecution(executionId)
+        .subscribe({
+            next: () => {
+                this.getScenarioExecutions().subscribe();
+                this.closeReportTab(executionId);
+            },
+            error: error => {
+                this.error = error.error;
+            }
+        }
+        );
     }
 }

@@ -118,6 +118,7 @@
                     "hide": "Hide steps"
                 },
                 "remove": "Confirm the deletion",
+                "remove-execution": "Confirm the deletion",
                 "input-output": {
                     "show": "Uncollapse entries/output",
                     "hide": "Collapse entries/output"

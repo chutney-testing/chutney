@@ -118,6 +118,7 @@
                     "hide": "Cacher étapes"
                 },
                 "remove": "Etes-vous sur de vouloir supprimer le scénario ?",
+                "remove-execution": "Etes-vous sur de vouloir supprimer l'exécution ?",
                 "input-output": {
                     "show": "Déplier entrées/sorties",
                     "hide": "Replier entrées/sorties"
