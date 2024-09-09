@@ -60,9 +60,11 @@ public class ScenarioExecutionReportEntity {
     public void updateReport(ExecutionHistory.Execution execution) {
         report = execution.report();
     }
+
     public String getReport() {
         return report;
     }
+
     public ExecutionHistory.Execution toDomain() {
         return ImmutableExecutionHistory.Execution.builder()
             .executionId(scenarioExecutionId)
@@ -82,9 +84,11 @@ public class ScenarioExecutionReportEntity {
     }
 
     private DataSet getDatasetFromReport(String report) {
-        try {
+        try { // TODO unit test \o/
             ScenarioExecutionReport scenarioExecutionReport = ReportObjectMapperConfiguration.reportObjectMapper().readValue(report, ScenarioExecutionReport.class);
-            if (scenarioExecutionReport.datasetId == null && scenarioExecutionReport.constants == null && scenarioExecutionReport.datatable == null) {
+            if (scenarioExecutionReport.datasetId == null &&
+                (scenarioExecutionReport.constants == null || scenarioExecutionReport.constants.isEmpty()) &&
+                (scenarioExecutionReport.datatable == null || scenarioExecutionReport.datatable.isEmpty())) {
                 return null;
             }
             return DataSet.builder()
