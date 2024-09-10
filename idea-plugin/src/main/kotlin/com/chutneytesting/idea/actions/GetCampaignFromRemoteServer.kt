@@ -13,6 +13,7 @@ import com.chutneytesting.idea.settings.ChutneySettings
 import com.chutneytesting.idea.util.HJsonUtils
 import com.chutneytesting.idea.util.sanitizeFilename
 import com.chutneytesting.kotlin.util.HttpClient
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.intellij.json.JsonFileType
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
@@ -36,19 +37,20 @@ import java.awt.BorderLayout
 import java.nio.file.Paths
 import javax.swing.JPanel
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 data class Campaign(
-    var id: Int?,
-    val title: String,
-    val description: String,
-    val scenarioIds: List<String> = emptyList(),
-    val computedParameters: Map<String, String>?,
-    val campaignExecutionReports: List<Any>?,
-    val environment: String?,
-    val parallelRun: Boolean,
-    val retryAuto: Boolean,
-    val datasetId: String?,
-    val tags: List<String>?
-)
+  val id: Int? = null,
+  val title: String,
+  val description: String? = null,
+  val environment: String,
+  val parallelRun: Boolean = false,
+  val retryAuto: Boolean = false,
+  val datasetId: String? = null,
+  val scenarios: List<CampaignScenario> = emptyList(),
+  val tags: List<String> = emptyList()
+) {
+  data class CampaignScenario(val scenarioId: Int, val datasetId: String? = null)
+}
 
 class GetCampaignFromRemoteServer : AnAction() {
 
@@ -92,7 +94,7 @@ class GetCampaignFromRemoteServer : AnAction() {
             val id = selectedItem.value
             try {
                 val psiFileFactory = PsiFileFactory.getInstance(project)
-                campaigns.find { it.id.toString() == id }?.scenarioIds?.forEach { scenarioId ->
+                campaigns.find { it.id.toString() == id }?.scenarios?.map { it.scenarioId }?.forEach { scenarioId ->
                     val scenario = HttpClient.get<Map<String, Any>>(
                         serverInfo,
                         "/api/scenario/v2/raw/$scenarioId"
