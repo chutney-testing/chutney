@@ -10,6 +10,7 @@ package com.chutneytesting.action.selenium.driver;
 import static com.chutneytesting.action.spi.validation.Validator.getErrorsFrom;
 import static com.chutneytesting.action.spi.validation.Validator.of;
 import static java.time.temporal.ChronoUnit.SECONDS;
+import static java.util.Optional.ofNullable;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import com.chutneytesting.action.spi.Action;
@@ -49,7 +50,7 @@ public abstract class AbstractSeleniumDriverInitAction implements Action {
         this.finallyActionRegistry = finallyActionRegistry;
         this.logger = logger;
         this.hubUrl = hubUrl;
-        this.headless = headless;
+        this.headless = ofNullable(headless).orElse(true);
         this.driverPath = driverPath;
         this.browserPath = browserPath;
     }

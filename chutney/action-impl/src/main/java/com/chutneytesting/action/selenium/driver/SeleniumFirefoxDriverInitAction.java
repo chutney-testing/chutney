@@ -34,8 +34,8 @@ public class SeleniumFirefoxDriverInitAction extends AbstractSeleniumDriverInitA
                                            @Input("headless") Boolean headless,
                                            @Input("driverPath") String driverPath,
                                            @Input("browserPath") String browserPath,
-                                           @Input("firefoxProfile")String firefoxProfile,
-                                           @Input("firefoxPreferences")Map<String, String> firefoxPreferences) {
+                                           @Input("firefoxProfile") String firefoxProfile,
+                                           @Input("firefoxPreferences") Map<String, String> firefoxPreferences) {
         super(finallyActionRegistry, logger, hubUrl, headless, driverPath, browserPath);
         this.firefoxProfile = firefoxProfile;
         this.firefoxPreferences = ofNullable(firefoxPreferences).orElse(emptyMap());
@@ -44,7 +44,9 @@ public class SeleniumFirefoxDriverInitAction extends AbstractSeleniumDriverInitA
     @Override
     protected MutableCapabilities buildOptions() {
         FirefoxOptions firefoxOptions = new FirefoxOptions();
-        firefoxOptions.addArguments("-headless");
+        if (headless) {
+            firefoxOptions.addArguments("-headless");
+        }
         firefoxOptions.setLogLevel(FirefoxDriverLogLevel.FATAL);
         try {
             FirefoxProfile profile = firefoxProfile != null ? FirefoxProfile.fromJson(firefoxProfile) : new FirefoxProfile();
