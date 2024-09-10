@@ -12,6 +12,7 @@ import com.chutneytesting.idea.settings.ChutneySettings
 import com.chutneytesting.kotlin.util.HttpClient
 import com.google.gson.Gson
 import com.intellij.notification.NotificationListener
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import javax.swing.Icon
@@ -50,5 +51,9 @@ class AddRemoveScenarioInCampaignAction(
         } catch (e: Exception) {
             EventDataLogger.logError(e.toString(), project)
         }
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+      return ActionUpdateThread.BGT
     }
 }

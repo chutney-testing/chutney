@@ -9,6 +9,7 @@ package com.chutneytesting.idea.actions
 
 import com.chutneytesting.idea.logger.EventDataLogger
 import com.intellij.ide.actions.RevealFileAction
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.application.PathManager
@@ -44,6 +45,10 @@ class OpenChutneyConfigFileAction : AnAction() {
             return
         }
         FileEditorManager.getInstance(project).openFile(findFileByPath, true)
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+      return ActionUpdateThread.BGT
     }
 
 }

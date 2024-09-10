@@ -42,7 +42,9 @@ class CopyScenarioAsKotlinDslAction : AnAction() {
         }
     }
 
-
+    override fun getActionUpdateThread(): ActionUpdateThread {
+      return ActionUpdateThread.BGT
+    }
 }
 
 private fun generateDsl(

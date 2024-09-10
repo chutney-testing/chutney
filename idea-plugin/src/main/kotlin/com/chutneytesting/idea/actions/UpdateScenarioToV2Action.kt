@@ -56,4 +56,8 @@ class UpdateScenarioToV2Action : AnAction() {
         }
 
     }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+      return ActionUpdateThread.BGT
+    }
 }

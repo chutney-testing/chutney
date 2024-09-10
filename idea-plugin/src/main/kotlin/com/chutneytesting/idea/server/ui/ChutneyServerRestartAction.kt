@@ -10,6 +10,7 @@ package com.chutneytesting.idea.server.ui
 import com.chutneytesting.idea.server.ChutneyServerRegistry
 import com.chutneytesting.idea.server.ChutneyServerSettingsManager
 import com.intellij.icons.AllIcons
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 
@@ -30,6 +31,10 @@ class ChutneyServerRestartAction(private val mySession: ChutneyToolWindowSession
     override fun actionPerformed(e: AnActionEvent) {
         mySession.saveSettings()
         mySession.restart(ChutneyServerSettingsManager.loadSettings())
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+      return ActionUpdateThread.BGT
     }
 
 }
