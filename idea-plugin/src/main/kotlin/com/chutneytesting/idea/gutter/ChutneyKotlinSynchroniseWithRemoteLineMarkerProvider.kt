@@ -24,11 +24,11 @@ import com.intellij.openapi.ui.popup.JBPopupFactory
 import com.intellij.openapi.util.IconLoader
 import com.intellij.psi.PsiDocumentManager
 import com.intellij.psi.PsiElement
+import com.intellij.psi.PsiManager
 import com.intellij.psi.codeStyle.CodeStyleManager
 import com.intellij.psi.search.FilenameIndex
 import com.intellij.psi.search.GlobalSearchScope
 import com.intellij.task.ProjectTaskManager
-import com.intellij.testFramework.utils.vfs.getPsiFile
 import com.intellij.ui.awt.RelativePoint
 import com.intellij.util.ui.UIUtil
 import org.apache.commons.text.StringEscapeUtils
@@ -134,8 +134,8 @@ class ChutneyKotlinSynchroniseWithRemoteLineMarkerProvider : LineMarkerProvider{
                 FilenameIndex.getVirtualFilesByName(
                     "$id-${title}.chutney.json",
                     GlobalSearchScope.moduleScope(module)
-                ).forEachIndexed { index, virtualFile  ->
-                    val psiFile = virtualFile.getPsiFile(project)
+                ).forEachIndexed { _, virtualFile  ->
+                    val psiFile = PsiManager.getInstance(project).findFile(virtualFile)!!
                     val document = PsiDocumentManager.getInstance(project).getDocument(psiFile) ?: return@forEachIndexed
                     document.setText("$scenario".replace("\r\n", "\n"))
                     FileDocumentManager.getInstance().saveDocument(document)

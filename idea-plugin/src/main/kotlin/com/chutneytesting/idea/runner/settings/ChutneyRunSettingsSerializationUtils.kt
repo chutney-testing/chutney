@@ -34,7 +34,7 @@ object ChutneyRunSettingsSerializationUtils {
         val testType = readEnumByName(element, Key.TEST_TYPE, TestType.SCENARIO_FILE)
         builder.testType = testType
         if (testType === TestType.ALL_SCENARIO_IN_DIRECTORY) {
-            val directory = readString(element, Key.ALL_IN_DIRECTORY, "")
+            val directory = readString(element, Key.ALL_IN_DIRECTORY)
             builder.directory = FileUtil.toSystemDependentName(directory)
         } else if (testType === TestType.SCENARIO_FILE) {
             readScenarioFile(element, builder)
@@ -44,31 +44,31 @@ object ChutneyRunSettingsSerializationUtils {
         val serverType = readEnumByName(element, Key.SERVER_TYPE, ServerType.INTERNAL)
         builder.serverType = serverType
         if (serverType === ServerType.EXTERNAL) {
-            val serverAddress = readString(element, Key.SERVER_ADDRESS, "")
+            val serverAddress = readString(element, Key.SERVER_ADDRESS)
             builder.serverAddress = serverAddress
         }
         builder.variables = ChutneyVariablesData.readExternal(element)
-        builder.methodName = readString(element, Key.METHOD_NAME, "")
+        builder.methodName = readString(element, Key.METHOD_NAME)
         return builder
     }
 
     private fun readScenariosFiles(element: Element, builder: ChutneyRunSettings) {
-        builder.scenariosFilesPath = readString(element, Key.SCENARIOS_FILES, "")
+        builder.scenariosFilesPath = readString(element, Key.SCENARIOS_FILES)
     }
 
 
     private fun readScenarioFile(element: Element, builder: ChutneyRunSettings) {
-        val jsFile = readString(element, Key.SCENARIO_FILE, "")
+        val jsFile = readString(element, Key.SCENARIO_FILE)
         builder.scenarioFilePath = FileUtil.toSystemDependentName(jsFile)
     }
 
     private fun <E : Enum<E>> readEnumByName(element: Element, key: Key, defaultValue: E): E {
-        val str = readString(element, key, "")
-        val enumConstant = EnumUtils.findEnum<E>(defaultValue.declaringClass, str)
+        val str = readString(element, key)
+        val enumConstant = EnumUtils.findEnum(defaultValue.declaringJavaClass, str)
         return ObjectUtils.notNull(enumConstant, defaultValue)
     }
 
-    private fun readString(element: Element, key: Key, defaultValue: String): String {
+    private fun readString(element: Element, key: Key, defaultValue: String = ""): String {
         val value = JDOMExternalizer.readString(element, key.key)
         return value ?: defaultValue
     }

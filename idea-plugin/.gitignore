@@ -7,6 +7,7 @@
 ## Plugin-specific files:
 # IntelliJ
 /out/
+.intellijPlatform/
 
 ### Gradle template
 .gradle
