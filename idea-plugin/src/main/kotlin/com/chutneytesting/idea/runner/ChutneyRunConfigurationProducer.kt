@@ -157,9 +157,10 @@ class ChutneyRunConfigurationProducer :
         override fun provideSettings(psiElement: PsiElement): ChutneyRunSettings? {
             val psiFile = psiElement.containingFile ?: return null
             val virtualFile = psiFile.virtualFile
-            if (virtualFile == null || (!ChutneyUtil.isChutneyJson(psiFile) && !ChutneyUtil.isChutneyYaml(psiFile) && !ChutneyUtil.isChutneyDslMethod(
-                    psiElement.parent
-                ))
+            if (virtualFile == null ||
+              ( !ChutneyUtil.isChutneyJson(psiFile) && !ChutneyUtil.isChutneyYaml(psiFile) &&
+                  psiElement.parent != null && !ChutneyUtil.isChutneyDslMethod(psiElement.parent)
+                  )
             ) {
                 return null
             }
