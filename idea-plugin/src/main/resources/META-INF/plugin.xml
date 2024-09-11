@@ -137,11 +137,6 @@
                     icon="AllIcons.Plugins.Downloads"
                     text="Get Campaign From Remote Server"
                     description="Get campaign from remote server"/>
-            <action id="Chutney.UpdateScenarioToV2Action"
-                    class="com.chutneytesting.idea.actions.UpdateScenarioToV2Action"
-                    icon="AllIcons.Plugins.Updated"
-                    text="Update Scenario To V2"
-                    description="Update scenario to v2"/>
             <action id="Chutney.CopyScenarioAsKotlinDslAction"
                     class="com.chutneytesting.idea.actions.CopyScenarioAsKotlinDslAction"
                     icon="AllIcons.Plugins.Updated"

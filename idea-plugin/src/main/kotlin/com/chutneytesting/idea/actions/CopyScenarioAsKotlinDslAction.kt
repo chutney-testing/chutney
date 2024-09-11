@@ -25,9 +25,6 @@ class CopyScenarioAsKotlinDslAction : AnAction() {
         val project = event.project ?: return
         val file = event.getData(DataKeys.VIRTUAL_FILE) ?: return
         val psiFile = event.getData(LangDataKeys.PSI_FILE) ?: return
-        val editor = event.getData(PlatformDataKeys.EDITOR) ?: return
-        val document = editor.document
-        if (ChutneyUtil.isChutneyV1Json(psiFile)) return
         val processJsonReference = ChutneyUtil.processJsonReference(psiFile.virtualFile)
         val scenarioV2 = ScenarioV2(JsonSerializer().toMap(processJsonReference))
         val id = ChutneyUtil.getChutneyScenarioIdFromFileName(file.name)

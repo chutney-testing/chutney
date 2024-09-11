@@ -97,12 +97,7 @@ class JsonTestReportsParser(
                 error("Unsupported")
             }
 
-        val jsonString = if (ChutneyUtil.isChutneyV1Json(findFile)) {
-            mapper.toString(ScenarioV1ToV2Converter().getScenarioV2(json).asMap())
-        } else {
-            json
-        }
-        val request = Request(content = jsonString, params = configuration.getRunSettings().variables.envs)
+        val request = Request(content = json, params = configuration.getRunSettings().variables.envs)
         val body = Gson().toJson(request, Request::class.java)
         try {
             val result = HttpClient.post<Report>(ChutneyServerInfo(serverUrl, "", ""), query, body)

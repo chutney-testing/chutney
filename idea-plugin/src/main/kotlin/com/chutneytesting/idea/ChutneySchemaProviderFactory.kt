@@ -17,6 +17,6 @@ class ChutneySchemaProviderFactory : JsonSchemaProviderFactory {
         if (project.isDisposed) {
             return listOf()
         }
-        return listOf(ChutneyJsonSchemaV1FileProvider(project), ChutneyJsonSchemaV2FileProvider(project))
+        return listOf(ChutneyJsonSchemaV2FileProvider(project))
     }
 }

@@ -37,10 +37,7 @@ class AddScenarioToLocalServer : RemoteScenarioBaseAction() {
         val titleAndDescription = getChutneyScenarioDescriptionFromFileName(file.name)
         try {
             val localServerURL = ChutneyServerRegistry.instance.myServer?.serverUrl ?: return
-            var content = escapeSql(HJsonUtils.convertHjson(psiFile.text))
-            if (ChutneyUtil.isChutneyV1Json(psiFile)) {
-                content = JsonValue.readHjson(ScenarioV1ToV2Converter().convert(content)).toString(Stringify.PLAIN)
-            }
+            val content = escapeSql(HJsonUtils.convertHjson(psiFile.text))
 
             val query = "/api/scenario/v2/raw"
             val body =
