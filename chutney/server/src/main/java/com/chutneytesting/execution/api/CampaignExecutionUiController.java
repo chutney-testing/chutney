@@ -8,6 +8,7 @@
 package com.chutneytesting.execution.api;
 
 import static com.chutneytesting.campaign.api.dto.CampaignExecutionReportMapper.toDto;
+import static com.chutneytesting.dataset.api.DataSetMapper.fromExecutionDatasetDto;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
@@ -115,15 +116,7 @@ public class CampaignExecutionUiController {
     ) {
         String userId = userService.currentUser().getId();
         CampaignExecution report;
-        DataSet ds = null;
-        if (dataset != null) {
-            ds = DataSet.builder()
-                .withId(dataset.getId())
-                .withName("")
-                .withConstants(ofNullable(dataset.getConstants()).map(KeyValue::toMap).orElse(null))
-                .withDatatable(ofNullable(dataset.getDatatable()).map(datatable -> datatable.stream().map(KeyValue::toMap).toList()).orElse(null))
-                .build();
-        }
+        DataSet ds = fromExecutionDatasetDto(dataset);
         report = campaignExecutionEngine.executeById(campaignId, environment.orElse(null), ds, userId);
         return toDto(report);
     }

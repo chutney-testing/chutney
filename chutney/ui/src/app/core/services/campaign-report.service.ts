@@ -6,12 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { CampaignExecutionFullReport, ScenarioExecutionReport, StepExecutionReport } from '@core/model';
+import { CampaignExecutionFullReport, KeyValue, ScenarioExecutionReport, StepExecutionReport } from '@core/model';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { TranslateService } from '@ngx-translate/core';
 import { DurationPipe } from '@shared/pipes';
 import jsPDF from 'jspdf';
 import autoTable, { CellHookData } from 'jspdf-autotable';
+import { ExecutionDataset } from "@core/model/scenario/execution.dataset";
 
 @Injectable({
     providedIn: 'root'
@@ -139,7 +140,12 @@ export class CampaignReportService {
             jsonResponse.user,
             jsonResponse.testCaseTitle,
             jsonResponse.error,
-            contextVariables
+            contextVariables,
+            datasetVariables ? new ExecutionDataset(
+                datasetVariables.get("constants") as Array<KeyValue>,
+                datasetVariables.get("datatable") as Array<Array<KeyValue>>,
+                String(datasetVariables.get("datasetId"))
+            ) : null
         );
     }
 

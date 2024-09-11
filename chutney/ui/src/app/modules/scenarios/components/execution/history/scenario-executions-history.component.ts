@@ -9,7 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { catchError, delay, map, switchMap, tap } from 'rxjs/operators';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 import { Dataset, Execution, GwtTestCase } from '@model';
-import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
+import { ScenarioExecutionService } from 'src/app/core/services/scenario-execution.service';
 import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { EMPTY, Observable, of, Subscription, zip } from 'rxjs';
 import { ScenarioService } from '@core/services';
@@ -299,7 +299,7 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
         const execution = this.executions.find(exec => exec.executionId === executionId);
         this.scenarioExecutionService.findExecutionReport(execution.scenarioId, execution.executionId).pipe(
             map(scenarioExecutionReport => {
-                const dataset = scenarioExecutionReport.datasetId || scenarioExecutionReport.constants || scenarioExecutionReport.datatable ? new Dataset("", "", [], new Date(), scenarioExecutionReport.constants, scenarioExecutionReport.datatable, scenarioExecutionReport.datasetId) : null;
+                const dataset = scenarioExecutionReport.dataset && (scenarioExecutionReport.dataset.datasetId || scenarioExecutionReport.dataset.constants || scenarioExecutionReport.dataset.datatable) ? new Dataset("", "", [], new Date(), scenarioExecutionReport.dataset.constants, scenarioExecutionReport.dataset.datatable, scenarioExecutionReport.dataset.datasetId) : null;
                 this.executeScenario(execution.environment, dataset)
             })
         ).subscribe()

@@ -18,6 +18,7 @@ import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { TranslateService } from '@ngx-translate/core';
 import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { DatasetUtils } from "@shared/tools/dataset-utils";
 
 @Component({
     selector: 'chutney-scenario-executions',
@@ -63,7 +64,8 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
                 private formBuilder: FormBuilder,
                 private datePipe: DateFormatPipe,
                 private translateService: TranslateService,
-                private modalService: BsModalService) {
+                private modalService: BsModalService,
+                private datasetUtils: DatasetUtils) {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -92,7 +94,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
         this.environments = [...new Set(this.executions.map(exec => exec.environment))].map(env => this.toSelectOption(env));
-        this.datasets = [...new Set(this.executions.map(exec => exec.dataset).filter(ds=> !!ds))].map(ds => ds.id ? ds.id : "Custom").map(ds => this.toSelectOption(ds));
+        this.datasets = this.removeDuplicateListItems(this.executions.map(exec => exec.dataset).filter(ds=> !!ds).map(ds => ds.id ? ds.id : "Custom").map(ds => this.toSelectOption(ds)));
         this.executors = [...new Set(this.executions.map(exec => exec.user))].map(user => this.toSelectOption(user));
         this.campaigns = [...new Set(this.executions.filter(exec => !!exec.campaignReport).map(exec => exec.campaignReport.campaignName))].map(camp => this.toSelectOption(camp));
         this.tags = [...new Set(this.executions.flatMap(exec => exec.tags))].map(tag => this.toSelectOption(tag));
@@ -131,11 +133,9 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     }
 
     protected getDatasetFromExecution(execution: Execution) {
-        if (execution.dataset) {
-            if (execution.dataset?.id) {
-                return execution.dataset?.id
-            }
-            return 'Custom'
+        const datasetName = this.datasetUtils.getExecutionDatasetName(execution.dataset)
+        if (datasetName.trim() != '') {
+            return datasetName
         }
         return this.scenario.defaultDataset;
     }
@@ -278,6 +278,19 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     replay(execution: Execution, event: MouseEvent) {
         event.stopPropagation();
         this.onReplay.emit(execution.executionId);
+    }
+
+    private removeDuplicateListItems(list: ListItem[]) {
+        const seen = new Set<string>();
+        return list.filter(elem => {
+            if (!elem) return false
+            const key = `${elem.text}-${elem.id}`
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
     }
 
     emitDeleteExecutionEvent() {

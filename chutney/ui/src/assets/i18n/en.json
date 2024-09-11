@@ -427,7 +427,8 @@
         },
         "actions": {
             "createDataset": "+ Edit new dataset"
-        }
+        },
+        "customLabel": "Custom"
     },
     "global": {
         "status": {

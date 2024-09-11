@@ -5,7 +5,7 @@
  *
  */
 
-import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
+import { ScenarioExecutionService } from '@core/services/scenario-execution.service';
 import { environment } from '@env/environment';
 import { of } from 'rxjs';
 import { HttpClient } from '@angular/common/http';

@@ -12,8 +12,11 @@ import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { Dataset, Execution, KeyValue, ScenarioExecutionReport } from '@model';
 import { HttpClient } from '@angular/common/http';
+import { ExecutionDataset } from "@core/model/scenario/execution.dataset";
 
-@Injectable()
+@Injectable({
+    providedIn: "root"
+})
 export class ScenarioExecutionService {
 
     resourceUrl = '/api/ui/scenario';
@@ -127,9 +130,7 @@ export class ScenarioExecutionService {
             jsonResponse.testCaseTitle,
             jsonResponse.error,
             contextVariables,
-            constants,
-            datatable,
-            datasetId
+            new ExecutionDataset(constants, datatable, datasetId)
         );
     }
 

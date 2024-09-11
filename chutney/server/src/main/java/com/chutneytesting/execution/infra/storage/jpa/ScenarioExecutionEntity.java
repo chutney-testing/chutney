@@ -28,6 +28,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Version;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
 
 @Entity(name = "SCENARIO_EXECUTIONS")
@@ -73,6 +74,9 @@ public class ScenarioExecutionEntity {
     @Column(name = "TAGS")
     private String tags;
 
+    @Column(name = "DATASET_ID")
+    private String datasetId;
+
     @Column(name = "VERSION")
     @Version
     private Integer version;
@@ -92,6 +96,7 @@ public class ScenarioExecutionEntity {
         String scenarioTitle,
         String environment,
         String userId,
+        String datasetId,
         String tags,
         Integer version
     ) {
@@ -106,6 +111,7 @@ public class ScenarioExecutionEntity {
         this.scenarioTitle = scenarioTitle;
         this.environment = environment;
         this.userId = userId;
+        this.datasetId = datasetId;
         this.tags = tags;
         this.version = version;
     }
@@ -166,6 +172,10 @@ public class ScenarioExecutionEntity {
         return userId;
     }
 
+    public String datasetId() {
+        return datasetId;
+    }
+
     public String tags() {
         return tags;
     }
@@ -191,6 +201,7 @@ public class ScenarioExecutionEntity {
             execution.testCaseTitle(),
             execution.environment(),
             execution.user(),
+            execution.dataset().map(ds -> ds.id).orElse(null),
             truncateExecutionTags(TagListMapper.tagsToString(execution.tags().orElse(null))),
             version
         );
@@ -204,6 +215,12 @@ public class ScenarioExecutionEntity {
         return toDomain(campaignReport, null);
     }
     public ExecutionHistory.ExecutionSummary toDomain(CampaignExecution campaignReport, DataSet dataset) {
+        Optional<DataSet> scenarioDataset = ofNullable(datasetId)
+            .map(id -> DataSet.builder()
+                .withId(datasetId)
+                .withName("")
+                .build())
+            .or(() -> ofNullable(dataset));
         return ImmutableExecutionHistory.ExecutionSummary.builder()
             .executionId(id)
             .time(Instant.ofEpochMilli(executionTime).atZone(ZoneId.systemDefault()).toLocalDateTime())
@@ -213,7 +230,7 @@ public class ScenarioExecutionEntity {
             .error(ofNullable(error))
             .testCaseTitle(scenarioTitle)
             .environment(environment)
-            .dataset(ofNullable(dataset))
+            .dataset(scenarioDataset)
             .user(userId)
             .campaignReport(ofNullable(campaignReport))
             .scenarioId(scenarioId)

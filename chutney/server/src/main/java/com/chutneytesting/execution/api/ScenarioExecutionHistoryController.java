@@ -9,8 +9,10 @@ package com.chutneytesting.execution.api;
 
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
+import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import java.util.List;
 import java.util.Set;
+import java.util.Optional;
 import org.springframework.http.MediaType;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -45,7 +47,14 @@ class ScenarioExecutionHistoryController {
     @PreAuthorize("hasAuthority('SCENARIO_READ')")
     @GetMapping(path = "/api/ui/scenario/{scenarioId}/execution/{executionId}/v1", produces = MediaType.APPLICATION_JSON_VALUE)
     public ExecutionHistory.Execution getExecutionReport(@PathVariable("scenarioId") String scenarioId, @PathVariable("executionId") Long executionId) {
-        return executionHistoryRepository.getExecution(scenarioId, executionId); // TODO - return ExecutionReportDto
+        ExecutionHistory.Execution execution = executionHistoryRepository.getExecution(scenarioId, executionId); // TODO - return ExecutionReportDto
+        if (execution.dataset().isPresent()
+            && execution.dataset().get().id == null
+            && (execution.dataset().get().datatable == null || execution.dataset().get().datatable.isEmpty())
+            && (execution.dataset().get().constants == null || execution.dataset().get().constants.isEmpty())) {
+          return ImmutableExecutionHistory.Execution.copyOf(execution).withDataset(Optional.empty());
+        }
+        return execution;
     }
 
     @PreAuthorize("hasAuthority('SCENARIO_EXECUTE')")

@@ -7,10 +7,7 @@
 
 package com.chutneytesting.campaign.api.dto;
 
-import com.chutneytesting.dataset.api.DataSetDto;
-import com.chutneytesting.dataset.api.ImmutableDataSetDto;
-import com.chutneytesting.dataset.api.KeyValue;
-import com.chutneytesting.server.core.domain.dataset.DataSet;
+import com.chutneytesting.dataset.api.DataSetMapper;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.List;
@@ -29,7 +26,7 @@ public class CampaignExecutionReportMapper {
             campaignReport.status(),
             campaignReport.partialExecution,
             campaignReport.executionEnvironment,
-            datasetToDto(campaignReport.dataset),
+            DataSetMapper.toDto(campaignReport.dataset),
             campaignReport.userId,
             campaignReport.getDuration());
     }
@@ -45,22 +42,5 @@ public class CampaignExecutionReportMapper {
             campaignReport.executionEnvironment,
             campaignReport.userId,
             campaignReport.getDuration());
-    }
-
-    public static DataSetDto datasetToDto(DataSet dataset) {
-        if (dataset == null) {
-            return null;
-        }
-        ImmutableDataSetDto.Builder datasetBuilder = ImmutableDataSetDto.builder().name("");
-        if (dataset.id != null) {
-            datasetBuilder.id(dataset.id);
-        }
-        if (dataset.constants != null) {
-            datasetBuilder.constants(KeyValue.fromMap(dataset.constants));
-        }
-        if (dataset.datatable != null) {
-            datasetBuilder.datatable(dataset.datatable.stream().map(KeyValue::fromMap).toList());
-        }
-        return datasetBuilder.build();
     }
 }

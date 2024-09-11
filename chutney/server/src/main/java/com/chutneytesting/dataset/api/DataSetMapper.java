@@ -8,20 +8,26 @@
 package com.chutneytesting.dataset.api;
 
 
+import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
+
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 
 public class DataSetMapper {
 
     public static DataSetDto toDto(DataSet dataSet) {
-        return ImmutableDataSetDto.builder()
-            .id(dataSet.id)
-            .name(dataSet.name)
-            .description(dataSet.description)
-            .lastUpdated(dataSet.creationDate)
-            .tags(dataSet.tags)
-            .constants(KeyValue.fromMap(dataSet.constants))
-            .datatable(dataSet.datatable.stream().map(KeyValue::fromMap).toList())
-            .build();
+        if (dataSet == null) {
+            return null;
+        }
+        ImmutableDataSetDto.Builder datasetBuilder = ImmutableDataSetDto.builder().name("");
+        if (dataSet.id != null) datasetBuilder.id(dataSet.id);
+        if (dataSet.name != null) datasetBuilder.name(dataSet.name);
+        if (dataSet.constants != null) datasetBuilder.constants(KeyValue.fromMap(dataSet.constants));
+        if (dataSet.datatable != null) datasetBuilder.datatable(dataSet.datatable.stream().map(KeyValue::fromMap).toList());
+        if (dataSet.tags != null) datasetBuilder.tags(dataSet.tags);
+        if (dataSet.description != null) datasetBuilder.description(dataSet.description);
+        if (dataSet.creationDate != null) datasetBuilder.lastUpdated(dataSet.creationDate);
+        return datasetBuilder.build();
     }
 
     public static DataSet fromDto(DataSetDto dto) {
@@ -32,7 +38,19 @@ public class DataSetMapper {
             .withCreationDate(dto.lastUpdated())
             .withTags(dto.tags())
             .withConstants(KeyValue.toMap(dto.constants()))
-            .withDatatable(dto.datatable().stream().map(KeyValue::toMap).toList())
+            .withDatatable(ofNullable(dto.datatable()).map(datatable -> datatable.stream().map(KeyValue::toMap).toList()).orElse(emptyList()))
+            .build();
+    }
+
+    public static DataSet fromExecutionDatasetDto(ExecutionDatasetDto dto) {
+        if (dto == null) {
+            return null;
+        }
+        return DataSet.builder()
+            .withId(dto.getId())
+            .withName("")
+            .withConstants(ofNullable(dto.getConstants()).map(KeyValue::toMap).orElse(null))
+            .withDatatable(ofNullable(dto.getDatatable()).map(datatable -> datatable.stream().map(KeyValue::toMap).toList()).orElse(null))
             .build();
     }
 }

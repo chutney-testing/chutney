@@ -5,14 +5,14 @@
  *
  */
 
-import {ChangeDetectorRef, Component, inject, Input, OnInit} from "@angular/core";
-import {Dataset, KeyValue} from "@core/model";
-import {DataSetService, EnvironmentService} from "@core/services";
-import {NgbActiveModal} from "@ng-bootstrap/ng-bootstrap";
-import {TranslateService} from "@ngx-translate/core";
-import {catchError, map} from "rxjs/operators";
-import {FormArray, FormBuilder, FormControl, FormGroup, Validators} from "@angular/forms";
-import {Observable, of} from "rxjs";
+import { ChangeDetectorRef, Component, inject, Input, OnInit } from "@angular/core";
+import { Dataset, KeyValue } from "@core/model";
+import { DataSetService, EnvironmentService } from "@core/services";
+import { NgbActiveModal } from "@ng-bootstrap/ng-bootstrap";
+import { TranslateService } from "@ngx-translate/core";
+import { catchError } from "rxjs/operators";
+import { FormArray, FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { firstValueFrom, Observable, of } from "rxjs";
 
 
 @Component({
@@ -57,14 +57,12 @@ export class ScenarioExecuteModalComponent implements OnInit {
 
 
     ngOnInit(): void {
-        this.translateService.get('dataset.actions.createDataset').pipe(
-            map((res: string) => this.createDataset = new Dataset(res, "", [], new Date(), [], [])),
-            map(createDataset => {
-                this.datasetService.findAll().subscribe((res: Array<Dataset>) => {
-                    this.datasets = [...res, createDataset];
-                    this.filteredDatasets = [...res, createDataset];
-            });
-        })).subscribe();
+        const createDatasetLabel = this.translateService.instant('dataset.actions.createDataset');
+        this.createDataset = new Dataset(createDatasetLabel, "", [], new Date(), [], [])
+        this.datasetService.findAll().subscribe((res: Array<Dataset>) => {
+                this.datasets = [...res, this.createDataset];
+                this.filteredDatasets = [...res, this.createDataset];
+        });
 
         this.datasetForm = this.formBuilder.group({
             saveDatasetName: new FormControl({ value: '', disabled: true }),
@@ -93,34 +91,30 @@ export class ScenarioExecuteModalComponent implements OnInit {
         }
     }
 
-    executeModal() {
+    async executeModal() {
+        let dataset : Dataset = this.selectedDataset
         if (this.editionDataset) {
             const editedDataset = this.buildDataset();
             if (this.validateDatasetCreation(editedDataset)) {
-                this.translateService.get("scenarios.execution.modal.error.invalidDataset").subscribe(res => {
-                    this.errorMessage = res
-                })
+                this.errorMessage = this.translateService.instant("scenarios.execution.modal.error.invalidDataset")
                 return;
             }
             if (this.datasetForm.get("saveDatasetCheckbox").value) {
                 const datasetName = editedDataset.name
                 if (!datasetName || datasetName.trim() === '') {
-                    this.translateService.get("scenarios.execution.modal.error.datasetEmptyName").subscribe(res => {
-                        this.errorMessage = res
-                    })
+                    this.errorMessage = this.translateService.instant("scenarios.execution.modal.error.datasetEmptyName")
                     return;
                 }
-                this.saveDataset(editedDataset).subscribe(dataset => {
-                    if (dataset) {
-                        this.execute(dataset)
-                    }
-                })
+                const savedDataset = await firstValueFrom(this.saveDataset(editedDataset))
+                if (!savedDataset) {
+                    return;
+                }
+                dataset = savedDataset
             } else {
-                this.execute(editedDataset)
+                dataset = editedDataset
             }
-        } else {
-            this.execute(this.selectedDataset)
         }
+        this.execute(dataset)
     }
 
     execute(dataset: Dataset) {
@@ -158,7 +152,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
 
         return new Dataset(
             this.datasetForm.get("saveDatasetName").value,
-            "Created from " + this.selectedDataset.name,
+            this.selectedDataset.id ? "Created from " + this.selectedDataset.name : "Inline",
             [],
             new Date(),
             keyValues,
@@ -177,7 +171,7 @@ export class ScenarioExecuteModalComponent implements OnInit {
     }
 
     getDatasetDetails() {
-        if (this.selectedDataset) {
+        if (this.selectedDataset && this.selectedDataset?.id) {
             this.datasetService.findById(this.selectedDataset?.id).subscribe((res: Dataset) => {
                 this.datasetDetails = res;
             });

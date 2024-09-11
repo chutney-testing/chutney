@@ -19,6 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
+import { DatasetUtils } from "@shared/tools/dataset-utils";
 
 @Component({
     selector: 'chutney-campaign-executions',
@@ -52,6 +53,7 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     constructor(private formBuilder: FormBuilder,
                 private datePipe: DateFormatPipe,
                 private translateService: TranslateService,
+                private datasetUtils: DatasetUtils,
                 @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings) {
     }
 
@@ -85,7 +87,7 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.report.status))].map(status => this.toSelectOption(status,  this.translateService.instant(ExecutionStatus.toString(status))));
         this.environments = [...new Set(this.executions.map(exec => exec.report.executionEnvironment))].map(env => this.toSelectOption(env));
-        this.datasets = [...new Set(this.executions.map(exec => exec.report.dataset))].map(dataset => dataset ? this.toSelectOption(dataset.id ? dataset.id : "Custom") : null).filter(ds => ds);
+        this.datasets = this.removeDuplicateListItems(this.executions.map(exec => exec.report.dataset).map(dataset => dataset ? this.toSelectOption(dataset.id ? dataset.id : "Custom") : null).filter(ds => ds));
         this.executors = [...new Set(this.executions.map(exec => exec.report.user))].map(user => this.toSelectOption(user));
     }
 
@@ -110,13 +112,7 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     }
 
     protected getDataset(execution: CampaignReport) {
-        if (execution.report.dataset) {
-            if (execution.report.dataset?.id) {
-                return execution.report.dataset?.id
-            }
-            return 'Custom'
-        }
-        return this.campaign.datasetId
+        return this.datasetUtils.getDatasetName(execution.report.dataset)
     }
 
     private onFiltersChange() {
@@ -221,5 +217,18 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
         }
 
         return keywordMatch && statusMatch && dateMatch && userMatch && envMatch;
+    }
+
+    private removeDuplicateListItems(list: ListItem[]) {
+        const seen = new Set<string>();
+        return list.filter(elem => {
+            if (!elem) return false
+            const key = `${elem.text}-${elem.id}`
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
     }
 }
