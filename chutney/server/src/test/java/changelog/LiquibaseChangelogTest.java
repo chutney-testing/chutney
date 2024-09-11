@@ -130,7 +130,7 @@ class LiquibaseChangelogTest {
             @DisplayName("Set scenario executions sequence correctly")
             void set_scenario_executions_sequence_value_after_migration() {
                 ScenarioExecutionEntity execution = transactionTemplate.execute(status -> {
-                    ScenarioExecutionEntity e = new ScenarioExecutionEntity(null, "1", null, null, null, null, null, null, null, null, null, null, null);
+                    ScenarioExecutionEntity e = new ScenarioExecutionEntity(null, "1", null, null, null, null, null, null, null, null, null, null, null, null);
                     entityManager.persist(e);
                     return e;
                 });

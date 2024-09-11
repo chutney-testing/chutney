@@ -516,7 +516,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                     .addScenarioExecutionReport(scenarioExecutionOneReport)
                     .addScenarioExecutionReport(scenarioExecutionTwoReport)
                     .userId("user")
-                    .dataSetId("ds287")
+                    .dataset(DataSet.builder().withName("ds287").build())
                     .build();
                 campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
