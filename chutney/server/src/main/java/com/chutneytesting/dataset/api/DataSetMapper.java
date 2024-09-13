@@ -12,6 +12,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.server.core.domain.dataset.DataSet;
+import org.springframework.util.CollectionUtils;
 
 public class DataSetMapper {
 
@@ -44,6 +45,11 @@ public class DataSetMapper {
 
     public static DataSet fromExecutionDatasetDto(ExecutionDatasetDto dto) {
         if (dto == null) {
+            return null;
+        }
+        else if (dto.getId() == null &&
+            CollectionUtils.isEmpty(dto.getConstants()) &&
+            CollectionUtils.isEmpty(dto.getDatatable())) {
             return null;
         }
         return DataSet.builder()
