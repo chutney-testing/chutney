@@ -1,0 +1,18 @@
+#SPDX-FileCopyrightText: 2017-2024 Enedis
+#SPDX-License-Identifier: Apache-2.0
+
+name: 'build acceptance tests'
+description: 'build acceptance tests'
+
+runs:
+  using: "composite"
+  steps:
+    - uses: actions/checkout@v4
+
+    - name: Build acceptance tests
+      shell: bash
+      run: |
+        cd ./acceptance-tests
+        echo "Running: clean test"
+        mvn clean test
+        cd ..

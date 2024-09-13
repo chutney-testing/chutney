@@ -192,11 +192,6 @@
         </dependency>
         <dependency>
             <groupId>com.chutneytesting</groupId>
-            <artifactId>chutney-junit-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.chutneytesting</groupId>
             <artifactId>ui</artifactId>
             <scope>test</scope>
         </dependency>
