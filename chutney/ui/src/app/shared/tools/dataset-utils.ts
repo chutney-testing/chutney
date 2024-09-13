@@ -18,13 +18,13 @@ export class DatasetUtils {
 
     public getDatasetName(dataset?: Dataset) {
         if (!dataset) return ''
-        return this.getExecutionDatasetName({id: dataset.id, constants: dataset.uniqueValues, datatable: dataset.multipleValues})
+        return this.getExecutionDatasetName({datasetId: dataset.id, constants: dataset.uniqueValues, datatable: dataset.multipleValues})
     }
 
-    public getExecutionDatasetName(dataset?: {id?: string, constants?: Array<KeyValue>, datatable?: Array<Array<KeyValue>> }) {
+    public getExecutionDatasetName(dataset?: {datasetId?: string, constants?: Array<KeyValue>, datatable?: Array<Array<KeyValue>> }) {
         if (dataset) {
-            if (dataset?.id) {
-                return dataset?.id
+            if (dataset?.datasetId) {
+                return dataset?.datasetId
             } else if ((dataset.constants && (dataset.constants.length > 0)) || (dataset.datatable && (dataset.datatable.length > 0))) {
                 return this.translateService.instant("dataset.customLabel")
             }

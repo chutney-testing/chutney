@@ -6,7 +6,7 @@
  */
 
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
-import { CampaignExecutionReport, Dataset } from '@core/model';
+import { CampaignExecutionReport, Dataset, KeyValue } from '@core/model';
 
 export class Execution {
 
@@ -49,7 +49,24 @@ export class Execution {
       jsonObject.error,
       jsonObject.scenarioId,
       jsonObject.campaignReport,
-      jsonObject.dataset
+      this.getDataset(jsonObject.dataset)
     );
+  }
+
+  private static getDataset(jsonDataset: any) {
+      if (!jsonDataset) {
+          return null;
+      }
+      const constants = jsonDataset.constants &&  Object.keys(jsonDataset.constants).map(key => new KeyValue(key,jsonDataset.constants[key]));
+      const datatable = jsonDataset.datatable?.map(line => Object.keys(line).map(key => new KeyValue(key, line[key])))
+      return new Dataset(
+          jsonDataset.name,
+          jsonDataset.description,
+          jsonDataset.tags,
+          jsonDataset.lastUpdated,
+          constants,
+          datatable,
+          jsonDataset.id
+      )
   }
 }

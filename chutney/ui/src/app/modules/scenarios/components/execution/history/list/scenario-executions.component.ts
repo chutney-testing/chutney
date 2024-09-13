@@ -133,7 +133,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     }
 
     protected getDatasetFromExecution(execution: Execution) {
-        const datasetName = this.datasetUtils.getExecutionDatasetName(execution.dataset)
+        const datasetName = this.datasetUtils.getDatasetName(execution.dataset)
         if (datasetName.trim() != '') {
             return datasetName
         }

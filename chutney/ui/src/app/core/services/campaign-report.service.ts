@@ -50,7 +50,7 @@ export class CampaignReportService {
         const hasDataset = report.scenarioExecutionReports.some(s => s.dataset);
         if(hasDataset){
             dataHeader = [["id", "Scenario", "Status", "Dataset", "error"]];
-            dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.dataset, s.error.toString()]);
+            dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.dataset ? (s.dataset.id || this.translate.instant("dataset.customLabel")) : '', s.error.toString()]);
         } else {
             dataHeader = [["id", "Scenario", "Status", "error"]];
             dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.error.toString()]);
@@ -91,7 +91,7 @@ export class CampaignReportService {
                 let r = this.buildExecutionReport(s);
                 pdf.text(r.scenarioName, 15, 25);
                 if(s.dataset) {
-                    pdf.text(`${this.translate.instant('scenarios.execution.dataset.title')}: ${s.dataset}`, 15, startY);
+                    pdf.text(`${this.translate.instant('scenarios.execution.dataset.title')}: ${s.dataset.id || this.translate.instant("dataset.customLabel")}`, 15, startY);
                     startY += 5;
                 }
                 const scenarioReportBody = r.report.steps.map(step => [step.name, step.status, this.buildErrorMessage(step)]);
