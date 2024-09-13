@@ -37,5 +37,6 @@ services:
     ports:
       - 3000:3000
     volumes:
-      - ./supervision/grafana/grafana.db:/var/lib/grafana/grafana.db
+      - ./supervision/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ./supervision/grafana/dashboards/:/etc/grafana/provisioning/dashboards
 
