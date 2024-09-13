@@ -14,8 +14,6 @@ plugins {
   kotlin("jvm") version "2.0.20"
   // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
   id("org.jetbrains.intellij.platform") version "2.0.1"
-  // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-  //id("org.jetbrains.intellij.platform.migration") version "2.0.1"
 }
 
 configurations.all {
