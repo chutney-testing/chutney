@@ -152,6 +152,9 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
         if (filters.environments && filters.environments.length) {
             params['env'] = filters.environments.map(env => env.id).toString();
         }
+        if (filters.dataset && filters.dataset.length) {
+            params['dataset'] = filters.dataset.map(dataset => dataset.id).toString();
+        }
         if (filters.executors && filters.executors.length) {
             params['exec'] = filters.executors.map(env => env.id).toString();
         }
@@ -185,6 +188,8 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
                 + space
                 + report.executionEnvironment
                 + space
+                + report.dataset
+                + space
                 + this.datePipe.transform(report.startDate, 'DD MMM. YYYY HH:mm')
                 + space
                 + report.executionId
@@ -216,7 +221,12 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
             envMatch = !!filters.environments.find(env => env.id === report.executionEnvironment);
         }
 
-        return keywordMatch && statusMatch && dateMatch && userMatch && envMatch;
+        let datasetMatch = true;
+        if (filters.dataset && filters.dataset.length) {
+            datasetMatch = !!filters.dataset.find(dataset => this.datasetUtils.getDatasetName(dataset) == this.datasetUtils.getDatasetName(report.dataset));
+        }
+
+        return keywordMatch && statusMatch && dateMatch && userMatch && envMatch && datasetMatch;
     }
 
     private removeDuplicateListItems(list: ListItem[]) {

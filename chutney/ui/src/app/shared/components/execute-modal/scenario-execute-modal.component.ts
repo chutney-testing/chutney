@@ -150,6 +150,12 @@ export class ScenarioExecuteModalComponent implements OnInit {
         const mkv = this.datasetForm.controls['multiKeyValues'] as FormArray;
         const multiKeyValues = mkv.value ? mkv.value.map(a => a.map((p) => new KeyValue(p.key, p.value))) : [];
 
+        if (this.selectedDataset && this.selectedDataset.id
+            && this.compareDatatable(multiKeyValues, this.selectedDataset.multipleValues)
+            && this.compareKeyValueArraysUnordered(keyValues, this.selectedDataset.uniqueValues)) {
+            return this.selectedDataset // The dataset is in edition mode but has not been edited, return the original dataset
+        }
+
         return new Dataset(
             this.datasetForm.get("saveDatasetName").value,
             this.selectedDataset.id ? "Created from " + this.selectedDataset.name : "Inline",
@@ -218,5 +224,33 @@ export class ScenarioExecuteModalComponent implements OnInit {
 
     get datasetFormControl() {
         return this.datasetForm.controls;
+    }
+
+    private compareDatatable(datatable1: Array<Array<KeyValue>>, datatable2: Array<Array<KeyValue>>) {
+        if (datatable1.length !== datatable2.length) {
+            return false;
+        }
+        for (let i = 0; i < datatable1.length; i++) {
+            const innerArr1 = datatable1[i];
+            const innerArr2 = datatable2[i];
+            if (!this.compareKeyValueArraysUnordered(innerArr1, innerArr2)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private compareKeyValueArraysUnordered(array1: Array<KeyValue>, array2: Array<KeyValue>): boolean {
+        if (array1.length !== array2.length) {
+            return false;
+        }
+        const sortedArray1 = array1.slice().sort((a, b) => a.key.localeCompare(b.key));
+        const sortedArray2 = array2.slice().sort((a, b) => a.key.localeCompare(b.key));
+        for (let i = 0; i < sortedArray1.length; i++) {
+            if (!sortedArray1[i].equals(sortedArray2[i])) {
+                return false;
+            }
+        }
+        return true;
     }
 }
