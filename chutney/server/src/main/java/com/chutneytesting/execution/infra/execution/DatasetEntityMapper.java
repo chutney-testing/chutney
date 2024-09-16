@@ -16,10 +16,13 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DatasetEntityMapper {
 
     private static ObjectMapper mapper = new ObjectMapper();
+    private static Logger logger = LoggerFactory.getLogger(DatasetEntityMapper.class);
 
     private static List<Map<String, String>> datasetDatatableFromString(String datasetDatatable) {
         if (datasetDatatable == null) {
@@ -29,6 +32,7 @@ public class DatasetEntityMapper {
             return mapper.readValue(datasetDatatable, new TypeReference<>() {
             });
         } catch (JsonProcessingException e) {
+            logger.error("Error while parsing dataset datatable", e);
             return emptyList();
         }
     }
@@ -41,6 +45,7 @@ public class DatasetEntityMapper {
             return mapper.readValue(datasetConstants, new TypeReference<>() {
             });
         } catch (JsonProcessingException e) {
+            logger.error("Error while parsing dataset constants", e);
             return emptyMap();
         }
     }
@@ -52,6 +57,7 @@ public class DatasetEntityMapper {
         try {
             return mapper.writeValueAsString(datatable);
         } catch (JsonProcessingException e) {
+            logger.error("Error while serializing dataset datatable to string", e);
             return null;
         }
     }
@@ -63,6 +69,7 @@ public class DatasetEntityMapper {
         try {
             return mapper.writeValueAsString(constants);
         } catch (JsonProcessingException e) {
+            logger.error("Error while serializing dataset constants to string", e);
             return null;
         }
     }

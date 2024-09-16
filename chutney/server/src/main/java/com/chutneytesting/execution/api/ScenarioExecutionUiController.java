@@ -112,16 +112,7 @@ public class ScenarioExecutionUiController {
         LOGGER.debug("execute async scenario '{}'", scenarioId);
         TestCase testCase = testCaseRepository.findExecutableById(scenarioId).orElseThrow(() -> new ScenarioNotFoundException(scenarioId));
         String userId = userService.currentUser().getId();
-        DataSet execDataset = ofNullable(dataset).map(eds -> {
-            if (eds.getId() != null) {
-                return datasetRepository.findById(eds.getId());
-            }
-            return DataSet.builder()
-                .withName("")
-                .withConstants(KeyValue.toMap(eds.getConstants()))
-                .withDatatable(ofNullable(eds.getDatatable()).map(datatable -> datatable.stream().map(KeyValue::toMap).toList()).orElse(null))
-                .build();
-        }).orElseGet(() -> getDataSet(testCase));
+        DataSet execDataset = getDataSet(dataset, testCase);
         return executionEngineAsync.execute(new ExecutionRequest(testCase, env, userId, execDataset)).toString();
     }
 
@@ -137,7 +128,7 @@ public class ScenarioExecutionUiController {
         LOGGER.debug("executeScenario for scenarioId='{}'", scenarioId);
         TestCase testCase = testCaseRepository.findExecutableById(scenarioId).orElseThrow(() -> new ScenarioNotFoundException(scenarioId));
         String userId = userService.currentUserId();
-        DataSet dataset = getDataSet(testCase);
+        DataSet dataset = getDataSetFromTestCase(testCase);
         ScenarioExecutionReport report = executionEngine.simpleSyncExecution(new ExecutionRequest(testCase, env, userId, dataset));
 
         return reportObjectMapper.writeValueAsString(this.scenarioExecutionReportMapper.toDto(report));
@@ -186,13 +177,28 @@ public class ScenarioExecutionUiController {
         ).toFlowable(BackpressureStrategy.BUFFER));
     }
 
-    private DataSet getDataSet(TestCase testCase) {
+    private DataSet getDataSetFromTestCase(TestCase testCase) {
         String defaultDatasetId = testCase.metadata().defaultDataset();
         if (!defaultDatasetId.isEmpty()) {
             return datasetRepository.findById(defaultDatasetId);
         } else {
             return DataSet.NO_DATASET;
         }
+    }
+
+    private DataSet getDataSet(ExecutionDatasetDto dataset, TestCase testCase) {
+        if (dataset == null) {
+            return getDataSetFromTestCase(testCase);
+        } else if (dataset.getId() != null) {
+            return datasetRepository.findById(dataset.getId());
+        } else if (dataset.getConstants() != null || dataset.getDatatable() != null) {
+            return DataSet.builder()
+                .withName("")
+                .withConstants(KeyValue.toMap(dataset.getConstants()))
+                .withDatatable(ofNullable(dataset.getDatatable()).map(datatable -> datatable.stream().map(KeyValue::toMap).toList()).orElse(null))
+                .build();
+        }
+        return getDataSetFromTestCase(testCase);
     }
 
     // TODO - Use Spring serialization

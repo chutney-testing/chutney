@@ -100,11 +100,7 @@ public class CampaignExecution {
 
     public void startScenarioExecution(TestCaseDataset testCaseDataset, String executionEnvironment) throws UnsupportedOperationException {
         OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
-            .filter(i -> {
-                var se = this.scenarioExecutions.get(i);
-                return se.scenarioId().equals(testCaseDataset.testcase().id()) &&
-                    DatasetUtils.compareDataset(se.execution().dataset().orElse(null), selectDatasetId(testCaseDataset).orElse(null));
-            })
+            .filter(i -> scenarioIdAndDatasetMatch(selectDatasetId(testCaseDataset).orElse(null), testCaseDataset.testcase().id(), i))
             .findFirst();
         this.scenarioExecutions.set(indexOpt.getAsInt(),
             new ScenarioExecutionCampaign(
@@ -126,11 +122,7 @@ public class CampaignExecution {
 
     public void updateScenarioExecutionId(ExecutionHistory.Execution storedExecution) throws UnsupportedOperationException {
         OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
-            .filter(i -> {
-                var se = this.scenarioExecutions.get(i);
-                return se.scenarioId().equals(storedExecution.scenarioId()) &&
-                    compareDataset(se.execution().dataset().orElse(null), storedExecution.dataset().orElse(null));
-            })
+            .filter(i -> scenarioIdAndDatasetMatch(storedExecution.dataset().orElse(null), storedExecution.scenarioId(), i))
             .findFirst();
         var scenarioExecution = this.scenarioExecutions.get(indexOpt.getAsInt()).execution();
         this.scenarioExecutions.set(indexOpt.getAsInt(),
@@ -141,6 +133,12 @@ public class CampaignExecution {
                     .from(scenarioExecution)
                     .executionId(storedExecution.executionId())
                     .build()));
+    }
+
+    private boolean scenarioIdAndDatasetMatch(DataSet dataset, String scenarioId, int i) {
+        var se = this.scenarioExecutions.get(i);
+        return se.scenarioId().equals(scenarioId) &&
+            compareDataset(se.execution().dataset().orElse(null), dataset);
     }
 
     private Optional<DataSet> selectDatasetId(TestCaseDataset testCaseDataset) {

@@ -115,9 +115,8 @@ public class CampaignExecutionUiController {
             @RequestBody ExecutionDatasetDto dataset
     ) {
         String userId = userService.currentUser().getId();
-        CampaignExecution report;
         DataSet ds = fromExecutionDatasetDto(dataset);
-        report = campaignExecutionEngine.executeById(campaignId, environment.orElse(null), ds, userId);
+        CampaignExecution report = campaignExecutionEngine.executeById(campaignId, environment.orElse(null), ds, userId);
         return toDto(report);
     }
 }

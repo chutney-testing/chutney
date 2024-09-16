@@ -83,7 +83,7 @@ public class ScenarioExecutionReportEntity {
             .build();
     }
 
-    private DataSet getDatasetFromReport(String report) {
+    protected DataSet getDatasetFromReport(String report) {
         try { // TODO unit test \o/
             ScenarioExecutionReport scenarioExecutionReport = ReportObjectMapperConfiguration.reportObjectMapper().readValue(report, ScenarioExecutionReport.class);
             if (scenarioExecutionReport.datasetId == null &&
