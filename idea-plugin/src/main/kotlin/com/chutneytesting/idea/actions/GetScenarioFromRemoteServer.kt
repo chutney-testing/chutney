@@ -15,6 +15,7 @@ import com.chutneytesting.idea.util.sanitizeFilename
 import com.chutneytesting.kotlin.util.HttpClient
 import com.google.gson.Gson
 import com.intellij.json.JsonFileType
+import com.intellij.openapi.actionSystem.ActionUpdateThread
 import com.intellij.openapi.actionSystem.AnAction
 import com.intellij.openapi.actionSystem.AnActionEvent
 import com.intellij.openapi.actionSystem.CommonDataKeys
@@ -121,4 +122,7 @@ class GetScenarioFromRemoteServer : AnAction() {
         dialogBuilder.show()
     }
 
+    override fun getActionUpdateThread(): ActionUpdateThread {
+      return ActionUpdateThread.BGT
+    }
 }

@@ -8,10 +8,7 @@
 package com.chutneytesting.idea.actions
 
 import com.chutneytesting.idea.util.HJsonUtils
-import com.intellij.openapi.actionSystem.AnAction
-import com.intellij.openapi.actionSystem.AnActionEvent
-import com.intellij.openapi.actionSystem.LangDataKeys
-import com.intellij.openapi.actionSystem.PlatformDataKeys
+import com.intellij.openapi.actionSystem.*
 import com.intellij.openapi.command.WriteCommandAction
 import com.intellij.openapi.editor.EditorModificationUtil
 import com.intellij.openapi.ui.DialogBuilder
@@ -63,5 +60,9 @@ class PasteHJsonFromClipBoardAction : AnAction() {
             }
             WriteCommandAction.runWriteCommandAction(ed.project, r)
         }
+    }
+
+    override fun getActionUpdateThread(): ActionUpdateThread {
+      return ActionUpdateThread.BGT
     }
 }

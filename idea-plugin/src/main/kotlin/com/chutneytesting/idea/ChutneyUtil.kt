@@ -26,9 +26,8 @@ import java.io.File
 
 object ChutneyUtil {
 
-    val mapper: ObjectMapper = ObjectMapper()
-    val yamlReader = ObjectMapper(YAMLFactory())
-    val jsonReferenceProcessor = JsonReferenceProcessor().apply {
+    private val mapper: ObjectMapper = ObjectMapper()
+    private val jsonReferenceProcessor = JsonReferenceProcessor().apply {
         maxDepth = -1
         isPreserveRefs = true
         // isCacheInMemory = true
@@ -40,28 +39,12 @@ object ChutneyUtil {
         return mapper.writeValueAsString(node)
     }
 
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated("remove once all scenario are renamed from iceberg.json -> chutney.json")
-    fun isLegacyScenarioJson(jsonPsi: PsiFile): Boolean {
-        return jsonPsi.name.indexOf("iceberg.json") > 1
-    }
-
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated("remove once all scenario are renamed from iceberg.yaml -> chutney.yaml")
-    fun isLegacyScenarioYaml(jsonPsi: PsiFile): Boolean {
-        return jsonPsi.name.indexOf("iceberg.yaml") > 1 || jsonPsi.name.indexOf("iceberg.yml") > 1
-    }
-
     fun isChutneyJson(jsonPsi: PsiFile): Boolean {
-        return jsonPsi.name.indexOf("scenario.json") > 1 || jsonPsi.name.indexOf("chutney.json") > 1 || isLegacyScenarioJson(
-            jsonPsi
-        )
+        return jsonPsi.name.indexOf("scenario.json") > 1 || jsonPsi.name.indexOf("chutney.json") > 1
     }
 
     fun isChutneyYaml(jsonPsi: PsiFile): Boolean {
-        return jsonPsi.name.indexOf("chutney.yml") > 1 || jsonPsi.name.indexOf("chutney.yaml") > 1 || isLegacyScenarioYaml(
-            jsonPsi
-        )
+        return jsonPsi.name.indexOf("chutney.yml") > 1 || jsonPsi.name.indexOf("chutney.yaml") > 1
     }
 
     private fun isChutneyDsl(ktPsi: PsiFile?): Boolean {
@@ -92,12 +75,6 @@ object ChutneyUtil {
         return virtualFile.name.indexOf("scenario.json") > 1 || virtualFile.name.indexOf("chutney.json") > 1
     }
 
-    @ApiStatus.ScheduledForRemoval
-    @Deprecated("remove once all scenario are renamed from iceberg.json -> chutney.json")
-    fun isLegacyScenarioJson(virtualFile: VirtualFile): Boolean {
-        return virtualFile.name.indexOf("iceberg.json") > 1
-    }
-
     fun getChutneyScenarioIdFromFileName(fileName: String): Int? {
         val dashIndex = fileName.indexOf("-")
         return try {
@@ -125,34 +102,5 @@ object ChutneyUtil {
 
     fun isChutneyFragmentsJson(virtualFile: VirtualFile): Boolean {
         return virtualFile.name.indexOf("icefrag.json") > 1
-    }
-
-    fun isChutneyV1Json(jsonPsi: PsiFile): Boolean {
-        if (jsonPsi !is JsonFile) return false
-        return ApplicationManager.getApplication().runReadAction(Computable {
-            val allTopLevelValues = jsonPsi.allTopLevelValues
-            val first = allTopLevelValues.first { it is JsonObject }
-            return@Computable isChutneyJson(jsonPsi) && (first as JsonObject).propertyList.any { it?.name == "scenario" }
-        })
-    }
-
-    fun isChutneyV2Json(jsonPsi: PsiFile): Boolean {
-        if (jsonPsi !is JsonFile) return false
-        return ApplicationManager.getApplication().runReadAction(Computable {
-            val allTopLevelValues = jsonPsi.allTopLevelValues
-            val first = allTopLevelValues.first { it is JsonObject }
-            return@Computable isChutneyJson(jsonPsi) && (first as JsonObject).propertyList.any {
-                it?.name in listOf(
-                    "givens",
-                    "when",
-                    "thens"
-                )
-            }
-        })
-    }
-
-    fun convertYamlToJson(yaml: String): String {
-        val obj = yamlReader.readValue(yaml, Any::class.java)
-        return mapper.writeValueAsString(obj)
     }
 }

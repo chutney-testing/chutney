@@ -5,155 +5,128 @@
  *
  */
 
-import org.jetbrains.changelog.markdownToHTML
-
-fun properties(key: String) = project.findProperty(key).toString()
+import org.jetbrains.intellij.platform.gradle.IntelliJPlatformType
 
 plugins {
-    // Java support
-    id("java")
-    // Kotlin support
-    id("org.jetbrains.kotlin.jvm") version "1.8.22"
-    // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
-    id("org.jetbrains.intellij") version "1.13.3"
-    // gradle-changelog-plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-    id("org.jetbrains.changelog") version "1.3.1"
+  // Java support
+  java
+  // Kotlin support
+  kotlin("jvm") version "2.0.20"
+  // gradle-intellij-plugin - read more: https://github.com/JetBrains/gradle-intellij-plugin
+  id("org.jetbrains.intellij.platform") version "2.0.1"
 }
 
 configurations.all {
-    exclude("org.sl4j")
-    resolutionStrategy {
-        failOnVersionConflict()
-    }
-}
-configurations.runtimeOnly {
-    shouldResolveConsistentlyWith(configurations.implementation.get())
+  exclude("org.sl4j")
+  resolutionStrategy {
+    failOnVersionConflict()
+  }
 }
 
-group = properties("pluginGroup")
-version = properties("chutneyVersion")
+configurations.runtimeOnly {
+  shouldResolveConsistentlyWith(configurations.implementation.get())
+}
+
+private val chutneyVersion = providers.gradleProperty("chutneyVersion").get()
+
+group = providers.gradleProperty("pluginGroup")
+version = chutneyVersion
 
 repositories {
-    mavenLocal()
-    mavenCentral()
-    maven {
-        url = uri("https://repo1.maven.org/maven2")
-    }
+  mavenLocal()
+  mavenCentral()
+  intellijPlatform {
+    defaultRepositories()
+  }
+}
+
+java {
+  sourceCompatibility = JavaVersion.VERSION_21
+  targetCompatibility = JavaVersion.VERSION_17
+}
+
+kotlin {
+  jvmToolchain(17)
 }
 
 dependencies {
-    implementation(enforcedPlatform("com.chutneytesting:chutney-parent:${properties["chutneyVersion"]}"))
-    implementation("com.chutneytesting", "chutney-kotlin-dsl", properties("chutneyVersion"))
-    implementation("com.chutneytesting", "chutney-kotlin-dsl", properties("chutneyVersion")) {
-      isTransitive = false
-    }
-    // Runtime for kotlin-dsl dependency (server info && Http client)
-    runtimeOnly("com.fasterxml.jackson.module", "jackson-module-kotlin")
-    runtimeOnly("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310")
-    runtimeOnly("com.fasterxml.jackson.module", "jackson-module-paranamer")
-    runtimeOnly("org.apache.httpcomponents.client5", "httpclient5") {
-      exclude("org.slf4j")
-    }
-    runtimeOnly("org.apache.httpcomponents.core5", "httpcore5")
-    implementation("com.google.guava", "guava")
-    implementation("org.hjson", "hjson")
-    implementation("org.apache.commons", "commons-text")
-    implementation("com.fasterxml.jackson.core", "jackson-core")
-    implementation("com.fasterxml.jackson.core", "jackson-databind")
-    implementation("com.fasterxml.jackson.core", "jackson-annotations")
-    implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml")
-    implementation("org.jetbrains:annotations") {
-        version { strictly("24.0.0") }
-    }
+  intellijPlatform {
+    // Build against the least version supported
+    intellijIdeaUltimate("2023.1")
 
-    // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-script-util
-    implementation("org.jetbrains.kotlin:kotlin-script-util:1.8.22")
+    // \o/ Conflict here when building !! => Use Spring bundled plugin transitive dependencies
+    //bundledPlugin("com.intellij.java")
+    //bundledPlugin("org.jetbrains.plugins.yaml")
+    bundledPlugin("com.intellij.spring")
+    bundledPlugin("org.jetbrains.kotlin")
 
-    implementation("me.andrz.jackson", "jackson-json-reference-core", "0.3.2") {
-        // exclude("org.sl4j") does not exclude
-        isTransitive = false // this exclude "org.sl4j"
-    }
-    runtimeOnly("com.chutneytesting", "local-api-unsecure", properties("chutneyVersion"), ext = "jar") {
-        isTransitive = false
-    }
+    pluginVerifier()
+    instrumentationTools()
+  }
 
+  implementation(enforcedPlatform("com.chutneytesting:chutney-parent:$chutneyVersion"))
+  implementation("com.chutneytesting", "chutney-kotlin-dsl", chutneyVersion) {
+    isTransitive = false
+  }
+  // Runtime for kotlin-dsl dependency (server info && Http client)
+  runtimeOnly("com.fasterxml.jackson.module", "jackson-module-kotlin")
+  runtimeOnly("com.fasterxml.jackson.datatype", "jackson-datatype-jsr310")
+  runtimeOnly("com.fasterxml.jackson.module", "jackson-module-paranamer")
+  runtimeOnly("org.apache.httpcomponents.client5", "httpclient5") {
+    exclude("org.slf4j")
+  }
+  runtimeOnly("org.apache.httpcomponents.core5", "httpcore5")
+  implementation("com.google.guava", "guava")
+  implementation("org.hjson", "hjson")
+  implementation("org.apache.commons", "commons-text")
+  implementation("com.fasterxml.jackson.core", "jackson-core")
+  implementation("com.fasterxml.jackson.core", "jackson-databind")
+  implementation("com.fasterxml.jackson.core", "jackson-annotations")
+  implementation("com.fasterxml.jackson.dataformat", "jackson-dataformat-yaml")
+  implementation("org.jetbrains:annotations") {
+    version { strictly("24.0.0") }
+  }
+
+  // https://mvnrepository.com/artifact/org.jetbrains.kotlin/kotlin-script-util
+  implementation("org.jetbrains.kotlin:kotlin-script-util:1.8.22")
+
+  implementation("me.andrz.jackson", "jackson-json-reference-core", "0.3.2") {
+    // exclude("org.sl4j") does not exclude
+    isTransitive = false // this excludes "org.sl4j"
+  }
+  runtimeOnly("com.chutneytesting", "local-api-unsecure", chutneyVersion, ext = "jar") {
+    isTransitive = false
+  }
 }
 
-// See https://github.com/JetBrains/gradle-intellij-plugin/
-intellij {
-    pluginName.set(properties("pluginName"))
-    version.set(properties("platformVersion"))
-    type.set(properties("platformType"))
-    downloadSources.set(properties("platformDownloadSources").toBoolean())
-    updateSinceUntilBuild.set(true)
+// see https://plugins.jetbrains.com/docs/intellij/tools-intellij-platform-gradle-plugin-extension.html
+intellijPlatform {
+  buildSearchableOptions = false
 
-    // Plugin Dependencies. Uses `platformPlugins` property from the gradle.properties file.
-    plugins.set(properties("platformPlugins").split(',').map(String::trim).filter(String::isNotEmpty))
+  pluginConfiguration {
+    version = chutneyVersion
 
-    tasks{
-        buildSearchableOptions {
-            enabled = false
-        }
-
-        runIde {
-            maxHeapSize = "2g"
-        }
+    ideaVersion {
+      sinceBuild = providers.gradleProperty("pluginSinceBuild")
+      untilBuild = providers.gradleProperty("pluginSinceUntil")
     }
-}
-configure<JavaPluginExtension> {
-    sourceCompatibility = JavaVersion.VERSION_17
-}
+  }
 
-// Configure Gradle Changelog Plugin - read more: https://github.com/JetBrains/gradle-changelog-plugin
-changelog {
-    version.set(properties("chutneyVersion"))
-    groups.set(emptyList())
-}
+  publishing {
+    token = System.getenv("PUBLISH_TOKEN")
+    channels = listOf(chutneyVersion.split('-').getOrElse(1) { "default" }.split('.').first())
+  }
 
-
-tasks {
-    // Set the compatibility versions to 17
-    withType<JavaCompile> {
-        sourceCompatibility = "17"
-        targetCompatibility = "17"
+  // https://github.com/JetBrains/intellij-platform-gradle-plugin/issues/1719
+  pluginVerification {
+    // Need to set this option because can't download android dependencies
+    // because don't know how to set proxy configuration for this
+    //freeArgs.add("-offline")
+    ides {
+      // Check against the last Ultimate version
+      ide(IntelliJPlatformType.IntellijIdeaUltimate, "2024.2.1")
+      // \o/ Can't use recommended, got dependency conflict !!
+      // recommended()
     }
-    withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions.jvmTarget = "17"
-    }
-
-
-    patchPluginXml {
-        version.set(properties("chutneyVersion"))
-        sinceBuild.set(properties("pluginSinceBuild"))
-        untilBuild.set(properties("pluginUntilBuild"))
-
-        // Extract the <!-- Plugin description --> section from README.md and provide for the plugin's manifest
-        pluginDescription.set(
-            File(projectDir, "README.md").readText().lines().run {
-                val start = "<!-- Plugin description -->"
-                val end = "<!-- Plugin description end -->"
-
-                if (!containsAll(listOf(start, end))) {
-                    throw GradleException("Plugin description section not found in README.md:\n$start ... $end")
-                }
-                subList(indexOf(start) + 1, indexOf(end))
-            }.joinToString("\n").run { markdownToHTML(this) }
-        )
-
-        // Get the latest available change notes from the changelog file
-        changeNotes.set(provider { changelog.getLatest().toHTML() })
-    }
-
-    runPluginVerifier {
-        ideVersions.set(properties("pluginVerifierIdeVersions").split(',').map(String::trim).filter(String::isNotEmpty))
-    }
-
-    publishPlugin {
-        dependsOn("patchChangelog")
-        token.set(System.getenv("PUBLISH_TOKEN"))
-        // pluginVersion is based on the SemVer (https://semver.org) and supports pre-release labels, like 2.1.7-alpha.3
-        // Specify pre-release label to publish the plugin in a custom Release Channel automatically. Read more:
-        // https://plugins.jetbrains.com/docs/intellij/deployment.html#specifying-a-release-channel
-        channels.set(listOf(properties("chutneyVersion").split('-').getOrElse(1) { "default" }.split('.').first()))
-    }
+  }
 }

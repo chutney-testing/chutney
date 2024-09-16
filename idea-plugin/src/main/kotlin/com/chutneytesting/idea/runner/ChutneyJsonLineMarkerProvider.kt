@@ -26,24 +26,11 @@ class ChutneyJsonLineMarkerProvider : ChutneyLineMarkerProvider() {
         if (!ChutneyUtil.isChutneyJson(jsonPsi)) {
             return null
         }
-        if (ChutneyUtil.isChutneyV2Json(jsonPsi)) {
-            if (psiElement is JsonProperty && psiElement.name == "title") {
-                val anchor = PsiTreeUtil.getDeepestFirst(psiElement)
-                val value = psiElement.value
-                val displayName = value?.text ?: "<no-name> scenario"
-                return lineMarkerInfo(anchor, displayName)
-            }
-
-        } else {
-            if (psiElement is JsonProperty && psiElement.name == "scenario") {
-                val anchor = PsiTreeUtil.getDeepestFirst(psiElement)
-                val value = psiElement.value
-                var displayName = ""
-                if (value is JsonObject) {
-                    displayName = value.findProperty("name")?.value?.text ?: "<no-name> scenario"
-                }
-                return lineMarkerInfo(anchor, displayName)
-            }
+        if (psiElement is JsonProperty && psiElement.name == "title") {
+          val anchor = PsiTreeUtil.getDeepestFirst(psiElement)
+          val value = psiElement.value
+          val displayName = value?.text ?: "<no-name> scenario"
+          return lineMarkerInfo(anchor, displayName)
         }
         return null
     }
@@ -54,8 +41,6 @@ class ChutneyJsonLineMarkerProvider : ChutneyLineMarkerProvider() {
     ) {
 
     }
-
-
 }
 
 sealed class Type {

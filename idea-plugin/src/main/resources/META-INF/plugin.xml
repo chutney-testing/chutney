@@ -9,76 +9,18 @@
     <id>com.chutneytesting.idea.chutney-idea-plugin</id>
     <name>Chutney</name>
     <vendor email="support@chutneytesting.com" url="https://github.com/chutney-testing/chutney-idea-plugin">ChutneyTesting</vendor>
-    <version>2.3</version>
     <description><![CDATA[
         <p>A plugin to help you easily edit, run chutney scenario files.</p><br/>
     ]]></description>
 
     <change-notes><![CDATA[
-    Version 2.3<br>
-      <ul>
-          <li>Upgrade to chutney 1.7.1 with java 17</li>
-      </ul>
-    Version 0.10.0<br>
-      <ul>
-          <li>Fix version sent when updating scenario on remote server</li>
-      </ul>
-    Version 0.9.0<br>
-      <ul>
-          <li>Add authentication on api</li>
-      </ul>
-      Version 0.8.0<br>
-      <ul>
-          <li>Update to 2020.2 SDK</li>
-          <li>show sub steps on tree test ui</li>
-          <li>Update to latest Chutney server v1.2.4</li>
-      </ul>
-      Version 0.7.0<br>
-      <ul>
-          <li>Update to 2019.3 SDK</li>
-      </ul>
-      Version 0.6.0<br>
-      <ul>
-          <li>Add composable scenarios using json rerferences</li>
-          <li>Add show diff between local scenarios files and remote</li>
-      </ul>
-      Version 0.5.2<br>
-      <ul>
-          <li>fix get campaign scenarios actions</li>
-      </ul>
-      Version 0.5.1<br>
-      <ul>
-          <li>fix url to add scenario to remote server</li>
-      </ul>
-      Version 0.5.0<br>
-      <ul>
-          <li>Add Support to scenario v1 <-> v2</li>
-          <li>Update to latest Chutney server(amqp-basic-consume with selector)</li>
-      </ul>
-      Version 0.4.0<br>
-      <ul>
-          <li>Fix Support to IDEA 2019</li>
-          <li>Add ReRun Failed tests</li>
-      </ul>
-      Version 0.3.0<br>
-      <ul>
-          <li>Add Settings for remote server</li>
-          <li>Add Folding for target and steps</li>
-          <li>Add SpEL Completion inside ${...}</li>
-          <li>Run multiple scenarios configuration</ul>
-      </ul>
-      Version 0.2.0<br>
-      Version 0.1.0<br>
-      <ul>
-          <li>Initial version</li>
-          <li>Run Chutney scenario files on remote/embedded Chutney Server</ul>
-      </ul>
-      ]]>
-    </change-notes>
+      <p>Check <a href="https://github.com/chutney-testing/chutney/releases">Chutney GitHub releases</a></p><br/>
+    ]]></change-notes>
 
     <!-- please see http://www.jetbrains.org/intellij/sdk/docs/basics/getting_started/plugin_compatibility.html
          on how to target different products -->
     <depends>com.intellij.modules.platform</depends>
+    <depends>com.intellij.modules.java</depends>
     <depends>org.jetbrains.plugins.yaml</depends>
     <depends optional="true" config-file="kotlin-support-plugin.xml">org.jetbrains.kotlin</depends>
     <depends optional="true" config-file="spring-support-plugin.xml">com.intellij.spring</depends>
@@ -195,11 +137,6 @@
                     icon="AllIcons.Plugins.Downloads"
                     text="Get Campaign From Remote Server"
                     description="Get campaign from remote server"/>
-            <action id="Chutney.UpdateScenarioToV2Action"
-                    class="com.chutneytesting.idea.actions.UpdateScenarioToV2Action"
-                    icon="AllIcons.Plugins.Updated"
-                    text="Update Scenario To V2"
-                    description="Update scenario to v2"/>
             <action id="Chutney.CopyScenarioAsKotlinDslAction"
                     class="com.chutneytesting.idea.actions.CopyScenarioAsKotlinDslAction"
                     icon="AllIcons.Plugins.Updated"

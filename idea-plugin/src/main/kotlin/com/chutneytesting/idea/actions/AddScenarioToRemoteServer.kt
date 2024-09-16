@@ -37,10 +37,6 @@ class AddScenarioToRemoteServer : AnAction() {
             val serverInfo = ChutneySettings.getInstance().state.serverInfo()!!
             val processJsonReference = ChutneyUtil.processJsonReference(psiFile.virtualFile)
             var hJsonString: String? = JsonValue.readHjson(processJsonReference).toString(Stringify.PLAIN)
-            if (ChutneyUtil.isChutneyV1Json(psiFile)) {
-                hJsonString = JsonValue.readHjson(ScenarioV1ToV2Converter().convert(processJsonReference))
-                    .toString(Stringify.PLAIN)
-            }
             val content = HJsonUtils.convertHjson(hJsonString)
             val query = "/api/scenario/v2/raw"
             val body =

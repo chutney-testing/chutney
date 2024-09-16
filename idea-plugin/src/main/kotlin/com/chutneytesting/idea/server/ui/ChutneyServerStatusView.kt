@@ -91,6 +91,10 @@ class ChutneyServerStatusView(private val myDisposable: Disposable) {
             }
         }
 
+        override fun getActionUpdateThread(): ActionUpdateThread {
+          return ActionUpdateThread.BGT
+        }
+
         fun setUrl(url: String?) {
             myUrl = url
         }
@@ -108,6 +112,10 @@ class ChutneyServerStatusView(private val myDisposable: Disposable) {
                 val content: Transferable = StringSelection(url)
                 CopyPasteManager.getInstance().setContents(content)
             }
+        }
+
+        override fun getActionUpdateThread(): ActionUpdateThread {
+          return ActionUpdateThread.BGT
         }
 
         fun setUrl(url: String?) {

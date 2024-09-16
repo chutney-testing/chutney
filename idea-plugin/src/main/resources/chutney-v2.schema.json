@@ -824,9 +824,6 @@
           {
             "type": "object",
             "properties": {
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "name": {
                 "$ref": "#/definitions/task_name"
               },
@@ -847,9 +844,6 @@
           {
             "type": "object",
             "properties": {
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "type": {
                 "enum": [
                   "context-put"
@@ -873,9 +867,6 @@
             "properties": {
               "strategy": {
                 "$ref": "#/definitions/task_strategy"
-              },
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
               },
               "name": {
                 "$ref": "#/definitions/task_name"
@@ -909,9 +900,6 @@
               "strategy": {
                 "$ref": "#/definitions/task_strategy"
               },
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "name": {
                 "$ref": "#/definitions/task_name"
               },
@@ -941,9 +929,6 @@
           {
             "type": "object",
             "properties": {
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "name": {
                 "$ref": "#/definitions/task_name"
               },
@@ -965,9 +950,6 @@
           {
             "type": "object",
             "properties": {
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "name": {
                 "$ref": "#/definitions/task_name"
               },
@@ -989,9 +971,6 @@
           {
             "type": "object",
             "properties": {
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "name": {
                 "$ref": "#/definitions/task_name"
               },
@@ -1013,9 +992,6 @@
           {
             "type": "object",
             "properties": {
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "name": {
                 "$ref": "#/definitions/task_name"
               },
@@ -1037,9 +1013,6 @@
           {
             "type": "object",
             "properties": {
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "name": {
                 "$ref": "#/definitions/task_name"
               },
@@ -1063,9 +1036,6 @@
             "properties": {
               "strategy": {
                 "$ref": "#/definitions/task_strategy"
-              },
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
               },
               "name": {
                 "$ref": "#/definitions/task_name"
@@ -1095,9 +1065,6 @@
           {
             "type": "object",
             "properties": {
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "strategy": {
                 "$ref": "#/definitions/task_strategy"
               },
@@ -1129,9 +1096,6 @@
           {
             "type": "object",
             "properties": {
-              "gwtType": {
-                "$ref": "#/definitions/gwt_type"
-              },
               "name": {
                 "$ref": "#/definitions/task_name"
               },

@@ -25,14 +25,15 @@ class DynamicActionGroup : ActionGroup() {
         val file = event.getData(CommonDataKeys.VIRTUAL_FILE) ?: return emptyArray()
         val id = ChutneyUtil.getChutneyScenarioIdFromFileName(file.name)
         val campaigns = getCampaigns()
-        return campaigns.map {
-            val selected = it.scenarioIds.contains(id.toString())
+        return campaigns
+          .map { campaign ->
+            val selected = campaign.scenarios.map { it.scenarioId }.contains(id)
             AddRemoveScenarioInCampaignAction(
-                it,
+                campaign,
                 id!!,
                 selected,
-                it.id.toString() + "-" + it.title,
-                it.title,
+                campaign.id.toString() + "-" + campaign.title,
+                campaign.title,
                 if (selected) AllIcons.Actions.Checked_selected else null
             )
         }.toTypedArray()

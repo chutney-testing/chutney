@@ -34,7 +34,7 @@ class ChutneyJsonSchemaV2FileProvider(val project: Project) : JsonSchemaFileProv
     private fun isChutneyFile(virtualFile: VirtualFile): Boolean {
         if (project.isDisposed) return false
         val psiFile = PsiManager.getInstance(project).findFile(virtualFile) ?: return false
-        return ChutneyUtil.isChutneyV2Json(psiFile) || ChutneyUtil.isChutneyYaml(psiFile)
+        return ChutneyUtil.isChutneyJson(psiFile) || ChutneyUtil.isChutneyYaml(psiFile)
     }
 
     override fun getSchemaFile(): VirtualFile? {

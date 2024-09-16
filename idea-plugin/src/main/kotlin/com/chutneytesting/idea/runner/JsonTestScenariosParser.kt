@@ -46,11 +46,7 @@ class JsonTestScenariosParser(
             } else {
                 error("Unsupported")
             }
-        val scenarioBase = if (ChutneyUtil.isChutneyV1Json(findFile)) {
-            parseScenario(json)
-        } else {
-            parseScenarioV2ToV1(json)
-        }
+        val scenarioBase = parseScenarioV2ToV1(json)
         handler.notifyTextAvailable(
             ServiceMessageBuilder.testSuiteStarted(scenarioBase.scenario.name ?: "<no-name>")
                 .addAttribute("locationHint", jsonFile.url)
