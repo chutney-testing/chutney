@@ -19,7 +19,7 @@ import org.junit.jupiter.api.Test;
 public class DatasetUtilsTest {
 
     @Test
-    public void should_compare_same_external_dataset() {
+    void should_return_true_when_comparing_datasets_with_same_values() {
         //Given
         Map<String, String> constants1 = new HashMap<>();
         constants1.put("HEADER", "VALUE");
@@ -55,7 +55,7 @@ public class DatasetUtilsTest {
     }
 
     @Test
-    public void should_compare_external_dataset_with_different_id() {
+    void should_return_false_when_comparing_datasets_with_different_id() {
         //Given
         DataSet dataset1 = DataSet.builder().withName("").withId("DATASET_ID_1").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
         DataSet dataset2 = DataSet.builder().withName("").withId("DATASET_ID_2").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
@@ -68,7 +68,7 @@ public class DatasetUtilsTest {
     }
 
     @Test
-    public void should_compare_external_dataset_with_different_constants() {
+    void should_return_false_when_comparing_datasets_with_different_constants() {
         //Given
         DataSet dataset1 = DataSet.builder().withId(null).withName("").withConstants(Map.of("HEADER", "DIFFERENT VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
         DataSet dataset2 = DataSet.builder().withId(null).withName("").withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
@@ -81,7 +81,7 @@ public class DatasetUtilsTest {
     }
 
     @Test
-    public void should_compare_external_dataset_with_different_datatable_different_length() {
+    void should_return_false_when_comparing_datasets_with_different_datatable_with_extra_row() {
         //Given
         DataSet dataset1 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"))).build();
         DataSet dataset2 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
@@ -94,7 +94,7 @@ public class DatasetUtilsTest {
     }
 
     @Test
-    public void should_compare_external_dataset_with_different_datatable_different_value() {
+    void should_return_false_when_comparing_datasets_with_different_datatable() {
         //Given
         DataSet dataset1 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE2"))).build();
         DataSet dataset2 = DataSet.builder().withName("").withId(null).withConstants(Map.of("HEADER", "VALUE")).withDatatable(List.of(Map.of("HEADER1", "VALUE1"), Map.of("HEADER2", "VALUE_DIFF"))).build();
