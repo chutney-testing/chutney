@@ -5,7 +5,7 @@
  *
  */
 
-import { Component, forwardRef } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import {
     AbstractControl,
     ControlValueAccessor,
@@ -42,6 +42,7 @@ export class FormsDataGridComponent implements ControlValueAccessor {
 
     dataGridForm: FormArray;
     headers: FormArray = this.fb.array([]);
+    @Input() enableImportExport: boolean;
 
     constructor(private fb: FormBuilder,
                 private fileSaverService: FileSaverService) {

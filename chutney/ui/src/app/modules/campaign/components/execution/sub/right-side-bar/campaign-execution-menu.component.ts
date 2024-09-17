@@ -18,7 +18,7 @@ import { FileSaverService } from 'ngx-filesaver';
 import * as JSZip from 'jszip';
 
 import { CampaignService, EnvironmentService, JiraPluginService, LoginService, ScenarioService } from '@core/services';
-import { Authorization, Campaign, ScenarioIndex, TestCase } from '@model';
+import { Authorization, Campaign, Dataset, ScenarioIndex, TestCase } from '@model';
 import { EventManagerService } from '@shared';
 import { MenuItem } from '@shared/components/layout/menuItem';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -93,16 +93,22 @@ export class CampaignExecutionMenuComponent implements OnInit, OnChanges {
     }
 
     private executeCampaign() {
-        const executeCallback = (env: string, dataset: string) => {
+        const executeCallback = (env: string, dataset: Dataset) => {
             this.broadcastCatchError(this.campaignService.executeCampaign(this.campaign.id, env, dataset)).subscribe();
             timer(1000).pipe(
                 switchMap(() => of(this.eventManagerService.broadcast({ name: 'execute', env: env })))
             ).subscribe();
         }
 
-        const modalRef = this.ngbModalService.open(ScenarioExecuteModalComponent, { centered: true });
+        let modalSize: "lg" | "xl" = "lg"
+        const changeModalSize = (size: "lg" | "xl") => {
+            modalSize = size;
+            modalRef.update({size: modalSize})
+        }
+        const modalRef = this.ngbModalService.open(ScenarioExecuteModalComponent, { centered: true, size: modalSize });
         modalRef.componentInstance.environments = this.environments;
         modalRef.componentInstance.executeCallback = executeCallback;
+        modalRef.componentInstance.changeModalSize = changeModalSize;
     }
 
     private deleteCampaign() {

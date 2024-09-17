@@ -9,16 +9,18 @@
   <button type="button" class="btn btn-info mb-3" (click)="insertNewKeyValue()">
     {{ 'global.actions.add' | translate }} <span class="fa fa-grip-lines" aria-hidden="true"></span>
   </button>
-  <div class="float-end">
-    <button type="button" class="btn btn-info" (click)="exportKeyValue()">
-      <span class="fa fa-file-csv" aria-hidden="true"></span> {{ 'global.actions.export' | translate }}
-    </button>
-    <div class="btn btn-info div-file ms-2">
-      <span class="fa fa-file-import" aria-hidden="true"></span> {{ 'global.actions.import' | translate }}
-      <input class="input-file" type="file" name="file" multiple="false"
-        (change)="importKeyValue($event.target.files)"/>
-    </div>
-  </div>
+  @if (enableImportExport) {
+      <div class="float-end">
+        <button type="button" class="btn btn-info" (click)="exportKeyValue()">
+          <span class="fa fa-file-csv" aria-hidden="true"></span> {{ 'global.actions.export' | translate }}
+        </button>
+        <div class="btn btn-info div-file ms-2">
+          <span class="fa fa-file-import" aria-hidden="true"></span> {{ 'global.actions.import' | translate }}
+          <input class="input-file" type="file" name="file" multiple="false"
+            (change)="importKeyValue($event.target.files)"/>
+        </div>
+      </div>
+  }
 
   @for (keyValue of keyValuesForm.controls; track keyValue; let i = $index) {
     <div [formGroup]="keyValuesForm">

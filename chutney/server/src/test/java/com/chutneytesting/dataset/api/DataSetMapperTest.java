@@ -11,8 +11,12 @@ import static com.chutneytesting.dataset.api.DataSetMapper.fromDto;
 import static com.chutneytesting.dataset.api.DataSetMapper.toDto;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.chutneytesting.server.core.domain.dataset.DataSet;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -74,6 +78,59 @@ class DataSetMapperTest {
         DataSetDto dataset = toDto(fromDto(dataSetDto));
 
         assertThat(dataset.datatable().get(0)).containsExactlyElementsOf(datatableLine);
+    }
+
+    @Test
+    public void should_build_dataset_with_every_field() {
+        DataSet dataSet = DataSet.builder()
+            .withName("dataset")
+            .withId("id")
+            .withDatatable(List.of(Map.of("TOTO", "TUTU")))
+            .withConstants(Map.of("TOTO", "TUTU"))
+            .withDescription("description")
+            .withCreationDate(Instant.now())
+            .withTags(List.of("TAG"))
+            .build();
+
+        DataSetDto datasetDto = DataSetMapper.toDto(dataSet);
+
+        assertThat(datasetDto).isNotNull();
+        assertThat(datasetDto.constants().get(0).key()).isEqualTo("TOTO");
+        assertThat(datasetDto.constants().get(0).value()).isEqualTo("TUTU");
+        assertThat(datasetDto.datatable().get(0).get(0).key()).isEqualTo("TOTO");
+        assertThat(datasetDto.datatable().get(0).get(0).value()).isEqualTo("TUTU");
+        assertThat(datasetDto.tags().get(0)).isEqualTo("TAG");
+        assertThat(datasetDto.description()).isEqualTo("description");
+        assertThat(datasetDto.lastUpdated()).isAfter(Instant.now().minus(1, ChronoUnit.HOURS));
+        assertThat(datasetDto.id().get()).isEqualTo("id");
+        assertThat(datasetDto.name()).isEqualTo("dataset");
+    }
+
+    @Test
+    public void should_build_dataset_from_NO_DATASET() {
+        DataSet dataSet = DataSet.NO_DATASET;
+
+        DataSetDto datasetDto = DataSetMapper.toDto(dataSet);
+
+        assertThat(datasetDto).isNotNull();
+    }
+
+    @Test
+    public void should_build_dataset_from_execution_dataset() {
+        ExecutionDatasetDto executionDatasetDto = new ExecutionDatasetDto()
+            .setConstants(List.of(ImmutableKeyValue.builder().key("TOTO").value("TUTU").build()))
+            .setDatatable(List.of(List.of(ImmutableKeyValue.builder().key("TOTO").value("TUTU").build())))
+            .setId("dataset");
+
+        DataSet dataset = DataSetMapper.fromExecutionDatasetDto(executionDatasetDto);
+
+        assertThat(dataset).isNotNull();
+        assertThat(dataset.constants).containsKey("TOTO");
+        assertThat(dataset.constants).containsValue("TUTU");
+        assertThat(dataset.datatable.get(0)).containsKey("TOTO");
+        assertThat(dataset.datatable.get(0)).containsValue("TUTU");
+        assertThat(dataset.id).isEqualTo("dataset");
+        assertThat(dataset.name).isEqualTo("");
     }
 
     private KeyValue keyOf(String key, String value) {

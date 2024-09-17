@@ -67,6 +67,14 @@
             }
         },
         "execution": {
+            "modal": {
+                "error": {
+                    "datasetEmptyName": "Dataset name is empty",
+                    "invalidDataset": "Dataset is empty or invalid"
+                },
+                "saveDatasetCheckbox": "Save new dataset",
+                "saveDatasetInputPlaceholder": "Dataset name"
+            },
             "history": {
                 "title": "Executions' history",
                 "time": "Today at",
@@ -216,7 +224,8 @@
                     "date": "Date",
                     "status": "Status",
                     "env": "Environment",
-                    "executor": "User"
+                    "executor": "User",
+                    "dataset": "Dataset"
                 },
                 "empty": "No executions"
             },
@@ -415,7 +424,11 @@
     "dataset": {
         "error": {
             "duplicatedHeader": "One or many columns have duplicated header"
-        }
+        },
+        "actions": {
+            "createDataset": "+ Edit new dataset"
+        },
+        "customLabel": "Custom"
     },
     "global": {
         "status": {

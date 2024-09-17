@@ -115,7 +115,7 @@
             </div>
         </div>
     </div>
-    @if (execution.dataset) {
+    @if (getDataset(scenarioExecutionReport).trim() !== '') {
         <div class="row mb-2">
             <div class="col justify-content-center">
                 <div class="hr-fa float-start align-self-center cursor-pointer" (click)="toggleDatasetVariables()">
@@ -123,29 +123,29 @@
                        [ngClass]="collapseDataset ? 'fa-chevron-right' : 'fa-chevron-down'"></i>
                 </div>
                 <hr class="hr-text cursor-pointer"
-                    attr.data-content="{{'scenarios.execution.dataset.title' | translate}}: {{execution.dataset}}"
+                    attr.data-content="{{'scenarios.execution.dataset.title' | translate}}: {{getDataset(scenarioExecutionReport)}}"
                     (click)="toggleDatasetVariables()">
                 <div [ngbCollapse]="collapseDataset" [animation]="false">
-                    @if (scenarioExecutionReport?.datatable) {
+                    @if (scenarioExecutionReport?.dataset.datatable && scenarioExecutionReport?.dataset.datatable.length > 0) {
                     <div class="ctx-var mb-2">
                         <span class="fw-bold">
                             <i class="fa fa-th me-1"></i> Datatable
                         </span>
-                        <span class="ms-3 cursor-pointer" (click)="openOffCanva(monaco, scenarioExecutionReport.datatable)">
+                        <span class="ms-3 cursor-pointer" (click)="openOffCanva(monaco, scenarioExecutionReport.dataset.datatable)">
                             <i class="fa-sm fa-regular fa-eye"></i>
                         </span>
-                        <span class="ms-3 action" (click)="copy(scenarioExecutionReport.datatable)">
+                        <span class="ms-3 action" (click)="copy(scenarioExecutionReport.dataset.datatable)">
                             <i class="fa-sm fa-regular fa-copy"></i>
                         </span>
                     </div>
                     }
-                    @if (scenarioExecutionReport?.constants) {
+                    @if (scenarioExecutionReport?.dataset.constants && scenarioExecutionReport?.dataset.constants.length > 0) {
                     <div>
                         <span class="fw-bold">
                              <i class="fa fa-list me-1"></i>
                             {{'global.smallword.key' | translate }}/ {{'global.smallword.value' | translate }}
                         </span>
-                        @for (uniqueValue of scenarioExecutionReport?.constants; track $index) {
+                        @for (uniqueValue of scenarioExecutionReport?.dataset.constants; track $index) {
                             <div class="ctx-var">
                                 <span class="fw-bold text-wrap text-break">{{ uniqueValue.key }}</span>
                                 <span class="ms-3 action" (click)="copy(uniqueValue.value)">

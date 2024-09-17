@@ -5,7 +5,7 @@
  *
  */
 
-import { Component, forwardRef } from '@angular/core';
+import { Component, forwardRef, Input } from '@angular/core';
 import {
     AbstractControl,
     ControlValueAccessor,
@@ -40,6 +40,7 @@ export class FormsKeyValueComponent implements ControlValueAccessor {
 
     keyValuesForm: FormArray;
     isDisabled: boolean;
+    @Input() enableImportExport: boolean = true;
 
     constructor(
         private fb: FormBuilder,

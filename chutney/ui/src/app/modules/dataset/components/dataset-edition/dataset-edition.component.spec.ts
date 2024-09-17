@@ -18,16 +18,12 @@ import { DatasetEditionComponent } from './dataset-edition.component';
 import { DataSetService } from '@core/services';
 import { of } from 'rxjs';
 import { DatasetListComponent } from '@modules/dataset/components/dataset-list/dataset-list.component';
-import {
-    FormsKeyValueComponent
-} from '@modules/dataset/components/dataset-edition/forms-key-value/forms-key-value.component';
-import {
-    FormsDataGridComponent
-} from '@modules/dataset/components/dataset-edition/forms-data-grid/forms-data-grid.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { FeatureService } from '@core/feature/feature.service';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { RouterModule } from '@angular/router';
+import { FormsDataGridComponent } from "@shared/components/dataset/forms-data-grid/forms-data-grid.component";
+import { FormsKeyValueComponent } from "@shared/components/dataset/forms-key-value/forms-key-value.component";
 
 describe('DatasetEditionComponent', () => {
 

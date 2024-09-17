@@ -67,6 +67,14 @@
             }
         },
         "execution": {
+            "modal": {
+                "error": {
+                    "datasetEmptyName": "Le nom du dataset est vide",
+                    "invalidDataset": "Le dataset est vide ou invalid"
+                },
+                "saveDatasetCheckbox": "Sauvegarder le nouveau dataset",
+                "saveDatasetInputPlaceholder": "Nom du dataset"
+            },
             "history": {
                 "title": "Historique des exécutions",
                 "time": "Aujourd'hui à",
@@ -216,7 +224,8 @@
                     "date": "Date",
                     "status": "Statut",
                     "env": "Environnement",
-                    "executor": "Utilisateur"
+                    "executor": "Utilisateur",
+                    "dataset": "Dataset"
                 },
                 "empty": "Aucune exécution"
             },
@@ -415,7 +424,11 @@
     "dataset": {
         "error": {
             "duplicatedHeader": "Une ou plusieurs colonnes ont le même header"
-        }
+        },
+        "actions": {
+            "createDataset": "+ Editer un nouveau dataset"
+        },
+        "customLabel": "Custom"
     },
     "global": {
         "status": {

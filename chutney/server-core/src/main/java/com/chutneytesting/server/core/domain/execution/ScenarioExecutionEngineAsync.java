@@ -126,7 +126,7 @@ public class ScenarioExecutionEngineAsync {
             .user(executionRequest.userId)
             .campaignReport(ofNullable(executionRequest.campaignExecution))
             .tags(new HashSet<>(executionRequest.tags))
-            .datasetId(ofNullable(executionRequest.dataset).map(ds -> ds.id))
+            .dataset(ofNullable(executionRequest.dataset))
             .build();
 
         return executionHistoryRepository.store(executionRequest.testCase.id(), detachedExecution);
@@ -238,7 +238,7 @@ public class ScenarioExecutionEngineAsync {
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
             .tags(new HashSet<>(executionRequest.tags))
-            .datasetId(ofNullable(executionRequest.dataset).map(ds -> ds.id))
+            .dataset(executionRequest.dataset)
             .build();
 
         ExecutionHistory.Execution execution = executionHistoryRepository.store(executionRequest.testCase.id(), detachedExecution);
@@ -288,7 +288,7 @@ public class ScenarioExecutionEngineAsync {
             .testCaseTitle(scenarioReport.scenarioName)
             .environment(executionRequest.environment)
             .user(executionRequest.userId)
-            .datasetId(ofNullable(executionRequest.dataset).map(ds -> ds.id))
+            .dataset(ofNullable(executionRequest.dataset))
             .build();
     }
 

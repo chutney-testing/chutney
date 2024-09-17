@@ -5,6 +5,8 @@
  *
  */
 
+import { Dataset } from "@core/model";
+
 export class ScenarioExecutionReportOutline {
     constructor(
         public scenarioId?: string,
@@ -14,6 +16,7 @@ export class ScenarioExecutionReportOutline {
         public status?: string,
         public startDate?: Date,
         public info: Array<string> = [],
-        public error: Array<string> = []
+        public error: Array<string> = [],
+        public dataset?: Dataset
     ) {}
 }

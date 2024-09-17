@@ -28,6 +28,7 @@ public class ScenarioExecutionReport {
     public final String environment;
     public final String user;
     public final Set<String> tags;
+    public final String datasetId;
     public final Map<String, Object> contextVariables;
     public final Map<String, String> constants;
     public final List<Map<String, String>> datatable;
@@ -45,6 +46,7 @@ public class ScenarioExecutionReport {
             environment,
             user,
             tags,
+            Optional.ofNullable(dataSet).map(ds -> ds.id).orElse(null),
             Optional.ofNullable(dataSet).map(ds -> ds.constants).orElse(emptyMap()),
             Optional.ofNullable(dataSet).map(ds -> ds.datatable).orElse(emptyList()),
             report);
@@ -57,6 +59,7 @@ public class ScenarioExecutionReport {
                                    String environment,
                                    String user,
                                    Collection<String> tags,
+                                   String datasetId,
                                    Map<String, String> constants,
                                    List<Map<String, String>> datatable,
                                    StepExecutionReportCore report) {
@@ -67,8 +70,9 @@ public class ScenarioExecutionReport {
         this.tags = Optional.ofNullable(tags).map(Set::copyOf).orElse(emptySet());
         this.contextVariables = searchContextVariables(report);
         this.report = report;
+        this.datasetId = datasetId;
         this.constants = constants;
-        this.datatable =datatable;
+        this.datatable = datatable;
     }
 
     public ScenarioExecutionReport(long executionId,

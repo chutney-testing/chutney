@@ -7,6 +7,7 @@
 
 package com.chutneytesting.server.core.domain.execution.history;
 
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -42,7 +43,7 @@ public interface ExecutionHistory {
 
         String environment();
 
-        Optional<String> datasetId();
+        Optional<DataSet> dataset();
 
         String user();
 

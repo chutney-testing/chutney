@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Inject, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { CampaignExecutionReport, CampaignReport } from '@model';
+import { Campaign, CampaignExecutionReport, CampaignReport } from '@model';
 import { Params } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -19,6 +19,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
+import { DatasetUtils } from "@shared/tools/dataset-utils";
 
 @Component({
     selector: 'chutney-campaign-executions',
@@ -28,6 +29,7 @@ import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
 
     @Input() executions: CampaignReport[] = [];
+    @Input() campaign: Campaign;
     @Output() onExecutionSelect = new EventEmitter<{ execution: CampaignReport, focus: boolean }>();
     @Input() filters: Params;
     @Output() filtersChange = new EventEmitter<Params>();
@@ -42,6 +44,8 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
 
     environments: ListItem[] = [];
 
+    datasets: ListItem[] = [];
+
     executors: ListItem[] = [];
 
     private readonly iso_Date_Delimiter = '-';
@@ -49,6 +53,7 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
     constructor(private formBuilder: FormBuilder,
                 private datePipe: DateFormatPipe,
                 private translateService: TranslateService,
+                private datasetUtils: DatasetUtils,
                 @Inject(DROPDOWN_SETTINGS) public dropdownSettings: IDropdownSettings) {
     }
 
@@ -81,8 +86,8 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
 
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.report.status))].map(status => this.toSelectOption(status,  this.translateService.instant(ExecutionStatus.toString(status))));
-        //this.status = [{id: '1', text: 'hello'}];
         this.environments = [...new Set(this.executions.map(exec => exec.report.executionEnvironment))].map(env => this.toSelectOption(env));
+        this.datasets = this.removeDuplicateListItems(this.executions.map(exec => exec.report.dataset).map(dataset => dataset ? this.toSelectOption(dataset.id ? dataset.id : "Custom") : null).filter(ds => ds));
         this.executors = [...new Set(this.executions.map(exec => exec.report.user))].map(user => this.toSelectOption(user));
     }
 
@@ -97,12 +102,17 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
             date: this.formBuilder.control(this.toNgbDate(this.filters['date'])),
             status: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['status'],  (status) => this.translateService.instant(ExecutionStatus.toString(status)))),
             environments: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['env'])),
+            dataset: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['dataset'])),
             executors: this.formBuilder.control(this.selectedOptionsFromUri(this.filters['exec']))
         });
     }
 
     private applyFiltersOnExecutions() {
         this.filteredExecutions = this.executions.filter(exec => this.matches(exec.report, this.filtersForm.value))
+    }
+
+    protected getDataset(execution: CampaignReport) {
+        return this.datasetUtils.getDatasetName(execution.report.dataset)
     }
 
     private onFiltersChange() {
@@ -142,6 +152,9 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
         if (filters.environments && filters.environments.length) {
             params['env'] = filters.environments.map(env => env.id).toString();
         }
+        if (filters.dataset && filters.dataset.length) {
+            params['dataset'] = filters.dataset.map(dataset => dataset.id).toString();
+        }
         if (filters.executors && filters.executors.length) {
             params['exec'] = filters.executors.map(env => env.id).toString();
         }
@@ -175,6 +188,8 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
                 + space
                 + report.executionEnvironment
                 + space
+                + report.dataset
+                + space
                 + this.datePipe.transform(report.startDate, 'DD MMM. YYYY HH:mm')
                 + space
                 + report.executionId
@@ -206,6 +221,24 @@ export class CampaignExecutionsComponent implements OnChanges, OnDestroy {
             envMatch = !!filters.environments.find(env => env.id === report.executionEnvironment);
         }
 
-        return keywordMatch && statusMatch && dateMatch && userMatch && envMatch;
+        let datasetMatch = true;
+        if (filters.dataset && filters.dataset.length) {
+            datasetMatch = !!filters.dataset.find(dataset => this.datasetUtils.getDatasetName(dataset) == this.datasetUtils.getDatasetName(report.dataset));
+        }
+
+        return keywordMatch && statusMatch && dateMatch && userMatch && envMatch && datasetMatch;
+    }
+
+    private removeDuplicateListItems(list: ListItem[]) {
+        const seen = new Set<string>();
+        return list.filter(elem => {
+            if (!elem) return false
+            const key = `${elem.text}-${elem.id}`
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
     }
 }

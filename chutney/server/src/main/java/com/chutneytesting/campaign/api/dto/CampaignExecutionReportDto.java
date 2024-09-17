@@ -7,6 +7,7 @@
 
 package com.chutneytesting.campaign.api.dto;
 
+import com.chutneytesting.dataset.api.DataSetDto;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -16,16 +17,17 @@ import java.util.List;
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class CampaignExecutionReportDto {
 
-    private Long executionId;
-    private String campaignName;
-    private LocalDateTime startDate;
-    private ServerReportStatus status;
-    private List<ScenarioExecutionReportOutlineDto> scenarioExecutionReports;
-    private boolean partialExecution;
-    private String executionEnvironment;
+    private final Long executionId;
+    private final String campaignName;
+    private final LocalDateTime startDate;
+    private final ServerReportStatus status;
+    private final List<ScenarioExecutionReportOutlineDto> scenarioExecutionReports;
+    private final boolean partialExecution;
+    private final String executionEnvironment;
+    private final DataSetDto dataset;
     @JsonProperty("user")
-    private String userId;
-    private Long duration;
+    private final String userId;
+    private final Long duration;
 
     public CampaignExecutionReportDto(Long executionId,
                                       List<ScenarioExecutionReportOutlineDto> scenarioExecutionReports,
@@ -34,6 +36,7 @@ public class CampaignExecutionReportDto {
                                       ServerReportStatus status,
                                       boolean partialExecution,
                                       String executionEnvironment,
+                                      DataSetDto dataset,
                                       String userId,
                                       Long duration) {
         this.executionId = executionId;
@@ -43,6 +46,7 @@ public class CampaignExecutionReportDto {
         this.status = status;
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
+        this.dataset = dataset;
         this.userId = userId;
         this.duration = duration;
     }
@@ -88,5 +92,9 @@ public class CampaignExecutionReportDto {
 
     public String getUserId() {
         return userId;
+    }
+
+    public DataSetDto getDataset() {
+        return dataset;
     }
 }

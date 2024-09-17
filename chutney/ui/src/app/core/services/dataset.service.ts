@@ -30,8 +30,8 @@ export class DataSetService {
                     dto.description,
                     dto.tags,
                     dto.lastUpdated,
-                    [],
-                    [],
+                    dto.uniqueValues,
+                    dto.multipleValues,
                     dto.id
                 ));
 

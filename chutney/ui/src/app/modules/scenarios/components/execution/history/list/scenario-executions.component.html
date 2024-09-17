@@ -177,7 +177,7 @@
                 [term]="filtersForm.get('keyword').value"></ngb-highlight>
               </td>
               <td class="text-break">
-                  <ngb-highlight [result]="execution.dataset"
+                  <ngb-highlight [result]="getDatasetFromExecution(execution)"
                                  [term]="filtersForm.get('keyword').value"></ngb-highlight>
               </td>
               <td>

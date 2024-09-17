@@ -37,10 +37,12 @@ import { NgbOffcanvas } from '@ng-bootstrap/ng-bootstrap';
 import { NGX_MONACO_EDITOR_CONFIG } from 'ngx-monaco-editor-v2';
 
 import { Authorization, Execution, GwtTestCase, ScenarioExecutionReport, StepExecutionReport } from '@model';
-import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
+import { ScenarioExecutionService } from 'src/app/core/services/scenario-execution.service';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { StringifyPipe } from '@shared/pipes';
 import { findScrollContainer } from '@shared/tools';
+import { TranslateService } from "@ngx-translate/core";
+import { DatasetUtils } from "@shared/tools/dataset-utils";
 
 @Component({
     selector: 'chutney-scenario-execution',
@@ -97,7 +99,9 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
         private stringify: StringifyPipe,
         private renderer: Renderer2,
         private offcanvasService: NgbOffcanvas,
-        private elementRef: ElementRef) {
+        private elementRef: ElementRef,
+        private datasetUtils: DatasetUtils,
+        private translateService: TranslateService) {
     }
 
     ngOnInit() {
@@ -193,6 +197,13 @@ export class ScenarioExecutionComponent implements OnInit, OnDestroy, AfterViewI
                 this.selectStep(failedStep[0], true);
             });
         }
+    }
+
+    protected getDataset(execution: ScenarioExecutionReport) {
+        if (!execution || !execution.dataset) {
+            return ''
+        }
+        return this.datasetUtils.getExecutionDatasetName(execution.dataset)
     }
 
     stopScenario() {

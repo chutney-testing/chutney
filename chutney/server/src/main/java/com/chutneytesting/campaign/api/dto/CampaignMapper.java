@@ -15,6 +15,7 @@ import static java.util.stream.Collectors.toList;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public class CampaignMapper {
 
@@ -55,7 +56,7 @@ public class CampaignMapper {
             dto.getEnvironment(),
             dto.isParallelRun(),
             dto.isRetryAuto(),
-            dto.getDatasetId(),
+            !StringUtils.isBlank(dto.getDatasetId()) ? dto.getDatasetId() : null,
             dto.getTags().stream().map(String::trim).map(String::toUpperCase).collect(toList())
         );
     }

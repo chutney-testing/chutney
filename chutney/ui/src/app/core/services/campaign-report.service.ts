@@ -6,12 +6,13 @@
  */
 
 import { Injectable } from '@angular/core';
-import { CampaignExecutionFullReport, ScenarioExecutionReport, StepExecutionReport } from '@core/model';
+import { CampaignExecutionFullReport, KeyValue, ScenarioExecutionReport, StepExecutionReport } from '@core/model';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { TranslateService } from '@ngx-translate/core';
 import { DurationPipe } from '@shared/pipes';
 import jsPDF from 'jspdf';
 import autoTable, { CellHookData } from 'jspdf-autotable';
+import { ExecutionDataset } from "@core/model/scenario/execution.dataset";
 
 @Injectable({
     providedIn: 'root'
@@ -27,7 +28,7 @@ export class CampaignReportService {
 
         this.campaignSummaryGeneration(pdf, report);
         pdf.addPage();
-        this.scenariiSummaryGeneration(pdf, report);
+        this.scenarioSummaryGeneration(pdf, report);
 
         return pdf;
     }
@@ -49,12 +50,12 @@ export class CampaignReportService {
         const hasDataset = report.scenarioExecutionReports.some(s => s.dataset);
         if(hasDataset){
             dataHeader = [["id", "Scenario", "Status", "Dataset", "error"]];
-            dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.dataset, s.error.toString()]);
+            dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.dataset ? (s.dataset.id || this.translate.instant("dataset.customLabel")) : '', s.error.toString()]);
         } else {
             dataHeader = [["id", "Scenario", "Status", "error"]];
             dataBody = report.scenarioExecutionReports.map(s => [s.scenarioId.toString(), s.testCaseTitle, s.status, s.error.toString()]);
         }
-        
+
         pdf.setFontSize(pdfFontSize - 2);
         autoTable(pdf, {
             body: dataBody,
@@ -75,7 +76,7 @@ export class CampaignReportService {
         });
     }
 
-    private scenariiSummaryGeneration(pdf: jsPDF, report: CampaignExecutionFullReport) {
+    private scenarioSummaryGeneration(pdf: jsPDF, report: CampaignExecutionFullReport) {
         const scenariiDetailsTitle = this.translate.instant('campaigns.execution.scenarios.title');
         pdf.text(scenariiDetailsTitle, 148, 15, { align: "center" });
 
@@ -90,7 +91,7 @@ export class CampaignReportService {
                 let r = this.buildExecutionReport(s);
                 pdf.text(r.scenarioName, 15, 25);
                 if(s.dataset) {
-                    pdf.text(`${this.translate.instant('scenarios.execution.dataset.title')}: ${s.dataset}`, 15, startY);
+                    pdf.text(`${this.translate.instant('scenarios.execution.dataset.title')}: ${s.dataset.id || this.translate.instant("dataset.customLabel")}`, 15, startY);
                     startY += 5;
                 }
                 const scenarioReportBody = r.report.steps.map(step => [step.name, step.status, this.buildErrorMessage(step)]);
@@ -139,7 +140,12 @@ export class CampaignReportService {
             jsonResponse.user,
             jsonResponse.testCaseTitle,
             jsonResponse.error,
-            contextVariables
+            contextVariables,
+            datasetVariables ? new ExecutionDataset(
+                datasetVariables.get("constants") as Array<KeyValue>,
+                datasetVariables.get("datatable") as Array<Array<KeyValue>>,
+                String(datasetVariables.get("datasetId"))
+            ) : null
         );
     }
 

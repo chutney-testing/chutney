@@ -5,10 +5,11 @@
  *
  */
 
-import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
+import { ScenarioExecutionService } from '@core/services/scenario-execution.service';
 import { environment } from '@env/environment';
 import { of } from 'rxjs';
-import { HttpClient } from '@angular/common/http'; // replace with your service's path
+import { HttpClient } from '@angular/common/http';
+import { Dataset } from "@model";
 
 describe('ScenarioService', () => {
     let service: ScenarioExecutionService;
@@ -24,7 +25,7 @@ describe('ScenarioService', () => {
         httpClientSpy.post.and.returnValue(of('123'));
         const scenarioId = 'testScenario';
         const env = 'testEnv';
-        const dataset = 'testDataset';
+        const dataset = new Dataset("", "", [], new Date(), [], []);
 
         service.executeScenarioAsync(scenarioId, env, dataset)
             .subscribe({
@@ -33,7 +34,7 @@ describe('ScenarioService', () => {
                 }
             );
         expect(httpClientSpy.post.calls.count()).withContext('expected one call').toBe(1, );
-        let expectedCallPath = `${environment.backend}${service.resourceUrl}/executionasync/v1/${scenarioId}/${env}/${dataset}`;
+        let expectedCallPath = `${environment.backend}${service.resourceUrl}/executionasync/v1/${scenarioId}/${env}`;
         expect(httpClientSpy.post.calls.allArgs()[0][0]).withContext('expected post url').toBe(expectedCallPath);
     });
 

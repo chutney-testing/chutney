@@ -9,11 +9,12 @@ package com.chutneytesting.server.core.domain.scenario.campaign;
 
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.RUNNING;
 import static com.chutneytesting.server.core.domain.execution.report.ServerReportStatus.SUCCESS;
+import static com.chutneytesting.server.core.domain.tools.DatasetUtils.compareDataset;
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.unmodifiableList;
 import static java.util.Optional.ofNullable;
-import static java.util.function.Predicate.not;
 
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
@@ -24,11 +25,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.OptionalInt;
 import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class CampaignExecution {
 
@@ -37,7 +36,7 @@ public class CampaignExecution {
     public final String campaignName;
     public final boolean partialExecution;
     public final String executionEnvironment;
-    public final String dataSetId;
+    public final DataSet dataset;
     public final String userId;
 
     // Not mandatory
@@ -53,7 +52,7 @@ public class CampaignExecution {
         boolean partialExecution,
         String executionEnvironment,
         String userId,
-        String dataSetId,
+        DataSet dataset,
         LocalDateTime startDate,
         ServerReportStatus status,
         List<ScenarioExecutionCampaign> scenarioExecutions
@@ -63,7 +62,7 @@ public class CampaignExecution {
         this.campaignName = campaignName;
         this.partialExecution = partialExecution;
         this.executionEnvironment = executionEnvironment;
-        this.dataSetId = ofNullable(dataSetId).filter(not(String::isBlank)).orElse(null);
+        this.dataset = dataset;
         this.userId = userId;
         this.scenarioExecutions = scenarioExecutions;
 
@@ -90,59 +89,62 @@ public class CampaignExecution {
                         .status(ServerReportStatus.NOT_EXECUTED)
                         .duration(0)
                         .environment(executionEnvironment)
-                        .datasetId(selectDatasetId(testCase))
+                        .dataset(selectDatasetId(testCase))
                         .user(userId)
                         .scenarioId(testCase.testcase().id())
                         .build())));
     }
 
     public void startScenarioExecution(TestCaseDataset testCaseDataset, String executionEnvironment) throws UnsupportedOperationException {
-        OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
-            .filter(i -> {
-                var se = this.scenarioExecutions.get(i);
-                return se.scenarioId().equals(testCaseDataset.testcase().id()) &&
-                    se.execution().datasetId().equals(selectDatasetId(testCaseDataset));
-            })
-            .findFirst();
-        this.scenarioExecutions.set(indexOpt.getAsInt(),
-            new ScenarioExecutionCampaign(
-                testCaseDataset.testcase().id(),
-                testCaseDataset.testcase().metadata().title(),
-                ImmutableExecutionHistory.ExecutionSummary.builder()
-                    .executionId(-1L)
-                    .testCaseTitle(testCaseDataset.testcase().metadata().title())
-                    .time(now())
-                    .status(RUNNING)
-                    .duration(0)
-                    .environment(executionEnvironment)
-                    .datasetId(selectDatasetId(testCaseDataset))
-                    .user(userId)
-                    .scenarioId(testCaseDataset.testcase().id())
-                    .tags(this.scenarioExecutions.get(indexOpt.getAsInt()).execution().tags())
-                    .build()));
+        this.scenarioExecutions.stream()
+            .filter(scenarioExecutions -> scenarioIdAndDatasetMatch(selectDatasetId(testCaseDataset).orElse(null), testCaseDataset.testcase().id(), scenarioExecutions))
+            .findFirst()
+            .ifPresent(
+                scenarioExecution ->
+                    this.scenarioExecutions.set(this.scenarioExecutions.indexOf(scenarioExecution),
+                        new ScenarioExecutionCampaign(
+                            testCaseDataset.testcase().id(),
+                            testCaseDataset.testcase().metadata().title(),
+                            ImmutableExecutionHistory.ExecutionSummary.builder()
+                                .executionId(-1L)
+                                .testCaseTitle(testCaseDataset.testcase().metadata().title())
+                                .time(now())
+                                .status(RUNNING)
+                                .duration(0)
+                                .environment(executionEnvironment)
+                                .dataset(selectDatasetId(testCaseDataset))
+                                .user(userId)
+                                .scenarioId(testCaseDataset.testcase().id())
+                                .tags(scenarioExecution.execution().tags())
+                                .build()))
+            );
     }
 
     public void updateScenarioExecutionId(ExecutionHistory.Execution storedExecution) throws UnsupportedOperationException {
-        OptionalInt indexOpt = IntStream.range(0, this.scenarioExecutions.size())
-            .filter(i -> {
-                var se = this.scenarioExecutions.get(i);
-                return se.scenarioId().equals(storedExecution.scenarioId()) &&
-                    se.execution().datasetId().equals(storedExecution.datasetId());
-            })
-            .findFirst();
-        var scenarioExecution = this.scenarioExecutions.get(indexOpt.getAsInt()).execution();
-        this.scenarioExecutions.set(indexOpt.getAsInt(),
-            new ScenarioExecutionCampaign(
-                storedExecution.scenarioId(),
-                storedExecution.testCaseTitle(),
-                ImmutableExecutionHistory.ExecutionSummary.builder()
-                    .from(scenarioExecution)
+        this.scenarioExecutions.stream()
+            .filter(scenarioExecution -> scenarioIdAndDatasetMatch(storedExecution.dataset().orElse(null), storedExecution.scenarioId(), scenarioExecution))
+            .findFirst()
+            .ifPresent(scenarioExecution -> {
+                var updatedExecution = ImmutableExecutionHistory.ExecutionSummary.builder()
+                    .from(scenarioExecution.execution())
                     .executionId(storedExecution.executionId())
-                    .build()));
+                    .build();
+                this.scenarioExecutions.set(this.scenarioExecutions.indexOf(scenarioExecution),
+                    new ScenarioExecutionCampaign(
+                        storedExecution.scenarioId(),
+                        storedExecution.testCaseTitle(),
+                        updatedExecution
+                    ));
+            });
     }
 
-    private Optional<String> selectDatasetId(TestCaseDataset testCaseDataset) {
-        return ofNullable(testCaseDataset.datasetId()).or(() -> ofNullable(dataSetId)).filter(not(String::isBlank));
+    private boolean scenarioIdAndDatasetMatch(DataSet dataset, String scenarioId, ScenarioExecutionCampaign scenarioExecution) {
+        return scenarioExecution.scenarioId().equals(scenarioId) &&
+            compareDataset(scenarioExecution.execution().dataset().orElse(null), dataset);
+    }
+
+    private Optional<DataSet> selectDatasetId(TestCaseDataset testCaseDataset) {
+        return ofNullable(testCaseDataset.dataset()).or(() -> ofNullable(dataset));
     }
 
     public void endScenarioExecution(ScenarioExecutionCampaign scenarioExecutionCampaign) throws UnsupportedOperationException {
@@ -230,7 +232,7 @@ public class CampaignExecution {
             .partialExecution(partialExecution)
             .campaignName(campaignName)
             .environment(executionEnvironment)
-            .dataSetId(dataSetId)
+            .dataset(dataset)
             .userId(userId)
             .startDate(startDate)
             .status(status)

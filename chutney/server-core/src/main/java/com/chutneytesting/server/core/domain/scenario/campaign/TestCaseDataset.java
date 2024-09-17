@@ -7,30 +7,23 @@
 
 package com.chutneytesting.server.core.domain.scenario.campaign;
 
-import static java.util.Optional.ofNullable;
-import static java.util.function.Predicate.not;
-
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
+import com.chutneytesting.server.core.domain.tools.DatasetUtils;
 import java.util.Objects;
 
-public record TestCaseDataset(TestCase testcase, String datasetId) {
-
-    @Override
-    public String datasetId() {
-        return ofNullable(datasetId).filter(not(String::isBlank)).orElse(null);
-    }
+public record TestCaseDataset(TestCase testcase, DataSet dataset) {
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TestCaseDataset that = (TestCaseDataset) o;
-        return Objects.equals(testcase.id(), that.testcase.id()) &&
-            Objects.equals(datasetId(), that.datasetId());
+        return Objects.equals(testcase.id(), that.testcase.id()) && DatasetUtils.compareDataset(dataset, that.dataset());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(testcase.id(), datasetId());
+        return Objects.hash(testcase.id(), dataset());
     }
 }

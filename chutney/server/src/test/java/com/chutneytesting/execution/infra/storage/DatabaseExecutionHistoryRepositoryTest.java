@@ -398,7 +398,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .environment("env")
                 .addScenarioExecutionReport(scenarioExecutionOneReport)
                 .userId("user")
-                .dataSetId("ds287")
+                .dataset(DataSet.builder().withId("ds287").withName("").build())
                 .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
@@ -434,7 +434,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .environment("env")
                 .addScenarioExecutionReport(scenarioExecutionOneReport)
                 .userId("user")
-                .dataSetId("ds287")
+                .dataset(DataSet.builder().withId("ds287").withName("").build())
                 .build();
             campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
@@ -516,7 +516,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                     .addScenarioExecutionReport(scenarioExecutionOneReport)
                     .addScenarioExecutionReport(scenarioExecutionTwoReport)
                     .userId("user")
-                    .dataSetId("ds287")
+                    .dataset(DataSet.builder().withName("ds287").build())
                     .build();
                 campaignExecutionDBRepository.saveCampaignExecution(campaign.id(), campaignExecution);
 
@@ -609,7 +609,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                     .report(report)
                     .testCaseTitle("Fake title")
                     .environment("")
-                    .datasetId("fake dataset id")
+                    .dataset(DataSet.builder().withId("fake dataset id").withName("").build())
                     .user("")
                     .build();
             }
@@ -625,7 +625,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 .report(buildReport())
                 .testCaseTitle("Fake title")
                 .environment("")
-                .datasetId("fake dataset id")
+                .dataset(DataSet.builder().withId("fake dataset id").withName("").build())
                 .user("")
                 .tags(defaultScenarioTags())
                 .build();

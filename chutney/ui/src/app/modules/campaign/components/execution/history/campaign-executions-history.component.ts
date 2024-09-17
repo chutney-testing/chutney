@@ -9,7 +9,7 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Params, Router } from '@angular/router';
 
 import { EMPTY, Observable, of, Subscription, zip } from 'rxjs';
-import { delay, repeat, switchMap, tap } from 'rxjs/operators';
+import { delay, map, repeat, switchMap, tap } from 'rxjs/operators';
 import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 
 import { Campaign, CampaignReport } from '@model';
@@ -72,6 +72,7 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
         this.eventManagerService.destroy(this.onExecuteSubscription);
         this.eventManagerService.destroy(this.onErrorSubscription);
         this.eventManagerService.destroy(this.onReplaySubscription);
+        this.eventManagerService.destroy(this.campaignExecutionLast);
         this.unsubscribeRefresh();
     }
 
@@ -99,8 +100,9 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
 
     private replay() {
         const lastReport = this.campaignReports[0]
-        this.campaignService.executeCampaign(this.campaign.id, lastReport.report.executionEnvironment).subscribe()
-        this.refreshCampaign()
+        this.campaignService.executeCampaign(this.campaign.id, lastReport.report.executionEnvironment, lastReport.report.dataset).pipe(
+            map(campaignExecutionReport => this.refreshCampaign())
+        ).subscribe()
     }
 
     private checkForRefresh() {
@@ -231,7 +233,9 @@ export class CampaignExecutionsHistoryComponent implements OnInit, OnDestroy {
         if (queryParams['open']) {
             let executions$: Observable<CampaignReport>[] = queryParams['open']
                 .split(',')
-                .map(id => of(this.campaignReports.find(cer => cer.report.executionId == id)));
+                .map(id => this.campaignReports.find(cer => cer.report.executionId == id))
+                .filter((campaignReport: CampaignReport) => campaignReport)
+                .map((campaignReport: CampaignReport) => of(campaignReport))
             openedExecutions$ = zip(executions$);
         }
 

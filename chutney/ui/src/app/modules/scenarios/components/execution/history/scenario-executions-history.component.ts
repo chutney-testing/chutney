@@ -6,10 +6,10 @@
  */
 
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { catchError, delay, switchMap, tap } from 'rxjs/operators';
+import { catchError, delay, map, switchMap, tap } from 'rxjs/operators';
 import { ActivatedRoute, Params, Router } from '@angular/router';
-import { Execution, GwtTestCase } from '@model';
-import { ScenarioExecutionService } from '@modules/scenarios/services/scenario-execution.service';
+import { Dataset, Execution, GwtTestCase } from '@model';
+import { ScenarioExecutionService } from 'src/app/core/services/scenario-execution.service';
 import { NgbNavChangeEvent } from '@ng-bootstrap/ng-bootstrap';
 import { EMPTY, Observable, of, Subscription, zip } from 'rxjs';
 import { ScenarioService } from '@core/services';
@@ -264,7 +264,7 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
         this.scenarioExecution$ = this.eventManagerService.subscribe('execute', (data) => this.executeScenario(data.env, data.dataset));
     }
 
-    private executeScenario(env: string, dataset: string = null) {
+    private executeScenario(env: string, dataset: Dataset = null) {
         this.scenarioExecutionService
             .executeScenarioAsync(this.scenarioId, env, dataset)
             .pipe(
@@ -297,7 +297,12 @@ export class ScenarioExecutionsHistoryComponent implements OnInit, OnDestroy {
 
     replay(executionId: number) {
         const execution = this.executions.find(exec => exec.executionId === executionId);
-        this.executeScenario(execution.environment, execution.dataset)
+        this.scenarioExecutionService.findExecutionReport(execution.scenarioId, execution.executionId).pipe(
+            map(scenarioExecutionReport => {
+                const dataset = scenarioExecutionReport.dataset && (scenarioExecutionReport.dataset.datasetId || scenarioExecutionReport.dataset.constants || scenarioExecutionReport.dataset.datatable) ? new Dataset("", "", [], new Date(), scenarioExecutionReport.dataset.constants, scenarioExecutionReport.dataset.datatable, scenarioExecutionReport.dataset.datasetId) : null;
+                this.executeScenario(execution.environment, dataset)
+            })
+        ).subscribe()
     }
 
     deleteExecution(executionId: number) {

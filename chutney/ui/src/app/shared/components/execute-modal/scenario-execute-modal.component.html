@@ -5,8 +5,8 @@
   ~
   -->
 
+<div>
 <div class="modal-body" ngbAutofocus>
-
   @if (errorMessage) {
   <div class="alert alert-dismissible alert-danger mt-3">
     <button type="button" class="btn-close" data-bs-dismiss="alert" (click)="errorMessage = null"></button>
@@ -29,6 +29,7 @@
       <p-dropdown
         [options]="filteredDatasets"
         [(ngModel)]="selectedDataset"
+        (ngModelChange)="selectedDatasetChanged()"
         optionLabel="name"
         [filter]="true"
         [showClear]="true"
@@ -39,11 +40,18 @@
         <ng-template pTemplate="selectedItem" let-selectedDataset>
           <div class="d-flex justify-content-between">
             <span class="option-label">{{ selectedDataset.name }} </span>
-            @if ( datasetDetails?.uniqueValues.length ) {
-              <div class="px-1 my-auto">
-                <p-button class="bi bi-eye-fill" (click)="this.showHideDataset($event)" [rounded]="true" [text]="true" severity="secondary" />
-              </div>
-            }
+            <div class="d-flex flex-row">
+              @if ( datasetDetails?.uniqueValues.length ) {
+                <div class="px-1 my-auto">
+                  <p-button class="bi bi-eye-fill" (click)="this.showHideDataset($event)" [rounded]="true" [text]="true" severity="secondary" />
+                </div>
+              }
+              @if ( createDataset != selectedDataset ) {
+                <div class="ms-1 px-1 my-auto">
+                  <p-button class="bi bi-pencil-fill" (click)="this.editDataset($event, selectedDataset)" [rounded]="true" [text]="true" severity="secondary" />
+                </div>
+              }
+            </div>
           </div>
         </ng-template>
         <ng-template let-dataset pTemplate="item">
@@ -82,8 +90,51 @@
       </tbody>
     </table>
   </div>
+
+    @if (editionDataset) {
+    <ng-container [formGroup]="datasetForm">
+        <div class="m-3">
+            <div>
+                <ul class="nav nav-tabs">
+                    <li class="nav-item cursor-pointer">
+                        <a class="nav-link" [ngClass]="{ 'active':activeTab==='keyValue'}"
+                           (click)="selectTab('keyValue')"><span class="fa fa-list" aria-hidden="true"></span></a>
+                    </li>
+                    <li class="nav-item cursor-pointer">
+                        <a class="nav-link" [ngClass]="{ 'active':activeTab==='multiKeyValue'}"
+                           (click)="selectTab('multiKeyValue')"><span class="fa fa-th" aria-hidden="true"></span></a>
+                    </li>
+                </ul>
+
+                <div class="tab-content clearfix">
+                    <div class="tab-pane" id="keyValue" [ngClass]="{ 'active':activeTab==='keyValue'}">
+                        <chutney-forms-key-value formControlName="keyValues" [enableImportExport]="false"></chutney-forms-key-value>
+                    </div>
+                    <div class="tab-pane" id="mulitKeyValue" [ngClass]="{ 'active':activeTab==='multiKeyValue'}">
+                        <chutney-forms-data-grid formControlName="multiKeyValues" [enableImportExport]="false"></chutney-forms-data-grid>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex flex-column align-items-end m-3">
+            <div class="d-flex me-3 align-content-center me-2">
+                <label class="form-check-label me-2" for="saveDatasetCheckbox">{{ "scenarios.execution.modal.saveDatasetCheckbox" | translate }}</label>
+                <input id="saveDatasetCheckbox" type="checkbox" class="form-check-input" formControlName="saveDatasetCheckbox"/>
+            </div>
+            @if (datasetForm.get('saveDatasetCheckbox').value) {
+                <div class="d-flex flex-column justify-content-end m-2 w-50">
+                    <input type="text" class="form-control" [ngClass]="{ 'is-invalid': datasetFormControl.saveDatasetName.invalid && datasetFormControl.saveDatasetName.touched }" id="saveDatasetName" formControlName="saveDatasetName" placeholder="{{ 'scenarios.execution.modal.saveDatasetInputPlaceholder' | translate }}"/>
+                    <div class="invalid-feedback">
+                        {{ "scenarios.execution.modal.error.datasetEmptyName" | translate }}
+                    </div>
+                </div>
+            }
+        </div>
+    </ng-container>
+    }
 </div>
 <div class="modal-footer">
   <button type="button" class="btn btn-light" (click)="activeModal.dismiss('cancel click')">{{ "global.actions.cancel" | translate }}</button>
-  <button type="button" class="btn btn-primary" (click)="execute()">{{ "global.actions.execute" | translate }}</button>
+  <button type="button" class="btn btn-primary" (click)="executeModal()" [disabled]="!environmentsLoaded">{{ "global.actions.execute" | translate }}</button>
+</div>
 </div>

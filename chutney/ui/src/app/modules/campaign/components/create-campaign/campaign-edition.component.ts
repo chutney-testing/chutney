@@ -322,7 +322,7 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
         this.campaign.environment = this.selectedEnvironment;
         this.campaign.parallelRun = formValue['parallelRun'];
         this.campaign.retryAuto = formValue['retryAuto'];
-        this.campaign.datasetId = this.datasetId;
+        this.campaign.datasetId = (!this.datasetId || this.datasetId.trim() === "") ? null : this.datasetId
         const tags = formValue['campaignTags'] + '';
         this.campaign.tags = tags.length !== 0 ? tags.split(',') : [];
 

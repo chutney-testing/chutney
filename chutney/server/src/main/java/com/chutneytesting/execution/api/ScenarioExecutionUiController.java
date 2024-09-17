@@ -7,6 +7,10 @@
 
 package com.chutneytesting.execution.api;
 
+import static java.util.Optional.ofNullable;
+
+import com.chutneytesting.dataset.api.ExecutionDatasetDto;
+import com.chutneytesting.dataset.api.KeyValue;
 import com.chutneytesting.dataset.domain.DataSetRepository;
 import com.chutneytesting.environment.api.environment.EmbeddedEnvironmentApi;
 import com.chutneytesting.execution.domain.GwtScenarioMarshaller;
@@ -103,12 +107,12 @@ public class ScenarioExecutionUiController {
     }
 
     @PreAuthorize("hasAuthority('SCENARIO_EXECUTE')")
-    @PostMapping(path = {"/api/ui/scenario/executionasync/v1/{scenarioId}/{env}", "/api/ui/scenario/executionasync/v1/{scenarioId}/{env}/{dataset}"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env, @PathVariable(value = "dataset", required = false) Optional<String> dataset) {
+    @PostMapping(path = {"/api/ui/scenario/executionasync/v1/{scenarioId}/{env}", "/api/ui/scenario/executionasync/v1/{scenarioId}/{env}"}, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public String executeScenarioAsyncWithExecutionParameters(@PathVariable("scenarioId") String scenarioId, @PathVariable("env") String env, @RequestBody(required = false) ExecutionDatasetDto dataset) {
         LOGGER.debug("execute async scenario '{}'", scenarioId);
         TestCase testCase = testCaseRepository.findExecutableById(scenarioId).orElseThrow(() -> new ScenarioNotFoundException(scenarioId));
         String userId = userService.currentUser().getId();
-        DataSet execDataset = dataset.map(datasetRepository::findById).orElseGet(() -> getDataSet(testCase));
+        DataSet execDataset = getDataSet(dataset, testCase);
         return executionEngineAsync.execute(new ExecutionRequest(testCase, env, userId, execDataset)).toString();
     }
 
@@ -124,7 +128,7 @@ public class ScenarioExecutionUiController {
         LOGGER.debug("executeScenario for scenarioId='{}'", scenarioId);
         TestCase testCase = testCaseRepository.findExecutableById(scenarioId).orElseThrow(() -> new ScenarioNotFoundException(scenarioId));
         String userId = userService.currentUserId();
-        DataSet dataset = getDataSet(testCase);
+        DataSet dataset = getDataSetFromTestCase(testCase);
         ScenarioExecutionReport report = executionEngine.simpleSyncExecution(new ExecutionRequest(testCase, env, userId, dataset));
 
         return reportObjectMapper.writeValueAsString(this.scenarioExecutionReportMapper.toDto(report));
@@ -173,13 +177,28 @@ public class ScenarioExecutionUiController {
         ).toFlowable(BackpressureStrategy.BUFFER));
     }
 
-    private DataSet getDataSet(TestCase testCase) {
+    private DataSet getDataSetFromTestCase(TestCase testCase) {
         String defaultDatasetId = testCase.metadata().defaultDataset();
         if (!defaultDatasetId.isEmpty()) {
             return datasetRepository.findById(defaultDatasetId);
         } else {
             return DataSet.NO_DATASET;
         }
+    }
+
+    private DataSet getDataSet(ExecutionDatasetDto dataset, TestCase testCase) {
+        if (dataset == null) {
+            return getDataSetFromTestCase(testCase);
+        } else if (dataset.getId() != null) {
+            return datasetRepository.findById(dataset.getId());
+        } else if (dataset.getConstants() != null || dataset.getDatatable() != null) {
+            return DataSet.builder()
+                .withName("")
+                .withConstants(KeyValue.toMap(dataset.getConstants()))
+                .withDatatable(ofNullable(dataset.getDatatable()).map(datatable -> datatable.stream().map(KeyValue::toMap).toList()).orElse(null))
+                .build();
+        }
+        return getDataSetFromTestCase(testCase);
     }
 
     // TODO - Use Spring serialization

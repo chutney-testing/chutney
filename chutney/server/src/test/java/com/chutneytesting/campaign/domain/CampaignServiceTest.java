@@ -16,6 +16,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
@@ -60,7 +61,7 @@ class CampaignServiceTest {
             .partialExecution(true)
             .campaignName("test name")
             .executionId(43L)
-            .dataSetId("dataset id test")
+            .dataset(DataSet.builder().withId("dataset id test").withName("").build())
             .startDate(LocalDateTime.MAX)
             .addScenarioExecutionReport(scenarioExecutionReport1)
             .addScenarioExecutionReport(scenarioExecutionReport2)

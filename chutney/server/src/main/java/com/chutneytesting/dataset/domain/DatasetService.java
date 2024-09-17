@@ -86,7 +86,7 @@ public class DatasetService {
             .forEach(c -> campaignRepository.createOrUpdate(
                 CampaignBuilder.builder()
                     .from(c)
-                    .setExternalDatasetId(newId)
+                    .setDatasetId(newId)
                     .build())
             );
     }

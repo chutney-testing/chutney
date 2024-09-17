@@ -16,6 +16,7 @@ import com.chutneytesting.campaign.infra.CampaignJpaRepository;
 import com.chutneytesting.campaign.infra.jpa.CampaignExecutionEntity;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionReportEntity;
+import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.DetachedExecution;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.Execution;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory.ExecutionSummary;
@@ -109,7 +110,10 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
         CampaignExecution campaignExecution = ofNullable(scenarioExecution.campaignExecution())
             .map(ce -> ce.toDomain(campaignJpaRepository.findById(ce.campaignId()).get().title()))
             .orElse(null);
-        return scenarioExecution.toDomain(campaignExecution);
+        ScenarioExecutionReportEntity scenarioExecutionReportEntity = scenarioExecutionReportJpaRepository.findByScenarioExecutionId(scenarioExecution.id());
+        DataSet dataset = ofNullable(scenarioExecutionReportEntity).flatMap(scenarioExecutionReport -> scenarioExecutionReport.toDomain().dataset())
+            .orElse(null);
+        return scenarioExecution.toDomain(campaignExecution, dataset);
     }
 
     @Override
@@ -266,6 +270,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
             scenarioExecutionReport.environment,
             scenarioExecutionReport.user,
             scenarioExecutionReport.tags,
+            scenarioExecutionReport.datasetId,
             scenarioExecutionReport.constants,
             scenarioExecutionReport.datatable,
             report);

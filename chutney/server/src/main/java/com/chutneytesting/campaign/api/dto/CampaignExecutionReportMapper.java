@@ -7,6 +7,7 @@
 
 package com.chutneytesting.campaign.api.dto;
 
+import com.chutneytesting.dataset.api.DataSetMapper;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignExecution;
 import java.util.List;
@@ -25,6 +26,7 @@ public class CampaignExecutionReportMapper {
             campaignReport.status(),
             campaignReport.partialExecution,
             campaignReport.executionEnvironment,
+            DataSetMapper.toDto(campaignReport.dataset),
             campaignReport.userId,
             campaignReport.getDuration());
     }

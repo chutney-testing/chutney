@@ -26,6 +26,7 @@ import com.chutneytesting.campaign.api.dto.CampaignExecutionReportDto;
 import com.chutneytesting.campaign.api.dto.ScenarioExecutionReportOutlineDto;
 import com.chutneytesting.campaign.domain.CampaignService;
 import com.chutneytesting.campaign.infra.FakeCampaignRepository;
+import com.chutneytesting.dataset.api.DataSetDto;
 import com.chutneytesting.dataset.domain.DatasetService;
 import com.chutneytesting.scenario.api.raw.dto.ImmutableTestCaseIndexDto;
 import com.chutneytesting.scenario.api.raw.dto.TestCaseIndexDto;
@@ -470,8 +471,8 @@ public class CampaignControllerTest {
 
     @JsonIgnoreProperties("scenarioExecutionReports")
     static class CampaignExecutionReportDtoTest extends CampaignExecutionReportDto {
-        public CampaignExecutionReportDtoTest(Long executionId, List<ScenarioExecutionReportOutlineDto> scenarioExecutionReports, String campaignName, LocalDateTime startDate, ServerReportStatus status, boolean partialExecution, String executionEnvironment, String userId, Long duration) {
-            super(executionId, scenarioExecutionReports, campaignName, startDate, status, partialExecution, executionEnvironment, userId, duration);
+        public CampaignExecutionReportDtoTest(Long executionId, List<ScenarioExecutionReportOutlineDto> scenarioExecutionReports, String campaignName, LocalDateTime startDate, ServerReportStatus status, boolean partialExecution, String executionEnvironment, String userId, Long duration, DataSetDto dataset) {
+            super(executionId, scenarioExecutionReports, campaignName, startDate, status, partialExecution, executionEnvironment, dataset, userId, duration);
         }
     }
 }

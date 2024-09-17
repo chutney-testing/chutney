@@ -26,7 +26,7 @@
           {{'scenarios.execution.history.title' | translate}}
         </a>
         <ng-template ngbNavContent>
-          <chutney-scenario-executions [executions]="executions"
+          <chutney-scenario-executions [executions]="executions" [scenario]="scenario"
             [(filters)]="executionsFilters"
           (onExecutionSelect)="openReport($event)"
           (onReplay)="replay($event)"

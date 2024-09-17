@@ -9,6 +9,7 @@ package com.chutneytesting.server.core.domain.scenario.campaign;
 
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
+import com.chutneytesting.server.core.domain.tools.DatasetUtils;
 import java.util.Comparator;
 import java.util.Objects;
 
@@ -32,11 +33,11 @@ public record ScenarioExecutionCampaign(
         if (o == null || getClass() != o.getClass()) return false;
         ScenarioExecutionCampaign that = (ScenarioExecutionCampaign) o;
         return Objects.equals(scenarioId, that.scenarioId) &&
-            Objects.equals(execution.datasetId(), that.execution.datasetId());
+            DatasetUtils.compareDataset(execution.dataset().orElse(null), that.execution.dataset().orElse(null));
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(scenarioId, execution.datasetId());
+        return Objects.hash(scenarioId, execution.dataset());
     }
 }

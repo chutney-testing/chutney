@@ -6,7 +6,7 @@
  */
 
 import { Component, EventEmitter, Input, OnChanges, OnDestroy, Output, SimpleChanges, TemplateRef, ViewChild } from '@angular/core';
-import { Execution } from '@model';
+import { Execution, GwtTestCase } from '@model';
 import { Params, Router } from '@angular/router';
 import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { FormBuilder, FormControl, FormGroup } from '@angular/forms';
@@ -18,6 +18,7 @@ import { NgbDate } from '@ng-bootstrap/ng-bootstrap/datepicker/ngb-date';
 import { TranslateService } from '@ngx-translate/core';
 import { ListItem } from 'ng-multiselect-dropdown/multiselect.model';
 import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
+import { DatasetUtils } from "@shared/tools/dataset-utils";
 
 @Component({
     selector: 'chutney-scenario-executions',
@@ -49,6 +50,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     private readonly iso_Date_Delimiter = '-';
 
     @Input() executions: Execution[] = [];
+    @Input() scenario: GwtTestCase;
     @Output() onExecutionSelect = new EventEmitter<{ execution: Execution, focus: boolean }>();
     @Input() filters: Params;
     @Output() filtersChange = new EventEmitter<Params>();
@@ -62,7 +64,8 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
                 private formBuilder: FormBuilder,
                 private datePipe: DateFormatPipe,
                 private translateService: TranslateService,
-                private modalService: BsModalService) {
+                private modalService: BsModalService,
+                private datasetUtils: DatasetUtils) {
     }
 
     ngOnChanges(changes: SimpleChanges): void {
@@ -91,7 +94,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     private initFiltersOptions() {
         this.status = [...new Set(this.executions.map(exec => exec.status))].map(status => this.toSelectOption(status, this.translateService.instant(ExecutionStatus.toString(status))));
         this.environments = [...new Set(this.executions.map(exec => exec.environment))].map(env => this.toSelectOption(env));
-        this.datasets = [...new Set(this.executions.map(exec => exec.dataset).filter(ds=> !!ds))].map(ds => this.toSelectOption(ds));
+        this.datasets = this.removeDuplicateListItems(this.executions.map(exec => exec.dataset).filter(ds=> !!ds).map(ds => ds.id ? ds.id : "Custom").map(ds => this.toSelectOption(ds)));
         this.executors = [...new Set(this.executions.map(exec => exec.user))].map(user => this.toSelectOption(user));
         this.campaigns = [...new Set(this.executions.filter(exec => !!exec.campaignReport).map(exec => exec.campaignReport.campaignName))].map(camp => this.toSelectOption(camp));
         this.tags = [...new Set(this.executions.flatMap(exec => exec.tags))].map(tag => this.toSelectOption(tag));
@@ -129,6 +132,9 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
             .subscribe();
     }
 
+    protected getDatasetFromExecution(execution: Execution) {
+        return this.datasetUtils.getDatasetName(execution.dataset)
+    }
 
     private selectedOptionsFromUri(param: string, labelResolver?: (param) => string) {
         if (param) {
@@ -239,7 +245,7 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
 
         let datasetMatch = true;
         if (filters.datasets && filters.datasets.length) {
-            datasetMatch = !!filters.datasets.find((ds:ListItem) => ds.id === exec.dataset);
+            datasetMatch = !!filters.datasets.find((ds:ListItem) => exec.dataset !! && ds.id === exec.dataset.id);
         }
 
         let campaignMatch = true;
@@ -268,6 +274,19 @@ export class ScenarioExecutionsComponent implements OnChanges, OnDestroy {
     replay(execution: Execution, event: MouseEvent) {
         event.stopPropagation();
         this.onReplay.emit(execution.executionId);
+    }
+
+    private removeDuplicateListItems(list: ListItem[]) {
+        const seen = new Set<string>();
+        return list.filter(elem => {
+            if (!elem) return false
+            const key = `${elem.text}-${elem.id}`
+            if (seen.has(key)) {
+                return false;
+            }
+            seen.add(key);
+            return true;
+        });
     }
 
     emitDeleteExecutionEvent() {

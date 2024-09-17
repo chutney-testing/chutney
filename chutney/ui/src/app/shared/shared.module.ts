@@ -52,6 +52,8 @@ import { DistinctPipe } from './pipes/distinct.pipe';
 import { ScenarioExecuteModalComponent } from './components/execute-modal/scenario-execute-modal.component';
 import { DropdownModule } from 'primeng/dropdown';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { FormsDataGridComponent } from "@shared/components/dataset/forms-data-grid/forms-data-grid.component";
+import { FormsKeyValueComponent } from "@shared/components/dataset/forms-key-value/forms-key-value.component";
 
 @NgModule({
     imports: [
@@ -95,7 +97,9 @@ import { FloatLabelModule } from 'primeng/floatlabel';
         ChutneyLeftMenuComponent,
         ChutneyRightMenuComponent,
         DistinctPipe,
-        ScenarioExecuteModalComponent
+        ScenarioExecuteModalComponent,
+        FormsDataGridComponent,
+        FormsKeyValueComponent
     ],
     exports: [
         ComponentSearchPipe,
@@ -123,7 +127,9 @@ import { FloatLabelModule } from 'primeng/floatlabel';
         ChutneyEditorComponent,
         ChutneyRightMenuComponent,
         DistinctPipe,
-        ScenarioExecuteModalComponent
+        ScenarioExecuteModalComponent,
+        FormsDataGridComponent,
+        FormsKeyValueComponent
     ],
     providers: [
         {

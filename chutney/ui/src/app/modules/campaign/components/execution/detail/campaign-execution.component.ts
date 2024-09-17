@@ -23,6 +23,10 @@ import { ExecutionStatus } from '@core/model/scenario/execution-status';
 import { EventManagerService } from '@shared';
 import { sortByAndOrder } from '@shared/tools';
 import { CampaignReportService } from '@core/services/campaign-report.service';
+import { DatasetUtils } from "@shared/tools/dataset-utils";
+import { map, tap } from "rxjs/operators";
+import { ScenarioExecutionService } from "src/app/core/services/scenario-execution.service";
+import { ExecutionDataset } from "@core/model/scenario/execution.dataset";
 
 @Component({
     selector: 'chutney-campaign-execution',
@@ -38,6 +42,8 @@ export class CampaignExecutionComponent implements OnInit {
     Authorization = Authorization;
     ExecutionStatus = ExecutionStatus;
 
+    datasetByScenarioExecutionId: Map<string, ExecutionDataset> = new Map<string, ExecutionDataset>()
+
     errors: string[] = [];
     jiraTestExecutionId: string;
     private jiraScenarios: JiraScenario[] = [];
@@ -52,7 +58,9 @@ export class CampaignExecutionComponent implements OnInit {
         private jiraLinkService: JiraPluginService,
         private campaignService: CampaignService,
         private eventManagerService: EventManagerService,
-        private campaignReportService: CampaignReportService
+        private campaignReportService: CampaignReportService,
+        private scenarioExecutionService: ScenarioExecutionService,
+        private datasetUtils: DatasetUtils
     ) { }
 
     ngOnInit(): void {
@@ -64,12 +72,33 @@ export class CampaignExecutionComponent implements OnInit {
             this.jiraTestExecutionId = result.jirjiraTestExecutionScenarios.id;
         });
         this.report.report.scenarioExecutionReports.forEach((_report, index) => this.showMore[index] = false);
+        this.fetchMissingInlineDatasetsForScenarioExecution()
+    }
+
+    private fetchMissingInlineDatasetsForScenarioExecution() {
+        const scenarioExecutionReportWithoutDataset = this.report.report.scenarioExecutionReports.filter(scenarioExecutionReport => !scenarioExecutionReport.dataset);
+        for (const execution of scenarioExecutionReportWithoutDataset) {
+             this.scenarioExecutionService.findExecutionReport(execution.scenarioId, execution.executionId).pipe(
+                map(scenarioExecution => scenarioExecution.dataset),
+                tap(dataset => this.datasetByScenarioExecutionId.set(String(execution.executionId), dataset))
+            ).subscribe()
+        }
     }
 
     private cleanJiraUrl() {
         if (this.jiraUrl && this.jiraUrl.length == 0) {
             this.jiraUrl = null;
         }
+    }
+
+    protected getDataset(execution: ScenarioExecutionReportOutline) {
+        if (!execution.dataset) {
+            if (this.datasetByScenarioExecutionId && this.datasetByScenarioExecutionId.has(String(execution.executionId))) {
+                return this.datasetUtils.getExecutionDatasetName(this.datasetByScenarioExecutionId.get(String(execution.executionId)))
+            }
+            return ''
+        }
+        return this.datasetUtils.getDatasetName(execution.dataset)
     }
 
     private jiraTestExecutionScenarios$(): Observable<JiraTestExecutionScenarios> {
