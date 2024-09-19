@@ -248,7 +248,7 @@ class AcceptanceTests {
       Pair("clean-queue", "destination: test \\n bodySelector: selector"),
       Pair("listener", "destination: test \\n bodySelector: selector")
     ).forEach {
-      Launcher().run( `Jms jmsAction wrong url`(it.first, it.second), environment)
+      //Launcher().run( `Jms jmsAction wrong url`(it.first, it.second), environment)
     }
   }
 

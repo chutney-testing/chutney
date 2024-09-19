@@ -76,19 +76,14 @@ fun `Jms sender then clean then send and listen it on embedded broker`(
 ): ChutneyScenario {
 
   return Scenario(title = "Jms sender then clean then send and listen it on embedded broker") {
-    Given("a jms endpoint") {
-      JmsBrokerStartAction(
-        configUri ="broker:(tcp://localhost:$port)?useJmx=false&persistent=false"
-      )
-    }
-    And("An associated target") {
+    Given("An associated target") {
       createEnvironment(
         "JMS_ENV_OK",
         """
         [
           {
               "name": "test_jms",
-              "url": "vm://host.testcontainers.internal:$port",
+              "url": "vm://localhost:$port",
               "properties": [
                   {
                       "key": "java.naming.factory.initial",
