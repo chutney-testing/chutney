@@ -13,7 +13,7 @@ import com.chutneytesting.kotlin.dsl.*
 val executeCampaignById = Scenario(title = "Execute campaign by id") {
   createCampaignWith2Scenarios()
   When("this campaign is executed by id") {
-    HttpGetAction(
+    HttpPostAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/ui/campaign/execution/v1/byID/${'$'}{#campaignId}",
         headers = mapOf(
@@ -115,7 +115,7 @@ val unknownCampaignById = Scenario(title = "Execution by id of an unknown campai
     )
   }
   When("an unknown campaign is executed by id and not found") {
-    HttpGetAction(
+    HttpPostAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/ui/campaign/execution/v1/byID/${'$'}{#campaignId}",
         headers = mapOf(

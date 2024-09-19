@@ -9,11 +9,11 @@ package com.chutneytesting.acceptance
 
 import com.chutneytesting.acceptance.tests.*
 import com.chutneytesting.acceptance.tests.actions.*
-import com.chutneytesting.acceptance.tests.agent.`We receive a network configuration to persist`
+import com.chutneytesting.acceptance.tests.`We receive a network configuration to persist`
 import com.chutneytesting.acceptance.tests.edition.*
 import com.chutneytesting.acceptance.tests.engine.*
-import com.chutneytesting.acceptance.tests.security.`Add and remove user to-from an existing role`
-import com.chutneytesting.acceptance.tests.security.`Declare a new role with its authorizations`
+import com.chutneytesting.acceptance.tests.`Add and remove user to-from an existing role`
+import com.chutneytesting.acceptance.tests.`Declare a new role with its authorizations`
 import com.chutneytesting.kotlin.dsl.ChutneyEnvironment
 import com.chutneytesting.kotlin.dsl.ChutneyTarget
 import com.chutneytesting.kotlin.launcher.Launcher

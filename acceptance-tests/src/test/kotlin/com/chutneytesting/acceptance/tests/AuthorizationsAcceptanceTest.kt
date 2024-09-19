@@ -5,7 +5,7 @@
  *
  */
 
-package com.chutneytesting.acceptance.tests.security
+package com.chutneytesting.acceptance.tests
 
 import com.chutneytesting.kotlin.dsl.*
 
