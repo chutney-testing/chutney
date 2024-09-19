@@ -22,11 +22,11 @@
 ```shell
 // from example project folder
 // Run
-docker-compose -f ./.docker/dev-docker-compose-demo.yml up -d
+docker compose -f ./.docker/dev-docker-compose-demo.yml up -d
 // Stop
-docker-compose -f ./.docker/dev-docker-compose-demo.yml stop
+docker compose -f ./.docker/dev-docker-compose-demo.yml stop
 // Remove
-docker-compose -f ./.docker/dev-docker-compose-demo.yml rm
+docker compose -f ./.docker/dev-docker-compose-demo.yml rm
 ```
 > **Notes**:
 > * The Chutney web interface should be visible at http://localhost (admin/Admin). **Try to execute** some scenarios and campaigns to generate some data that will be used in dashboards bellow.
