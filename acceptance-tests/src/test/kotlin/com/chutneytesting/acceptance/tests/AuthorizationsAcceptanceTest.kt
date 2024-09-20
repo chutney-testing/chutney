@@ -7,6 +7,7 @@
 
 package com.chutneytesting.acceptance.tests
 
+import com.chutneytesting.acceptance.common.jsonHeader
 import com.chutneytesting.kotlin.dsl.*
 
 val `Declare a new role with its authorizations` = Scenario(title = "Declare a new role with its authorizations") {
@@ -30,7 +31,7 @@ val `Declare a new role with its authorizations` = Scenario(title = "Declare a n
       HttpPostAction(
           target = "CHUTNEY_LOCAL",
           uri = "/api/v1/authorizations",
-          headers = mapOf("Content-Type" to "application/json;charset=UTF-8"),
+          headers = jsonHeader(),
           body = """
           {
               "roles": ${'$'}{#jsonSerialize(#jsonPath(#currentAuthorizations, '$.roles').appendElement(#newRole))},
@@ -98,7 +99,7 @@ val `Add and remove user to-from an existing role` = Scenario(title = "Add and r
     HttpPostAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/v1/authorizations",
-        headers = mapOf("Content-Type" to "application/json;charset=UTF-8"),
+        headers = jsonHeader(),
         body = """
           {
               "roles": ${'$'}{#jsonPath(#currentAuthorizations, '$.roles')},
@@ -131,8 +132,7 @@ val `Add and remove user to-from an existing role` = Scenario(title = "Add and r
       HttpGetAction(
           target = "CHUTNEY_LOCAL_NO_USER",
           uri = "/api/v1/user",
-          headers = mapOf(
-              "Content-Type" to "application/json;charset=UTF-8",
+          headers = jsonHeader() + mapOf(
               "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"user:user\").getBytes())}"
           ),
           validations = mapOf(statusValidation(200)),
@@ -151,7 +151,7 @@ val `Add and remove user to-from an existing role` = Scenario(title = "Add and r
     HttpPostAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/v1/authorizations",
-        headers = mapOf("Content-Type" to "application/json;charset=UTF-8"),
+        headers = jsonHeader(),
         body = "currentAuthorizations".spEL,
         validations = mapOf(statusValidation(200)),
     )

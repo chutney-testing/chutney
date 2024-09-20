@@ -160,11 +160,11 @@
             <artifactId>activemq-broker</artifactId>
         </dependency>
         <!-- To fix https://github.com/gpc/jms/issues/18-->
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-kahadb-store</artifactId>
             <version>5.18.3</version>
-        </dependency>
+        </dependency-->
         <!-- SQL task -->
         <dependency>
             <groupId>com.zaxxer</groupId>

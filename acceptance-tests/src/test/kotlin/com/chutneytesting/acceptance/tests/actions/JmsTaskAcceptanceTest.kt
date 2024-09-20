@@ -62,19 +62,13 @@ fun `Jms jmsAction wrong url`(
     When("The scenario is executed") {
       executeScenario("${'$'}{#scenarioId}", environmentName)
     }
-    Then("") {
-      DebugAction()
-    }
     Then("the report status is FAILURE") {
       checkScenarioFailure()
     }
   }
 }
 
-fun `Jms sender then clean then send and listen it on embedded broker`(
-  port: Int
-): ChutneyScenario {
-
+fun `Jms sender then clean then send and listen it on embedded broker`(): ChutneyScenario {
   return Scenario(title = "Jms sender then clean then send and listen it on embedded broker") {
     Given("An associated target") {
       createEnvironment(
@@ -83,7 +77,7 @@ fun `Jms sender then clean then send and listen it on embedded broker`(
         [
           {
               "name": "test_jms",
-              "url": "vm://localhost:$port",
+              "url": "tcp://localhost:61616",
               "properties": [
                   {
                       "key": "java.naming.factory.initial",
@@ -100,6 +94,14 @@ fun `Jms sender then clean then send and listen it on embedded broker`(
         "scenarioId",
         """
         {
+            "givens":[
+                {
+                    "sentence":"Start JMS server",
+                    "implementation":{
+                        "task":"{\n type: jms-broker-start \n}"
+                    }
+                }
+            ],
             "when":{
                 "sentence":"Send JMS Message",
                 "implementation":{
@@ -138,9 +140,6 @@ fun `Jms sender then clean then send and listen it on embedded broker`(
     }
     When("The scenario is executed") {
       executeScenario("${'$'}{#scenarioId}", "JMS_ENV_OK")
-    }
-    Then("") {
-      DebugAction()
     }
     Then("the report status is SUCCESS") {
       checkScenarioSuccess()

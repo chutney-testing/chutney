@@ -78,9 +78,6 @@ val `amqp test all steps` = Scenario(title = "amqp test all steps") {
   When("The scenario is executed") {
     executeScenario("${'$'}{#scenarioId}","AMQP_SCENARIO_ENV")
   }
-  Then("debug") {
-    DebugAction()
-  }
   Then("the report status is SUCCESS") {
     checkScenarioSuccess()
   }

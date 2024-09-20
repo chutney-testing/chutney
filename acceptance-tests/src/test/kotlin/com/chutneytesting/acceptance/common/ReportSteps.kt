@@ -26,3 +26,5 @@ fun ChutneyStepBuilder.checkScenarioFailure() {
       expected = "FAILURE"
   )
 }
+
+fun jsonHeader() = mapOf("Content-Type" to "application/json;charset=UTF-8")

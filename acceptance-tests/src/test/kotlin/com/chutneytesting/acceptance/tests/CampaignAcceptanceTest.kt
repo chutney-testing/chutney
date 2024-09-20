@@ -8,6 +8,7 @@
 package com.chutneytesting.acceptance.tests
 
 import com.chutneytesting.acceptance.common.createScenario
+import com.chutneytesting.acceptance.common.jsonHeader
 import com.chutneytesting.kotlin.dsl.*
 
 val executeCampaignById = Scenario(title = "Execute campaign by id") {
@@ -16,15 +17,9 @@ val executeCampaignById = Scenario(title = "Execute campaign by id") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/ui/campaign/execution/v1/byID/${'$'}{#campaignId}",
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8"
-        ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
-        outputs = mapOf(
-            "report" to "#body".elEval()
-        )
+        headers = jsonHeader(),
+        validations = mapOf(statusValidation(200)),
+        outputs = mapOf("report" to "#body".elEval())
     )
   }
   checkCampaignExecution()
@@ -33,9 +28,7 @@ val executeCampaignById = Scenario(title = "Execute campaign by id") {
 val executeCampaignByName = Scenario(title = "Execute campaign name") {
   Given("A campaign name") {
     ContextPutAction(
-        entries = mapOf(
-            "campaignName" to "generate().id(\"campaign-\", 10)".spEL()
-        )
+        entries = mapOf("campaignName" to "generate().id(\"campaign-\", 10)".spEL())
     )
   }
   createCampaignWith2Scenarios("campaignName".spEL())
@@ -43,12 +36,8 @@ val executeCampaignByName = Scenario(title = "Execute campaign name") {
     HttpGetAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/ui/campaign/execution/v1/" + "campaignName".spEL(),
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8"
-        ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
+        headers = jsonHeader(),
+        validations = mapOf(statusValidation(200)),
         outputs = mapOf(
             "report" to "json(#body, \"${'$'}[0]\")".spEL()
         )
@@ -60,21 +49,15 @@ val executeCampaignByName = Scenario(title = "Execute campaign name") {
 val executeForSurefireReport = Scenario(title = "Execution for surefire of a campaign") {
   Given("An unknown campaign name") {
     ContextPutAction(
-        entries = mapOf(
-            "campaignName" to "generate().id(\"campaign-\", 10)".spEL()
-        )
+        entries = mapOf("campaignName" to "generate().id(\"campaign-\", 10)".spEL())
     )
   }
   When("this campaign is executed by name") {
     HttpGetAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/ui/campaign/execution/v1/\" + \"campaignName\".spEL() + /surefire",
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8"
-        ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
+        headers = jsonHeader(),
+        validations = mapOf(statusValidation(200)),
         outputs = mapOf(
             "surfireResponseHeader" to "headers".spEL()
         )
@@ -109,18 +92,14 @@ val executeForSurefireReport = Scenario(title = "Execution for surefire of a cam
 val unknownCampaignById = Scenario(title = "Execution by id of an unknown campaign") {
   Given("An unknown id") {
     ContextPutAction(
-        entries = mapOf(
-            "campaignId" to "generate().randomLong()".spEL()
-        )
+        entries = mapOf("campaignId" to "generate().randomLong()".spEL())
     )
   }
   When("an unknown campaign is executed by id and not found") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/ui/campaign/execution/v1/byID/${'$'}{#campaignId}",
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8"
-        ),
+        headers = jsonHeader(),
         validations = mapOf(
             statusValidation(404)
         ),
@@ -131,21 +110,15 @@ val unknownCampaignById = Scenario(title = "Execution by id of an unknown campai
 val unknownCampaignByName = Scenario(title = "Execution by name of an unknown campaign") {
   Given("An unknown id") {
     ContextPutAction(
-        entries = mapOf(
-            "campaignName" to "generate().id(\"campaign-\", 10)".spEL()
-        )
+        entries = mapOf("campaignName" to "generate().id(\"campaign-\", 10)".spEL())
     )
   }
   When("an unknown campaign is executed by name") {
     HttpGetAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/ui/campaign/execution/v1/" + "campaignName".spEL(),
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8"
-        ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
+        headers = jsonHeader(),
+        validations = mapOf(statusValidation(200)),
         outputs = mapOf(
             "report" to "body".spEL()
         )
@@ -188,15 +161,11 @@ private fun ChutneyScenarioBuilder.checkCampaignExecution() {
       HttpGetAction(
           target = "CHUTNEY_LOCAL",
           uri = "/api/ui/campaign/v1/${'$'}{#campaignId}",
-          headers = mapOf(
-              "Content-Type" to "application/json;charset=UTF-8"
-          ),
+          headers = jsonHeader(),
           validations = mapOf(
               statusValidation(200)
           ),
-          outputs = mapOf(
-              "campaign" to "body".spEL()
-          )
+          outputs = mapOf("campaign" to "body".spEL())
       )
     }
     Step("Assert execution is present") {
@@ -238,15 +207,13 @@ private fun ChutneyStepBuilder.createCampaign(campaignName: String = "campaign")
                     "tags":[]
                 }
                 """.trimIndent(),
-      headers = mapOf(
-          "Content-Type" to "application/json;charset=UTF-8"
-      ),
-      validations = mapOf(
-          statusValidation(200)
-      ),
+      headers = jsonHeader(),
+      validations = mapOf(statusValidation(200)),
       outputs = mapOf(
           "campaignId" to "jsonPath(#body, \"${'$'}.id\")".spEL()
       )
   )
 }
+
+
 

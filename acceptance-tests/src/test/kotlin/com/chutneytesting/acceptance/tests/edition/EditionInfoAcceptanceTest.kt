@@ -7,6 +7,7 @@
 
 package com.chutneytesting.acceptance.tests.edition
 
+import com.chutneytesting.acceptance.common.jsonHeader
 import com.chutneytesting.kotlin.dsl.*
 
 val readTestCaseMetadataScenario = Scenario(title = "Consult new testcase metadata") {
@@ -37,32 +38,22 @@ val readTestCaseMetadataScenario = Scenario(title = "Consult new testcase metada
                     }
                 }
                 """,
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8",
+        headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"robert:robert\").getBytes())}"
         ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
-        outputs = mapOf(
-            "testcaseId" to "body".spEL()
-        )
+        validations = mapOf(statusValidation(200)),
+        outputs = mapOf("testcaseId" to "body".spEL())
     )
   }
   When("admin consult it") {
     HttpGetAction(
         target = "CHUTNEY_LOCAL_NO_USER",
         uri = "/api/scenario/v2/${'$'}{#testcaseId}",
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8",
+        headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"admin:admin\").getBytes())}"
         ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
-        outputs = mapOf(
-            "scenario" to "body".spEL()
-        )
+        validations = mapOf(statusValidation(200)),
+        outputs = mapOf("scenario" to "body".spEL())
     )
   }
   Then("Check testcase metadata") {
@@ -109,13 +100,10 @@ val readTestCaseAfterUpdateScenario = Scenario(title = "Consult testcase metadat
                     }
                 }
                 """,
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8",
+        headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"robert:robert\").getBytes())}"
         ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
+        validations = mapOf(statusValidation(200)),
         outputs = mapOf(
             "testcaseId" to "body".spEL()
         )
@@ -141,13 +129,10 @@ val readTestCaseAfterUpdateScenario = Scenario(title = "Consult testcase metadat
                     }
                 }
                 """,
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8",
+        headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"paloma:paloma\").getBytes())}"
         ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
+        validations = mapOf(statusValidation(200)),
         outputs = mapOf(
             "testcaseId" to "body".spEL()
         )
@@ -157,13 +142,10 @@ val readTestCaseAfterUpdateScenario = Scenario(title = "Consult testcase metadat
     HttpGetAction(
         target = "CHUTNEY_LOCAL_NO_USER",
         uri = "/api/scenario/v2/${'$'}{#testcaseId}",
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8",
+        headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"admin:admin\").getBytes())}"
         ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
+        validations = mapOf(statusValidation(200)),
         outputs = mapOf(
             "scenario" to "body".spEL()
         )
@@ -205,13 +187,10 @@ val updateTestCaseWithBadVersionScenario = Scenario(title = "Update testcase wit
                     }
                 }
                 """,
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8",
+        headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"robert:robert\").getBytes())}"
         ),
-        validations = mapOf(
-            statusValidation(200)
-        ),
+        validations = mapOf(statusValidation(200)),
         outputs = mapOf(
             "testcaseId" to "body".spEL()
         )
@@ -237,8 +216,7 @@ val updateTestCaseWithBadVersionScenario = Scenario(title = "Update testcase wit
                     }
                 }
                 """,
-        headers = mapOf(
-            "Content-Type" to "application/json;charset=UTF-8",
+        headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"paloma:paloma\").getBytes())}"
         ),
         validations = mapOf(

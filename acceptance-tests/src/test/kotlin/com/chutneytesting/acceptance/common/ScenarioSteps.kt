@@ -13,9 +13,7 @@ import com.chutneytesting.kotlin.dsl.spEL
 import com.chutneytesting.kotlin.dsl.statusValidation
 
 fun ChutneyStepBuilder.createScenario(outputScenarioId: String, scenario: String? = null) {
-  val tmpScenario: String
-  if(scenario == null) {
-    tmpScenario = """
+  val tmpScenario = scenario ?: """
     {
         "when":{
             "sentence":"Just a success step",
@@ -26,9 +24,6 @@ fun ChutneyStepBuilder.createScenario(outputScenarioId: String, scenario: String
         "thens":[]
     }  
     """.trimIndent()
-  } else {
-    tmpScenario = scenario
-  }
 
   HttpPostAction(
       target = "CHUTNEY_LOCAL",
@@ -39,12 +34,8 @@ fun ChutneyStepBuilder.createScenario(outputScenarioId: String, scenario: String
                     "scenario": $tmpScenario
                 }
                 """,
-      headers = mapOf(
-          "Content-Type" to "application/json;charset=UTF-8"
-      ),
-      validations = mapOf(
-          statusValidation(200)
-      ),
+      headers = jsonHeader(),
+      validations = mapOf(statusValidation(200)),
       outputs = mapOf(
           outputScenarioId to "body".spEL()
       )
@@ -57,9 +48,7 @@ fun ChutneyStepBuilder.executeScenario(scenarioId: String, environment: String) 
       uri = "/api/ui/scenario/execution/v1/$scenarioId/$environment",
       timeout = "25 s",
       body = null,
-      validations = mapOf(
-          statusValidation(200)
-      ),
+      validations = mapOf(statusValidation(200)),
       outputs = mapOf(
           "report" to "body".spEL()
       )

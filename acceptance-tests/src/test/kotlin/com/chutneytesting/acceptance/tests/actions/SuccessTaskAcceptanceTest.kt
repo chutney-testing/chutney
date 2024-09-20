@@ -7,22 +7,19 @@
 
 package com.chutneytesting.acceptance.tests.actions
 
-import com.chutneytesting.acceptance.common.checkScenarioSuccess
-import com.chutneytesting.acceptance.common.executeScenario
-import com.chutneytesting.kotlin.dsl.DebugAction
 import com.chutneytesting.kotlin.dsl.Scenario
 import com.chutneytesting.kotlin.dsl.SuccessAction
 
 val `Direct Success` = Scenario(title = "Direct Success") {
 
   When("Direct success") {
-    DebugAction()
+    SuccessAction()
   }
 }
 
 val `Substeps Success` = Scenario(title = "Substeps Success") {
   Given("Direct success") {
-    DebugAction()
+    SuccessAction()
   }
   When(" I want to have one substep") {
     SuccessAction()

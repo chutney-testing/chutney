@@ -65,9 +65,6 @@ fun `Jakarta actionInputs wrong url`(
     When("The scenario is executed") {
       executeScenario("${'$'}{#scenarioId}", environmentName)
     }
-    Then("") {
-      DebugAction()
-    }
     Then("the report status is FAILURE") {
       checkScenarioFailure()
     }
@@ -78,7 +75,7 @@ fun `Jakarta sender then clean then send and listen it on embedded broker`(
   port: Int
 ): ChutneyScenario {
 
-  return Scenario(title = "Jms sender then clean then send and listen it on embedded broker") {
+  return Scenario(title = "Jakarta sender then clean then send and listen it on embedded broker") {
     Given("a jakarta endpoint") {
       JakartaBrokerStartAction(
         configUri ="tcp://localhost:$port"
@@ -146,9 +143,6 @@ fun `Jakarta sender then clean then send and listen it on embedded broker`(
     }
     When("The scenario is executed") {
       executeScenario("${'$'}{#scenarioId}", "JAKARTA_ENV_OK")
-    }
-    Then("") {
-      DebugAction()
     }
     Then("the report status is SUCCESS") {
       checkScenarioSuccess()

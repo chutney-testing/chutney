@@ -19,6 +19,7 @@ import com.chutneytesting.kotlin.dsl.ChutneyTarget
 import com.chutneytesting.kotlin.launcher.Launcher
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
 import com.chutneytesting.kotlin.util.HttpClient
+import com.chutneytesting.tools.SocketUtils
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
@@ -33,15 +34,14 @@ import java.time.Duration
 class AcceptanceTests {
 
   companion object {
-    private var adminServerInfo: ChutneyServerInfo? = null
-    val ENVIRONMENT_NAME = "DEFAULT"
-    var chutneyServer: GenericContainer<Nothing>? = null
+    private const val ENVIRONMENT_NAME = "DEFAULT"
 
+    private var adminServerInfo: ChutneyServerInfo? = null
+    private var chutneyServer: GenericContainer<Nothing>? = null
     private var environment: ChutneyEnvironment = ChutneyEnvironment(ENVIRONMENT_NAME)
 
     private var actionHttpPort: Int? = null
     private var actionAmqpPort: Int? = null
-    private var actionJmsPort: Int? = null
     private var actionJakartaPort: Int? = null
 
     @JvmStatic
@@ -65,16 +65,14 @@ class AcceptanceTests {
             "/config"
         )
       }
-      actionHttpPort = 42156
+      actionHttpPort = SocketUtils.freePortFromSystem()
       actionAmqpPort = 5672
-      actionJmsPort = 30444
-      actionJakartaPort = 31444
+      actionJakartaPort = SocketUtils.freePortFromSystem()
       org.testcontainers.Testcontainers.exposeHostPorts(
         actionHttpPort!!,
         actionAmqpPort!!,
-        actionJmsPort!!,
         actionJakartaPort!!
-      );
+      )
 
       chutneyServer!!.start()
       adminServerInfo = ChutneyServerInfo("https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}", "admin", "admin", null, null, null)
@@ -140,8 +138,8 @@ class AcceptanceTests {
 
   @Test
   fun `Kafka all Tasks test`() {
-   // Launcher().run(`Kafka basic publish wrong url failure`, environment)
-    Launcher().run(`Kafka basic publish success`(), environment)
+    Launcher().run(`Kafka basic publish wrong url failure`, environment)
+    Launcher().run(`Kafka basic publish success`, environment)
   }
 
   @Test
@@ -242,13 +240,13 @@ class AcceptanceTests {
 
   @Test
   fun `Jms Task test`() {
-    Launcher().run( `Jms sender then clean then send and listen it on embedded broker`(actionJmsPort!!), environment)
+    Launcher().run( `Jms sender then clean then send and listen it on embedded broker`(), environment)
     listOf(
       Pair("sender", "destination: test \\n body: something"),
       Pair("clean-queue", "destination: test \\n bodySelector: selector"),
       Pair("listener", "destination: test \\n bodySelector: selector")
     ).forEach {
-      //Launcher().run( `Jms jmsAction wrong url`(it.first, it.second), environment)
+      Launcher().run( `Jms jmsAction wrong url`(it.first, it.second), environment)
     }
   }
 

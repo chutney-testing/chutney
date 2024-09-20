@@ -8,13 +8,10 @@
 package com.chutneytesting.acceptance.tests.actions
 
 import com.chutneytesting.acceptance.common.checkScenarioSuccess
-import com.chutneytesting.acceptance.common.createEnvironment
 import com.chutneytesting.acceptance.common.createScenario
 import com.chutneytesting.acceptance.common.executeScenario
 import com.chutneytesting.kotlin.dsl.ChutneyScenarioBuilder
-import com.chutneytesting.kotlin.dsl.DebugAction
 import com.chutneytesting.kotlin.dsl.Scenario
-import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils
 
 val `Execution by UI controller` = Scenario(title = "Execution by UI controller") {
   micrometerScenario(
@@ -123,9 +120,6 @@ private fun ChutneyScenarioBuilder.micrometerScenario(scenario: String) {
   }
   When("The scenario is executed") {
     executeScenario("${'$'}{#scenarioId}", "DEFAULT")
-  }
-  Then(""){
-    DebugAction()
   }
   Then("the report status is SUCCESS") {
     checkScenarioSuccess()

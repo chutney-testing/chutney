@@ -13,20 +13,18 @@ import com.chutneytesting.kotlin.dsl.statusValidation
 
 fun ChutneyStepBuilder.createEnvironment(environmentName: String, targets: String) {
   HttpPostAction(
-      target = "CHUTNEY_LOCAL",
-      uri = "/api/v2/environments",
-      headers = mapOf(
-          "Content-Type" to "application/json;charset=UTF-8",
-      ),
-      body = """
-                {
-                    "name": "$environmentName",
-                    "description": "",
-                    "targets": $targets
-                }
-                """,
-      validations = mapOf(
-          statusValidation(200)
-      )
+    target = "CHUTNEY_LOCAL",
+    uri = "/api/v2/environments",
+    headers = jsonHeader(),
+    body = """
+            {
+                "name": "$environmentName",
+                "description": "",
+                "targets": $targets
+            }
+           """,
+    validations = mapOf(
+      statusValidation(200)
+    )
   )
 }

@@ -8,9 +8,12 @@
 package com.chutneytesting.acceptance.tests.engine
 
 import com.chutneytesting.acceptance.common.checkScenarioSuccess
-import com.chutneytesting.acceptance.common.createScenario
 import com.chutneytesting.acceptance.common.executeScenario
-import com.chutneytesting.kotlin.dsl.*
+import com.chutneytesting.acceptance.common.jsonHeader
+import com.chutneytesting.kotlin.dsl.HttpPostAction
+import com.chutneytesting.kotlin.dsl.Scenario
+import com.chutneytesting.kotlin.dsl.spEL
+import com.chutneytesting.kotlin.dsl.statusValidation
 
 val `Execute gwt scenario with global vars` = Scenario(title = "Execute gwt scenario with global vars") {
   Given("Global variables defined in global_var") {
@@ -24,7 +27,7 @@ val `Execute gwt scenario with global vars` = Scenario(title = "Execute gwt scen
           "message": "{ \"simple\": { \"word\": \"a_word\", \"line\": \"one line\", \"multiline\": \"My half empty glass,\\nI will fill your empty half.\\nNow you are half full.\" }, \"escape\": { \"quote\": \"line with quote \\\"\", \"backslash\": \"line with backslash \\\\\", \"slash\": \"line with slash as url http://host:port/path\", \"apostrophe\": \"line with apostrophe '\" } }"
       }
       """,
-      headers = mapOf("Content-Type" to "application/json;charset=UTF-8"),
+      headers = jsonHeader(),
       validations = mapOf(
         statusValidation(200)
       )
@@ -138,12 +141,8 @@ val `Execute gwt scenario with global vars` = Scenario(title = "Execute gwt scen
                 }
             }
             """,
-      headers = mapOf(
-        "Content-Type" to "application/json;charset=UTF-8"
-      ),
-      validations = mapOf(
-          statusValidation(200)
-      ),
+      headers = jsonHeader(),
+      validations = mapOf(statusValidation(200)),
       outputs = mapOf(
         "scenarioId" to "body".spEL()
       )

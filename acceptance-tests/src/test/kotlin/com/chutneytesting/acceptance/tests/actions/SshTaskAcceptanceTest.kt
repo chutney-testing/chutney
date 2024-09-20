@@ -48,9 +48,6 @@ fun `Scenario execution unable to login, status SUCCESS and command stderr`(): C
     When("The scenario is executed") {
       executeScenario("${'$'}{#scenarioId}", "SSH_ENV_KO")
     }
-    Then("debug") {
-      DebugAction()
-    }
     Then("the report status is FAILURE") {
       checkScenarioFailure()
     }
@@ -88,12 +85,7 @@ fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
         "scenarioId",
         """
         {
-            "givens":[{
-                "sentence":"Execute commands",
-                "implementation":{
-                    "task":"{\n type: ssh-server-start \n inputs: {\n usernames: [\"test\"] \n passwords: [\"test\"] \n} \n}"
-                }
-            }],"when":{
+            "when":{
                 "sentence":"Execute commands",
                 "implementation":{
                     "task":"{\n type: ssh-client \n target: test_ssh \n inputs: {\n commands: [\n {\n command: echo test \n timeout: 500 ms \n},{\n command: echo testbis \n} \n] \n} \n}"
@@ -172,9 +164,6 @@ fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
     }
     When("The scenario is executed") {
       executeScenario("${'$'}{#scenarioId}", "SSH_ENV_OK")
-    }
-    Then("debug") {
-      DebugAction()
     }
     Then("the report status is SUCCESS") {
       checkScenarioSuccess()

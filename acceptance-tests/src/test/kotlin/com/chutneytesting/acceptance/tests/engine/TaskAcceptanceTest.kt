@@ -7,9 +7,6 @@
 
 package com.chutneytesting.acceptance.tests.engine
 
-import com.chutneytesting.acceptance.common.checkScenarioSuccess
-import com.chutneytesting.acceptance.common.createScenario
-import com.chutneytesting.acceptance.common.executeScenario
 import com.chutneytesting.kotlin.dsl.*
 
 fun `Retrieve action action-id from all actions and by identifier`(
@@ -28,10 +25,10 @@ fun `Retrieve action action-id from all actions and by identifier`(
         )
       )
     }
-    And("Request engine for action " + actionId) {
+    And("Request engine for action $actionId") {
       HttpGetAction(
         target = "CHUTNEY_LOCAL",
-        uri = "/api/action/v1/" + actionId,
+        uri = "/api/action/v1/$actionId",
         validations = mapOf(statusValidation(200)),
         outputs = mapOf(
           "action" to "body".spEL

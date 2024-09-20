@@ -7,6 +7,7 @@
 
 package com.chutneytesting.acceptance.tests
 
+import com.chutneytesting.acceptance.common.jsonHeader
 import com.chutneytesting.kotlin.dsl.*
 
 // Agent A (main) -> Agent B
@@ -31,7 +32,7 @@ fun `We receive a network configuration to persist`(): ChutneyScenario {
         HttpPostAction(
           target = "CHUTNEY_LOCAL",
           uri = "/api/v1/agentnetwork/configuration",
-          headers = mapOf("Content-Type" to "application/json;charset=UTF-8"),
+          headers = jsonHeader(),
           body = "jsonSerialize(#networkConfiguration)".spEL,
           outputs = mapOf(
             "networkConfiguration" to "body".spEL
@@ -43,7 +44,7 @@ fun `We receive a network configuration to persist`(): ChutneyScenario {
       HttpPostAction(
         target = "CHUTNEY_LOCAL",
         uri = "/api/v1/agentnetwork/wrapup",
-        headers = mapOf("Content-Type" to "application/json;charset=UTF-8"),
+        headers = jsonHeader(),
         body = """
        {
             "networkConfiguration": {

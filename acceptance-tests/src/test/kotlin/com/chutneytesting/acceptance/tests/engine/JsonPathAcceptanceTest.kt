@@ -7,12 +7,10 @@
 
 package com.chutneytesting.acceptance.tests.engine
 
-import com.chutneytesting.acceptance.common.checkScenarioFailure
 import com.chutneytesting.acceptance.common.checkScenarioSuccess
 import com.chutneytesting.acceptance.common.createScenario
 import com.chutneytesting.acceptance.common.executeScenario
 import com.chutneytesting.kotlin.dsl.CompareAction
-import com.chutneytesting.kotlin.dsl.DebugAction
 import com.chutneytesting.kotlin.dsl.Scenario
 import com.chutneytesting.kotlin.dsl.spEL
 

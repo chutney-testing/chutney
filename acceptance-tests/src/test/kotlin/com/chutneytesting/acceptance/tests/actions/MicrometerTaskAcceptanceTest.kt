@@ -369,7 +369,7 @@ private fun ChutneyScenarioBuilder.micrometerScenario(scenario: String) {
   val micrometerEnv = "ENV_MICRO_" + RandomStringUtils.randomAlphabetic(8)
   Given("a target for the http server mock") {
     createEnvironment(
-      "$micrometerEnv",
+      micrometerEnv,
       """
         [
             {

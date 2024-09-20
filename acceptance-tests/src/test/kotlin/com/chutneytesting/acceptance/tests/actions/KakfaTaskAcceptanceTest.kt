@@ -49,12 +49,11 @@ val `Kafka basic publish wrong url failure` = Scenario(title = "Kafka basic publ
   }
 }
 
-fun `Kafka basic publish success`(): ChutneyScenario {
-  return Scenario(title = "Kafka basic publish wrong url failure") {
-    Given("an associated target test_kafka having url in system property spring.embedded.kafka.brokers") {
-      createEnvironment(
-        "KAFKA_ENV_OK",
-        """
+val `Kafka basic publish success` = Scenario(title = "Kafka basic publish wrong url failure") {
+  Given("an associated target test_kafka having url in system property spring.embedded.kafka.brokers") {
+    createEnvironment(
+      "KAFKA_ENV_OK",
+      """
         [
             {
                 "name": "test_kafka",
@@ -62,12 +61,12 @@ fun `Kafka basic publish success`(): ChutneyScenario {
             }
         ]
         """.trimIndent()
-      )
-    }
-    And("This scenario with kafka tasks is saved") {
-      createScenario(
-        "scenarioId",
-        scenario = """
+    )
+  }
+  And("This scenario with kafka tasks is saved") {
+    createScenario(
+      "scenarioId",
+      scenario = """
         {
             "givens": [
             {
@@ -99,13 +98,12 @@ fun `Kafka basic publish success`(): ChutneyScenario {
             ]
         }
         """.trimIndent()
-      )
-    }
-    When("The scenario is executed") {
-      executeScenario("${'$'}{#scenarioId}", "KAFKA_ENV_OK")
-    }
-    Then("the report status is SUCCESS") {
-      checkScenarioSuccess()
-    }
+    )
+  }
+  When("The scenario is executed") {
+    executeScenario("${'$'}{#scenarioId}", "KAFKA_ENV_OK")
+  }
+  Then("the report status is SUCCESS") {
+    checkScenarioSuccess()
   }
 }

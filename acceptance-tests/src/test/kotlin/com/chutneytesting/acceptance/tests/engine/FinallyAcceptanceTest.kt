@@ -7,32 +7,18 @@
 
 package com.chutneytesting.acceptance.tests.engine
 
-import com.chutneytesting.acceptance.common.createScenario
-import com.chutneytesting.acceptance.common.executeScenario
-import com.chutneytesting.kotlin.dsl.DebugAction
+import com.chutneytesting.kotlin.dsl.FinalAction
 import com.chutneytesting.kotlin.dsl.Scenario
 
+/**
+ * this scenario proves that there is no infinite-loop when a {@link FinallyAction} registers another {@link FinallyAction} with the same identifier
+ */
 val `Step of a type self registering as Finally Action does not create an infinite loop` = Scenario(title = "Step of a type self registering as Finally Action does not create an infinite loop") {
-  Given("this scenario is saved") {
-    createScenario("scenarioId",
-        """
-        {
-            "when":{
-                "sentence":"Do something to register finally action",
-                "implementation":{
-                    "task":"{\n type: self-registering-finally \n }"
-                }
-            },
-            "thens":[]
-        }
-        """.trimIndent()
+  When("Register finally action") {
+    FinalAction(
+      name = "Finally action",
+      type =  "self-registering-finally"
     )
-  }
-  When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}","DEFAULT")
-  }
-  Then("the report status is SUCCESS") {
-    DebugAction()
   }
 }
 

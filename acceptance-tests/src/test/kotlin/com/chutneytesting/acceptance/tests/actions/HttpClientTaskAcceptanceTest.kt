@@ -124,9 +124,6 @@ fun `Http (verb) request local valid endpoint`(
     When("The scenario is executed") {
       executeScenario("${'$'}{#scenarioId}",environmentName)
     }
-    Then("") {
-      DebugAction()
-    }
     Then("the report status is SUCCESS") {
       checkScenarioSuccess()
     }

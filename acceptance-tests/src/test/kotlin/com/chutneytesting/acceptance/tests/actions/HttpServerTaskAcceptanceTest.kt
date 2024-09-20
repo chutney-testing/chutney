@@ -11,8 +11,6 @@ import com.chutneytesting.acceptance.common.checkScenarioSuccess
 import com.chutneytesting.acceptance.common.createEnvironment
 import com.chutneytesting.acceptance.common.createScenario
 import com.chutneytesting.acceptance.common.executeScenario
-import com.chutneytesting.kotlin.dsl.ContextPutAction
-import com.chutneytesting.kotlin.dsl.DebugAction
 import com.chutneytesting.kotlin.dsl.Scenario
 
 
