@@ -155,7 +155,7 @@
                     },
                     "disableTextWrap": false,
                     "editorMode": "builder",
-                    "expr": "sum by(status) (increase(scenario_execution_count_total[2m]))",
+                    "expr": "sum by(status) (scenario_execution_count_total)",
                     "fullMetaSearch": false,
                     "includeNullMetadata": true,
                     "instant": false,
