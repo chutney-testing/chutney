@@ -7,7 +7,7 @@
 
 package com.chutneytesting.kotlin.util
 
-import com.chutneytesting.kolin.util.ChutneyServerInfoClearProperties
+import util.ChutneyServerInfoClearProperties
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension

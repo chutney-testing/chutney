@@ -7,7 +7,6 @@
 
 package com.chutneytesting.kotlin.synchronize.server
 
-import com.chutneytesting.kolin.util.ChutneyServerInfoClearProperties
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
 import com.chutneytesting.kotlin.util.HttpsClientTest
 import com.fasterxml.jackson.databind.JsonNode
@@ -16,6 +15,7 @@ import com.github.tomakehurst.wiremock.core.WireMockConfiguration
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.stubbing.ServeEvent
 import org.junit.jupiter.api.extension.RegisterExtension
+import util.ChutneyServerInfoClearProperties
 
 @ChutneyServerInfoClearProperties
 abstract class ChutneyServerServiceImplTest {

@@ -2,14 +2,6 @@
 #SPDX-License-Identifier: Apache-2.0
 
 ######################
-# Maven
-######################
-.mvn/
-**/target/
-!.mvn/wrapper/maven-wrapper.properties
-!.mvn/wrapper/MavenWrapperDownloader.java
-
-######################
 # Chutney
 ######################
 .chutney
