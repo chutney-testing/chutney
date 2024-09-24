@@ -69,7 +69,6 @@
       <groupId>com.chutneytesting</groupId>
       <artifactId>chutney-kotlin-dsl</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.testcontainers</groupId>
       <artifactId>testcontainers</artifactId>
@@ -86,36 +85,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>postgresql</artifactId>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>kafka</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>rabbitmq</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.testcontainers</groupId>
-      <artifactId>selenium</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.wiremock.integrations.testcontainers</groupId>
-      <artifactId>wiremock-testcontainers-module</artifactId>
-      <version>1.0-alpha-13</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>test</scope> <!-- testRuntime for real \o/ -->
     </dependency>
   </dependencies>
 

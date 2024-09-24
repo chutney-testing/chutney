@@ -11,6 +11,8 @@ import com.chutneytesting.kotlin.dsl.ChutneyStepBuilder
 import com.chutneytesting.kotlin.dsl.HttpPostAction
 import com.chutneytesting.kotlin.dsl.statusValidation
 
+const val UNKNOWN_TARGET = "unknownhost:12345"
+
 fun ChutneyStepBuilder.createEnvironment(environmentName: String, targets: String) {
   HttpPostAction(
     target = "CHUTNEY_LOCAL",

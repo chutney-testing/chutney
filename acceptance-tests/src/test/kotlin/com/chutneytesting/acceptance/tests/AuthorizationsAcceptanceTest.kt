@@ -34,7 +34,7 @@ val `Declare a new role with its authorizations` = Scenario(title = "Declare a n
           headers = jsonHeader(),
           body = """
           {
-              "roles": ${'$'}{#jsonSerialize(#jsonPath(#currentAuthorizations, '$.roles').appendElement(#newRole))},
+              "roles": ${'$'}{#jsonPath(#currentAuthorizations, '$.roles').appendElement(#newRole)},
               "authorizations": ${'$'}{#jsonPath(#currentAuthorizations, '$.authorizations')}
           }  
           """.trimIndent(),
@@ -103,7 +103,7 @@ val `Add and remove user to-from an existing role` = Scenario(title = "Add and r
         body = """
           {
               "roles": ${'$'}{#jsonPath(#currentAuthorizations, '$.roles')},
-              "authorizations": ${'$'}{#jsonSerialize(#jsonPath(#currentAuthorizations, "$.authorizations[?(@.name!='"+#roleNameWithNoUser+"')]").appendElement(#roleUserAuthorizations))}
+              "authorizations": ${'$'}{#jsonPath(#currentAuthorizations, "$.authorizations[?(@.name!='"+#roleNameWithNoUser+"')]").appendElement(#roleUserAuthorizations)}
           }
           """.trimIndent(),
         validations = mapOf(statusValidation(200)),

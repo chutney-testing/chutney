@@ -7,11 +7,13 @@
 
 package com.chutneytesting.acceptance.tests.actions
 
-import com.chutneytesting.acceptance.common.checkScenarioSuccess
+import com.chutneytesting.acceptance.common.checkScenarioReportSuccess
 import com.chutneytesting.acceptance.common.createScenario
 import com.chutneytesting.acceptance.common.executeScenario
 import com.chutneytesting.kotlin.dsl.ChutneyScenarioBuilder
 import com.chutneytesting.kotlin.dsl.Scenario
+import com.chutneytesting.kotlin.dsl.spEL
+import com.chutneytesting.kotlin.dsl.hjsonSpEL
 
 val `Execution by UI controller` = Scenario(title = "Execution by UI controller") {
   micrometerScenario(
@@ -27,19 +29,19 @@ val `Execution by UI controller` = Scenario(title = "Execution by UI controller"
                 {
                     "sentence":"Json assert",
                     "implementation":{
-                        "task":"{\n type: json-assert \n inputs: {\n document: \${'$'}{#test_int} \n expected: {\n ${'$'}.status.code: 200.0 \n ${'$'}.status.reason: OK \n} \n} \n}"
+                        "task":"{\n type: json-assert \n inputs: {\n document: ${"test_int".hjsonSpEL} \n expected: {\n $.status.code: 200.0 \n $.status.reason: OK \n} \n} \n}"
                     }
                 },
                 {
                     "sentence":"Xml assert",
                     "implementation":{
-                        "task":"{\n type: xml-assert \n inputs: {\n document: \${'$'}{#test_xml} \n expected: {\n /test/xml/@attr: attributeValue \n /test/xml/status/code: \"200.0\" \n /test/xml/status/reason: OK \n} \n} \n}"
+                        "task":"{\n type: xml-assert \n inputs: {\n document: ${"test_xml".hjsonSpEL} \n expected: {\n /test/xml/@attr: attributeValue \n /test/xml/status/code: \"200.0\" \n /test/xml/status/reason: OK \n} \n} \n}"
                     }
                 },
                 {
                     "sentence":"Xml assert with namespace",
                     "implementation":{
-                        "task":"{\n type: xml-assert \n inputs: {\n document: \${'$'}{#test_xml_ns} \n expected: {\n /test/xml/@attr: attributeValue \n /test/xml/status/code: \"200.0\" \n /test/xml/status/reason: OK \n} \n} \n}"
+                        "task":"{\n type: xml-assert \n inputs: {\n document: ${"test_xml_ns".hjsonSpEL} \n expected: {\n /test/xml/@attr: attributeValue \n /test/xml/status/code: \"200.0\" \n /test/xml/status/reason: OK \n} \n} \n}"
                     }
                 }
             ]
@@ -68,25 +70,25 @@ val `All in one assertions` = Scenario(title = "All in one assertions") {
                 {
                     "sentence":"Json assert",
                     "implementation":{
-                        "task":"{\n type: json-assert \n inputs: {\n document: \${'$'}{#test_json} \n expected: {\n ${'$'}.status.code: \"200\" \n ${'$'}.status.reason: OK \n ${'$'}.status.not_exist: null \n} \n} \n}"
+                        "task":"{\n type: json-assert \n inputs: {\n document: ${"test_json".hjsonSpEL} \n expected: {\n $.status.code: \"200\" \n $.status.reason: OK \n $.status.not_exist: null \n} \n} \n}"
                     }
                 },
                 {
                     "sentence":"Json compare",
                     "implementation":{
-                        "task":"{\n type: json-compare \n inputs: {\n document1: \${'$'}{#test_json} \n document2: \${'$'}{#test_json2} \n comparingPaths: {\n ${'$'}.status: ${'$'}.test.status \n ${'$'}.status.code: ${'$'}.test.status.code \n} \n} \n}"
+                        "task":"{\n type: json-compare \n inputs: {\n document1: ${"test_json".hjsonSpEL} \n document2: ${"test_json2".hjsonSpEL} \n comparingPaths: {\n $.status: $.test.status \n $.status.code: $.test.status.code \n} \n} \n}"
                     }
                 },
                 {
                     "sentence":"Xml assert",
                     "implementation":{
-                        "task":"{\n type: xml-assert \n inputs: {\n document: \${'$'}{#test_xml} \n expected: {\n /test/xml/is//text(): boring \n} \n} \n}"
+                        "task":"{\n type: xml-assert \n inputs: {\n document: ${"test_xml".hjsonSpEL} \n expected: {\n /test/xml/is//text(): boring \n} \n} \n}"
                     }
                 },
                 {
                     "sentence":"Json assert",
                     "implementation":{
-                        "task":"{\n type: json-assert \n inputs: {\n document: \${'$'}{#test_int} \n expected: {\n ${'$'}.status.code: 200.0 \n} \n} \n}"
+                        "task":"{\n type: json-assert \n inputs: {\n document: ${"test_int".hjsonSpEL} \n expected: {\n $.status.code: 200.0 \n} \n} \n}"
                     }
                 }
             ]
@@ -119,9 +121,9 @@ private fun ChutneyScenarioBuilder.micrometerScenario(scenario: String) {
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}", "DEFAULT")
+    executeScenario("scenarioId".spEL, "DEFAULT")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
 }

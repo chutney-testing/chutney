@@ -537,7 +537,7 @@ fun ChutneyStepBuilder.HttpPostAction(
     target: String,
     uri: String,
     headers: Map<String, Any> = mapOf(),
-    body: Any? = null,
+    body: Any?,
     timeout: String? = null,
     outputs: Map<String, Any> = mapOf(),
     strategy: Strategy? = null,
@@ -716,8 +716,8 @@ fun statusValidation(statusCode: Int) = "status_ok" to "#status.equals($statusCo
  */
 fun ChutneyStepBuilder.HttpsServerStartAction(
     port: String?,
-    trustStorePath: String?,
-    trustStorePassword: String?,
+    trustStorePath: String? = null,
+    trustStorePassword: String? = null,
     keyStorePath: String? = null,
     keyStorePassword: String? = null,
     keyPassword: String? = null,

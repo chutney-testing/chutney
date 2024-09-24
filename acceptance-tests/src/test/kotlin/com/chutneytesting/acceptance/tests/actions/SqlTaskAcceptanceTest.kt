@@ -45,10 +45,10 @@ val `Sql query success` = Scenario(title = "Sql query success") {
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}","SQL_ENV_OK")
+    executeScenario("scenarioId".spEL,"SQL_ENV_OK")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
   And("The report contains record results"){
     CompareAction(
@@ -100,10 +100,10 @@ val `Sql query wrong table` = Scenario(title = "Sql query success") {
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}","SQL_ENV_KO")
+    executeScenario("scenarioId".spEL,"SQL_ENV_KO")
   }
   Then("the report status is FAILURE") {
-    checkScenarioFailure()
+    checkScenarioReportFailure()
   }
 }
 

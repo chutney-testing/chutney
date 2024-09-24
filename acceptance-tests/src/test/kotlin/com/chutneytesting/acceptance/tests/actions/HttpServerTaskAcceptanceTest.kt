@@ -7,11 +7,13 @@
 
 package com.chutneytesting.acceptance.tests.actions
 
-import com.chutneytesting.acceptance.common.checkScenarioSuccess
+import com.chutneytesting.acceptance.common.checkScenarioReportSuccess
 import com.chutneytesting.acceptance.common.createEnvironment
 import com.chutneytesting.acceptance.common.createScenario
 import com.chutneytesting.acceptance.common.executeScenario
 import com.chutneytesting.kotlin.dsl.Scenario
+import com.chutneytesting.kotlin.dsl.hjsonSpEL
+import com.chutneytesting.kotlin.dsl.spEL
 
 
 val `Http post request local server endpoint` = Scenario(title = "Http post request local server endpoint") {
@@ -33,7 +35,7 @@ val `Http post request local server endpoint` = Scenario(title = "Http post requ
       """.trimIndent()
     )
   }
-  And("This scenario with sql task is saved") {
+  And("This scenario is saved") {
     createScenario(
       "scenarioId",
       """
@@ -56,7 +58,7 @@ val `Http post request local server endpoint` = Scenario(title = "Http post requ
                 {
                     "sentence":"Listens to POST requests",
                     "implementation":{
-                        "task":"{\n type: https-listener \n inputs: {\n https-server: \${'$'}{#httpsServer} \n uri: /test \n verb: POST \n expected-message-count: \"1\" \n} \n}"
+                        "task":"{\n type: https-listener \n inputs: {\n https-server: ${"httpsServer".hjsonSpEL} \n uri: /test \n verb: POST \n expected-message-count: \"1\" \n} \n}"
                     }
                 },
                 {
@@ -70,9 +72,9 @@ val `Http post request local server endpoint` = Scenario(title = "Http post requ
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}", "HTTP_SERVER_ENV")
+    executeScenario("scenarioId".spEL, "HTTP_SERVER_ENV")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
 }

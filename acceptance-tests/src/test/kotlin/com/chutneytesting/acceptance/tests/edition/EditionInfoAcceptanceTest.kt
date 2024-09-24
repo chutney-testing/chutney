@@ -48,7 +48,7 @@ val readTestCaseMetadataScenario = Scenario(title = "Consult new testcase metada
   When("admin consult it") {
     HttpGetAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/scenario/v2/${'$'}{#testcaseId}",
+        uri = "/api/scenario/v2/${"testcaseId".spEL}",
         headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"admin:admin\").getBytes())}"
         ),
@@ -115,7 +115,7 @@ val readTestCaseAfterUpdateScenario = Scenario(title = "Consult testcase metadat
         uri = "/api/scenario/v2",
         body = """
                  {
-                    "id": "${'$'}{#testcaseId}",
+                    "id": "${"testcaseId".spEL}",
                     "title": "new Title",
                     "description": "new description",
                     "tags": [ "second", "third" ],
@@ -141,7 +141,7 @@ val readTestCaseAfterUpdateScenario = Scenario(title = "Consult testcase metadat
   When("admin consult it") {
     HttpGetAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/scenario/v2/${'$'}{#testcaseId}",
+        uri = "/api/scenario/v2/${"testcaseId".spEL}",
         headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"admin:admin\").getBytes())}"
         ),
@@ -202,7 +202,7 @@ val updateTestCaseWithBadVersionScenario = Scenario(title = "Update testcase wit
         uri = "/api/scenario/v2",
         body = """
                  {
-                    "id": "${'$'}{#testcaseId}",
+                    "id": "${"testcaseId".spEL}",
                     "title": "new Title",
                     "description": "new description",
                     "tags": [ "second", "third" ],

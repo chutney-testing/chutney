@@ -7,7 +7,7 @@
 
 package com.chutneytesting.acceptance.tests.engine
 
-import com.chutneytesting.acceptance.common.checkScenarioSuccess
+import com.chutneytesting.acceptance.common.checkScenarioReportSuccess
 import com.chutneytesting.acceptance.common.createScenario
 import com.chutneytesting.acceptance.common.executeScenario
 import com.chutneytesting.kotlin.dsl.CompareAction
@@ -38,10 +38,10 @@ val `Scenario execution with simple json value extraction` = Scenario(title = "S
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}","DEFAULT")
+    executeScenario("scenarioId".spEL,"DEFAULT")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
   And("the extracted value is 'value1'") {
     CompareAction(
@@ -76,10 +76,10 @@ val `Scenario execution with multiple json value extraction` = Scenario(title = 
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}","DEFAULT")
+    executeScenario("scenarioId".spEL,"DEFAULT")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
   And("the extracted value is '[\"value1\",\"value1\"]'") {
     CompareAction(
@@ -114,10 +114,10 @@ val `Scenario execution with json object value extraction` = Scenario(title = "S
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}","DEFAULT")
+    executeScenario("scenarioId".spEL,"DEFAULT")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
   And("the extracted value is '{field1=value1}'") {
     CompareAction(

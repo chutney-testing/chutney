@@ -34,7 +34,7 @@
         <kotlin.compiler.languageVersion>1.9</kotlin.compiler.languageVersion>
         <kotlin.compiler.apiVersion>1.9</kotlin.compiler.apiVersion>
         <kotlin.compiler.jvmTarget>${maven.compiler.target}</kotlin.compiler.jvmTarget>
-        <kotlin.version>1.9.21</kotlin.version>
+        <kotlin.version>1.9.25</kotlin.version>
 
         <chutney.version>${project.version}</chutney.version>
     </properties>

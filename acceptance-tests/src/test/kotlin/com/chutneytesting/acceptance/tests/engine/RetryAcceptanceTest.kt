@@ -7,7 +7,7 @@
 
 package com.chutneytesting.acceptance.tests.engine
 
-import com.chutneytesting.acceptance.common.checkScenarioSuccess
+import com.chutneytesting.acceptance.common.checkScenarioReportSuccess
 import com.chutneytesting.acceptance.common.createScenario
 import com.chutneytesting.acceptance.common.executeScenario
 import com.chutneytesting.kotlin.dsl.*
@@ -21,7 +21,7 @@ val `Retry should stop after success assertion` = Scenario(title = "Retry should
             "when":{
                 "sentence":"Set stop date",
                 "implementation":{
-                    "task":"{\n type: context-put \n inputs: {\n entries: {\n dateTimeFormat: ss \n secondsPlus5: \${'$'}{#dateFormatter(#dateTimeFormat).format(#now().plusSeconds(5))} \n} \n} \n}"
+                    "task":"{\n type: context-put \n inputs: {\n entries: {\n dateTimeFormat: ss \n secondsPlus5: ${"dateFormatter(#dateTimeFormat).format(#now().plusSeconds(5))".hjsonSpEL} \n} \n} \n}"
                 }
             },
             "thens":[
@@ -38,13 +38,13 @@ val `Retry should stop after success assertion` = Scenario(title = "Retry should
                         {
                             "sentence":"Set current date",
                             "implementation":{
-                                "task":"{\n type: context-put \n inputs: {\n entries: {\n currentSeconds: \${'$'}{#dateFormatter(#dateTimeFormat).format(#now())} \n} \n} \n}"
+                                "task":"{\n type: context-put \n inputs: {\n entries: {\n currentSeconds: ${"dateFormatter(#dateTimeFormat).format(#now())".hjsonSpEL} \n} \n} \n}"
                             }
                         },
                         {
                             "sentence":"Check current date get to stop date",
                             "implementation":{
-                                "task":"{\n type: string-assert \n inputs: {\n document: \${'$'}{#secondsPlus5} \n expected: \${'$'}{T(java.lang.String).format('%02d', new Integer(#currentSeconds) + 1)} \n} \n}"
+                                "task":"{\n type: string-assert \n inputs: {\n document: ${"secondsPlus5".hjsonSpEL} \n expected: \${'$'}{T(java.lang.String).format('%02d', new Integer(#currentSeconds) + 1)} \n} \n}"
                             }
                         }
                     ]
@@ -55,9 +55,9 @@ val `Retry should stop after success assertion` = Scenario(title = "Retry should
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}", "DEFAULT")
+    executeScenario("scenarioId".spEL, "DEFAULT")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
 }

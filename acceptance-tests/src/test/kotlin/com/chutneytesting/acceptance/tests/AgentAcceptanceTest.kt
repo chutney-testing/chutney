@@ -24,7 +24,7 @@ fun `We receive a network configuration to persist`(): ChutneyScenario {
           target = "CHUTNEY_LOCAL",
           uri = "/api/v1/description",
           outputs = mapOf(
-            "networkConfiguration" to "json(#body, \"\$.networkConfiguration\")".spEL
+            "networkConfiguration" to "json(#body, '\$.networkConfiguration')".spEL
           )
         )
       }
@@ -48,7 +48,7 @@ fun `We receive a network configuration to persist`(): ChutneyScenario {
         body = """
        {
             "networkConfiguration": {
-                "creationDate": "${'$'}{#jsonPath(#networkConfiguration, "$.networkConfiguration.creationDate")}",
+                "creationDate": "${"jsonPath(#networkConfiguration, \"$.networkConfiguration.creationDate\")".spEL}",
                 "environmentsConfiguration": [
                     {
                         "name": "AGENT_ENV",
@@ -60,9 +60,9 @@ fun `We receive a network configuration to persist`(): ChutneyScenario {
                         ]
                     }
                 ],
-                "agentNetworkConfiguration": ${'$'}{#jsonSerialize(#jsonPath(#networkConfiguration, "$.networkConfiguration.agentNetworkConfiguration"))}
+                "agentNetworkConfiguration": ${"jsonSerialize(#jsonPath(#networkConfiguration, \"$.networkConfiguration.agentNetworkConfiguration\"))".spEL}
             },
-            "agentsGraph": ${'$'}{#jsonSerialize(#jsonPath(#networkConfiguration, "$.agentsGraph"))}
+            "agentsGraph": ${"jsonSerialize(#jsonPath(#networkConfiguration, \"$.agentsGraph\"))".spEL}
         }  
        """.trimIndent(),
         validations = mapOf(statusValidation(200))
@@ -82,7 +82,7 @@ fun `We receive a network configuration to persist`(): ChutneyScenario {
       Step("Check target is present") {
         CompareAction(
           mode = "equals",
-          actual = "json(#environments, \"\$[0].targets[0].name\")".spEL,
+          actual = "json(#environments, '\$[0].targets[0].name')".spEL,
           expected = "fake_target"
         )
       }

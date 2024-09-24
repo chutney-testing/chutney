@@ -32,7 +32,7 @@ val `Register simple success action` = Scenario(title = "Register simple success
     executeScenario("scenarioId".spEL, "DEFAULT")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
   And("The report contains a single node for final actions") {
     JsonAssertAction(
@@ -80,7 +80,7 @@ val `Register multiple actions with one complex, ie with inputs and strategy` = 
                         "sentence":"Register variable in context",
                         "implementation":{
                             "target": "CHUTNEY_LOCAL",
-                            "task":"{\n type: final \n inputs: {\n type: context-put \n name: Put myKey \n inputs: {\n entries: {\n myKey: myValue \n} \n} validations: {\n putOk: \${'$'}{#myKey == 'myValue'} \n} \n} \n}"
+                            "task":"{\n type: final \n inputs: {\n type: context-put \n name: Put myKey \n inputs: {\n entries: {\n myKey: myValue \n} \n} validations: {\n putOk: ${"myKey == 'myValue'".hjsonSpEL} \n} \n} \n}"
                         }
                     }
                 ]
@@ -94,7 +94,7 @@ val `Register multiple actions with one complex, ie with inputs and strategy` = 
     executeScenario("scenarioId".spEL, "DEFAULT")
   }
   Then("the report status is FAILURE") {
-    checkScenarioFailure()
+    checkScenarioReportFailure()
   }
   And("The report contains a single node for final actions") {
     JsonAssertAction(
@@ -145,7 +145,7 @@ val `Register final action with validations on outputs` = Scenario(title = "Regi
                         "sentence":"Register action providing outputs",
                         "implementation":{
                             "target": "CHUTNEY_LOCAL",
-                            "task":"{\n type: final \n target: test_http \n inputs: {\n type: http-get \n name: Get user \n inputs: {\n uri: /api/v1/user \n timeout: 5 sec \n} \n validations: { \n http_OK: \${'$'}{ #status == 200 } \n} \n} \n}"
+                            "task":"{\n type: final \n target: test_http \n inputs: {\n type: http-get \n name: Get user \n inputs: {\n uri: /api/v1/user \n timeout: 5 sec \n} \n validations: { \n http_OK: ${"status == 200".hjsonSpEL} \n} \n} \n}"
                         }
                     }
                 ]
@@ -159,13 +159,13 @@ val `Register final action with validations on outputs` = Scenario(title = "Regi
     executeScenario("scenarioId".spEL, "ENV_FINAL")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
   And("The report contains the executions (in declaration reverse order) of all the final actions action") {
     JsonAssertAction(
       document = "report".spEL,
       expected = mapOf(
-        "$.report.steps[0].steps[0].evaluatedInputs.validations.http_OK" to "\\\${ #status == 200 }",
+        "$.report.steps[0].steps[0].evaluatedInputs.validations.http_OK" to "\\\${#status == 200}",
         "$.report.steps[1].steps[0].type" to "http-get",
         "$.report.steps[1].steps[0].status" to "SUCCESS",
       )

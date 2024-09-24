@@ -8,7 +8,10 @@
 package com.chutneytesting.acceptance.tests.actions
 
 import com.chutneytesting.acceptance.common.*
-import com.chutneytesting.kotlin.dsl.*
+import com.chutneytesting.kotlin.dsl.ChutneyScenario
+import com.chutneytesting.kotlin.dsl.Scenario
+import com.chutneytesting.kotlin.dsl.hjsonSpEL
+import com.chutneytesting.kotlin.dsl.spEL
 
 
 fun `Jms jmsAction wrong url`(
@@ -24,7 +27,7 @@ fun `Jms jmsAction wrong url`(
         [
           {
               "name": "test_jms",
-              "url": "tcp://localhost:11111",
+              "url": "tcp://$UNKNOWN_TARGET",
               "properties": [
                   {
                       "key": "java.naming.factory.initial",
@@ -36,7 +39,7 @@ fun `Jms jmsAction wrong url`(
       """.trimIndent()
       )
     }
-    And("This scenario with sql task is saved") {
+    And("This scenario is saved") {
       createScenario(
         "scenarioId",
         """
@@ -51,7 +54,7 @@ fun `Jms jmsAction wrong url`(
                 {
                     "sentence":"Assert http status",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#status} \n expected: 200 \n mode: not equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: ${"status".hjsonSpEL} \n expected: 200 \n mode: not equals \n} \n}"
                     }
                 }
             ]
@@ -60,10 +63,10 @@ fun `Jms jmsAction wrong url`(
       )
     }
     When("The scenario is executed") {
-      executeScenario("${'$'}{#scenarioId}", environmentName)
+      executeScenario("scenarioId".spEL, environmentName)
     }
     Then("the report status is FAILURE") {
-      checkScenarioFailure()
+      checkScenarioReportFailure()
     }
   }
 }
@@ -89,7 +92,7 @@ fun `Jms sender then clean then send and listen it on embedded broker`(): Chutne
       """.trimIndent()
       )
     }
-    And("This scenario with sql task is saved") {
+    And("This scenario is saved") {
       createScenario(
         "scenarioId",
         """
@@ -130,7 +133,7 @@ fun `Jms sender then clean then send and listen it on embedded broker`(): Chutne
                 {
                     "sentence":"Check JMS message",
                     "implementation":{
-                        "task":"{\n type: string-assert \n inputs: {\n document: \${'$'}{#textMessage} \n expected: message to catch \n} \n}"
+                        "task":"{\n type: string-assert \n inputs: {\n document: ${"textMessage".hjsonSpEL} \n expected: message to catch \n} \n}"
                     }
                 }
             ]
@@ -139,10 +142,10 @@ fun `Jms sender then clean then send and listen it on embedded broker`(): Chutne
       )
     }
     When("The scenario is executed") {
-      executeScenario("${'$'}{#scenarioId}", "JMS_ENV_OK")
+      executeScenario("scenarioId".spEL, "JMS_ENV_OK")
     }
     Then("the report status is SUCCESS") {
-      checkScenarioSuccess()
+      checkScenarioReportSuccess()
     }
   }
 }

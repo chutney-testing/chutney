@@ -7,23 +7,24 @@
 
 package com.chutneytesting.acceptance.common
 
+import com.chutneytesting.engine.api.execution.StatusDto
 import com.chutneytesting.kotlin.dsl.ChutneyStepBuilder
 import com.chutneytesting.kotlin.dsl.CompareAction
 import com.chutneytesting.kotlin.dsl.spEL
 
-fun ChutneyStepBuilder.checkScenarioSuccess() {
-  CompareAction(
-      mode = "equals",
-      actual = "json(#report, \"$.report.status\")".spEL,
-      expected = "SUCCESS"
-  )
+fun ChutneyStepBuilder.checkScenarioReportSuccess() {
+  checkScenarioReportStatus(StatusDto.SUCCESS)
 }
 
-fun ChutneyStepBuilder.checkScenarioFailure() {
+fun ChutneyStepBuilder.checkScenarioReportFailure() {
+  checkScenarioReportStatus(StatusDto.FAILURE)
+}
+
+private fun ChutneyStepBuilder.checkScenarioReportStatus(status: StatusDto) {
   CompareAction(
-      mode = "equals",
-      actual = "json(#report, \"$.report.status\")".spEL,
-      expected = "FAILURE"
+    mode = "equals",
+    actual = "json(#report, '$.report.status')".spEL,
+    expected = status.name
   )
 }
 

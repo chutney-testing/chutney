@@ -26,7 +26,7 @@ val `Request testcase edition` = Scenario(title = "Request testcase edition") {
   And("paloma requests an edition on an existing testcase") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+        uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
         body = null,
         headers = mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"paloma:paloma\").getBytes())}"
@@ -37,7 +37,7 @@ val `Request testcase edition` = Scenario(title = "Request testcase edition") {
   And("robert requests an edition on the same testcase") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+        uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
         body = null,
         headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"robert:robert\").getBytes())}"
@@ -48,7 +48,7 @@ val `Request testcase edition` = Scenario(title = "Request testcase edition") {
   When("admin consult it") {
     HttpGetAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+        uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
         headers = jsonHeader() + mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"admin:admin\").getBytes())}"
         ),
@@ -97,7 +97,7 @@ val `Request for a second time testcase edition` = Scenario(title = "Request for
   And("paloma requests an edition on an existing testcase") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+        uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
         body = null,
         headers = mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"paloma:paloma\").getBytes())}"
@@ -109,7 +109,7 @@ val `Request for a second time testcase edition` = Scenario(title = "Request for
   When ("paloma requests an edition on the same testcase") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+        uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
         body = null,
         headers = mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"paloma:paloma\").getBytes())}"
@@ -141,7 +141,7 @@ val `End testcase edition` = Scenario(title = "End testcase edition") {
   And("Paloma requests an edition on an existing testcase") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+        uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
         body = null,
         headers = mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"paloma:paloma\").getBytes())}"
@@ -152,7 +152,7 @@ val `End testcase edition` = Scenario(title = "End testcase edition") {
   When ("Paloma ends its edition") {
     HttpDeleteAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+        uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
         headers = mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"paloma:paloma\").getBytes())}"
         ),
@@ -163,7 +163,7 @@ val `End testcase edition` = Scenario(title = "End testcase edition") {
     Step("Consults the current editions of this testcase") {
       HttpGetAction(
           target = "CHUTNEY_LOCAL",
-          uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+          uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
           validations = mapOf(
               statusValidation(200)
           ),
@@ -186,7 +186,7 @@ val `Edition time to live` = Scenario(title = "Edition time to live") {
   And("Paloma requests an edition on an existing testcase") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL_NO_USER",
-        uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+        uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
         body = null,
         headers = mapOf(
             "Authorization" to "Basic ${'$'}{T(java.util.Base64).getEncoder().encodeToString((\"paloma:paloma\").getBytes())}"
@@ -201,7 +201,7 @@ val `Edition time to live` = Scenario(title = "Edition time to live") {
     Step("Consults the current editions of this testcase") {
       HttpGetAction(
           target = "CHUTNEY_LOCAL",
-          uri = "/api/v1/editions/testcases/${'$'}{#testcaseId}",
+          uri = "/api/v1/editions/testcases/${"testcaseId".spEL}",
           validations = mapOf(statusValidation(200)),
           outputs = mapOf("currentEditions" to "body".spEL())
       )

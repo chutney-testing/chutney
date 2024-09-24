@@ -16,8 +16,9 @@ val executeCampaignById = Scenario(title = "Execute campaign by id") {
   When("this campaign is executed by id") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL",
-        uri = "/api/ui/campaign/execution/v1/byID/${'$'}{#campaignId}",
+        uri = "/api/ui/campaign/execution/v1/byID/${"campaignId".spEL}",
         headers = jsonHeader(),
+        body = null,
         validations = mapOf(statusValidation(200)),
         outputs = mapOf("report" to "#body".elEval())
     )
@@ -28,7 +29,7 @@ val executeCampaignById = Scenario(title = "Execute campaign by id") {
 val executeCampaignByName = Scenario(title = "Execute campaign name") {
   Given("A campaign name") {
     ContextPutAction(
-        entries = mapOf("campaignName" to "generate().id(\"campaign-\", 10)".spEL())
+        entries = mapOf("campaignName" to "generate().id('campaign-', 10)".spEL())
     )
   }
   createCampaignWith2Scenarios("campaignName".spEL())
@@ -39,7 +40,7 @@ val executeCampaignByName = Scenario(title = "Execute campaign name") {
         headers = jsonHeader(),
         validations = mapOf(statusValidation(200)),
         outputs = mapOf(
-            "report" to "json(#body, \"${'$'}[0]\")".spEL()
+            "report" to "json(#body, '$[0]')".spEL()
         )
     )
   }
@@ -49,7 +50,7 @@ val executeCampaignByName = Scenario(title = "Execute campaign name") {
 val executeForSurefireReport = Scenario(title = "Execution for surefire of a campaign") {
   Given("An unknown campaign name") {
     ContextPutAction(
-        entries = mapOf("campaignName" to "generate().id(\"campaign-\", 10)".spEL())
+        entries = mapOf("campaignName" to "generate().id('campaign-', 10)".spEL())
     )
   }
   When("this campaign is executed by name") {
@@ -98,8 +99,9 @@ val unknownCampaignById = Scenario(title = "Execution by id of an unknown campai
   When("an unknown campaign is executed by id and not found") {
     HttpPostAction(
         target = "CHUTNEY_LOCAL",
-        uri = "/api/ui/campaign/execution/v1/byID/${'$'}{#campaignId}",
+        uri = "/api/ui/campaign/execution/v1/byID/${"campaignId".spEL}",
         headers = jsonHeader(),
+        body = null,
         validations = mapOf(
             statusValidation(404)
         ),
@@ -110,7 +112,7 @@ val unknownCampaignById = Scenario(title = "Execution by id of an unknown campai
 val unknownCampaignByName = Scenario(title = "Execution by name of an unknown campaign") {
   Given("An unknown id") {
     ContextPutAction(
-        entries = mapOf("campaignName" to "generate().id(\"campaign-\", 10)".spEL())
+        entries = mapOf("campaignName" to "generate().id('campaign-', 10)".spEL())
     )
   }
   When("an unknown campaign is executed by name") {
@@ -137,22 +139,22 @@ private fun ChutneyScenarioBuilder.checkCampaignExecution() {
     Step("Check execution id not empty") {
       CompareAction(
           mode = "greater-than",
-          actual = "json(#report, \"${'$'}.executionId\").toString()".spEL(),
+          actual = "json(#report, '$.executionId').toString()".spEL(),
           expected = "0"
       )
     }
     Step("Check status is SUCCESS") {
       CompareAction(
           mode = "equals",
-          actual = "json(#report, \"${'$'}.status\")".spEL(),
+          actual = "json(#report, '$.status')".spEL(),
           expected = "SUCCESS"
       )
     }
     Step("Check scenario ids") {
       CompareAction(
           mode = "equals",
-          actual = "#json(#report, \"${'$'}.scenarioExecutionReports[*].scenarioId\").toString()".elEval(),
-          expected = "[\"${'$'}{#scenario1Id}\",\"${'$'}{#scenario2Id}\"]"
+          actual = "json(#report, '$.scenarioExecutionReports[*].scenarioId').toString()".spEL(),
+          expected = "[\"${"scenario1Id".spEL}\",\"${"scenario2Id".spEL}\"]"
       )
     }
   }
@@ -160,7 +162,7 @@ private fun ChutneyScenarioBuilder.checkCampaignExecution() {
     Step("Request campaign from Chutney instance") {
       HttpGetAction(
           target = "CHUTNEY_LOCAL",
-          uri = "/api/ui/campaign/v1/${'$'}{#campaignId}",
+          uri = "/api/ui/campaign/v1/${"campaignId".spEL}",
           headers = jsonHeader(),
           validations = mapOf(
               statusValidation(200)
@@ -171,14 +173,14 @@ private fun ChutneyScenarioBuilder.checkCampaignExecution() {
     Step("Assert execution is present") {
       CompareAction(
           mode = "equals",
-          actual = "json(#campaign, \"${'$'}.campaignExecutionReports[0].executionId\").toString()".spEL(),
-          expected = "json(#report, \"${'$'}.executionId\").toString()".spEL()
+          actual = "json(#campaign, '$.campaignExecutionReports[0].executionId').toString()".spEL(),
+          expected = "json(#report, '$.executionId').toString()".spEL()
       )
     }
   }
 }
 
-private fun ChutneyScenarioBuilder.createCampaignWith2Scenarios(campaignName: String = "generate().id(\"campaign-\", 10)".spEL()) {
+private fun ChutneyScenarioBuilder.createCampaignWith2Scenarios(campaignName: String = "generate().id('campaign-', 10)".spEL()) {
   Given("Create a campaign with 2 scenario") {
     Step("Create first scenario") {
       createScenario("scenario1Id")
@@ -200,7 +202,7 @@ private fun ChutneyStepBuilder.createCampaign(campaignName: String = "campaign")
                 {
                     "title":"$campaignName",
                     "description":"",
-                    "scenarios":[ {"scenarioId": "${'$'}{#scenario1Id}"}, {"scenarioId": "${'$'}{#scenario2Id}", "datasetId": null} ],
+                    "scenarios":[ {"scenarioId": "${"scenario1Id".spEL}"}, {"scenarioId": "${"scenario2Id".spEL}", "datasetId": null} ],
                     "environment":"DEFAULT",
                     "parallelRun": false,
                     "retryAuto": false,
@@ -210,7 +212,7 @@ private fun ChutneyStepBuilder.createCampaign(campaignName: String = "campaign")
       headers = jsonHeader(),
       validations = mapOf(statusValidation(200)),
       outputs = mapOf(
-          "campaignId" to "jsonPath(#body, \"${'$'}.id\")".spEL()
+          "campaignId" to "jsonPath(#body, '$.id')".spEL()
       )
   )
 }

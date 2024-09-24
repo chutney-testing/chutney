@@ -7,12 +7,14 @@
 
 package com.chutneytesting.acceptance.tests.actions
 
-import com.chutneytesting.acceptance.common.checkScenarioSuccess
+import com.chutneytesting.acceptance.common.checkScenarioReportSuccess
 import com.chutneytesting.acceptance.common.createEnvironment
 import com.chutneytesting.acceptance.common.createScenario
 import com.chutneytesting.acceptance.common.executeScenario
 import com.chutneytesting.kotlin.dsl.ChutneyScenarioBuilder
 import com.chutneytesting.kotlin.dsl.Scenario
+import com.chutneytesting.kotlin.dsl.hjsonSpEL
+import com.chutneytesting.kotlin.dsl.spEL
 import org.testcontainers.shaded.org.apache.commons.lang3.RandomStringUtils
 
 val `Micrometer counter meter` = Scenario(title = "Micrometer counter meter") {
@@ -26,7 +28,7 @@ val `Micrometer counter meter` = Scenario(title = "Micrometer counter meter") {
                             {
                                 "sentence": "Create counter meter",
                                 "implementation":{
-                                    "task":"{\n type: micrometer-counter \n inputs: {\n name: my.counter \n tags: [ 'myTagKey', 'myTagValue' ] \n} \n outputs: {\n myCounter: \${'$'}{#micrometerCounter} \n} \n}"
+                                    "task":"{\n type: micrometer-counter \n inputs: {\n name: my.counter \n tags: [ 'myTagKey', 'myTagValue' ] \n} \n outputs: {\n myCounter: ${"micrometerCounter".hjsonSpEL} \n} \n}"
                                 }
                             },
                             {
@@ -41,13 +43,13 @@ val `Micrometer counter meter` = Scenario(title = "Micrometer counter meter") {
                                     {
                                         "sentence": "Check counter value",
                                         "implementation":{
-                                            "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
+                                            "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
                                         }
                                     },
                                     {
                                         "sentence": "Check counter tags",
                                         "implementation":{
-                                            "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.availableTags[?(@.tag=='myTagKey')].values[0]\").toString()} \n expected: '[\"myTagValue\"]' \n mode: equals \n} \n}"
+                                            "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.availableTags[?(@.tag=='myTagKey')].values[0]\").toString()} \n expected: '[\"myTagValue\"]' \n mode: equals \n} \n}"
                                         }
                                     }
                                 ]
@@ -58,7 +60,7 @@ val `Micrometer counter meter` = Scenario(title = "Micrometer counter meter") {
                 "when":{
                     "sentence": "Increment my counter",
                     "implementation":{
-                        "task":"{\n type: micrometer-counter \n inputs: {\n counter: \${'$'}{#myCounter} \n increment: '2' \n} \n}"
+                        "task":"{\n type: micrometer-counter \n inputs: {\n counter: ${"myCounter".hjsonSpEL} \n increment: '2' \n} \n}"
                     }
                 },
                 "thens":[
@@ -71,7 +73,7 @@ val `Micrometer counter meter` = Scenario(title = "Micrometer counter meter") {
                     {
                         "sentence": "Check counter value",
                         "implementation":{
-                            "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[2.0]' \n mode: equals \n} \n}"
+                            "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[2.0]' \n mode: equals \n} \n}"
                         }
                     }
                 ]
@@ -92,7 +94,7 @@ val `Micrometer timer meter` = Scenario(title = "Micrometer timer meter") {
                         {
                             "sentence": "Create timer meter",
                             "implementation":{
-                                "task":"{\n type: micrometer-timer \n inputs: {\n name: my.timer \n tags: [ 'myTagKey', 'myTagValue' ] \n} \n outputs: {\n myTimer: \${'$'}{#micrometerTimer} \n} \n}"
+                                "task":"{\n type: micrometer-timer \n inputs: {\n name: my.timer \n tags: [ 'myTagKey', 'myTagValue' ] \n} \n outputs: {\n myTimer: ${"micrometerTimer".hjsonSpEL} \n} \n}"
                             }
                         },
                         {
@@ -107,13 +109,13 @@ val `Micrometer timer meter` = Scenario(title = "Micrometer timer meter") {
                                 {
                                     "sentence": "Check timer count value",
                                     "implementation":{
-                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
+                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
                                     }
                                 },
                                 {
                                     "sentence": "Check timer tags",
                                     "implementation":{
-                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.availableTags[?(@.tag=='myTagKey')].values[0]\").toString()} \n expected: '[\"myTagValue\"]' \n mode: equals \n} \n}"
+                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.availableTags[?(@.tag=='myTagKey')].values[0]\").toString()} \n expected: '[\"myTagValue\"]' \n mode: equals \n} \n}"
                                     }
                                 }
                             ]
@@ -124,7 +126,7 @@ val `Micrometer timer meter` = Scenario(title = "Micrometer timer meter") {
             "when":{
                 "sentence": "Update my timer",
                 "implementation":{
-                    "task":"{\n type: micrometer-timer \n inputs: {\n timer: \${'$'}{#myTimer} \n record: '5 s' \n} \n}"
+                    "task":"{\n type: micrometer-timer \n inputs: {\n timer: ${"myTimer".hjsonSpEL} \n record: '5 s' \n} \n}"
                 }
             },
             "thens":[
@@ -137,19 +139,19 @@ val `Micrometer timer meter` = Scenario(title = "Micrometer timer meter") {
                 {
                     "sentence": "Check timer count value",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[1.0]' \n mode: equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[1.0]' \n mode: equals \n} \n}"
                     }
                 },
                 {
                     "sentence": "Check timer total time value",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='TOTAL_TIME')].value\").toString()} \n expected: '[5.0]' \n mode: equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='TOTAL_TIME')].value\").toString()} \n expected: '[5.0]' \n mode: equals \n} \n}"
                     }
                 },
                 {
                     "sentence": "Check timer max value",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='MAX')].value\").toString()} \n expected: '[5.0]' \n mode: equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='MAX')].value\").toString()} \n expected: '[5.0]' \n mode: equals \n} \n}"
                     }
                 }
             ]
@@ -166,7 +168,7 @@ val `Micrometer timer meter with start and stop` = Scenario(title = "Micrometer 
                 {
                     "sentence": "An existing timer",
                     "implementation":{
-                        "task":"{\n type: micrometer-timer \n inputs: {\n name: my.timer.start.stop \n tags: [ 'myTagKey', 'myTagValue' ] \n} \n outputs: {\n myTimer: \${'$'}{#micrometerTimer} \n} \n}"
+                        "task":"{\n type: micrometer-timer \n inputs: {\n name: my.timer.start.stop \n tags: [ 'myTagKey', 'myTagValue' ] \n} \n outputs: {\n myTimer: ${"micrometerTimer".hjsonSpEL} \n} \n}"
                     }
                 }
             ],
@@ -176,7 +178,7 @@ val `Micrometer timer meter with start and stop` = Scenario(title = "Micrometer 
                     {
                         "sentence": "Start a timing sample",
                         "implementation":{
-                            "task":"{\n type: micrometer-timer-start \n outputs: {\n myTimingSample: \${'$'}{#micrometerTimerSample} \n} \n}"
+                            "task":"{\n type: micrometer-timer-start \n outputs: {\n myTimingSample: ${"micrometerTimerSample".hjsonSpEL} \n} \n}"
                         }
                     },
                     {
@@ -188,7 +190,7 @@ val `Micrometer timer meter with start and stop` = Scenario(title = "Micrometer 
                     {
                         "sentence": "Stop the timing sample",
                         "implementation":{
-                            "task":"{\n type: micrometer-timer-stop \n inputs: {\n sample: \${'$'}{#micrometerTimerSample} \n timer: \${'$'}{#myTimer} \n} \n}"
+                            "task":"{\n type: micrometer-timer-stop \n inputs: {\n sample: ${"micrometerTimerSample".hjsonSpEL} \n timer: ${"myTimer".hjsonSpEL} \n} \n}"
                         }
                     }
                 ]
@@ -203,19 +205,19 @@ val `Micrometer timer meter with start and stop` = Scenario(title = "Micrometer 
                 {
                     "sentence": "Check timer count value",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[1.0]' \n mode: equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[1.0]' \n mode: equals \n} \n}"
                     }
                 },
                 {
                     "sentence": "Check timer total time value",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \"\${'$'}{#json(#body, \\\"${'$'}.measurements[?(@.statistic=='TOTAL_TIME')].value\\\").get(0).toString()}\" \n expected: '1' \n mode: greater than \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: \"\${'$'}{#json(#body, \\\"$.measurements[?(@.statistic=='TOTAL_TIME')].value\\\").get(0).toString()}\" \n expected: '1' \n mode: greater than \n} \n}"
                     }
                 },
                 {
                     "sentence": "Check timer max value",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \"\${'$'}{#json(#body, \\\"${'$'}.measurements[?(@.statistic=='MAX')].value\\\").get(0).toString()}\" \n expected: '1' \n mode: greater than \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: \"\${'$'}{#json(#body, \\\"$.measurements[?(@.statistic=='MAX')].value\\\").get(0).toString()}\" \n expected: '1' \n mode: greater than \n} \n}"
                     }
                 }
             ]
@@ -250,13 +252,13 @@ val `Micrometer gauge meter` = Scenario(title = "Micrometer gauge meter") {
                                 {
                                     "sentence": "Check gauge value",
                                     "implementation":{
-                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='VALUE')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
+                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='VALUE')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
                                     }
                                 },
                                 {
                                     "sentence": "Check gauge tags",
                                     "implementation":{
-                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.availableTags[?(@.tag=='myTagKey')].values[0]\").toString()} \n expected: '[\"myTagValue\"]' \n mode: equals \n} \n}"
+                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.availableTags[?(@.tag=='myTagKey')].values[0]\").toString()} \n expected: '[\"myTagValue\"]' \n mode: equals \n} \n}"
                                     }
                                 }
                             ]
@@ -267,7 +269,7 @@ val `Micrometer gauge meter` = Scenario(title = "Micrometer gauge meter") {
             "when":{
                 "sentence": "Update gauge object",
                 "implementation":{
-                    "task":"{\n type: success \n outputs: {\n noop: \${'$'}{#myGaugeObject.add(new Object())} \n} \n}"
+                    "task":"{\n type: success \n outputs: {\n noop: ${"myGaugeObject.add(new Object())".hjsonSpEL} \n} \n}"
                 }
             },
             "thens":[
@@ -280,7 +282,7 @@ val `Micrometer gauge meter` = Scenario(title = "Micrometer gauge meter") {
                 {
                     "sentence": "Check gauge value",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='VALUE')].value\").toString()} \n expected: '[1.0]' \n mode: equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='VALUE')].value\").toString()} \n expected: '[1.0]' \n mode: equals \n} \n}"
                     }
                 }
             ]
@@ -300,7 +302,7 @@ val `Micrometer distribution summary meter` = Scenario(title = "Micrometer distr
                         {
                             "sentence": "Create distribution meter",
                             "implementation":{
-                                "task":"{\n type: micrometer-summary \n inputs: {\n name: my.summary \n tags: [ 'myTagKey', 'myTagValue' ] \n} \n outputs: {\n mySummary: \${'$'}{#micrometerSummary} \n} \n}"
+                                "task":"{\n type: micrometer-summary \n inputs: {\n name: my.summary \n tags: [ 'myTagKey', 'myTagValue' ] \n} \n outputs: {\n mySummary: ${"micrometerSummary".hjsonSpEL} \n} \n}"
                             }
                         },
                         {
@@ -315,19 +317,19 @@ val `Micrometer distribution summary meter` = Scenario(title = "Micrometer distr
                                 {
                                     "sentence": "Check distribution total value",
                                     "implementation":{
-                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='TOTAL')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
+                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='TOTAL')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
                                     }
                                 },
                                 {
                                     "sentence": "Check distribution count value",
                                     "implementation":{
-                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
+                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[0.0]' \n mode: equals \n} \n}"
                                     }
                                 },
                                 {
                                     "sentence": "Check distribution tags",
                                     "implementation":{
-                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.availableTags[?(@.tag=='myTagKey')].values[0]\").toString()} \n expected: '[\"myTagValue\"]' \n mode: equals \n} \n}"
+                                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.availableTags[?(@.tag=='myTagKey')].values[0]\").toString()} \n expected: '[\"myTagValue\"]' \n mode: equals \n} \n}"
                                     }
                                 }
                             ]
@@ -338,7 +340,7 @@ val `Micrometer distribution summary meter` = Scenario(title = "Micrometer distr
             "when":{
                 "sentence": "Update my distribution",
                 "implementation":{
-                    "task":"{\n type: micrometer-summary \n inputs: {\n distributionSummary: \${'$'}{#mySummary} \n record: '2' \n} \n}"
+                    "task":"{\n type: micrometer-summary \n inputs: {\n distributionSummary: ${"mySummary".hjsonSpEL} \n record: '2' \n} \n}"
                 }
             },
             "thens":[
@@ -351,13 +353,13 @@ val `Micrometer distribution summary meter` = Scenario(title = "Micrometer distr
                 {
                     "sentence": "Check distribution total value",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='TOTAL')].value\").toString()} \n expected: '[2.0]' \n mode: equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='TOTAL')].value\").toString()} \n expected: '[2.0]' \n mode: equals \n} \n}"
                     }
                 },
                 {
                     "sentence": "Check distribution count value",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"${'$'}.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[1.0]' \n mode: equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#json(#body, \"$.measurements[?(@.statistic=='COUNT')].value\").toString()} \n expected: '[1.0]' \n mode: equals \n} \n}"
                     }
                 }
             ]
@@ -391,9 +393,9 @@ private fun ChutneyScenarioBuilder.micrometerScenario(scenario: String) {
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}", micrometerEnv)
+    executeScenario("scenarioId".spEL, micrometerEnv)
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
 }

@@ -8,8 +8,9 @@
 package com.chutneytesting.acceptance.tests.actions
 
 import com.chutneytesting.acceptance.common.*
-import com.chutneytesting.kotlin.dsl.ChutneyScenario
 import com.chutneytesting.kotlin.dsl.Scenario
+import com.chutneytesting.kotlin.dsl.hjsonSpEL
+import com.chutneytesting.kotlin.dsl.spEL
 
 val `Kafka basic publish wrong url failure` = Scenario(title = "Kafka basic publish wrong url failure") {
   Given("A target pointing to a non unknown service") {
@@ -19,7 +20,7 @@ val `Kafka basic publish wrong url failure` = Scenario(title = "Kafka basic publ
         [
             {
                 "name": "test_kafka",
-                "url": "tcp://unknownhost:12345"
+                "url": "tcp://$UNKNOWN_TARGET"
             }
         ]  
         """.trimIndent()
@@ -42,10 +43,10 @@ val `Kafka basic publish wrong url failure` = Scenario(title = "Kafka basic publ
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}", "KAFKA_ENV_KO")
+    executeScenario("scenarioId".spEL, "KAFKA_ENV_KO")
   }
   Then("the report status is FAILURE") {
-    checkScenarioFailure()
+    checkScenarioReportFailure()
   }
 }
 
@@ -72,27 +73,27 @@ val `Kafka basic publish success` = Scenario(title = "Kafka basic publish wrong 
             {
                 "sentence":"start server",
                 "implementation":{
-                    "task":"{\n type: kafka-broker-start \n target: test_kafka \n inputs: {\n topic: [\"a-topic\"] \n port: 9092 \n} \n}"
+                    "task":"{\n type: kafka-broker-start \n target: test_kafka \n inputs: {\n topic: ['a-topic'] \n port: 9092 \n} \n}"
                 }
             }
             ],
             "when":{
                 "sentence":"Publish to broker",
                 "implementation":{
-                    "task":"{\n type: kafka-basic-publish \n target: test_kafka \n inputs: {\n topic: a-topic \n payload: bodybuilder \n headers: {\n X-API-VERSION: \"1.0\" \n} \n} \n}"
+                    "task":"{\n type: kafka-basic-publish \n target: test_kafka \n inputs: {\n topic: a-topic \n payload: bodybuilder \n headers: {\n X-API-VERSION: '1.0' \n} \n} \n}"
                 }
             },
             "thens":[
                 {
                     "sentence":"Consume from broker",
                     "implementation":{
-                        "task":"{\n type: kafka-basic-consume \n target: test_kafka \n inputs: {\n topic: a-topic \n group: chutney \n ackMode: BATCH \n properties: {\n auto.offset.reset: earliest \n} \n} \n outputs: {\n payload : \${'$'}{#payloads[0]} \n} \n}"
+                        "task":"{\n type: kafka-basic-consume \n target: test_kafka \n inputs: {\n topic: a-topic \n group: chutney \n ackMode: BATCH \n properties: {\n auto.offset.reset: earliest \n} \n} \n outputs: {\n payload : ${"payloads[0]".hjsonSpEL} \n} \n}"
                     }
                 },
                 {
                     "sentence":"Check payload",
                     "implementation":{
-                        "task":"{\n type: string-assert \n inputs: {\n document: \${'$'}{#payload} \n expected: bodybuilder \n} \n}"
+                        "task":"{\n type: string-assert \n inputs: {\n document: ${"payload".hjsonSpEL} \n expected: bodybuilder \n} \n}"
                     }
                 }
             ]
@@ -101,9 +102,9 @@ val `Kafka basic publish success` = Scenario(title = "Kafka basic publish wrong 
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}", "KAFKA_ENV_OK")
+    executeScenario("scenarioId".spEL, "KAFKA_ENV_OK")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
 }

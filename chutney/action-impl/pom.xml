@@ -159,12 +159,6 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-broker</artifactId>
         </dependency>
-        <!-- To fix https://github.com/gpc/jms/issues/18-->
-        <!--dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-kahadb-store</artifactId>
-            <version>5.18.3</version>
-        </dependency-->
         <!-- SQL task -->
         <dependency>
             <groupId>com.zaxxer</groupId>

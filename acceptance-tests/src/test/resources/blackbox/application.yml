@@ -2,7 +2,7 @@
 #SPDX-License-Identifier: Apache-2.0
 
 server:
-  instance-name: local dev
+  instance-name: acceptance-test
   port: 8443
   http:
     port: 8080

@@ -25,7 +25,7 @@ fun `Http (verb) request wrong url`(
         [
             {
                 "name": "test_http",
-                "url": "http://localhost:12345"
+                "url": "http://$UNKNOWN_TARGET"
             }
         ]
         """.trimIndent()
@@ -45,7 +45,7 @@ fun `Http (verb) request wrong url`(
                 {
                     "sentence":"Assert http status",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#status} \n expected: 200 \n mode: not equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: ${"status".hjsonSpEL} \n expected: 200 \n mode: not equals \n} \n}"
                     }
                 }
             ]
@@ -54,10 +54,10 @@ fun `Http (verb) request wrong url`(
       )
     }
     When("The scenario is executed") {
-      executeScenario("${'$'}{#scenarioId}",environmentName)
+      executeScenario("scenarioId".spEL,environmentName)
     }
     Then("the report status is FAILURE") {
-      checkScenarioFailure()
+      checkScenarioReportFailure()
     }
   }
 }
@@ -74,7 +74,7 @@ fun `Http (verb) request local valid endpoint`(
     Given("an app providing an http interface") {
       HttpsServerStartAction(
         port = port.toString(),
-        trustStorePath = "resourcePath(\"blackbox/keystores/truststore.jks\")".spEL,
+        trustStorePath = "resourcePath('blackbox/keystores/truststore.jks')".spEL,
         trustStorePassword = "truststore",
         outputs = mapOf(
           "appServer" to "httpsServer".spEL
@@ -99,7 +99,7 @@ fun `Http (verb) request local valid endpoint`(
       """.trimIndent()
       )
     }
-    And("This scenario with sql task is saved") {
+    And("This scenario is saved") {
       createScenario("scenarioId",
         """
         {
@@ -113,7 +113,7 @@ fun `Http (verb) request local valid endpoint`(
                 {
                     "sentence":"Assert http status",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#status} \n expected: \"200\" \n mode: equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: ${"status".hjsonSpEL} \n expected: '200' \n mode: equals \n} \n}"
                     }
                 }
             ]
@@ -122,10 +122,10 @@ fun `Http (verb) request local valid endpoint`(
       )
     }
     When("The scenario is executed") {
-      executeScenario("${'$'}{#scenarioId}",environmentName)
+      executeScenario("scenarioId".spEL,environmentName)
     }
     Then("the report status is SUCCESS") {
-      checkScenarioSuccess()
+      checkScenarioReportSuccess()
     }
   }
 }

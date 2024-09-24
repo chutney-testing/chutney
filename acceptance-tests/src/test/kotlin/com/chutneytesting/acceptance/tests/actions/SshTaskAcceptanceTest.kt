@@ -19,7 +19,7 @@ fun `Scenario execution unable to login, status SUCCESS and command stderr`(): C
         [
             {
                 "name": "test_ssh",
-                "url": "ssh://host.testcontainers.internal:12345",
+                "url": "ssh://$UNKNOWN_TARGET",
                 "properties": [
                     { "key" : "username", "value": "user" },
                     { "key" : "password", "value": "wrongpass" }
@@ -46,10 +46,10 @@ fun `Scenario execution unable to login, status SUCCESS and command stderr`(): C
       )
     }
     When("The scenario is executed") {
-      executeScenario("${'$'}{#scenarioId}", "SSH_ENV_KO")
+      executeScenario("scenarioId".spEL, "SSH_ENV_KO")
     }
     Then("the report status is FAILURE") {
-      checkScenarioFailure()
+      checkScenarioReportFailure()
     }
   }
 }
@@ -70,7 +70,7 @@ fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
         [
             {
                 "name": "test_ssh",
-                "url": "ssh://${'$'}{#sshServer.host()}:${'$'}{#sshServer.port()}",
+                "url": "ssh://${"sshServer.host()".spEL}:${"sshServer.port()".spEL}",
                 "properties": [
                     { "key" : "username", "value": "test" },
                     { "key" : "password", "value": "test" }
@@ -98,13 +98,13 @@ fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
                         {
                             "sentence": "Assert first command",
                             "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#results.get(0).command.command} \n expected: echo test \n mode: equals \n} \n}"
+                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(0).command.command".hjsonSpEL} \n expected: echo test \n mode: equals \n} \n}"
                             }
                         },
                         {
                             "sentence": "Assert first command timeout",
                             "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#results.get(0).command.timeout.toString()} \n expected: 500 ms \n mode: equals \n} \n}"
+                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(0).command.timeout.toString()".hjsonSpEL} \n expected: 500 ms \n mode: equals \n} \n}"
                             }
                         },
                         {
@@ -116,25 +116,25 @@ fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
                         {
                             "sentence": "Assert first command stdout",
                             "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#results.get(0).stdout} \n expected: \"\" \n mode: equals \n} \n}"
+                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(0).stdout".hjsonSpEL} \n expected: \"\" \n mode: equals \n} \n}"
                             }
                         },
                         {
                             "sentence": "Assert first command sterr",
                             "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#results.get(0).stderr} \n expected: \"\" \n mode: equals \n} \n}"
+                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(0).stderr".hjsonSpEL} \n expected: \"\" \n mode: equals \n} \n}"
                             }
                         },
                         {
                             "sentence": "Assert second command",
                             "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#results.get(1).command.command} \n expected: echo testbis \n mode: equals \n} \n}"
+                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(1).command.command".hjsonSpEL} \n expected: echo testbis \n mode: equals \n} \n}"
                             }
                         },
                         {
                             "sentence": "Assert second command timeout",
                             "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#results.get(1).command.timeout.toString()} \n expected: 5000 ms \n mode: equals \n} \n}"
+                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(1).command.timeout.toString()".hjsonSpEL} \n expected: 5000 ms \n mode: equals \n} \n}"
                             }
                         },
                         {
@@ -146,13 +146,13 @@ fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
                         {
                             "sentence": "Assert second command stdout",
                             "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#results.get(1).stdout} \n expected: \"\" \n mode: equals \n} \n}"
+                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(1).stdout".hjsonSpEL} \n expected: \"\" \n mode: equals \n} \n}"
                             }
                         },
                         {
                             "sentence": "Assert second command sterr",
                             "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#results.get(1).stderr} \n expected: \"\" \n mode: equals \n} \n}"
+                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(1).stderr".hjsonSpEL} \n expected: \"\" \n mode: equals \n} \n}"
                             }
                         }
                     ]
@@ -163,10 +163,10 @@ fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
       )
     }
     When("The scenario is executed") {
-      executeScenario("${'$'}{#scenarioId}", "SSH_ENV_OK")
+      executeScenario("scenarioId".spEL, "SSH_ENV_OK")
     }
     Then("the report status is SUCCESS") {
-      checkScenarioSuccess()
+      checkScenarioReportSuccess()
     }
     And("the SSHD server has received the commands") {
       Step("Check first command"){

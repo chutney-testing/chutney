@@ -9,20 +9,16 @@ package com.chutneytesting.acceptance
 
 import com.chutneytesting.acceptance.tests.*
 import com.chutneytesting.acceptance.tests.actions.*
-import com.chutneytesting.acceptance.tests.`We receive a network configuration to persist`
 import com.chutneytesting.acceptance.tests.edition.*
 import com.chutneytesting.acceptance.tests.engine.*
-import com.chutneytesting.acceptance.tests.`Add and remove user to-from an existing role`
-import com.chutneytesting.acceptance.tests.`Declare a new role with its authorizations`
 import com.chutneytesting.kotlin.dsl.ChutneyEnvironment
 import com.chutneytesting.kotlin.dsl.ChutneyTarget
 import com.chutneytesting.kotlin.launcher.Launcher
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
 import com.chutneytesting.kotlin.util.HttpClient
 import com.chutneytesting.tools.SocketUtils
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
+import org.junit.jupiter.params.ParameterizedTest
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.MountableFile
@@ -57,16 +53,18 @@ class AcceptanceTests {
       chutneyServer = GenericContainer<Nothing>("ghcr.io/chutney-testing/chutney/chutney-server:latest").apply {
         withStartupTimeout(Duration.ofSeconds(80))
         withExposedPorts(
-            8443, // Chutney
+          8443, // Chutney
         )
         withNetwork(network)
         withCopyFileToContainer(
-            MountableFile.forClasspathResource("/blackbox/"),
-            "/config"
+          MountableFile.forClasspathResource("/blackbox/"),
+          "/config"
         )
       }
       actionHttpPort = SocketUtils.freePortFromSystem()
-      actionAmqpPort = 5672
+      actionAmqpPort = SocketUtils.freePortFromSystem()
+      System.setProperty("qpid.amqp_port", actionAmqpPort.toString())
+
       actionJakartaPort = SocketUtils.freePortFromSystem()
       org.testcontainers.Testcontainers.exposeHostPorts(
         actionHttpPort!!,
@@ -75,16 +73,30 @@ class AcceptanceTests {
       )
 
       chutneyServer!!.start()
-      adminServerInfo = ChutneyServerInfo("https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}", "admin", "admin", null, null, null)
+      adminServerInfo = ChutneyServerInfo(
+        "https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}",
+        "admin",
+        "admin",
+        null,
+        null,
+        null
+      )
 
       // Set authorizations
       val roles = AcceptanceTests::class.java.getResource("/blackbox/roles.json")!!.path
       HttpClient.post<Any>(adminServerInfo!!, "/api/v1/authorizations", File(roles).readText())
 
-      environment = ChutneyEnvironment(name = ENVIRONMENT_NAME, targets =
-      listOf(
-          ChutneyTarget("CHUTNEY_LOCAL", "https://${chutneyServer?.host}:${chutneyServer?.getMappedPort(8443)}", mapOf("username" to "admin", "password" to "admin")),
-          ChutneyTarget("CHUTNEY_LOCAL_NO_USER", "https://${chutneyServer?.host}:${chutneyServer?.getMappedPort(8443)}", emptyMap()))
+      val mappedPort = chutneyServer?.getMappedPort(8443)
+      environment = ChutneyEnvironment(
+        name = ENVIRONMENT_NAME, targets =
+        listOf(
+          ChutneyTarget(
+            "CHUTNEY_LOCAL",
+            "https://${chutneyServer?.host}:$mappedPort",
+            mapOf("username" to "admin", "password" to "admin")
+          ),
+          ChutneyTarget("CHUTNEY_LOCAL_NO_USER", "https://${chutneyServer?.host}:$mappedPort", emptyMap())
+        )
       )
     }
 
@@ -94,66 +106,97 @@ class AcceptanceTests {
       chutneyServer?.stop()
     }
   }
-
-  @Test
+  
   fun `Execution by campaign id with 2 scenarios`() {
-    Launcher().run(executeCampaignById, environment)
-    Launcher().run(executeCampaignByName, environment)
-    Launcher().run(executeForSurefireReport, environment)
-    Launcher().run(unknownCampaignById, environment)
-    Launcher().run(unknownCampaignByName, environment)
+    listOf(
+      executeCampaignById,
+      executeCampaignByName,
+      executeForSurefireReport,
+      unknownCampaignById,
+      unknownCampaignByName
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Support testcase edition metadata`() {
-    Launcher().run(readTestCaseMetadataScenario, environment)
-    Launcher().run(readTestCaseAfterUpdateScenario, environment)
-    Launcher().run(updateTestCaseWithBadVersionScenario, environment)
+    listOf(
+      readTestCaseMetadataScenario,
+      readTestCaseAfterUpdateScenario,
+      updateTestCaseWithBadVersionScenario
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Support testcase editions`() {
-    Launcher().run(`Request testcase edition`, environment)
-    Launcher().run(`Request for a second time testcase edition`, environment)
-    Launcher().run(`End testcase edition`, environment)
-    Launcher().run(`Edition time to live`, environment)
+    listOf(
+      `Request testcase edition`,
+      `Request for a second time testcase edition`,
+      `End testcase edition`,
+      `Edition time to live`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `SQL Task test`() {
-    Launcher().run(`Sql query success`, environment)
-    Launcher().run(`Sql query wrong table`, environment)
+    listOf(
+      `Sql query success`,
+      `Sql query wrong table`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Success feature`() {
-    Launcher().run(`Direct Success`, environment)
-    Launcher().run(`Substeps Success`, environment)
+    listOf(
+      `Direct Success`,
+      `Substeps Success`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Amqp feature`() {
-    Launcher().run(`amqp test all steps`, environment)
+    Launcher().run(`amqp test all steps`(actionAmqpPort!!), environment)
   }
 
   @Test
   fun `Kafka all Tasks test`() {
-    Launcher().run(`Kafka basic publish wrong url failure`, environment)
-    Launcher().run(`Kafka basic publish success`, environment)
+    listOf(
+      `Kafka basic publish wrong url failure`,
+      `Kafka basic publish success`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Roles declarations and users associations`() {
-    Launcher().run(`Declare a new role with its authorizations`, environment)
-    Launcher().run(`Add and remove user to-from an existing role`, environment)
+    listOf(
+      `Declare a new role with its authorizations`,
+      `Add and remove user to-from an existing role`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Execution success action`() {
-    Launcher().run(`Action instantiation and execution of a success scenario`, environment)
-    Launcher().run(`Task instantiation and execution of a failed scenario`, environment)
-    Launcher().run(`Task instantiation and execution of a sleep scenario`, environment)
-    Launcher().run(`Task instantiation and execution of a debug scenario`, environment)
+    listOf(
+      `Action instantiation and execution of a success scenario`,
+      `Task instantiation and execution of a failed scenario`,
+      `Task instantiation and execution of a sleep scenario`,
+      `Task instantiation and execution of a debug scenario`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
@@ -163,19 +206,23 @@ class AcceptanceTests {
 
   @Test
   fun `Execution with jsonPath function`() {
-    Launcher().run(`Scenario execution with simple json value extraction`, environment)
-    Launcher().run(`Scenario execution with multiple json value extraction`, environment)
-    Launcher().run(`Scenario execution with json object value extraction`, environment)
+    listOf(
+      `Scenario execution with simple json value extraction`,
+      `Scenario execution with multiple json value extraction`,
+      `Scenario execution with json object value extraction`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Execution retry strategy`() {
-    Launcher().run( `Retry should stop after success assertion`, environment)
+    Launcher().run(`Retry should stop after success assertion`, environment)
   }
 
   @Test
   fun `Replace scenario parameters with data set or global var values`() {
-    Launcher().run( `Execute gwt scenario with global vars`, environment)
+    Launcher().run(`Execute gwt scenario with global vars`, environment)
   }
 
   @Test
@@ -183,15 +230,19 @@ class AcceptanceTests {
     listOf(
       Pair("debug", "[[{\"name\": \"filters\",\"type\": \"java.util.List\"}]]"),
       Pair("assert", "[[{\"name\": \"asserts\",\"type\": \"java.util.List\"}]]"),
-      Pair("compare", "[[{\"name\": \"actual\",\"type\": \"java.lang.String\"},{\"name\": \"expected\",\"type\": \"java.lang.String\"},{\"name\": \"mode\",\"type\": \"java.lang.String\"}]]")
+      Pair(
+        "compare",
+        "[[{\"name\": \"actual\",\"type\": \"java.lang.String\"},{\"name\": \"expected\",\"type\": \"java.lang.String\"},{\"name\": \"mode\",\"type\": \"java.lang.String\"}]]"
+      )
     ).forEach {
-      Launcher().run( `Retrieve action action-id from all actions and by identifier`(it.first, it.second), environment)
+      Launcher().run(`Retrieve action action-id from all actions and by identifier`(it.first, it.second), environment)
     }
 
   }
+
   @Test
   fun `HTTP server Task test`() {
-    Launcher().run( `Http post request local server endpoint`, environment)
+    Launcher().run(`Http post request local server endpoint`, environment)
   }
 
   @Test
@@ -202,7 +253,7 @@ class AcceptanceTests {
       Pair("POST", "uri: /notused  body: cool buddy"),
       Pair("PUT", "uri: /notused body: cool buddy"),
     ).forEach {
-      Launcher().run( `Http (verb) request wrong url`(it.first, it.second), environment)
+      Launcher().run(`Http (verb) request wrong url`(it.first, it.second), environment)
     }
 
     listOf(
@@ -211,65 +262,84 @@ class AcceptanceTests {
       Pair("POST", "uri: /mock/post  body: cool buddy"),
       Pair("PUT", "uri: /mock/put body: cool buddy"),
     ).forEach {
-      Launcher().run( `Http (verb) request local valid endpoint`(it.first, it.second, actionHttpPort!!), environment)
+      Launcher().run(`Http (verb) request local valid endpoint`(it.first, it.second, actionHttpPort!!), environment)
     }
   }
 
   @Test
   fun `Micrometer Tasks test`() {
-    Launcher().run( `Micrometer counter meter`, environment)
-    Launcher().run( `Micrometer timer meter`, environment)
-    Launcher().run( `Micrometer timer meter with start and stop`, environment)
-    Launcher().run( `Micrometer gauge meter`, environment)
-    Launcher().run( `Micrometer distribution summary meter`, environment)
+    listOf(
+      `Micrometer counter meter`,
+      `Micrometer timer meter`,
+      `Micrometer timer meter with start and stop`,
+      `Micrometer gauge meter`,
+      `Micrometer distribution summary meter`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Assertions Task test`() {
-    Launcher().run( `Execution by UI controller`, environment)
-    Launcher().run( `All in one assertions`, environment)
-    Launcher().run( `Test xsd actions`, environment)
+    listOf(
+      `Execution by UI controller`,
+      `All in one assertions`,
+      `Test xsd actions`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Final action for registering final actions for a testcase`() {
-    Launcher().run( `Register simple success action`, environment)
-    Launcher().run( `Register multiple actions with one complex, ie with inputs and strategy`, environment)
-    Launcher().run( `Register final action with validations on outputs`, environment)
+    listOf(
+      `Register simple success action`,
+      `Register multiple actions with one complex, ie with inputs and strategy`,
+      `Register final action with validations on outputs`
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Jms Task test`() {
-    Launcher().run( `Jms sender then clean then send and listen it on embedded broker`(), environment)
+    Launcher().run(`Jms sender then clean then send and listen it on embedded broker`(), environment)
     listOf(
       Pair("sender", "destination: test \\n body: something"),
       Pair("clean-queue", "destination: test \\n bodySelector: selector"),
       Pair("listener", "destination: test \\n bodySelector: selector")
     ).forEach {
-      Launcher().run( `Jms jmsAction wrong url`(it.first, it.second), environment)
+      Launcher().run(`Jms jmsAction wrong url`(it.first, it.second), environment)
     }
   }
 
   @Test
   fun `Jakarta Task test`() {
-    Launcher().run( `Jakarta sender then clean then send and listen it on embedded broker`(actionJakartaPort!!), environment)
+    Launcher().run(
+      `Jakarta sender then clean then send and listen it on embedded broker`(actionJakartaPort!!),
+      environment
+    )
     listOf(
       Pair("sender", "destination: test \\n body: something"),
       Pair("clean", "destination: test \\n bodySelector: selector"),
       Pair("listener", "destination: test \\n bodySelector: selector")
     ).forEach {
-      Launcher().run( `Jakarta actionInputs wrong url`(it.first, it.second), environment)
+      Launcher().run(`Jakarta actionInputs wrong url`(it.first, it.second), environment)
     }
   }
 
   @Test
   fun `SSH Task test`() {
-    Launcher().run( `Scenario execution unable to login, status SUCCESS and command stderr`(), environment)
-    Launcher().run(`Scenario execution with multiple ssh action`(), environment)
+    listOf(
+      `Scenario execution unable to login, status SUCCESS and command stderr`(),
+      `Scenario execution with multiple ssh action`()
+    ).forEach {
+      Launcher().run(it, environment)
+    }
   }
 
   @Test
   fun `Agent test`() {
-    Launcher().run( `We receive a network configuration to persist`(), environment)
+    Launcher().run(`We receive a network configuration to persist`(), environment)
   }
 }

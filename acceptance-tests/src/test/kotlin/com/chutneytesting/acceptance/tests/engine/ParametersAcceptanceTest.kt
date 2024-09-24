@@ -7,13 +7,10 @@
 
 package com.chutneytesting.acceptance.tests.engine
 
-import com.chutneytesting.acceptance.common.checkScenarioSuccess
+import com.chutneytesting.acceptance.common.checkScenarioReportSuccess
 import com.chutneytesting.acceptance.common.executeScenario
 import com.chutneytesting.acceptance.common.jsonHeader
-import com.chutneytesting.kotlin.dsl.HttpPostAction
-import com.chutneytesting.kotlin.dsl.Scenario
-import com.chutneytesting.kotlin.dsl.spEL
-import com.chutneytesting.kotlin.dsl.statusValidation
+import com.chutneytesting.kotlin.dsl.*
 
 val `Execute gwt scenario with global vars` = Scenario(title = "Execute gwt scenario with global vars") {
   Given("Global variables defined in global_var") {
@@ -100,7 +97,7 @@ val `Execute gwt scenario with global vars` = Scenario(title = "Execute gwt scen
                                         "type": "compare",
                                         "inputs": {
                                             "mode": "equals",
-                                            "actual": "\${'$'}{#slash}",
+                                            "actual": "${"slash".hjsonSpEL}",
                                             "expected": "line with slash as url http:\/\/host:port\/path"
                                         }
                                     }
@@ -110,7 +107,7 @@ val `Execute gwt scenario with global vars` = Scenario(title = "Execute gwt scen
                                         "type": "compare",
                                         "inputs": {
                                             "mode": "equals",
-                                            "actual": "\${'$'}{#apostrophe}",
+                                            "actual": "${"apostrophe".hjsonSpEL}",
                                             "expected": "line with apostrophe '"
                                         }
                                     }
@@ -120,7 +117,7 @@ val `Execute gwt scenario with global vars` = Scenario(title = "Execute gwt scen
                                         "type": "compare",
                                         "inputs": {
                                             "mode": "equals",
-                                            "actual": "\${'$'}{#quote}",
+                                            "actual": "${"quote".hjsonSpEL}",
                                             "expected": "line with quote \""
                                         }
                                     }
@@ -130,7 +127,7 @@ val `Execute gwt scenario with global vars` = Scenario(title = "Execute gwt scen
                                         "type": "compare",
                                         "inputs": {
                                             "mode": "equals",
-                                            "actual": "\${'$'}{#backslash}",
+                                            "actual": "${"backslash".hjsonSpEL}",
                                             "expected": "line with backslash \\"
                                         }
                                     }
@@ -149,9 +146,9 @@ val `Execute gwt scenario with global vars` = Scenario(title = "Execute gwt scen
     )
   }
   When("The scenario is executed") {
-    executeScenario("${'$'}{#scenarioId}", "DEFAULT")
+    executeScenario("scenarioId".spEL, "DEFAULT")
   }
   Then("the report status is SUCCESS") {
-    checkScenarioSuccess()
+    checkScenarioReportSuccess()
   }
 }

@@ -8,10 +8,7 @@
 package com.chutneytesting.acceptance.tests.actions
 
 import com.chutneytesting.acceptance.common.*
-import com.chutneytesting.kotlin.dsl.ChutneyScenario
-import com.chutneytesting.kotlin.dsl.DebugAction
-import com.chutneytesting.kotlin.dsl.JakartaBrokerStartAction
-import com.chutneytesting.kotlin.dsl.Scenario
+import com.chutneytesting.kotlin.dsl.*
 
 
 fun `Jakarta actionInputs wrong url`(
@@ -27,7 +24,7 @@ fun `Jakarta actionInputs wrong url`(
         [
           {
               "name": "test_jakarta",
-              "url": "tcp://localhost:11111",
+              "url": "tcp://$UNKNOWN_TARGET",
               "properties": [
                   {
                       "key": "java.naming.factory.initial",
@@ -54,7 +51,7 @@ fun `Jakarta actionInputs wrong url`(
                 {
                     "sentence":"Assert http status",
                     "implementation":{
-                        "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{#status} \n expected: 200 \n mode: not equals \n} \n}"
+                        "task":"{\n type: compare \n inputs: {\n actual: ${"status".hjsonSpEL} \n expected: 200 \n mode: not equals \n} \n}"
                     }
                 }
             ]
@@ -63,10 +60,10 @@ fun `Jakarta actionInputs wrong url`(
       )
     }
     When("The scenario is executed") {
-      executeScenario("${'$'}{#scenarioId}", environmentName)
+      executeScenario("scenarioId".spEL, environmentName)
     }
     Then("the report status is FAILURE") {
-      checkScenarioFailure()
+      checkScenarioReportFailure()
     }
   }
 }
@@ -100,7 +97,7 @@ fun `Jakarta sender then clean then send and listen it on embedded broker`(
       """.trimIndent()
       )
     }
-    And("This scenario with sql task is saved") {
+    And("This scenario is saved") {
       createScenario(
         "scenarioId",
         """
@@ -133,7 +130,7 @@ fun `Jakarta sender then clean then send and listen it on embedded broker`(
                 {
                     "sentence":"Check jakarta message",
                     "implementation":{
-                        "task":"{\n type: string-assert \n inputs: {\n document: \${'$'}{#textMessage} \n expected: message to catch \n} \n}"
+                        "task":"{\n type: string-assert \n inputs: {\n document: ${"textMessage".hjsonSpEL} \n expected: message to catch \n} \n}"
                     }
                 }
             ]
@@ -142,10 +139,10 @@ fun `Jakarta sender then clean then send and listen it on embedded broker`(
       )
     }
     When("The scenario is executed") {
-      executeScenario("${'$'}{#scenarioId}", "JAKARTA_ENV_OK")
+      executeScenario("scenarioId".spEL, "JAKARTA_ENV_OK")
     }
     Then("the report status is SUCCESS") {
-      checkScenarioSuccess()
+      checkScenarioReportSuccess()
     }
   }
 }
