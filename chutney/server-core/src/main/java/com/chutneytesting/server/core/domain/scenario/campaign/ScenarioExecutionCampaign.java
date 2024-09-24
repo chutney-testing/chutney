@@ -12,12 +12,17 @@ import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus
 import com.chutneytesting.server.core.domain.tools.DatasetUtils;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.function.Predicate;
 
 public record ScenarioExecutionCampaign(
     String scenarioId,
     String scenarioName,
     ExecutionHistory.ExecutionSummary execution
 ) {
+
+    public static Predicate<ScenarioExecutionCampaign> isRunning() {
+        return sec -> ServerReportStatus.RUNNING.equals(sec.status());
+    }
 
     public ServerReportStatus status() {
         return execution.status();
