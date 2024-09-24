@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class DatasetUtils {
 
     public static boolean compareDataset(DataSet dataset1, DataSet dataset2) {
-        if (dataset1 == null && dataset2 == null) {
+        if ((dataset1 == null || DataSet.NO_DATASET.equals(dataset1)) && (dataset2 == null || DataSet.NO_DATASET.equals(dataset2))) {
             return true;
         } else if (dataset1 == null || dataset2 == null) {
             return false;
