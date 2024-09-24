@@ -5,11 +5,11 @@
  *
  */
 
-import { Component, inject, Input, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup } from '@angular/forms';
-import { JiraDatasetLinks, JiraScenarioLinks, ScenarioIndex } from '@core/model';
-import { JiraPluginService } from '@core/services';
-import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import {Component, inject, Input, OnInit} from '@angular/core';
+import {FormArray, FormBuilder, FormGroup} from '@angular/forms';
+import {JiraDatasetLinks, JiraScenarioLinks, ScenarioIndex} from '@core/model';
+import {JiraPluginService} from '@core/services';
+import {NgbActiveModal} from '@ng-bootstrap/ng-bootstrap';
 
 
 @Component({
@@ -78,7 +78,7 @@ export class ScenarioJiraLinksModalComponent implements OnInit {
     }
 
     selectDataset(dataset: string,index: number) {
-        this.datasetForm["controls"][index].get("id").setValue(dataset);
+        this.datasetForm["controls"][index].get("datasetId").setValue(dataset);
     }
 
     getJiraLink(id: string) {
