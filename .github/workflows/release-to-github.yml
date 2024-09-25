@@ -10,7 +10,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/templates/build-all-template.yml
+    uses: ./.github/workflows/build-all-template.yml
     with:
       skipTests: true
       cache-artifacts: |
@@ -20,11 +20,11 @@ jobs:
 
   release-github:
     needs: [ build ]
-    uses: ./.github/workflows/templates/release-github-template.yml
+    uses: ./.github/workflows/release-github-template.yml
 
   release-docker:
     needs: [ build ]
-    uses: ./.github/workflows/templates/release-docker-template.yml
+    uses: ./.github/workflows/release-docker-template.yml
     with:
       version: ${{needs.build.outputs.PROJECT_VERSION}}
     secrets:
