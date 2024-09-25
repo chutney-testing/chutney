@@ -338,10 +338,8 @@ Use it to update [CHANGELOG.md](https://github.com/chutney-testing/chutney/blob/
 git switch -c release/<RELEASE_VERSION>
 git add CHANGELOG.md (see Update Changelog file section)
 Update manually `chutneyVersion`  in [idea-plugin/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/idea-plugin/gradle.properties)
-Update manually `chutneyVersion`  in [kotlin-dsl/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/kotlin-dsl/gradle.properties)
-mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
-mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
-mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false -f example/pom.xml
+mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
+mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false
 git add .
 git diff --staged
 git commit -m "chore: Release <RELEASE_VERSION>"
@@ -383,10 +381,8 @@ In order to effectively release artifacts :
 
 ```shell
 Update manually `chutneyVersion`  in [idea-plugin/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/idea-plugin/gradle.properties)
-Update manually `chutneyVersion`  in [kotlin-dsl/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/kotlin-dsl/gradle.properties)
-mvn versions:set -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
-mvn versions:set-scm-tag -DnewTag=HEAD -DgenerateBackupPoms=false -f chutney/pom.xml
-mvn versions:set -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false -f example/pom.xml
+mvn versions:set -DnewVersion=<NEXT_DEV_VERSION> -DgenerateBackupPoms=false
+mvn versions:set-scm-tag -DnewTag=HEAD -DgenerateBackupPoms=false
 git diff HEAD
 git add . && git commit -m "chore: Prepare next development <NEXT_DEV_VERSION>"
 git push origin
@@ -407,10 +403,8 @@ git push origin
 git switch -c release/<RELEASE_VERSION>
 git add CHANGELOG.md (see Update Changelog file section)
 Update manually `chutneyVersion`  in [idea-plugin/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/idea-plugin/gradle.properties)
-Update manually `chutneyVersion`  in [kotlin-dsl/gradle.properties](https://github.com/chutney-testing/chutney/blob/main/kotlin-dsl/gradle.properties)
-mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
-mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false -f chutney/pom.xml
-mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false -f example/pom.xml
+mvn versions:set -DnewVersion=<RELEASE_VERSION> -DgenerateBackupPoms=false
+mvn versions:set-scm-tag -DnewTag=<RELEASE_VERSION> -DgenerateBackupPoms=false
 git add .
 git diff --staged
 git commit -m "chore: Release <RELEASE_VERSION>"
@@ -430,8 +424,8 @@ Create a new maven module with _chutney-parent_ as parent.
 And name your module such as _chutney-task-\[task-name\]_
   ```xml
   <parent>
-      <artifactId>chutney-parent</artifactId>
       <groupId>com.chutneytesting</groupId>
+      <artifactId>chutney-parent</artifactId>
   </parent>
   ```
 
