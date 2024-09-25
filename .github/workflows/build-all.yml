@@ -11,7 +11,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/build-all-template.yml
+    uses: ./.github/workflows/templates/build-all-template.yml
     with:
       skipTests: ${{ startsWith(github.head_ref, 'release/') }}
     secrets:

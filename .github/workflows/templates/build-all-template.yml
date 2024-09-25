@@ -79,7 +79,7 @@ jobs:
       - uses: actions/checkout@v4
       - name: Retrieve chutney version from pom.xml
         id: get-version
-        run: cd ./chutney && echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT && cd ..
+        run: echo "PROJECT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_OUTPUT && cd ..
 
       - name: Resolve chutney maven goal from inputs
         id: chutney-goals
@@ -117,45 +117,6 @@ jobs:
             -Dversion=${{steps.get-version.outputs.PROJECT_VERSION}} \
             -Dpackaging=jar
 
-      - name: Resolve dsl gradle goal from inputs
-        id: dsl-goals
-        run: |
-          skipTestArg=""
-          gradleGoals="clean build"
-          if  ${{ inputs.skipTests }}; then
-            skipTestArg="-x test"
-          fi
-          if ${{ inputs.release }}; then
-            gradleGoals="publish -Pserver-id=${{inputs.server-id}}"
-            skipTestArg="-x test"
-          
-          fi
-          echo "DSL_GOALS=$gradleGoals $skipTestArg" >> $GITHUB_OUTPUT
-
-      - name: Build DSL
-        uses: ./.github/actions/build-dsl
-        env:
-          MAVEN_USERNAME: ${{secrets.maven-username}}
-          MAVEN_PASSWORD: ${{secrets.maven-password}}
-          CHUTNEY_GPG_KEY_ID: ${{ secrets.gpg-key-id }}
-          CHUTNEY_GPG_KEY: ${{ secrets.gpg-private-key }}
-          CHUTNEY_GPG_PASSPHRASE: ${{ secrets.gpg-passphrase }}
-        with:
-          goals: ${{steps.dsl-goals.outputs.DSL_GOALS}}
-          cache-artifacts: ${{ inputs.cache-artifacts }}
-
-      - name: Build acceptance tests
-        if: ${{! inputs.release}}
-        id: build-acceptance-tests
-        uses: ./.github/actions/build-acceptance-tests
-
-      - name: Build Example
-        if: ${{! inputs.release}}
-        id: build-example
-        uses: ./.github/actions/build-example
-        with:
-          goals: ${{steps.chutney-goals.outputs.CHUTNEY_GOALS}}
-          cache-artifacts: ${{ inputs.cache-artifacts }}
 
       - name: Resolve plugin gradle goal from inputs
         if: ${{! inputs.release}}

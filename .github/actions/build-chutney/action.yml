@@ -1,8 +1,8 @@
 #SPDX-FileCopyrightText: 2017-2024 Enedis
 #SPDX-License-Identifier: Apache-2.0
 
-name: 'build chutney'
-description: 'build chutney'
+name: 'build chutney-testing parent'
+description: 'build chutney-testing parent'
 inputs:
   goals:
     default: "clean install -V -B"
@@ -36,13 +36,11 @@ runs:
       run: |
         echo -e "$(ip addr show eth0 | grep "inet\b" | awk '{print $2}' | cut -d/ -f1)\t$(hostname -f) $(hostname -s)" | sudo tee -a /etc/hosts
 
-    - name: Build Chutney
+    - name: Build chutney-testing parent
       shell: bash
       run: |
-        cd ./chutney
         echo "Running: ${{inputs.goals}}"
         mvn ${{ inputs.goals }}
-        cd ..
 
     - name: Codecov
       if: ${{ ! contains(inputs.goals, '-DskipTests') }}
