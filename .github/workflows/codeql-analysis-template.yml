@@ -8,7 +8,8 @@ on:
     inputs:
       project-dir:
         type: string
-        required: true
+        default: ""
+        required: false
         description: "sourcecode root directory"
       language:
         type: string
