@@ -1,0 +1,162 @@
+<?xml version="1.0"?>
+<!--
+  ~ SPDX-FileCopyrightText: 2017-2024 Enedis
+  ~
+  ~ SPDX-License-Identifier: Apache-2.0
+  ~
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.chutneytesting</groupId>
+  <artifactId>acceptance-tests</artifactId>
+  <version>2.9.1-SNAPSHOT</version>
+  <description>A GitHub project template to help you start with Chutney Kotlin DSL</description>
+
+  <licenses>
+    <license>
+      <name>Apache-2.0</name>
+      <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+
+    <kotlin.compiler.languageVersion>1.9</kotlin.compiler.languageVersion>
+    <kotlin.compiler.apiVersion>1.9</kotlin.compiler.apiVersion>
+    <kotlin.compiler.jvmTarget>${maven.compiler.target}</kotlin.compiler.jvmTarget>
+    <kotlin.version>1.9.25</kotlin.version>
+
+    <chutney.version>${project.version}</chutney.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-bom</artifactId>
+        <version>${kotlin.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.chutneytesting</groupId>
+        <artifactId>chutney-parent</artifactId>
+        <version>${chutney.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>com.chutneytesting</groupId>
+        <artifactId>chutney-kotlin-dsl</artifactId>
+        <version>${chutney.version}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jetbrains.kotlin</groupId>
+      <artifactId>kotlin-stdlib</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.chutneytesting</groupId>
+      <artifactId>chutney-kotlin-dsl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>testcontainers</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.testcontainers</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-params</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <sourceDirectory>${project.basedir}/src/main/kotlin</sourceDirectory>
+    <testSourceDirectory>${project.basedir}/src/test/kotlin</testSourceDirectory>
+
+    <plugins>
+      <plugin>
+        <groupId>org.jetbrains.kotlin</groupId>
+        <artifactId>kotlin-maven-plugin</artifactId>
+        <version>${kotlin.version}</version>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>test-compile</id>
+            <goals>
+              <goal>test-compile</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <id>default-test</id>
+            <phase>test</phase>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <configuration>
+              <systemPropertyVariables>
+                <chutney.engine.stepAsTest>false</chutney.engine.stepAsTest>
+                <http.proxyHost>${http.proxyHost}</http.proxyHost>
+                <http.proxyPort>${http.proxyHost}</http.proxyPort>
+                <http.nonProxyHosts>${http.nonProxyHosts}</http.nonProxyHosts>
+                <https.proxyHost>${https.proxyHost}</https.proxyHost>
+                <https.proxyPort>${https.proxyHost}</https.proxyPort>
+                <https.nonProxyHosts>${https.nonProxyHosts}</https.nonProxyHosts>
+              </systemPropertyVariables>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <!-- Has to be after the default-test surefire execution declaration -->
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>3.2.0</version>
+        <executions>
+          <execution>
+            <id>chutney-test-report</id>
+            <phase>test</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <mainClass>com.chutneytesting.kotlin.execution.report.SiteGeneratorMain</mainClass>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

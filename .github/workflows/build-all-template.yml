@@ -144,6 +144,11 @@ jobs:
           goals: ${{steps.dsl-goals.outputs.DSL_GOALS}}
           cache-artifacts: ${{ inputs.cache-artifacts }}
 
+      - name: Build acceptance tests
+        if: ${{! inputs.release}}
+        id: build-acceptance-tests
+        uses: ./.github/actions/build-acceptance-tests
+
       - name: Build Example
         if: ${{! inputs.release}}
         id: build-example

@@ -15,7 +15,7 @@
     <groupId>com.chutneytesting</groupId>
     <artifactId>example</artifactId>
     <version>2.9.1-SNAPSHOT</version>
-    <description>A GitHub project template to help you start with Chutney Kotlin DSL</description>
+    <description>Example of scenarios written with chutney kotlin dsl</description>
 
     <licenses>
         <license>

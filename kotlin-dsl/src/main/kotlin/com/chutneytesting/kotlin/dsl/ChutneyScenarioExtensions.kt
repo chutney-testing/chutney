@@ -12,6 +12,8 @@ val String.spELVar: String
     get() = "#$this"
 val String.spEL: String
     get() = "\${#$this}"
+val String.hjsonSpEL: String
+    get() = "\\\${#$this}"
 
 @Deprecated("Duplicate", ReplaceWith("spEL()"))
 fun String.spELString(): String = "\${#$this}"

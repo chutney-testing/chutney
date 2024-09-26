@@ -109,8 +109,7 @@ class ExecutionServiceTest {
         )
         val scenario = Scenario(title = "scenario with for") {
             When("<i> step description - \${#key1} - \${#key2}", strategy = ForStrategy()) {
-                SuccessAction(
-                )
+                SuccessAction()
             }
         }
         val sut = ExecutionService()

@@ -323,7 +323,7 @@ fun ChutneyStepBuilder.AmqpCleanQueuesAction(
  * Finally action registered : QpidServerStopAction
  */
 fun ChutneyStepBuilder.QpidServerStartAction(
-    initConfig: String,
+    initConfig: String? = null,
     outputs: Map<String, Any> = mapOf(),
     validations: Map<String, Any> = mapOf()
 ) {
@@ -716,11 +716,11 @@ fun statusValidation(statusCode: Int) = "status_ok" to "#status.equals($statusCo
  */
 fun ChutneyStepBuilder.HttpsServerStartAction(
     port: String?,
-    trustStorePath: String?,
-    trustStorePassword: String?,
-    keyStorePath: String?,
-    keyStorePassword: String?,
-    keyPassword: String?,
+    trustStorePath: String? = null,
+    trustStorePassword: String? = null,
+    keyStorePath: String? = null,
+    keyStorePassword: String? = null,
+    keyPassword: String? = null,
     outputs: Map<String, Any> = mapOf(),
     validations: Map<String, Any> = mapOf()
 ) {
@@ -1008,9 +1008,6 @@ fun ChutneyStepBuilder.JmsCleanQueuesAction(
 fun ChutneyStepBuilder.JmsCleanQueueAction(
     target: String,
     destination: String,
-    selector: String? = null,
-    bodySelector: String? = null,
-    browserMaxDepth: Int? = null,
     timeOut: String? = null,
     outputs: Map<String, Any> = mapOf(),
     validations: Map<String, Any> = mapOf(),
@@ -1021,9 +1018,6 @@ fun ChutneyStepBuilder.JmsCleanQueueAction(
         target = target,
         inputs = listOf(
             "destination" to destination,
-            "selector" to selector,
-            "bodySelector" to bodySelector,
-            "browserMaxDepth" to browserMaxDepth,
             "timeOut" to timeOut
         ).notEmptyToMap(),
         outputs = outputs,
@@ -1864,7 +1858,7 @@ fun ChutneyStepBuilder.KafkaBrokerStartAction(
     validations: Map<String, Any> = mapOf()
 ) {
     implementation = ChutneyStepImpl(
-        type = "kafka-broker-start-consume",
+        type = "kafka-broker-start",
         inputs = listOf(
             "port" to port,
             "topics" to topics,
@@ -2159,6 +2153,112 @@ fun ChutneyStepBuilder.RadiusAccountingAction(
         validations = validations
     )
     if (strategy != null) this.strategy = strategy
+}
+
+/**
+ * On a jakarta target, consume all messages from a queue
+ */
+fun ChutneyStepBuilder.JakartaCleanQueueAction(
+    target: String,
+    destination: String,
+    timeOut: String? = null,
+    outputs: Map<String, Any> = mapOf(),
+    validations: Map<String, Any> = mapOf(),
+    strategy: Strategy? = null
+) {
+    implementation = ChutneyStepImpl(
+        type = "jakarta-clean-queue",
+        target = target,
+        inputs = listOf(
+            "destination" to destination,
+            "timeOut" to timeOut
+        ).notEmptyToMap(),
+        outputs = outputs,
+        validations = validations
+    )
+    if (strategy != null) this.strategy = strategy
+}
+
+/**
+ * On a jakarta target, get TextMessage from a queue
+ * -------
+ * Outputs:
+ * - textMessage : content of the message (String)
+ */
+fun ChutneyStepBuilder.JakartaListenerAction(
+    target: String,
+    destination: String,
+    selector: String? = null,
+    bodySelector: String? = null,
+    browserMaxDepth: Int? = null,
+    timeOut: String? = null,
+    outputs: Map<String, Any> = mapOf(),
+    validations: Map<String, Any> = mapOf(),
+    strategy: Strategy? = null
+) {
+    implementation = ChutneyStepImpl(
+        type = "jakarta-listener",
+        target = target,
+        inputs = listOf(
+            "destination" to destination,
+            "selector" to selector,
+            "bodySelector" to bodySelector,
+            "browserMaxDepth" to browserMaxDepth,
+            "timeOut" to timeOut
+        ).notEmptyToMap(),
+        outputs = outputs,
+        validations = validations
+    )
+    if (strategy != null) this.strategy = strategy
+}
+
+/**
+ * On a jms target, send a message to a queue
+ */
+fun ChutneyStepBuilder.JakartaSenderAction(
+    target: String,
+    destination: String,
+    headers: Map<String, Any> = mapOf(),
+    payload: String,
+    outputs: Map<String, Any> = mapOf(),
+    validations: Map<String, Any> = mapOf(),
+    strategy: Strategy? = null
+) {
+    implementation = ChutneyStepImpl(
+        type = "jms-sender",
+        target = target,
+        inputs = listOf(
+            "destination" to destination,
+            "body" to payload,
+            "headers" to headers
+        ).notEmptyToMap(),
+        outputs = outputs,
+        validations = validations
+    )
+    if (strategy != null) this.strategy = strategy
+}
+
+/**
+ * Start a jakarta server
+ * -------
+ * Outputs:
+ * - jakartaBrokerService : instance of jms server (org.apache.activemq.artemis.core.server.ActiveMQServer)
+ * -------
+ * Finally action registered : JakartaBrokerStopAction
+ */
+fun ChutneyStepBuilder.JakartaBrokerStartAction(
+    configUri: String? = null,
+    outputs: Map<String, Any> = mapOf(),
+    validations: Map<String, Any> = mapOf()
+) {
+    implementation = ChutneyStepImpl(
+        type = "jakarta-broker-start",
+        inputs = listOf(
+            "config-uri" to configUri,
+        ).notEmptyToMap(),
+        outputs = outputs,
+        validations = validations
+    )
 }
 
 // Helpers

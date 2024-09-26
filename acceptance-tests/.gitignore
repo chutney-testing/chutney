@@ -1,0 +1,71 @@
+#SPDX-FileCopyrightText: 2017-2024 Enedis
+#SPDX-License-Identifier: Apache-2.0
+
+# Chutney files
+.chutney/
+.env/
+
+######################
+# Maven
+######################
+/log/
+**/target/
+.mvn/
+!/**/src/**/target/
+
+######################
+# Maven Wrapper
+######################
+!.mvn/wrapper/maven-wrapper.jar
+
+
+######################
+# Package Files
+######################
+*.jar
+!xsd-1.0.0.jar
+*.war
+*.ear
+*.db
+
+######################
+# Windows
+######################
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+######################
+# Mac OSX
+######################
+.DS_Store
+.svn
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+######################
+# Directories
+######################
+/bin/
+/deploy/
+
+######################
+# Logs
+######################
+*.log
+
+######################
+# Others
+######################
+*.class
+*.*~
+*~
+.merge_file*
+*.bundle

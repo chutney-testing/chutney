@@ -58,7 +58,7 @@ public class JakartaBrokerStartAction implements Action {
 
     private Map<String, Object> toOutputs(ActiveMQServer brokerService) {
         Map<String, Object> outputs = new HashMap<>();
-        outputs.put("jmsBrokerService", brokerService);
+        outputs.put("jakartaBrokerService", brokerService);
         return outputs;
     }
 
