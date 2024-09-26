@@ -10,13 +10,7 @@
 ######################
 /log/
 **/target/
-.mvn/
 !/**/src/**/target/
-
-######################
-# Maven Wrapper
-######################
-!.mvn/wrapper/maven-wrapper.jar
 
 
 ######################
