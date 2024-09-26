@@ -75,6 +75,7 @@
   <modules>
     <module>chutney</module>
     <module>kotlin-dsl</module>
+    <module>acceptance-tests</module>
     <module>example</module>
   </modules>
 

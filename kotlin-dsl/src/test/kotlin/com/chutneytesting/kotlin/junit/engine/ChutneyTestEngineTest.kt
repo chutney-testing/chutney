@@ -87,8 +87,8 @@ private class ChutneyTestEngineTest {
     }
 
 
-    //@ParameterizedTest
-    //@MethodSource("containerChutneyTestSelectors")
+    @ParameterizedTest
+    @MethodSource("containerChutneyTestSelectors")
     fun should_execute_scenario_when_select_containerChutneyTest(selector: DiscoverySelector, startedEvent: Long, finishedEvent: Long, expectedReportingEntryPublished: Long) {
         val result: EngineExecutionResults = EngineTestKit.engine(CHUTNEY_JUNIT_ENGINE_ID)
             .selectors(selector)
