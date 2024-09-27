@@ -7,7 +7,9 @@
 
 package com.chutneytesting.server.core.domain.tools;
 
+import static com.chutneytesting.server.core.domain.dataset.DataSet.NO_DATASET;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.chutneytesting.server.core.domain.dataset.DataSet;
@@ -22,7 +24,7 @@ import org.junit.jupiter.api.Test;
 public class DatasetUtilsTest {
 
     @Nested
-    @DisplayName("Should compare datasets")
+    @DisplayName("Compare datasets")
     class CompareDataset {
 
         @Nested
@@ -32,9 +34,9 @@ public class DatasetUtilsTest {
             @DisplayName("null or NO_DATASET")
             void null_or_No_Dataset() {
                 assertTrue(DatasetUtils.compareDataset(null, null));
-                assertTrue(DatasetUtils.compareDataset(DataSet.NO_DATASET, null));
-                assertTrue(DatasetUtils.compareDataset(null, DataSet.NO_DATASET));
-                assertTrue(DatasetUtils.compareDataset(DataSet.NO_DATASET, DataSet.NO_DATASET));
+                assertTrue(DatasetUtils.compareDataset(NO_DATASET, null));
+                assertTrue(DatasetUtils.compareDataset(null, NO_DATASET));
+                assertTrue(DatasetUtils.compareDataset(NO_DATASET, NO_DATASET));
             }
 
             @Test
@@ -78,6 +80,16 @@ public class DatasetUtilsTest {
         @Nested
         @DisplayName("Datasets are not the same when")
         class NotTheSame {
+            @Test
+            @DisplayName("one dataset is null or NO_DATASET")
+            void one_null_or_No_Dataset() {
+                DataSet ds = DataSet.builder().withName("").build();
+                assertFalse(DatasetUtils.compareDataset(null, ds));
+                assertFalse(DatasetUtils.compareDataset(NO_DATASET, ds));
+                assertFalse(DatasetUtils.compareDataset(ds, null));
+                assertFalse(DatasetUtils.compareDataset(ds, NO_DATASET));
+            }
+
             @Test
             @DisplayName("ids are not")
             void should_return_false_when_comparing_datasets_with_different_id() {

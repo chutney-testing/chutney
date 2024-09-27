@@ -7,6 +7,8 @@
 
 package com.chutneytesting.server.core.domain.tools;
 
+import static com.chutneytesting.server.core.domain.dataset.DataSet.NO_DATASET;
+
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import java.util.List;
 import java.util.Map;
@@ -15,9 +17,9 @@ import java.util.stream.Collectors;
 public class DatasetUtils {
 
     public static boolean compareDataset(DataSet dataset1, DataSet dataset2) {
-        if ((dataset1 == null || DataSet.NO_DATASET.equals(dataset1)) && (dataset2 == null || DataSet.NO_DATASET.equals(dataset2))) {
+        if ((dataset1 == null || NO_DATASET.equals(dataset1)) && (dataset2 == null || NO_DATASET.equals(dataset2))) {
             return true;
-        } else if (dataset1 == null || dataset2 == null) {
+        } else if (dataset1 == null || NO_DATASET.equals(dataset1) || dataset2 == null || NO_DATASET.equals(dataset2)) {
             return false;
         } else if (dataset1.id != null) {
             return dataset1.id.equals(dataset2.id);
