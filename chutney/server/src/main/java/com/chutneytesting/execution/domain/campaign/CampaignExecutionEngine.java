@@ -22,6 +22,7 @@ import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.ExecutionRequest;
 import com.chutneytesting.server.core.domain.execution.FailedExecutionAttempt;
 import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngine;
+import com.chutneytesting.server.core.domain.execution.ScenarioExecutionEngineAsync;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistoryRepository;
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
@@ -63,6 +64,7 @@ public class CampaignExecutionEngine {
     private final CampaignRepository campaignRepository;
     private final CampaignExecutionRepository campaignExecutionRepository;
     private final ScenarioExecutionEngine scenarioExecutionEngine;
+    private final ScenarioExecutionEngineAsync scenarioExecutionEngineAsync;
     private final ExecutionHistoryRepository executionHistoryRepository;
     private final TestCaseRepository testCaseRepository;
     private final JiraXrayEmbeddedApi jiraXrayEmbeddedApi;
@@ -75,6 +77,7 @@ public class CampaignExecutionEngine {
     public CampaignExecutionEngine(CampaignRepository campaignRepository,
                                    CampaignExecutionRepository campaignExecutionRepository,
                                    ScenarioExecutionEngine scenarioExecutionEngine,
+                                   ScenarioExecutionEngineAsync scenarioExecutionEngineAsync,
                                    ExecutionHistoryRepository executionHistoryRepository,
                                    TestCaseRepository testCaseRepository,
                                    JiraXrayEmbeddedApi jiraXrayEmbeddedApi,
@@ -84,6 +87,7 @@ public class CampaignExecutionEngine {
         this.campaignRepository = campaignRepository;
         this.campaignExecutionRepository = campaignExecutionRepository;
         this.scenarioExecutionEngine = scenarioExecutionEngine;
+        this.scenarioExecutionEngineAsync = scenarioExecutionEngineAsync;
         this.executionHistoryRepository = executionHistoryRepository;
         this.testCaseRepository = testCaseRepository;
         this.jiraXrayEmbeddedApi = jiraXrayEmbeddedApi;
@@ -137,6 +141,25 @@ public class CampaignExecutionEngine {
         LOGGER.trace("Stop requested for {}", executionId);
         ofNullable(currentCampaignExecutionsStopRequests.computeIfPresent(executionId, (aLong, aBoolean) -> Boolean.TRUE))
             .orElseThrow(() -> new CampaignExecutionNotFoundException(null, executionId));
+
+        stopScenarioExecutions(executionId);
+    }
+
+    private void stopScenarioExecutions(Long campaignExecutionId) {
+        try {
+            var execution = campaignExecutionRepository.getCampaignExecutionById(campaignExecutionId);
+            execution.scenarioExecutionReports().stream()
+                .filter(ScenarioExecutionCampaign.isRunning())
+                .forEach(sec -> {
+                    try {
+                        scenarioExecutionEngineAsync.stop(sec.scenarioId(), sec.execution().executionId());
+                    } catch (Exception e) {
+                        LOGGER.warn("Cannot stop scenario execution {} from campaign execution {}", sec.execution().executionId(), campaignExecutionId);
+                    }
+                });
+        } catch (Exception e) {
+            LOGGER.warn("Cannot stop scenarios from campaign execution {}", campaignExecutionId);
+        }
     }
 
     public CampaignExecution replayFailedScenariosExecutionsForExecution(Long campaignExecutionId, String userId) {
@@ -211,7 +234,7 @@ public class CampaignExecutionEngine {
         List<TestCaseDataset> testCaseDatasets = scenariosToExecute.stream()
             .map(cs ->
                 testCaseRepository.findExecutableById(cs.scenarioId())
-                    .map(tc -> new TestCaseDataset(tc, ofNullable(cs.datasetId()).map(datasetId -> DataSet.builder().withId(datasetId).withName("").build()).orElse(campaignExecution.dataset)))
+                    .map(tc -> new TestCaseDataset(tc, resolveDataset(cs, campaignExecution)))
             )
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -240,28 +263,32 @@ public class CampaignExecutionEngine {
 
     private Consumer<TestCaseDataset> executeScenarioInCampaign(Campaign campaign, CampaignExecution campaignExecution) {
         return testCaseDataset -> {
-            ScenarioExecutionCampaign scenarioExecution;
-            // Is stop requested ?
-            if (!currentCampaignExecutionsStopRequests.get(campaignExecution.executionId)) {
-                // Init scenario execution in campaign report
-                campaignExecution.startScenarioExecution(testCaseDataset, campaign.executionEnvironment());
-                // Execute scenario
-                scenarioExecution = executeScenario(campaign, testCaseDataset, campaignExecution);
-                // Retry one time if failed
-                if (campaign.retryAuto && ServerReportStatus.FAILURE.equals(scenarioExecution.status())) {
+            try {
+                ScenarioExecutionCampaign scenarioExecution;
+                // Is stop requested ?
+                if (!currentCampaignExecutionsStopRequests.get(campaignExecution.executionId)) {
+                    // Init scenario execution in campaign report
+                    campaignExecution.startScenarioExecution(testCaseDataset, campaign.executionEnvironment());
+                    // Execute scenario
                     scenarioExecution = executeScenario(campaign, testCaseDataset, campaignExecution);
+                    // Retry one time if failed
+                    if (campaign.retryAuto && ServerReportStatus.FAILURE.equals(scenarioExecution.status())) {
+                        scenarioExecution = executeScenario(campaign, testCaseDataset, campaignExecution);
+                    }
+                } else {
+                    scenarioExecution = generateNotExecutedScenarioExecutionAndReport(campaign, testCaseDataset, campaignExecution);
                 }
-            } else {
-                scenarioExecution = generateNotExecutedScenarioExecutionAndReport(campaign, testCaseDataset, campaignExecution);
+                // Add scenario report to campaign's one
+                ofNullable(scenarioExecution)
+                    .ifPresent(serc -> {
+                        campaignExecution.endScenarioExecution(serc);
+                        // update xray test
+                        ExecutionHistory.Execution execution = executionHistoryRepository.getExecution(serc.scenarioId(), serc.execution().executionId());
+                        updateJira(campaign, campaignExecution, serc, execution);
+                    });
+            } catch (Exception e) {
+                LOGGER.error("Error in scenario execution for campaign execution {}", campaignExecution.executionId, e);
             }
-            // Add scenario report to campaign's one
-            ofNullable(scenarioExecution)
-                .ifPresent(serc -> {
-                    campaignExecution.endScenarioExecution(serc);
-                    // update xray test
-                    ExecutionHistory.Execution execution = executionHistoryRepository.getExecution(serc.scenarioId(), serc.execution().executionId());
-                    updateJira(campaign, campaignExecution, serc, execution);
-                });
         };
     }
 
@@ -308,24 +335,34 @@ public class CampaignExecutionEngine {
         return new ScenarioExecutionCampaign(testCaseDataset.testcase().id(), scenarioName, execution.summary());
     }
 
+    private DataSet resolveDataset(Campaign.CampaignScenario campaignScenario, CampaignExecution campaignExecution) {
+        return
+            ofNullable(campaignScenario.datasetId())
+                .map(datasetId -> DataSet.builder().withId(datasetId).withName("").build())
+                .or(() -> ofNullable(campaignExecution.dataset))
+                .map(ds -> {
+                    if (ds.id != null) {
+                        return datasetRepository.findById(ds.id);
+                    }
+                    return DataSet
+                        .builder()
+                        .withName("")
+                        .withDatatable(ds.datatable)
+                        .withConstants(ds.constants)
+                        .build();
+                })
+                .orElseGet(() -> DataSet.NO_DATASET);
+    }
+
     private ExecutionRequest buildExecutionRequest(Campaign campaign, TestCaseDataset testCaseDataset, CampaignExecution campaignExecution) {
-        // TODO if dataset null should throw exception ?
-        Optional<DataSet> dataset = ofNullable(testCaseDataset.dataset()); // We first get the dataset of the scenario in campaign
-        if (dataset.isEmpty()) {
-            dataset = ofNullable(campaignExecution.dataset); // If empty we get the scenario from the campaign (precised earlier if default dataset or inline dataset)
-        }
-        Optional<DataSet> datasetFull = dataset.map(ds -> {
-            if (ds.id != null) {
-                return datasetRepository.findById(ds.id);
-            }
-            return DataSet
-                .builder()
-                .withName("")
-                .withDatatable(ds.datatable)
-                .withConstants(ds.constants)
-                .build();
-        });
-        return new ExecutionRequest(testCaseDataset.testcase(), campaign.executionEnvironment(), campaignExecution.userId, datasetFull.orElse(null), campaignExecution, campaign.tags);
+        return new ExecutionRequest(
+            testCaseDataset.testcase(),
+            campaign.executionEnvironment(),
+            campaignExecution.userId,
+            testCaseDataset.dataset(),
+            campaignExecution,
+            campaign.tags
+        );
     }
 
     private void verifyNotAlreadyRunning(Campaign campaign) {
