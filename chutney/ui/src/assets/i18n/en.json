@@ -305,17 +305,18 @@
             "deletion.suffix": "?"
         },
         "scheduling": {
-            "title": "Schedule a new campaigns execution",
+            "title": "Schedule an execution",
             "schedule": "Schedule",
             "scheduling": "Scheduling",
             "back": "Back",
             "campaign": "Campaigns",
-            "schedulingDate": "Scheduling date",
-            "frequency": "Frequency",
+            "schedulingDate": "Date",
+            "frequency": "Repeat",
+            "environment": "Environment",
             "required": {
                 "campaign": "Campaign required",
-                "time": "Time required",
-                "date": "Date required"
+                "time": "Time",
+                "date": "Date"
             },
             "nothing": "Nothing scheduled"
         }
@@ -515,6 +516,9 @@
         },
         "msg": {
             "empty": "No data available"
+        },
+        "words": {
+            "dataset": "Dataset"
         }
     },
     "metrics": {

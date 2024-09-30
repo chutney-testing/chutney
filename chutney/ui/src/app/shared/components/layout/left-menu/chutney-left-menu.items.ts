@@ -21,7 +21,7 @@ export const allMenuItems: MenuItem [] = [
             {
                 label: 'menu.principal.campaigns',
                 link: '/campaign',
-                iconClass: 'fa fa-clock',
+                iconClass: 'fa fa-flask',
                 authorizations: [Authorization.CAMPAIGN_READ, Authorization.CAMPAIGN_WRITE,Authorization.CAMPAIGN_EXECUTE]
             },
             {

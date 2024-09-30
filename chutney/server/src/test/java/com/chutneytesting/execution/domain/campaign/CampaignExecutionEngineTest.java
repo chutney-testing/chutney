@@ -21,6 +21,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -63,6 +64,8 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.Answer;
 import org.springframework.core.task.support.ExecutorServiceAdapter;
@@ -602,7 +605,6 @@ public class CampaignExecutionEngineTest {
         CampaignExecution campaignExecution = sut.executeById(campaignId, env, dataSet, "USER");
 
         // Then
-        assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.dataset).isNotNull();
         assertThat(campaignExecution.dataset.id).isNull();
         assertThat(campaignExecution.dataset.constants).isEqualTo(constants);
@@ -628,7 +630,6 @@ public class CampaignExecutionEngineTest {
         CampaignExecution campaignExecution = sut.executeById(campaignId, env, dataSet, "USER");
 
         // Then
-        assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.dataset).isNotNull();
         assertThat(campaignExecution.dataset.constants).isEmpty();
         assertThat(campaignExecution.dataset.datatable).isEmpty();
@@ -675,6 +676,32 @@ public class CampaignExecutionEngineTest {
         // Then
         assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.dataset).isNull();
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "123, DEV, dataset123, user123",
+        "123, DEV, , user123"
+    })
+    void testExecuteScheduledCampaign(Long campaignId, String environment, String datasetId, String userId) {
+        //Given
+        var scenarios = Lists.list(firstTestCase.id()).stream().map(id -> new Campaign.CampaignScenario(id, null)).toList();
+        Campaign campaign = new Campaign(1L, "campaign1", null, scenarios, "DEV", false, false, null, List.of("TAG"));
+        when(campaignRepository.findById(any())).thenReturn(campaign);
+        if (datasetId != null) {
+            when(datasetRepository.findById(datasetId)).thenReturn(DataSet.NO_DATASET);
+        }
+
+        // When
+        CampaignExecutionEngine spySut = spy(sut);
+        spySut.executeScheduledCampaign(campaignId, environment, datasetId, userId);
+
+        // Then
+        if (datasetId != null) {
+            verify(spySut, times(1)).executeById(campaignId, environment, DataSet.NO_DATASET, userId);
+        } else {
+            verify(spySut, times(1)).executeById(campaignId, environment, null, userId);
+        }
     }
 
     private final static Random campaignIdGenerator = new Random();

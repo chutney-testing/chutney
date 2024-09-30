@@ -30,6 +30,37 @@
     }
 
     .dropdown-list {
-        width: auto!important;
+        width: 200px!important;
+    }
+}
+
+.schedule-form-group {
+    background-color:  var(--bs-light);
+    padding: 1em;
+    border-radius: 1em;
+    width: fit-content;
+    margin-top: 1em;
+}
+
+.campaigns-multi-select {
+    display: inline-block;
+    min-width: 200px;
+    width: 100%;
+}
+
+::ng-deep ng-multiselect-dropdown .multiselect-dropdown .dropdown-btn  {
+    font-size: small;
+
+    .selected-item-container {
+        width: 95%;
+
+        .selected-item {
+            min-width: fit-content;
+
+            span {
+                word-break: break-all;
+                padding-right: 10px;
+            }
+        }
     }
 }
