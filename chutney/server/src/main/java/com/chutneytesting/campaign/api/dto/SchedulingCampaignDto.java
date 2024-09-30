@@ -16,37 +16,29 @@ import java.util.List;
 public class SchedulingCampaignDto {
 
     private Long id;
-    private List<Long> campaignsId;
-    private List<String> campaignsTitle;
     private LocalDateTime schedulingDate;
     private String frequency;
+    private String environment;
+    private List<CampaignExecutionRequestDto> campaignExecutionRequestDto;
 
     public SchedulingCampaignDto() {
     }
 
     public SchedulingCampaignDto(Long id,
-                                 List<Long> campaignsId,
-                                 List<String> campaignsTitle,
                                  LocalDateTime schedulingDate,
-                                 String frequency
+                                 String frequency,
+                                 String environment,
+                                 List<CampaignExecutionRequestDto> campaignExecutionRequestDto
     ) {
         this.id = id;
-        this.campaignsId = campaignsId;
-        this.campaignsTitle = campaignsTitle;
         this.schedulingDate = schedulingDate;
         this.frequency = frequency;
+        this.environment = environment;
+        this.campaignExecutionRequestDto = campaignExecutionRequestDto;
     }
 
     public Long getId() {
         return id;
-    }
-
-    public List<Long> getCampaignsId() {
-        return campaignsId;
-    }
-
-    public List<String> getCampaignsTitle() {
-        return campaignsTitle;
     }
 
     public LocalDateTime getSchedulingDate() {
@@ -55,5 +47,16 @@ public class SchedulingCampaignDto {
 
     public String getFrequency() {
         return frequency;
+    }
+
+    public String getEnvironment() {
+        return environment;
+    }
+
+    public List<CampaignExecutionRequestDto> getCampaignExecutionRequestDto() {
+        return campaignExecutionRequestDto;
+    }
+
+    public record CampaignExecutionRequestDto(Long campaignId, String campaignTitle, String datasetId) {
     }
 }

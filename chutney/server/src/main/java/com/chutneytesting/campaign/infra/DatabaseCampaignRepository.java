@@ -14,7 +14,7 @@ import static java.util.Optional.ofNullable;
 import com.chutneytesting.campaign.domain.CampaignExecutionRepository;
 import com.chutneytesting.campaign.domain.CampaignNotFoundException;
 import com.chutneytesting.campaign.domain.CampaignRepository;
-import com.chutneytesting.campaign.domain.PeriodicScheduledCampaignRepository;
+import com.chutneytesting.campaign.domain.ScheduledCampaignRepository;
 import com.chutneytesting.campaign.infra.jpa.CampaignEntity;
 import com.chutneytesting.campaign.infra.jpa.CampaignScenarioEntity;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
@@ -33,15 +33,15 @@ public class DatabaseCampaignRepository implements CampaignRepository {
     private final CampaignJpaRepository campaignJpaRepository;
     private final CampaignScenarioJpaRepository campaignScenarioJpaRepository;
     private final CampaignExecutionRepository campaignExecutionRepository;
-    private final PeriodicScheduledCampaignRepository periodicScheduledCampaignRepository;
+    private final ScheduledCampaignRepository scheduledCampaignRepository;
 
     public DatabaseCampaignRepository(CampaignJpaRepository campaignJpaRepository,
                                       CampaignScenarioJpaRepository campaignScenarioJpaRepository,
-                                      CampaignExecutionDBRepository campaignExecutionRepository, PeriodicScheduledCampaignRepository periodicScheduledCampaignRepository) {
+                                      CampaignExecutionDBRepository campaignExecutionRepository, ScheduledCampaignRepository scheduledCampaignRepository) {
         this.campaignJpaRepository = campaignJpaRepository;
         this.campaignScenarioJpaRepository = campaignScenarioJpaRepository;
         this.campaignExecutionRepository = campaignExecutionRepository;
-        this.periodicScheduledCampaignRepository = periodicScheduledCampaignRepository;
+        this.scheduledCampaignRepository = scheduledCampaignRepository;
     }
 
     @Override
@@ -75,7 +75,7 @@ public class DatabaseCampaignRepository implements CampaignRepository {
         if (campaignJpaRepository.existsById(id)) {
             campaignExecutionRepository.clearAllExecutionHistory(id);
             campaignJpaRepository.deleteById(id);
-            periodicScheduledCampaignRepository.removeCampaignId(id);
+            scheduledCampaignRepository.removeCampaignId(id);
             return true;
         }
         return false;
