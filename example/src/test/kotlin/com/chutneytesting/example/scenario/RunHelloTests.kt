@@ -9,8 +9,8 @@ package com.chutneytesting.example.scenario
 
 import com.chutneytesting.example.environment_en
 import com.chutneytesting.example.environment_fr
+import com.chutneytesting.kotlin.annotations.ChutneyTest
 import com.chutneytesting.kotlin.dsl.ChutneyScenario
-import com.chutneytesting.kotlin.junit.api.ChutneyTest
 import com.chutneytesting.kotlin.launcher.Launcher
 import org.junit.jupiter.api.Test
 

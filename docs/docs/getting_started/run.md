@@ -29,7 +29,7 @@ Create a Kotlin file (ex. `Junit5SearchFeat.kt`) with the following content :
 package com.chutneytesting.getstart
 
 import com.chutneytesting.kotlin.dsl.ChutneyScenario
-import com.chutneytesting.kotlin.junit.api.ChutneyTest
+import com.chutneytesting.kotlin.annotations.ChutneyTest
 
 class Junit5SearchFeat {
 

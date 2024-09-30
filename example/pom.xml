@@ -12,31 +12,29 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.chutneytesting</groupId>
+    <parent>
+        <groupId>com.chutneytesting</groupId>
+        <artifactId>chutney-testing-parent</artifactId>
+        <version>2.9.1-SNAPSHOT</version>
+    </parent>
+
     <artifactId>example</artifactId>
-    <version>2.9.1-SNAPSHOT</version>
     <description>Example of scenarios written with chutney kotlin dsl</description>
 
     <licenses>
         <license>
             <name>Apache-2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
 
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-
         <kotlin.compiler.languageVersion>1.9</kotlin.compiler.languageVersion>
         <kotlin.compiler.apiVersion>1.9</kotlin.compiler.apiVersion>
         <kotlin.compiler.jvmTarget>${maven.compiler.target}</kotlin.compiler.jvmTarget>
         <kotlin.version>1.9.25</kotlin.version>
 
-        <chutney.version>${project.version}</chutney.version>
     </properties>
 
     <dependencyManagement>
@@ -54,11 +52,6 @@
                 <version>${chutney.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-            <dependency>
-                <groupId>com.chutneytesting</groupId>
-                <artifactId>chutney-kotlin-dsl</artifactId>
-                <version>${chutney.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -152,34 +145,13 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.3.0</version>
-                <executions>
-                    <execution>
-                        <id>default-test</id>
-                        <phase>test</phase>
-                        <goals>
-                            <goal>test</goal>
-                        </goals>
-                        <configuration>
-                            <systemPropertyVariables>
-                                <chutney.engine.stepAsTest>false</chutney.engine.stepAsTest>
-                                <http.proxyHost>${http.proxyHost}</http.proxyHost>
-                                <http.proxyPort>${http.proxyHost}</http.proxyPort>
-                                <http.nonProxyHosts>${http.nonProxyHosts}</http.nonProxyHosts>
-                                <https.proxyHost>${https.proxyHost}</https.proxyHost>
-                                <https.proxyPort>${https.proxyHost}</https.proxyPort>
-                                <https.nonProxyHosts>${https.nonProxyHosts}</https.nonProxyHosts>
-                            </systemPropertyVariables>
-                        </configuration>
-                    </execution>
-                </executions>
             </plugin>
             <plugin>
                 <!-- Has to be after the default-test surefire execution declaration -->
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>chutney-test-report</id>
@@ -194,5 +166,17 @@
                 </executions>
             </plugin>
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>3.1.3</version>
+                    <configuration>
+                        <skip>true</skip>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 </project>

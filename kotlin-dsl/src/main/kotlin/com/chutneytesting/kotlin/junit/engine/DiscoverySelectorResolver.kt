@@ -7,10 +7,10 @@
 
 package com.chutneytesting.kotlin.junit.engine
 
+import com.chutneytesting.kotlin.annotations.ChutneyTest
 import com.chutneytesting.kotlin.dsl.ChutneyEnvironment
 import com.chutneytesting.kotlin.dsl.ChutneyScenario
 import com.chutneytesting.kotlin.dsl.ChutneyStep
-import com.chutneytesting.kotlin.junit.api.ChutneyTest
 import org.junit.platform.commons.support.AnnotationSupport
 import org.junit.platform.commons.support.HierarchyTraversalMode
 import org.junit.platform.commons.support.ReflectionSupport

@@ -5,18 +5,15 @@
  *
  */
 
-package com.chutneytesting.kolin.util;
+package util
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-import org.junitpioneer.jupiter.ClearSystemProperty;
+import org.junitpioneer.jupiter.ClearSystemProperty
+import java.lang.annotation.Inherited
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.TYPE})
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CLASS)
+@Retention(AnnotationRetention.RUNTIME)
 @Inherited
+
 @ClearSystemProperty(key="http.proxyHost")
 @ClearSystemProperty(key="http.proxyPort")
 @ClearSystemProperty(key="http.proxyUser")
@@ -25,5 +22,4 @@ import org.junitpioneer.jupiter.ClearSystemProperty;
 @ClearSystemProperty(key="https.proxyPort")
 @ClearSystemProperty(key="https.proxyUser")
 @ClearSystemProperty(key="https.proxyPassword")
-public @interface ChutneyServerInfoClearProperties {
-}
+annotation class ChutneyServerInfoClearProperties ()

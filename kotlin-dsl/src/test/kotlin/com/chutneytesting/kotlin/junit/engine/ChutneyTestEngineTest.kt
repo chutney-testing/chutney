@@ -28,7 +28,7 @@ import org.mockito.Mockito.times
 import java.nio.file.Path
 import java.util.*
 
-private class ChutneyTestEngineTest {
+class ChutneyTestEngineTest {
 
     val sut = ChutneyTestEngine()
 
@@ -85,6 +85,7 @@ private class ChutneyTestEngineTest {
                 stats.started(1).finished(1).succeeded(1)
             }
     }
+
 
     @ParameterizedTest
     @MethodSource("containerChutneyTestSelectors")

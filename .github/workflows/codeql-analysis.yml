@@ -11,11 +11,10 @@ on:
       - 'docs/**'
 
 jobs:
-  chutney-analyze:
+  chutney-parent-analyze:
     uses: ./.github/workflows/codeql-analysis-template.yml
     with:
-      project-dir: chutney
-      language: java
+      language: java-kotlin
 
   chutney-ui-analyze:
     uses: ./.github/workflows/codeql-analysis-template.yml
@@ -23,23 +22,5 @@ jobs:
       project-dir: chutney/ui
       language: javascript-typescript
       build-mode: none
-
-  dsl-analyze:
-    uses: ./.github/workflows/codeql-analysis-template.yml
-    with:
-      project-dir: kotlin-dsl
-      language: java-kotlin
-
-  plugin-analyze:
-    uses: ./.github/workflows/codeql-analysis-template.yml
-    with:
-      project-dir: idea-plugin
-      language: kotlin
-
-  example-analyze:
-    uses: ./.github/workflows/codeql-analysis-template.yml
-    with:
-      project-dir: example
-      language: kotlin
 
 
