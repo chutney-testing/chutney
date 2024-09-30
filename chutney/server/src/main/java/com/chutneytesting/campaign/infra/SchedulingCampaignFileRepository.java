@@ -12,7 +12,9 @@ import static com.chutneytesting.campaign.domain.Frequency.toFrequency;
 import static com.chutneytesting.tools.file.FileUtils.initFolder;
 
 import com.chutneytesting.campaign.domain.PeriodicScheduledCampaign;
-import com.chutneytesting.campaign.domain.PeriodicScheduledCampaignRepository;
+import com.chutneytesting.campaign.domain.PeriodicScheduledCampaign.CampaignExecutionRequest;
+import com.chutneytesting.campaign.domain.ScheduledCampaignRepository;
+import com.chutneytesting.campaign.infra.SchedulingCampaignDto.CampaignExecutionRequestDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +29,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -38,7 +41,7 @@ import org.springframework.stereotype.Repository;
  * Scheduling campaign persistence.
  */
 @Repository
-public class SchedulingCampaignFileRepository implements PeriodicScheduledCampaignRepository {
+public class SchedulingCampaignFileRepository implements ScheduledCampaignRepository {
 
     private static final Path ROOT_DIRECTORY_NAME = Paths.get("scheduling");
     private static final String SCHEDULING_CAMPAIGNS_FILE = "schedulingCampaigns.json";
@@ -99,12 +102,10 @@ public class SchedulingCampaignFileRepository implements PeriodicScheduledCampai
             Map<String, SchedulingCampaignDto> schedulingCampaigns = readFromDisk();
             Map<String, SchedulingCampaignDto> schedulingCampaignsFiltered = new HashMap<>();
             schedulingCampaigns.forEach((key, schedulingCampaignDto) -> {
-                int indexCampaignId = schedulingCampaignDto.campaignsId.indexOf(id);
-                if (indexCampaignId != -1) { // Remove id and title if the campaignId has been found
-                    schedulingCampaignDto.campaignsTitle.remove(indexCampaignId);
-                    schedulingCampaignDto.campaignsId.remove(indexCampaignId);
-                }
-                if (!schedulingCampaignDto.campaignsId.isEmpty()) { // Set the schedule only if a campaign is present after removal
+                Optional<CampaignExecutionRequestDto> foundRequest = schedulingCampaignDto.campaignExecutionRequestDto.stream().filter(cer -> cer.campaignId().equals(id)).findFirst();
+                // Remove id and title if the campaignId has been found
+                foundRequest.ifPresent(schedulingCampaignDto.campaignExecutionRequestDto::remove);
+                if (!schedulingCampaignDto.campaignExecutionRequestDto.isEmpty()) { // Set the schedule only if a campaign is present after removal
                     schedulingCampaignsFiltered.put(key, schedulingCampaignDto);
                 }
             });
@@ -154,11 +155,11 @@ public class SchedulingCampaignFileRepository implements PeriodicScheduledCampai
     }
 
     private PeriodicScheduledCampaign fromDto(SchedulingCampaignDto dto) {
-        return new PeriodicScheduledCampaign(Long.valueOf(dto.id), dto.campaignsId, dto.campaignsTitle, dto.schedulingDate, toFrequency(dto.frequency));
+        return new PeriodicScheduledCampaign(Long.valueOf(dto.id), dto.schedulingDate, toFrequency(dto.frequency), dto.environment, dto.campaignExecutionRequestDto.stream().map(aa -> new CampaignExecutionRequest(aa.campaignId(), aa.campaignTitle(), aa.datasetId())).toList());
     }
 
     private SchedulingCampaignDto toDto(long id, PeriodicScheduledCampaign periodicScheduledCampaign) {
-        return new SchedulingCampaignDto(String.valueOf(id), periodicScheduledCampaign.campaignsId, periodicScheduledCampaign.campaignsTitle, periodicScheduledCampaign.nextExecutionDate, periodicScheduledCampaign.frequency.label);
+        return new SchedulingCampaignDto(String.valueOf(id), periodicScheduledCampaign.nextExecutionDate, periodicScheduledCampaign.frequency.label, periodicScheduledCampaign.environment,  periodicScheduledCampaign.campaignExecutionRequests.stream().map(aa -> new CampaignExecutionRequestDto(aa.campaignId(), aa.campaignTitle(), aa.datasetId())).toList());
     }
 
     private Long getCurrentMaxId(Map<String, SchedulingCampaignDto> schedulingCampaigns) {
