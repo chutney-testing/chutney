@@ -30,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -39,7 +38,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -133,7 +131,7 @@ public class KafkaBasicPublishActionTest {
             propertyToOverride, "a property value"
         );
 
-        KafkaBasicPublishAction defaultAction = new KafkaBasicPublishAction(target, null, null, null, properties, null);
+        KafkaBasicPublishAction defaultAction = new KafkaBasicPublishAction(target, null, null, null, properties, null, null);
         assertThat(defaultAction)
             .hasFieldOrPropertyWithValue("properties", expectedConfig)
         ;
@@ -143,7 +141,7 @@ public class KafkaBasicPublishActionTest {
     public void basic_publish_action_should_success() throws Exception {
         //given
         TestLogger logger = new TestLogger();
-        Action action = new KafkaBasicPublishAction(getKafkaTarget(), TOPIC, null, PAYLOAD, null, logger);
+        Action action = new KafkaBasicPublishAction(getKafkaTarget(), TOPIC, null, PAYLOAD, null, null, logger);
         //mocks
         ChutneyKafkaProducerFactory producerFactoryMock = mock(ChutneyKafkaProducerFactory.class);
         KafkaTemplate<String, String> kafkaTemplateMock = mock(KafkaTemplate.class);
@@ -168,7 +166,7 @@ public class KafkaBasicPublishActionTest {
     public void basic_publish_action_should_failed_when_timeout() throws Exception {
         //given
         TestLogger logger = new TestLogger();
-        Action action = new KafkaBasicPublishAction(getKafkaTarget(), TOPIC, null, PAYLOAD, null, logger);
+        Action action = new KafkaBasicPublishAction(getKafkaTarget(), TOPIC, null, PAYLOAD, null, null, logger);
         //mocks
         ChutneyKafkaProducerFactory producerFactoryMock = mock(ChutneyKafkaProducerFactory.class);
         KafkaTemplate<String, String> kafkaTemplateMock = mock(KafkaTemplate.class);
@@ -204,7 +202,7 @@ public class KafkaBasicPublishActionTest {
       props.put("session.timeout.ms", "60000");
       props.put("auto.offset.reset", "earliest");
 
-      Action sut = new KafkaBasicPublishAction(target, TOPIC, Map.of(), "my-test-value", props, logger);
+      Action sut = new KafkaBasicPublishAction(target, TOPIC, Map.of(), "my-test-value", props, null, logger);
 
       ActionExecutionResult actionExecutionResult = sut.execute();
 
@@ -235,7 +233,7 @@ public class KafkaBasicPublishActionTest {
       props.put("session.timeout.ms", "3000");
       props.put("auto.offset.reset", "earliest");
 
-      Action sut = new KafkaBasicPublishAction(target, TOPIC, Map.of(), "my-test-value", props, logger);
+      Action sut = new KafkaBasicPublishAction(target, TOPIC, Map.of(), "my-test-value", props, null, logger);
 
       ActionExecutionResult actionExecutionResult = sut.execute();
 
@@ -265,7 +263,6 @@ public class KafkaBasicPublishActionTest {
         ActionExecutionResult actionExecutionResult = sut.execute();
 
         assertThat(actionExecutionResult.status).isEqualTo(Success);
-        assertThat(actionExecutionResult.outputs).containsEntry("key", "my-key");
 
         ConsumerRecord<Integer, String> singleRecord = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
         assertThat(singleRecord.value()).isEqualTo("my-test-value");

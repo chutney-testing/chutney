@@ -63,7 +63,7 @@ public class KafkaBasicConsumeAction implements Action {
     static final String OUTPUT_HEADERS = "headers";
     static final String OUTPUT_PAYLOADS = "payloads";
     static final String OUTPUT_BODY_KEY_KEY = "key";
-    static final String OUTPUT_KEY = "key";
+    static final String OUTPUT_KEYS = "keys";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -222,7 +222,7 @@ public class KafkaBasicConsumeAction implements Action {
         Object payload = extractPayload(record);
         message.put(OUTPUT_BODY_HEADERS_KEY, headers);
         message.put(OUTPUT_BODY_PAYLOAD_KEY, payload);
-        message.put(OUTPUT_KEY, record.key());
+        message.put(OUTPUT_BODY_KEY_KEY, record.key());
         return message;
     }
 
@@ -254,7 +254,7 @@ public class KafkaBasicConsumeAction implements Action {
         results.put(OUTPUT_BODY, consumedMessages);
         results.put(OUTPUT_PAYLOADS, consumedMessages.stream().map(e -> e.get(OUTPUT_BODY_PAYLOAD_KEY)).collect(toList()));
         results.put(OUTPUT_HEADERS, consumedMessages.stream().map(e -> e.get(OUTPUT_BODY_HEADERS_KEY)).collect(toList()));
-        results.put(OUTPUT_KEY, consumedMessages.stream().map(e -> e.get(OUTPUT_BODY_KEY_KEY)).collect(toList()));
+        results.put(OUTPUT_KEYS, consumedMessages.stream().map(e -> e.get(OUTPUT_BODY_KEY_KEY)).collect(toList()));
         return results;
     }
 

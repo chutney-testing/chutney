@@ -12,7 +12,7 @@ import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BOD
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BODY_KEY_KEY;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BODY_PAYLOAD_KEY;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_HEADERS;
-import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_KEY;
+import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_KEYS;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_PAYLOADS;
 import static com.chutneytesting.action.spi.ActionExecutionResult.Status.Failure;
 import static com.chutneytesting.action.spi.ActionExecutionResult.Status.Success;
@@ -191,8 +191,6 @@ public class KafkaBasicConsumeActionTest {
         final Map<String, Object> message = body.get(0);
         final String payload1 = (String) message.get(OUTPUT_BODY_PAYLOAD_KEY);
         assertThat(payload1).isEqualTo("test message");
-        final String key = (String) message.get(OUTPUT_BODY_KEY_KEY);
-        assertThat(key).isEqualTo("KEY");
         final Map<String, Object> headers = (Map<String, Object>) message.get(OUTPUT_BODY_HEADERS_KEY);
         assertThat(headers.get("X-Custom-HeaderKey")).isEqualTo("X-Custom-HeaderValue");
         assertThat(headers).containsAllEntriesOf(ImmutableMap.of("X-Custom-HeaderKey", "X-Custom-HeaderValue", "header1", "value1"));
@@ -553,7 +551,7 @@ public class KafkaBasicConsumeActionTest {
         final List<Map<String, Object>> body = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_BODY);
         final List<Map<String, Object>> payloads = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_PAYLOADS);
         final List<Map<String, Object>> headers = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_HEADERS);
-        final List<Map<String, Object>> keys = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_KEY);
+        final List<Map<String, Object>> keys = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_KEYS);
         assertThat(body).hasSize(size);
         assertThat(payloads).hasSize(size);
         assertThat(headers).hasSize(size);

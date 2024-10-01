@@ -12,7 +12,7 @@ import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BOD
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BODY_KEY_KEY;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BODY_PAYLOAD_KEY;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_HEADERS;
-import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_KEY;
+import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_KEYS;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_PAYLOADS;
 import static com.chutneytesting.action.spi.ActionExecutionResult.Status.Failure;
 import static com.chutneytesting.action.spi.ActionExecutionResult.Status.Success;
@@ -160,7 +160,7 @@ public abstract class KafkaBasicConsumeActionIntegrationTest {
         final List<Map<String, Object>> body = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_BODY);
         final List<Map<String, Object>> payloads = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_PAYLOADS);
         final List<Map<String, Object>> headers = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_HEADERS);
-        final List<Map<String, Object>> keys = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_KEY);
+        final List<Map<String, Object>> keys = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_KEYS);
         assertThat(body).hasSize(size);
         assertThat(payloads).hasSize(size);
         assertThat(headers).hasSize(size);

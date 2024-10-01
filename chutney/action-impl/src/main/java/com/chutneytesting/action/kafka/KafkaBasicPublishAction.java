@@ -44,15 +44,6 @@ public class KafkaBasicPublishAction implements Action {
     private final Logger logger;
 
     public KafkaBasicPublishAction(Target target,
-                                   @Input("topic") String topic,
-                                   @Input("headers") Map<String, String> headers,
-                                   @Input("payload") String payload,
-                                   @Input("properties") Map<String, String> properties,
-                                   Logger logger) {
-        this(target, topic, headers, payload, properties, null, logger);
-    }
-
-    public KafkaBasicPublishAction(Target target,
                                  @Input("topic") String topic,
                                  @Input("headers") Map<String, String> headers,
                                  @Input("payload") String payload,
@@ -93,7 +84,7 @@ public class KafkaBasicPublishAction implements Action {
             kafkaTemplate.send(producerRecord).get(5, SECONDS);
 
             logger.info("Published Kafka Message on topic " + topic + (key != null ? " with key " + key : ""));
-            return ActionExecutionResult.ok(toOutputs(headers, payload, key));
+            return ActionExecutionResult.ok(toOutputs(headers, payload));
         } catch (Exception e) {
             logger.error("An exception occurs when sending a message to Kafka server: " + e.getMessage());
             return ActionExecutionResult.ko();
@@ -106,10 +97,9 @@ public class KafkaBasicPublishAction implements Action {
         }
     }
 
-    private Map<String, Object> toOutputs(Map<String, String> headers, String payload, String key) {
+    private Map<String, Object> toOutputs(Map<String, String> headers, String payload) {
         Map<String, Object> results = new HashMap<>();
         results.put("payload", payload);
-        results.put("key", key);
         results.put("headers", headers.entrySet().stream()
             .map(Map.Entry::toString)
             .collect(joining(";", "[", "]"))
