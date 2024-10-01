@@ -40,18 +40,30 @@ public class KafkaBasicPublishAction implements Action {
     private final Map<String, String> headers;
     private final String payload;
     private final Map<String, String> properties;
+    private final String key;
     private final Logger logger;
+
+    public KafkaBasicPublishAction(Target target,
+                                   @Input("topic") String topic,
+                                   @Input("headers") Map<String, String> headers,
+                                   @Input("payload") String payload,
+                                   @Input("properties") Map<String, String> properties,
+                                   Logger logger) {
+        this(target, topic, headers, payload, properties, null, logger);
+    }
 
     public KafkaBasicPublishAction(Target target,
                                  @Input("topic") String topic,
                                  @Input("headers") Map<String, String> headers,
                                  @Input("payload") String payload,
                                  @Input("properties") Map<String, String> properties,
+                                 @Input("key") String key,
                                  Logger logger) {
         this.target = target;
         this.topic = topic;
         this.headers = headers != null ? headers : emptyMap();
         this.payload = payload;
+        this.key = key;
         this.properties = ofNullable(
             MapUtils.merge(extractProducerConfig(target), properties)
         ).orElse(new HashMap<>());
@@ -75,13 +87,13 @@ public class KafkaBasicPublishAction implements Action {
                 .collect(Collectors.toList());
 
             logger.info("sending message to topic=" + topic);
-            ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>(topic, null, null, payload, recordHeaders);
+            ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>(topic, null, key, payload, recordHeaders);
 
             KafkaTemplate<String, String> kafkaTemplate = producerFactory.create(target, properties);
             kafkaTemplate.send(producerRecord).get(5, SECONDS);
 
-            logger.info("Published Kafka Message on topic " + topic);
-            return ActionExecutionResult.ok(toOutputs(headers, payload));
+            logger.info("Published Kafka Message on topic " + topic + (key != null ? " with key " + key : ""));
+            return ActionExecutionResult.ok(toOutputs(headers, payload, key));
         } catch (Exception e) {
             logger.error("An exception occurs when sending a message to Kafka server: " + e.getMessage());
             return ActionExecutionResult.ko();
@@ -94,9 +106,10 @@ public class KafkaBasicPublishAction implements Action {
         }
     }
 
-    private Map<String, Object> toOutputs(Map<String, String> headers, String payload) {
+    private Map<String, Object> toOutputs(Map<String, String> headers, String payload, String key) {
         Map<String, Object> results = new HashMap<>();
         results.put("payload", payload);
+        results.put("key", key);
         results.put("headers", headers.entrySet().stream()
             .map(Map.Entry::toString)
             .collect(joining(";", "[", "]"))

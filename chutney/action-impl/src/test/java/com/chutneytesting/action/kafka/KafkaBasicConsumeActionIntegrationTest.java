@@ -9,8 +9,10 @@ package com.chutneytesting.action.kafka;
 
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BODY;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BODY_HEADERS_KEY;
+import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BODY_KEY_KEY;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_BODY_PAYLOAD_KEY;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_HEADERS;
+import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_KEY;
 import static com.chutneytesting.action.kafka.KafkaBasicConsumeAction.OUTPUT_PAYLOADS;
 import static com.chutneytesting.action.spi.ActionExecutionResult.Status.Failure;
 import static com.chutneytesting.action.spi.ActionExecutionResult.Status.Success;
@@ -153,11 +155,12 @@ public abstract class KafkaBasicConsumeActionIntegrationTest {
     }
 
     private List<Map<String, Object>> assertActionOutputsSize(ActionExecutionResult actionExecutionResult, int size) {
-        assertThat(actionExecutionResult.outputs).hasSize(3);
+        assertThat(actionExecutionResult.outputs).hasSize(4);
 
         final List<Map<String, Object>> body = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_BODY);
         final List<Map<String, Object>> payloads = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_PAYLOADS);
         final List<Map<String, Object>> headers = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_HEADERS);
+        final List<Map<String, Object>> keys = (List<Map<String, Object>>) actionExecutionResult.outputs.get(OUTPUT_KEY);
         assertThat(body).hasSize(size);
         assertThat(payloads).hasSize(size);
         assertThat(headers).hasSize(size);
@@ -167,6 +170,7 @@ public abstract class KafkaBasicConsumeActionIntegrationTest {
             bodyTmp = body.get(i);
             assertThat(bodyTmp.get(OUTPUT_BODY_PAYLOAD_KEY)).isEqualTo(payloads.get(i));
             assertThat(bodyTmp.get(OUTPUT_BODY_HEADERS_KEY)).isEqualTo(headers.get(i));
+            assertThat(bodyTmp.get(OUTPUT_BODY_KEY_KEY)).isEqualTo(keys.get(i));
         }
 
         return body;

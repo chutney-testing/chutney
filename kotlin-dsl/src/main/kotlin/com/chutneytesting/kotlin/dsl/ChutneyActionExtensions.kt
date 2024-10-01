@@ -1774,6 +1774,7 @@ fun ChutneyStepBuilder.KafkaBasicPublishAction(
     topic: String,
     headers: Map<String, Any> = mapOf(),
     payload: Any,
+    key: String? = null,
     properties: Map<String, String> = mapOf(),
     outputs: Map<String, Any> = mapOf(),
     validations: Map<String, Any> = mapOf(),
@@ -1786,6 +1787,7 @@ fun ChutneyStepBuilder.KafkaBasicPublishAction(
             "topic" to topic,
             "headers" to headers,
             "payload" to payload,
+            "key" to key,
             "properties" to properties
         ).notEmptyToMap(),
         outputs = outputs,

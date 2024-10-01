@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.apache.kafka.clients.consumer.Consumer;
@@ -37,6 +38,8 @@ import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -74,18 +77,19 @@ public class KafkaBasicPublishActionTest {
 
     @Test
     void should_set_inputs_default_values() {
-        KafkaBasicPublishAction defaultAction = new KafkaBasicPublishAction(null, null, null, null, null, null);
+        KafkaBasicPublishAction defaultAction = new KafkaBasicPublishAction(null, null, null, null, null, null, null);
         assertThat(defaultAction)
             .hasFieldOrPropertyWithValue("topic", null)
             .hasFieldOrPropertyWithValue("headers", emptyMap())
             .hasFieldOrPropertyWithValue("payload", null)
+            .hasFieldOrPropertyWithValue("key", null)
             .hasFieldOrPropertyWithValue("properties", emptyMap())
         ;
     }
 
     @Test
     void should_validate_all_mandatory_inputs() {
-        KafkaBasicPublishAction defaultAction = new KafkaBasicPublishAction(null, null, null, null, null, null);
+        KafkaBasicPublishAction defaultAction = new KafkaBasicPublishAction(null, null, null, null, null, null, null);
         List<String> errors = defaultAction.validateInputs();
 
         assertThat(errors.size()).isEqualTo(8);
@@ -240,11 +244,43 @@ public class KafkaBasicPublishActionTest {
       consumer.close();
     }
 
+    @Test
+    public void should_produce_message_to_broker_with_explicit_key() throws Exception {
+        embeddedKafkaBroker.afterPropertiesSet();
+        Consumer<Integer, String> consumer = configureConsumer();
+
+        Target target = TestTarget.TestTargetBuilder.builder()
+            .withTargetId("kafka")
+            .withUrl("tcp://" + embeddedKafkaBroker.getBrokersAsString())
+            .build();
+
+        Map<String, String> props = new HashMap<>();
+        props.put("group.id", GROUP);
+        props.put("auto.commit.interval.ms", "10");
+        props.put("session.timeout.ms", "60000");
+        props.put("auto.offset.reset", "earliest");
+
+        Action sut = new KafkaBasicPublishAction(target, TOPIC, Map.of(), "my-test-value", props, "my-key", logger);
+
+        ActionExecutionResult actionExecutionResult = sut.execute();
+
+        assertThat(actionExecutionResult.status).isEqualTo(Success);
+        assertThat(actionExecutionResult.outputs).containsEntry("key", "my-key");
+
+        ConsumerRecord<Integer, String> singleRecord = KafkaTestUtils.getSingleRecord(consumer, TOPIC);
+        assertThat(singleRecord.value()).isEqualTo("my-test-value");
+        assertThat(String.valueOf(singleRecord.key())).isEqualTo("my-key");
+
+        consumer.close();
+    }
+
     private Consumer<Integer, String> configureConsumer() {
       Map<String, Object> consumerProps = KafkaTestUtils.consumerProps("testGroup", "true", embeddedKafkaBroker);
       consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
       consumerProps.put("bootstrap.servers", embeddedKafkaBroker.getBrokersAsString());
-      Consumer<Integer, String> consumer = new DefaultKafkaConsumerFactory<Integer, String>(consumerProps)
+      consumerProps.put("key.deserializer", StringDeserializer.class.getName());
+
+        Consumer<Integer, String> consumer = new DefaultKafkaConsumerFactory<Integer, String>(consumerProps)
           .createConsumer();
       consumer.subscribe(Collections.singleton(TOPIC));
       return consumer;
