@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { AlertService } from '@shared';
 
 import { InfoService, LoginService } from '@core/services';
+import { SsoOpenIdConnectService } from '@core/services/sso-open-id-connect.service';
 
 @Component({
   selector: 'chutney-login',
@@ -35,6 +36,7 @@ export class LoginComponent implements OnDestroy, OnInit {
     private infoService: InfoService,
     private route: ActivatedRoute,
     private alertService: AlertService,
+    private ssoService: SsoOpenIdConnectService
   ) {
     this.paramsSubscription = this.route.params.subscribe(params => {
       this.action = params['action'];
@@ -77,5 +79,14 @@ export class LoginComponent implements OnDestroy, OnInit {
             this.action = null;
         }
       );
+  }
+
+  connectSso() {
+    console.log('TOTOTOTOT')
+    this.ssoService.login()
+  }
+
+  getSsoProviderName() {
+    return this.ssoService.getSsoProviderName()
   }
 }

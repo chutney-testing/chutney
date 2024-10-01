@@ -8,10 +8,12 @@
 package com.chutneytesting.security;
 
 import com.chutneytesting.admin.api.InfoController;
+import com.chutneytesting.security.api.SsoOpenIdConnectController;
 import com.chutneytesting.security.api.UserController;
 import com.chutneytesting.security.api.UserDto;
 import com.chutneytesting.security.domain.AuthenticationService;
 import com.chutneytesting.security.domain.Authorizations;
+import com.chutneytesting.security.domain.CustomOAuth2UserService;
 import com.chutneytesting.security.infra.handlers.Http401FailureHandler;
 import com.chutneytesting.security.infra.handlers.HttpEmptyLogoutSuccessHandler;
 import com.chutneytesting.security.infra.handlers.HttpLoginSuccessHandler;
@@ -28,6 +30,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.ChannelSecurityConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
@@ -54,6 +57,11 @@ public class ChutneyWebSecurityConfig {
     }
 
     @Bean
+    public CustomOAuth2UserService oauth2UserService() {
+        return new CustomOAuth2UserService();
+    }
+
+    @Bean
     public SecurityFilterChain securityFilterChain(final HttpSecurity http) throws Exception {
         configureBaseHttpSecurity(http);
         UserDto anonymous = anonymous();
@@ -67,10 +75,23 @@ public class ChutneyWebSecurityConfig {
                     .requestMatchers(new MvcRequestMatcher(introspector, LOGIN_URL)).permitAll()
                     .requestMatchers(new MvcRequestMatcher(introspector, LOGOUT_URL)).permitAll()
                     .requestMatchers(new MvcRequestMatcher(introspector, InfoController.BASE_URL + "/**")).permitAll()
+                    .requestMatchers(new MvcRequestMatcher(introspector, SsoOpenIdConnectController.BASE_URL)).permitAll()
+                    .requestMatchers(new MvcRequestMatcher(introspector, SsoOpenIdConnectController.BASE_URL + "/**")).permitAll()
                     .requestMatchers(new MvcRequestMatcher(introspector, API_BASE_URL_PATTERN)).authenticated()
                     .requestMatchers(new MvcRequestMatcher(introspector, actuatorBaseUrl + "/**")).hasAuthority(Authorization.ADMIN_ACCESS.name())
                     .anyRequest().permitAll();
             })
+            .oauth2Login(oauth2Login -> oauth2Login
+                .loginPage(LOGIN_URL)
+                .defaultSuccessUrl("/")
+                .failureUrl("/")
+                .userInfoEndpoint(userInfoEndpointConfig -> {
+                    userInfoEndpointConfig.userService(oauth2UserService());
+                }))
+            .sessionManagement(sessionManagement -> {
+                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
+            })
+            .csrf(AbstractHttpConfigurer::disable)
             .httpBasic(Customizer.withDefaults());
 
         return http.build();
