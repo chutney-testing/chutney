@@ -55,6 +55,27 @@ spring:
       - ldap
       - mem-auth
       - db-sqlite
+  security:
+    oauth2:
+      client:
+        registration:
+          my-client: # Identifiant pour le client dans Spring Security
+            client-id: my-client  # Le client_id que vous avez défini dans votre serveur OIDC
+            client-secret: my-client-secret  # Le client_secret du serveur OIDC
+            scope: openid, profile, email  # Scopes requis (OpenID Connect nécessite "openid")
+            authorization-grant-type: authorization_code  # Type de grant (flux d'autorisation)
+            redirect-uri: "{baseUrl}/auth-callback"  # URL de redirection après authentification
+            provider: my-provider  # Le nom du provider associé (référence à la section provider)
+        provider:
+          my-provider: # Configuration du fournisseur OIDC
+            issuer-uri: http://localhost:3000  # URI de l'issuer (serveur OIDC)
+            user-info-uri: http://localhost:3000/userinfo  # URI pour obtenir les informations utilisateur
+            jwk-set-uri: http://localhost:3000/.well-known/openid-configuration/jwks  # URI pour obtenir la clé publique pour valider les tokens JWT
+            token-uri: http://localhost:3000/token  # URI pour échanger le code d'autorisation contre un token
+            authorization-uri: http://localhost:3000/auth  # URI pour l'authentification et obtenir le code d'autorisation
+            introspection-uri: http://localhost:3000/introspect  # URI d'introspection du token (facultatif)
+
+
 
 chutney:
   configuration-folder: .chutney/conf
@@ -110,3 +131,12 @@ jasypt:
   encryptor:
     private-key-format: pem
     private-key-location: classpath:/security/private.pem
+
+auth:
+  sso:
+    issuer: 'http://localhost:3000'
+    clientId: 'my-client'
+    responseType: 'code'
+    scope: 'openid profile email'
+    redirectBaseUrl: 'https://localhost:4200'
+    ssoProviderName: 'SSO OIDC'
