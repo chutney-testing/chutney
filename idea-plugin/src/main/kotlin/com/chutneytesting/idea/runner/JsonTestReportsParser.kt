@@ -54,6 +54,9 @@ data class Report(
     val environment: String,
     val contextVariables: Map<String, Any>,
     val tags: Set<String>,
+    val datasetId: String?,
+    val constants: Map<String, String>,
+    val datatable: List<Map<String, String>>,
     val report: Base
 )
 
