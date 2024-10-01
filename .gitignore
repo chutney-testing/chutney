@@ -1,12 +1,14 @@
 #SPDX-FileCopyrightText: 2017-2024 Enedis
 #SPDX-License-Identifier: Apache-2.0
 
-
 ######################
 # Maven
 ######################
-/log/
+.mvn/
+!.mvn/wrapper/MavenWrapperDownloader.java
+!.mvn/wrapper/maven-wrapper.properties
 **/target/
+/log/
 !/**/src/**/target/
 
 ######################
@@ -24,12 +26,64 @@
 *.ids
 *.orig
 
-
 ######################
 # Visual Studio Code
 ######################
 .vscode/
 **/.sts4-cache
 
-
+######################
+# Chutney
+######################
+**/.chutney/
 .env.chutney
+
+######################
+# Package Files
+######################
+*.jar
+*.war
+*.ear
+*.db
+
+######################
+# Windows
+######################
+# Windows image file caches
+Thumbs.db
+
+# Folder config file
+Desktop.ini
+
+######################
+# Mac OSX
+######################
+.DS_Store
+.svn
+
+# Thumbnails
+._*
+
+# Files that might appear on external disk
+.Spotlight-V100
+.Trashes
+
+######################
+# Directories
+######################
+/bin/
+/deploy/
+
+######################
+# Logs
+######################
+*.log
+
+######################
+# Others
+######################
+*.class
+*.*~
+*~
+.merge_file*
+*.bundle
