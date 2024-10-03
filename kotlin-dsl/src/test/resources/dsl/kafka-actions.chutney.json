@@ -13,6 +13,7 @@
                 "inputs": {
                     "topic": "topic",
                     "payload": "payload",
+                    "key": "key",
                     "properties": {
                         "bootstrap.servers": "a.host:666,b.host:999"
                     }
