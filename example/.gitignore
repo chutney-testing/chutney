@@ -2,6 +2,9 @@
 #SPDX-License-Identifier: Apache-2.0
 
 ######################
-# Chutney
+# Package Files
 ######################
-.chutney
+!.docker/demo/conf/chutney-demo.db
+!.docker/demo/conf/chutney-demo.db-shm
+!.docker/demo/conf/chutney-demo.db-wal
+!.docker/supervision/grafana/grafana.db
