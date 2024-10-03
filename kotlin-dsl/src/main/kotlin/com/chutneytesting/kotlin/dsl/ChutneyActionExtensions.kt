@@ -1387,7 +1387,7 @@ fun ChutneyStepBuilder.SeleniumScreenShotAction(
     strategy: Strategy? = null
 ) {
     implementation = ChutneyStepImpl(
-        type = "selenium-screenshot",
+        type = "selenium-screen-shot",
         inputs = mapOf(
             "web-driver" to webDriver
         ),
