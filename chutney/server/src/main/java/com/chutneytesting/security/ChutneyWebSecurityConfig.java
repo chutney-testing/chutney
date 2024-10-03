@@ -13,14 +13,16 @@ import com.chutneytesting.security.api.UserController;
 import com.chutneytesting.security.api.UserDto;
 import com.chutneytesting.security.domain.AuthenticationService;
 import com.chutneytesting.security.domain.Authorizations;
-import com.chutneytesting.security.domain.CustomOAuth2UserService;
 import com.chutneytesting.security.infra.handlers.Http401FailureHandler;
 import com.chutneytesting.security.infra.handlers.HttpEmptyLogoutSuccessHandler;
 import com.chutneytesting.security.infra.handlers.HttpLoginSuccessHandler;
+import com.chutneytesting.security.infra.sso.OAuth2UserDetailsService;
+import com.chutneytesting.security.infra.sso.SsoOpenIdConnectConfig;
 import com.chutneytesting.server.core.domain.security.Authorization;
 import com.chutneytesting.server.core.domain.security.User;
 import java.util.ArrayList;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
@@ -30,7 +32,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.ChannelSecurityConfigurer;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
@@ -57,8 +58,9 @@ public class ChutneyWebSecurityConfig {
     }
 
     @Bean
-    public CustomOAuth2UserService oauth2UserService() {
-        return new CustomOAuth2UserService();
+    @ConditionalOnMissingBean
+    public SsoOpenIdConnectConfig emptySsoOpenIdConnectConfig() {
+        return new SsoOpenIdConnectConfig();
     }
 
     @Bean
@@ -81,17 +83,7 @@ public class ChutneyWebSecurityConfig {
                     .requestMatchers(new MvcRequestMatcher(introspector, actuatorBaseUrl + "/**")).hasAuthority(Authorization.ADMIN_ACCESS.name())
                     .anyRequest().permitAll();
             })
-            .oauth2Login(oauth2Login -> oauth2Login
-                .loginPage(LOGIN_URL)
-                .defaultSuccessUrl("/")
-                .failureUrl("/")
-                .userInfoEndpoint(userInfoEndpointConfig -> {
-                    userInfoEndpointConfig.userService(oauth2UserService());
-                }))
-            .sessionManagement(sessionManagement -> {
-                sessionManagement.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED);
-            })
-            .csrf(AbstractHttpConfigurer::disable)
+            .oauth2ResourceServer(oauth2ResourceServerCustomizer -> oauth2ResourceServerCustomizer.jwt(Customizer.withDefaults()))
             .httpBasic(Customizer.withDefaults());
 
         return http.build();

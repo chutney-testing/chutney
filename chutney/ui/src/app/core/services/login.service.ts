@@ -109,15 +109,20 @@ export class LoginService {
     return url.includes(this.loginUrl);
   }
 
-  private setUser(user: User) {
-    this.user$.next(user);
+  currentUser(skipInterceptor: boolean = false, headers: HttpHeaders | {
+      [header: string]: string | string[];
+  } = {}): Observable<User> {
+    const headersInterceptor = skipInterceptor ? { 'no-intercept-error': ''} : {}
+      console.log(headers)
+      const options = {
+      headers: { ...headersInterceptor, ...headers}
+    };
+    console.log(options)
+    return this.http.get<User>(environment.backend + this.url, options);
   }
 
-  private currentUser(skipInterceptor: boolean = false): Observable<User> {
-    const options = {
-      headers: { 'no-intercept-error': ''}
-    };
-    return this.http.get<User>(environment.backend + this.url, skipInterceptor ? options : {});
+  private setUser(user: User) {
+    this.user$.next(user);
   }
 
   private defaultForwardUrl(user: User): string {

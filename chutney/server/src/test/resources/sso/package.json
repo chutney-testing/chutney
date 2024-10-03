@@ -1,0 +1,17 @@
+{
+    "name": "oidc-sso-server",
+    "version": "1.0.0",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "node sso-oidc.mjs"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "express": "^4.21.0",
+        "oidc-provider": "^8.5.1"
+    }
+}

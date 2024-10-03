@@ -7,7 +7,7 @@
 
 package com.chutneytesting.security.api;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.chutneytesting.security.infra.sso.SsoOpenIdConnectConfig;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,13 +23,8 @@ public class SsoOpenIdConnectController {
 
     private final SsoOpenIdConnectConfig ssoOpenIdConnectConfig;
 
-    SsoOpenIdConnectController(@Value("${auth.sso.issuer}") String issuer,
-                               @Value("${auth.sso.clientId}") String clientId,
-                               @Value("${auth.sso.responseType}") String responseType,
-                               @Value("${auth.sso.scope}") String scope,
-                               @Value("${auth.sso.redirectBaseUrl}") String redirectUri,
-                               @Value("${auth.sso.ssoProviderName}") String ssoProviderName) {
-        this.ssoOpenIdConnectConfig = new SsoOpenIdConnectConfig(issuer, clientId, responseType, scope, redirectUri, ssoProviderName);
+    SsoOpenIdConnectController(SsoOpenIdConnectConfig ssoOpenIdConnectConfig) {
+        this.ssoOpenIdConnectConfig = ssoOpenIdConnectConfig;
     }
 
     @GetMapping(path = "/config", produces = MediaType.APPLICATION_JSON_VALUE)
