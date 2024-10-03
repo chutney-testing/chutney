@@ -82,7 +82,6 @@ export class LoginComponent implements OnDestroy, OnInit {
   }
 
   connectSso() {
-    console.log('TOTOTOTOT')
     this.ssoService.login()
   }
 

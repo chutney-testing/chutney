@@ -7,10 +7,12 @@ import { Injectable } from '@angular/core';
 interface SsoAuthConfig {
   issuer: string,
   clientId: string,
+  clientSecret: string,
   responseType: string,
   scope: string,
   redirectBaseUrl: string,
-  ssoProviderName: string
+  ssoProviderName: string,
+  oidc: boolean
 }
 
 @Injectable({
@@ -34,7 +36,9 @@ export class SsoOpenIdConnectService {
             clientId: ssoConfig.clientId,
             responseType: ssoConfig.responseType,
             scope: ssoConfig.scope,
-            redirectUri: ssoConfig.redirectBaseUrl + '/'
+            redirectUri: ssoConfig.redirectBaseUrl + '/',
+            dummyClientSecret: ssoConfig.clientSecret,
+            oidc: ssoConfig.oidc
           }
         })
       )
@@ -59,8 +63,11 @@ export class SsoOpenIdConnectService {
       return this.oauthService.getIdentityClaims();
   }
 
+  get token(): string {
+      return this.oauthService.getIdToken();
+  }
+
   get isLoggedIn() {
       return this.oauthService.hasValidAccessToken();
   }
-
 }

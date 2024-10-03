@@ -1,0 +1,18 @@
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:3000  # URL du serveur OIDC
+
+auth:
+  sso:
+    issuer: 'http://localhost:3000'
+    clientId: 'my-client'
+    clientSecret: 'my-client-secret'
+    responseType: 'code'
+    scope: 'openid profile email'
+    redirectBaseUrl: 'https://localhost:4200'
+    ssoProviderName: 'SSO OIDC'
+    oidc: true
