@@ -100,7 +100,7 @@ public class StepDataEvaluatorTest {
         assertThat(evaluatedInputs.get("objectAttributeValue")).isEqualTo("attributeValue");
 
         assertThat(evaluatedInputs.get("map")).isInstanceOf(Map.class);
-        Map evaluatedMap = (Map<String, Object>)evaluatedInputs.get("map");
+        Map<String, Object> evaluatedMap = (Map<String, Object>) evaluatedInputs.get("map");
         assertThat(evaluatedMap.get("stringRawValue")).isEqualTo("rawValue");
         assertThat(evaluatedMap.get("objectRawValue")).isEqualTo(testObject);
         assertThat(evaluatedMap.get("destination")).isEqualTo("stringDestination");
@@ -111,13 +111,13 @@ public class StepDataEvaluatorTest {
         assertThat(evaluatedMap.get("objectAttributeValue")).isEqualTo("attributeValue");
 
         assertThat(evaluatedMap.get("innerMap")).isInstanceOf(Map.class);
-        Map evaluatedInnerMap = (Map<Object, Object>)evaluatedMap.get("innerMap");
+        Map<Object, Object> evaluatedInnerMap = (Map<Object, Object>) evaluatedMap.get("innerMap");
         assertThat(evaluatedInnerMap.get("dateTimeFormat")).isEqualTo("ss");
         assertThat(evaluatedInnerMap.get("dateTimeFormatRef")).isEqualTo("ss");
 
 
         assertThat(evaluatedInputs.get("list")).isInstanceOf(List.class);
-        List evaluatedList = (List<Object>)evaluatedInputs.get("list");
+        List<Object> evaluatedList = (List<Object>) evaluatedInputs.get("list");
         assertThat(evaluatedList.get(0)).isEqualTo("rawValue");
         assertThat(evaluatedList.get(1)).isEqualTo(testObject);
         assertThat(evaluatedList.get(2)).isEqualTo("stringDestination");
@@ -127,7 +127,7 @@ public class StepDataEvaluatorTest {
         assertThat(evaluatedList.get(6)).isEqualTo("attributeValue");
 
         assertThat(evaluatedInputs.get("set")).isInstanceOf(Set.class);
-        Set evaluatedSet = (Set<Object>)evaluatedInputs.get("set");
+        Set<Object> evaluatedSet = (Set<Object>) evaluatedInputs.get("set");
         assertThat(evaluatedSet).contains("rawValue");
         assertThat(evaluatedSet).contains(testObject);
         assertThat(evaluatedSet).contains("stringDestination");
@@ -211,6 +211,19 @@ public class StepDataEvaluatorTest {
     }
 
     @Test
+    public void should_resolve_expression_as_string() {
+        // Given
+        Map<String, Object> context = new HashMap<>();
+        context.put("toto", "titi");
+
+        // When
+        String result = sut.evaluateString("test ${#toto}", context);
+
+        // Then
+        assertThat(result).isEqualTo("test titi");
+    }
+
+    @Test
     public void should_evaluate_multiple_spel() {
         // Given
         ScenarioContextImpl scenarioContext = new ScenarioContextImpl();
@@ -247,18 +260,20 @@ public class StepDataEvaluatorTest {
         assertThat(evaluatedInputs.get("twoVariablesWithTextAtBeginning")).isEqualTo("Text - toto - tata");
         assertThat(evaluatedInputs.get("twoVariablesWithTextAtTheEnd")).isEqualTo("toto - tata - text");
 
-        assertThat(((Map)evaluatedInputs.get("object")).get("k1")).isEqualTo("value1");
-        assertThat(((Map)evaluatedInputs.get("objectWithSpaceAfter")).get("k2")).isEqualTo("value2");
-        assertThat(((Map)evaluatedInputs.get("objectWithSpaceBefore")).get("k3")).isEqualTo("value3");
-        assertThat(((Map)evaluatedInputs.get("objectWithSpaceAfterSuffix")).get("k4")).isEqualTo("value4");
-        assertThat(((Map)evaluatedInputs.get("objectWithSpaceBeforePrefix")).get("k5")).isEqualTo("value5");
+        assertThat(((Map) evaluatedInputs.get("object")).get("k1")).isEqualTo("value1");
+        assertThat(((Map) evaluatedInputs.get("objectWithSpaceAfter")).get("k2")).isEqualTo("value2");
+        assertThat(((Map) evaluatedInputs.get("objectWithSpaceBefore")).get("k3")).isEqualTo("value3");
+        assertThat(((Map) evaluatedInputs.get("objectWithSpaceAfterSuffix")).get("k4")).isEqualTo("value4");
+        assertThat(((Map) evaluatedInputs.get("objectWithSpaceBeforePrefix")).get("k5")).isEqualTo("value5");
     }
 
-    private class TestObject {
-        private String attribute;
+    private static class TestObject {
+        private final String attribute;
+
         public TestObject(String attribute) {
             this.attribute = attribute;
         }
+
         public String attribute() {
             return attribute;
         }
