@@ -17,6 +17,7 @@ import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -42,6 +43,7 @@ import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.util.ReflectionUtils;
 
@@ -81,17 +83,14 @@ public class RetryWithTimeOutStrategyTest {
 
     @Test
     public void step_succeeds_execute_only_once() {
-        // Given
         StrategyProperties strategyProperties = properties("100 sec", "50 ms");
         StepStrategyDefinition strategyDefinition = new StepStrategyDefinition("", strategyProperties);
 
-        // When
         Step step = mock(Step.class);
         when(step.strategy()).thenReturn(Optional.of(strategyDefinition));
         strategyUnderTest.execute(createScenarioExecution(null), step, null, null);
 
-        // Then
-        verify(step, times(1)).execute(any(), any(), any() );
+        verify(step, times(1)).execute(any(), any(), any());
     }
 
     @Test
@@ -302,7 +301,7 @@ public class RetryWithTimeOutStrategyTest {
 
     @SuppressWarnings("unused")
     private static Object[] retryStepParameters() {
-        return new Object[] {
+        return new Object[]{
             new Object[]{new Status[]{Status.SUCCESS}},
             new Object[]{new Status[]{Status.FAILURE, Status.SUCCESS}},
             new Object[]{new Status[]{Status.FAILURE, Status.FAILURE, Status.SUCCESS}},
@@ -315,6 +314,99 @@ public class RetryWithTimeOutStrategyTest {
         Field stopField = ReflectionUtils.findField(ScenarioExecution.class, "stop");
         stopField.setAccessible(true);
         ReflectionUtils.setField(stopField, scenarioExecution, true);
+    }
+
+    @Test
+    public void should_evaluate_spel_expression_in_timeout() {
+        StrategyProperties strategyProperties = properties("${#TIMEOUT_VALUE}", "50 ms");
+        StepStrategyDefinition strategyDefinition = new StepStrategyDefinition("", strategyProperties);
+
+        Step step = mockStep(Status.SUCCESS);
+        when(step.strategy()).thenReturn(Optional.of(strategyDefinition));
+
+        StepDataEvaluator evaluator = mock(StepDataEvaluator.class);
+        when(step.dataEvaluator()).thenReturn(evaluator);
+        when(evaluator.evaluate(eq("${#TIMEOUT_VALUE}"), any())).thenReturn("5 s");
+
+        strategyUnderTest.execute(ScenarioExecution.createScenarioExecution(null), step, new ScenarioContextImpl(), null);
+
+        verify(step).addInformation(contains("Retry strategy definition : [timeOut 5 s]"));
+    }
+
+    @Test
+    public void should_evaluate_spel_expression_in_retryDelay() {
+        StrategyProperties strategyProperties = properties("10 s", "${#RETRY_DELAY}");
+        StepStrategyDefinition strategyDefinition = new StepStrategyDefinition("", strategyProperties);
+
+        Step step = mockStep(Status.SUCCESS);
+        when(step.strategy()).thenReturn(Optional.of(strategyDefinition));
+
+        StepDataEvaluator evaluator = mock(StepDataEvaluator.class);
+        when(step.dataEvaluator()).thenReturn(evaluator);
+        when(evaluator.evaluate(eq("${#RETRY_DELAY}"), any())).thenReturn("100 ms");
+
+        strategyUnderTest.execute(ScenarioExecution.createScenarioExecution(null), step, new ScenarioContextImpl(), null);
+
+        ArgumentCaptor<String> infoCaptor = ArgumentCaptor.forClass(String.class);
+        verify(step, atLeastOnce()).addInformation(infoCaptor.capture());
+
+        List<String> capturedInfos = infoCaptor.getAllValues();
+        assertThat(capturedInfos).anyMatch(info ->
+            info.contains("Retry strategy definition : [timeOut 10 s] [delay 100 ms]"));
+    }
+
+    @Test
+    public void should_evaluate_complex_spel_expressions() {
+        StrategyProperties strategyProperties = properties("${#BASE_TIMEOUT + ' s'}", "${#RETRY_DELAY * 2 + ' ms'}");
+        StepStrategyDefinition strategyDefinition = new StepStrategyDefinition("", strategyProperties);
+
+        Step step = mockStep(Status.SUCCESS);
+        when(step.strategy()).thenReturn(Optional.of(strategyDefinition));
+
+        StepDataEvaluator evaluator = mock(StepDataEvaluator.class);
+        when(step.dataEvaluator()).thenReturn(evaluator);
+        when(evaluator.evaluate(eq("${#BASE_TIMEOUT + ' s'}"), any())).thenReturn("15 s");
+        when(evaluator.evaluate(eq("${#RETRY_DELAY * 2 + ' ms'}"), any())).thenReturn("200 ms");
+
+        strategyUnderTest.execute(ScenarioExecution.createScenarioExecution(null), step, new ScenarioContextImpl(), null);
+
+        ArgumentCaptor<String> infoCaptor = ArgumentCaptor.forClass(String.class);
+        verify(step, atLeastOnce()).addInformation(infoCaptor.capture());
+
+        List<String> capturedInfos = infoCaptor.getAllValues();
+        assertThat(capturedInfos).anyMatch(info ->
+            info.contains("Retry strategy definition : [timeOut 15 s] [delay 200 ms]"));
+    }
+
+    @Test
+    public void should_use_original_value_when_not_spel_expression() {
+        StrategyProperties strategyProperties = properties("20 s", "150 ms");
+        StepStrategyDefinition strategyDefinition = new StepStrategyDefinition("", strategyProperties);
+
+        Step step = mockStep(Status.SUCCESS);
+        when(step.strategy()).thenReturn(Optional.of(strategyDefinition));
+        when(step.dataEvaluator()).thenReturn(new StepDataEvaluator(null));
+
+        strategyUnderTest.execute(ScenarioExecution.createScenarioExecution(null), step, new ScenarioContextImpl(), null);
+
+        verify(step).addInformation(contains("Retry strategy definition : [timeOut 20 s] [delay 150 ms]"));
+    }
+
+    @Test
+    public void should_handle_mixed_spel_and_non_spel_values() {
+        StrategyProperties strategyProperties = properties("${#TIMEOUT_VALUE}", "100 ms");
+        StepStrategyDefinition strategyDefinition = new StepStrategyDefinition("", strategyProperties);
+
+        Step step = mockStep(Status.SUCCESS);
+        when(step.strategy()).thenReturn(Optional.of(strategyDefinition));
+
+        StepDataEvaluator evaluator = mock(StepDataEvaluator.class);
+        when(step.dataEvaluator()).thenReturn(evaluator);
+        when(evaluator.evaluate(eq("${#TIMEOUT_VALUE}"), any())).thenReturn("30 s");
+
+        strategyUnderTest.execute(ScenarioExecution.createScenarioExecution(null), step, new ScenarioContextImpl(), null);
+
+        verify(step).addInformation(contains("Retry strategy definition : [timeOut 30 s] [delay 100 ms]"));
     }
 
 }

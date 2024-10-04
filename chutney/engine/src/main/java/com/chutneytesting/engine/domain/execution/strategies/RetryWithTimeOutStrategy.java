@@ -9,6 +9,8 @@ package com.chutneytesting.engine.domain.execution.strategies;
 
 import com.chutneytesting.action.spi.time.Duration;
 import com.chutneytesting.engine.domain.execution.ScenarioExecution;
+import com.chutneytesting.engine.domain.execution.engine.evaluation.EvaluationException;
+import com.chutneytesting.engine.domain.execution.engine.evaluation.StepDataEvaluator;
 import com.chutneytesting.engine.domain.execution.engine.scenario.ScenarioContext;
 import com.chutneytesting.engine.domain.execution.engine.step.Step;
 import com.chutneytesting.engine.domain.execution.report.Status;
@@ -67,15 +69,19 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
             throw new IllegalStateException("Undefined parameter 'retryDelay'"); // TODO - be friendly -> provide a default value instead
         }
 
-        Long timeOutMs = toMilliSeconds(timeOut);
-        Long retryDelayMs = toMilliSeconds(retryDelay);
-        Long timeLeft = timeOutMs;
+        Object evaluatedTimeOut = evaluateExpression(timeOut, step.dataEvaluator(), scenarioContext);
+        Object evaluatedRetryDelay = evaluateExpression(retryDelay, step.dataEvaluator(), scenarioContext);
+
+        long timeOutMs = convertToMilliseconds(evaluatedTimeOut);
+        long retryDelayMs = convertToMilliseconds(evaluatedRetryDelay);
+
+        long timeLeft = timeOutMs;
         Status st = Status.NOT_EXECUTED;
         int tries = 1;
         List<String> lastErrors = new ArrayList<>();
         do {
-            Long tryStartTime = System.currentTimeMillis();
-            step.addInformation("Retry strategy definition : [timeOut " + timeOut + "] [delay " + retryDelay + "]");
+            long tryStartTime = System.currentTimeMillis();
+            logStrategyDefinition(step, timeOut, retryDelay, evaluatedTimeOut, evaluatedRetryDelay);
             step.addInformation("Try number : " + (tries++));
 
             st = executeAll(scenarioExecution, step, scenarioContext, localContext, strategies);
@@ -90,7 +96,7 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
                 }
                 timeLeft -= System.currentTimeMillis() - tryStartTime;
             } else {
-                if(!lastErrors.isEmpty()){
+                if (!lastErrors.isEmpty()) {
                     step.addErrorMessage("Error(s) on last step execution:");
                     lastErrors.forEach(step::addErrorMessage);
                 }
@@ -105,6 +111,38 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
         } while (timeLeft > 0); // TODO - needs to backoff a bit before retry
         return st;
     }
+
+    private void logStrategyDefinition(Step step, String timeOut, String retryDelay, Object evaluatedTimeOut, Object evaluatedRetryDelay) {
+        String timeOutLog = isSpelExpression(timeOut) ? evaluatedTimeOut.toString() : timeOut;
+        String retryDelayLog = isSpelExpression(retryDelay) ? evaluatedRetryDelay.toString() : retryDelay;
+        step.addInformation("Retry strategy definition : [timeOut " + timeOutLog + "] [delay " + retryDelayLog + "]");
+    }
+
+    private boolean isSpelExpression(String value) {
+        return value.contains("#{") || value.contains("${") || value.startsWith("#");
+    }
+
+    private Object evaluateExpression(String expression, StepDataEvaluator evaluator, ScenarioContext scenarioContext) {
+        if (isSpelExpression(expression)) {
+            try {
+                return evaluator.evaluate(expression, scenarioContext);
+            } catch (EvaluationException e) {
+                throw new RuntimeException("Failed to evaluate expression: " + expression, e);
+            }
+        }
+        return expression;
+    }
+
+    private long convertToMilliseconds(Object value) {
+        if (value instanceof Number) {
+            return ((Number) value).longValue();
+        } else if (value instanceof String) {
+            return toMilliSeconds((String) value);
+        } else {
+            throw new IllegalArgumentException("Invalid expression result type: " + value.getClass().getName());
+        }
+    }
+
 
     private Status executeAll(ScenarioExecution scenarioExecution,
                               Step step,
@@ -126,7 +164,6 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
     private long toMilliSeconds(String duration) {
         double durationInMS = Duration.parse(duration).toMilliseconds();
         return Math.round(durationInMS);
-
     }
 }
 
