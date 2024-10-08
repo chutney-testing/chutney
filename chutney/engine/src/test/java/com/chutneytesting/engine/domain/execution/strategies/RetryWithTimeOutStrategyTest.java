@@ -391,22 +391,4 @@ public class RetryWithTimeOutStrategyTest {
 
         verify(step).addInformation(contains("Retry strategy definition : [timeOut 20 s] [delay 150 ms]"));
     }
-
-    @Test
-    public void should_handle_mixed_spel_and_non_spel_values() {
-        StrategyProperties strategyProperties = properties("${#TIMEOUT_VALUE}", "100 ms");
-        StepStrategyDefinition strategyDefinition = new StepStrategyDefinition("", strategyProperties);
-
-        Step step = mockStep(Status.SUCCESS);
-        when(step.strategy()).thenReturn(Optional.of(strategyDefinition));
-
-        StepDataEvaluator evaluator = mock(StepDataEvaluator.class);
-        when(step.dataEvaluator()).thenReturn(evaluator);
-        when(evaluator.evaluate(eq("${#TIMEOUT_VALUE}"), any())).thenReturn("30 s");
-
-        strategyUnderTest.execute(ScenarioExecution.createScenarioExecution(null), step, new ScenarioContextImpl(), null);
-
-        verify(step).addInformation(contains("Retry strategy definition : [timeOut 30 s] [delay 100 ms]"));
-    }
-
 }

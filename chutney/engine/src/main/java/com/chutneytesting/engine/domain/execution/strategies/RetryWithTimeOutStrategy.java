@@ -69,11 +69,12 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
             throw new IllegalStateException("Undefined parameter 'retryDelay'"); // TODO - be friendly -> provide a default value instead
         }
 
+
         Object evaluatedTimeOut = evaluateExpression(timeOut, step.dataEvaluator(), scenarioContext);
         Object evaluatedRetryDelay = evaluateExpression(retryDelay, step.dataEvaluator(), scenarioContext);
 
-        long timeOutMs = convertToMilliseconds(evaluatedTimeOut);
-        long retryDelayMs = convertToMilliseconds(evaluatedRetryDelay);
+        long timeOutMs = toMilliSeconds(evaluatedTimeOut.toString());
+        long retryDelayMs = toMilliSeconds(evaluatedRetryDelay.toString());
 
         long timeLeft = timeOutMs;
         Status st = Status.NOT_EXECUTED;
@@ -81,7 +82,7 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
         List<String> lastErrors = new ArrayList<>();
         do {
             long tryStartTime = System.currentTimeMillis();
-            logStrategyDefinition(step, timeOut, retryDelay, evaluatedTimeOut, evaluatedRetryDelay);
+            step.addInformation("Retry strategy definition : [timeOut " + evaluatedTimeOut + "] [delay " + evaluatedRetryDelay + "]");
             step.addInformation("Try number : " + (tries++));
 
             st = executeAll(scenarioExecution, step, scenarioContext, localContext, strategies);
@@ -112,37 +113,18 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
         return st;
     }
 
-    private void logStrategyDefinition(Step step, String timeOut, String retryDelay, Object evaluatedTimeOut, Object evaluatedRetryDelay) {
-        String timeOutLog = isSpelExpression(timeOut) ? evaluatedTimeOut.toString() : timeOut;
-        String retryDelayLog = isSpelExpression(retryDelay) ? evaluatedRetryDelay.toString() : retryDelay;
-        step.addInformation("Retry strategy definition : [timeOut " + timeOutLog + "] [delay " + retryDelayLog + "]");
-    }
-
-    private boolean isSpelExpression(String value) {
-        return value.contains("#{") || value.contains("${") || value.startsWith("#");
-    }
-
     private Object evaluateExpression(String expression, StepDataEvaluator evaluator, ScenarioContext scenarioContext) {
-        if (isSpelExpression(expression)) {
-            try {
-                return evaluator.evaluate(expression, scenarioContext);
-            } catch (EvaluationException e) {
-                throw new RuntimeException("Failed to evaluate expression: " + expression, e);
-            }
+        if (evaluator == null) {
+            return expression;
         }
-        return expression;
-    }
-
-    private long convertToMilliseconds(Object value) {
-        if (value instanceof Number) {
-            return ((Number) value).longValue();
-        } else if (value instanceof String) {
-            return toMilliSeconds((String) value);
-        } else {
-            throw new IllegalArgumentException("Invalid expression result type: " + value.getClass().getName());
+        try {
+            Object result = evaluator.evaluate(expression, scenarioContext);
+            return result != null ? result : expression;
+        } catch (EvaluationException e) {
+            System.out.println("Failed to evaluate expression: " + expression);
+            throw new RuntimeException("Failed to evaluate expression: " + expression, e);
         }
     }
-
 
     private Status executeAll(ScenarioExecution scenarioExecution,
                               Step step,
