@@ -128,11 +128,9 @@ export class LoginService {
       [header: string]: string | string[];
   } = {}): Observable<User> {
     const headersInterceptor = skipInterceptor ? { 'no-intercept-error': ''} : {}
-      console.log(headers)
       const options = {
       headers: { ...headersInterceptor, ...headers}
     };
-    console.log(options)
     return this.http.get<User>(environment.backend + this.url, options);
   }
 

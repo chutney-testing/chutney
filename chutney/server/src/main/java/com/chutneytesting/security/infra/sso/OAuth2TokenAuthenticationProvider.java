@@ -18,19 +18,19 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.OAuth2AccessToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-public class TokenAuthenticationProvider implements AuthenticationProvider {
+public class OAuth2TokenAuthenticationProvider implements AuthenticationProvider {
 
     private final OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService;
     private final ClientRegistration clientRegistration;
 
-    public TokenAuthenticationProvider(OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService, ClientRegistration clientRegistration) {
+    public OAuth2TokenAuthenticationProvider(OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService, ClientRegistration clientRegistration) {
         this.oAuth2UserService = oAuth2UserService;
         this.clientRegistration = clientRegistration;
     }
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
-        TokenAuthenticationToken tokenAuth = (TokenAuthenticationToken) authentication;
+        OAuth2AuthenticationToken tokenAuth = (OAuth2AuthenticationToken) authentication;
         String token = tokenAuth.getCredentials().toString();
         OAuth2AccessToken accessToken = new OAuth2AccessToken(OAuth2AccessToken.TokenType.BEARER, token, null, null);
         OAuth2UserRequest userRequest = new OAuth2UserRequest(clientRegistration, accessToken);
@@ -44,6 +44,6 @@ public class TokenAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> authentication) {
-        return TokenAuthenticationToken.class.isAssignableFrom(authentication);
+        return OAuth2AuthenticationToken.class.isAssignableFrom(authentication);
     }
 }
