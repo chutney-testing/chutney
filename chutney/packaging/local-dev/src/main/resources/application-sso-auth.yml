@@ -2,9 +2,34 @@
 spring:
   security:
     oauth2:
+      client:
+        registration:
+          my-provider:
+            provider: my-provider
+            client-id: my-client
+            client-secret: my-client-secret
+            authorization-grant-type: authorization_code
+            redirect-uri: "https://localhost:4200/login/oauth2/code/{registrationId}"
+            scope: openid, profile, email
+            client-name: My Provider
+        provider:
+          my-provider:
+            issuer-uri: http://localhost:3000
+            authorization-uri: http://localhost:3000/auth
+            token-uri: http://localhost:3000/token
+            user-info-uri: http://localhost:3000/me
+            user-name-attribute: sub
+            jwk-set-uri: http://localhost:3000/jwks
       resourceserver:
-        jwt:
-          issuer-uri: http://localhost:3000  # URL du serveur OIDC
+        opaque-token:
+          introspection-uri: http://localhost:3000/token/introspection
+          client-id: 'my-client'
+          client-secret: 'my-client-secret'
+      authorizationserver:
+        issuer: http://localhost:3000
+        endpoint:
+          oidc:
+            user-info-uri: http://localhost:3000/userinfo
 
 auth:
   sso:

@@ -1,0 +1,51 @@
+/*
+ * SPDX-FileCopyrightText: 2017-2024 Enedis
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
+package com.chutneytesting.security.infra.sso;
+
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import org.springframework.http.HttpHeaders;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+
+public class TokenAuthenticationFilter extends OncePerRequestFilter {
+
+    private final AuthenticationManager authenticationManager;
+
+    public TokenAuthenticationFilter(AuthenticationManager authenticationManager){
+        this.authenticationManager = authenticationManager;
+    }
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain)
+        throws ServletException, IOException {
+        String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            String token = authorizationHeader.substring(7);
+            TokenAuthenticationToken authRequest = new TokenAuthenticationToken(token);
+            try {
+                Authentication authentication = authenticationManager.authenticate(authRequest);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                request.getSession(true);
+            } catch (AuthenticationException ex) {
+                SecurityContextHolder.clearContext();
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, ex.getMessage());
+                return;
+            }
+        }
+        filterChain.doFilter(request, response);
+    }
+}

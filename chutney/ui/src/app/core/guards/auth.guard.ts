@@ -22,25 +22,19 @@ export const authGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, st
     const translateService = inject(TranslateService);
     const loginService = inject(LoginService);
     const alertService = inject(AlertService);
-    const ssoOpenIdConnectService = inject(SsoOpenIdConnectService);
 
     const requestURL = state.url !== undefined ? state.url : '';
     const unauthorizedMessage = translateService.instant('login.unauthorized')
 
     if (!loginService.isAuthenticated()) {
-        if (ssoOpenIdConnectService.token) {
-            console.log(ssoOpenIdConnectService.token)
-            const user: User = await firstValueFrom(loginService.currentUser(true, {
-                'Authorization': 'Bearer ' + ssoOpenIdConnectService.token
-            }))
-            if (user) {
-                console.log('-------------------')
-                console.log(user)
-                return true
-            }
+        if (loginService.oauth2Token) {
+            await firstValueFrom(loginService.initLoginObservable(requestURL, {
+                'Authorization': 'Bearer ' + loginService.oauth2Token
+            }));
+        } else {
+            loginService.initLogin(requestURL);
+            return false;
         }
-        loginService.initLogin(requestURL);
-        return false;
     }
 
     const authorizations: Array<Authorization> = route.data['authorizations'] || [];

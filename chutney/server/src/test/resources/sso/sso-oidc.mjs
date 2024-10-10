@@ -8,20 +8,25 @@
 import express from 'express';
 import { Provider } from 'oidc-provider';
 
-const clients = [{
-    client_id: 'my-client',
-    client_secret: 'my-client-secret',
-    grant_types: ['authorization_code'],
-    redirect_uris: ['https://localhost:4200/'],
-}];
 const oidc = new Provider('http://localhost:3000', {
-    clients,
+    clients: [{
+        client_id: 'my-client',
+        client_secret: 'my-client-secret',
+        grant_types: ['authorization_code'],
+        redirect_uris: ['https://localhost:4200/'],
+        post_logout_redirect_uris: ['https://localhost:4200/'],
+    }],
     formats: {
-        AccessToken: 'jwt',
+        AccessToken: 'opaque',
+        RefreshToken: 'opaque',
+        IdToken: 'opaque'
     },
     features: {
-        introspection: { enabled: true },
+        introspection: {
+            enabled: true
+        },
         revocation: { enabled: true },
+        userinfo: { enabled: true },
     },
     clientBasedCORS(ctx, origin, client) {
         const allowedOrigins = ['https://localhost:4200'];

@@ -56,30 +56,6 @@ spring:
       - mem-auth
       - db-sqlite
       - sso-auth
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          issuer-uri: http://localhost:3000  # URL du serveur OIDC
-      client:
-        registration:
-          my-client: # Identifiant pour le client dans Spring Security
-            client-id: my-client  # Le client_id que vous avez défini dans votre serveur OIDC
-            client-secret: my-client-secret  # Le client_secret du serveur OIDC
-            scope: openid, profile, email  # Scopes requis (OpenID Connect nécessite "openid")
-            authorization-grant-type: authorization_code  # Type de grant (flux d'autorisation)
-            redirect-uri: "{baseUrl}/auth-callback"  # URL de redirection après authentification
-            provider: my-provider  # Le nom du provider associé (référence à la section provider)
-        provider:
-          my-provider: # Configuration du fournisseur OIDC
-            issuer-uri: http://localhost:3000  # URI de l'issuer (serveur OIDC)
-            user-info-uri: http://localhost:3000/userinfo  # URI pour obtenir les informations utilisateur
-            jwk-set-uri: http://localhost:3000/.well-known/openid-configuration/jwks  # URI pour obtenir la clé publique pour valider les tokens JWT
-            token-uri: http://localhost:3000/token  # URI pour échanger le code d'autorisation contre un token
-            authorization-uri: http://localhost:3000/auth  # URI pour l'authentification et obtenir le code d'autorisation
-            introspection-uri: http://localhost:3000/introspect  # URI d'introspection du token (facultatif)
-
-
 
 chutney:
   configuration-folder: .chutney/conf
