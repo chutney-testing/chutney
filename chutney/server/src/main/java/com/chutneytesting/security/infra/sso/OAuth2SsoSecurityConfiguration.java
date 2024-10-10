@@ -7,22 +7,67 @@
 
 package com.chutneytesting.security.infra.sso;
 
+import static com.chutneytesting.security.ChutneyWebSecurityConfig.API_BASE_URL_PATTERN;
+import static com.chutneytesting.security.ChutneyWebSecurityConfig.LOGIN_URL;
+import static com.chutneytesting.security.ChutneyWebSecurityConfig.LOGOUT_URL;
+
+import com.chutneytesting.admin.api.InfoController;
+import com.chutneytesting.security.ChutneyWebSecurityConfig;
+import com.chutneytesting.security.api.SsoOpenIdConnectController;
+import com.chutneytesting.security.api.UserDto;
 import com.chutneytesting.security.domain.AuthenticationService;
-import com.chutneytesting.security.infra.memory.InMemoryUserDetailsService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.chutneytesting.security.domain.Authorizations;
+import com.chutneytesting.server.core.domain.security.Authorization;
+import java.util.ArrayList;
+import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.security.oauth2.server.servlet.OAuth2AuthorizationServerProperties;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
+import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
 @Profile("sso-auth")
+@EnableWebSecurity
+@EnableMethodSecurity
+@EnableConfigurationProperties(OAuth2AuthorizationServerProperties.class)
 public class OAuth2SsoSecurityConfiguration {
+
+    @Value("${management.endpoints.web.base-path:/actuator}")
+    public static String ACTUATOR_BASE_URL;
+
+    @Value("${server.ssl.enabled:true}")
+    Boolean sslEnabled;
+
+    @Bean
+    public AuthenticationService authenticationService(Authorizations authorizations) {
+        return new AuthenticationService(authorizations);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SsoOpenIdConnectConfig emptySsoOpenIdConnectConfig() {
+        return new SsoOpenIdConnectConfig();
+    }
 
     @Bean
     @Primary
@@ -47,27 +92,47 @@ public class OAuth2SsoSecurityConfiguration {
     }
 
     @Bean
-    public OAuth2UserDetailsService oAuth2UserDetailsService(AuthenticationService authenticationService) {
-        return new OAuth2UserDetailsService(authenticationService);
+    public OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService(AuthenticationService authenticationService) {
+        return new CustomOAuth2UserService(authenticationService);
     }
 
-    @Configuration
-    @Profile("sso-auth")
-    public static class OAuth2SsoConfiguration {
+    @Bean
+    public TokenAuthenticationProvider tokenAuthenticationProvider(AuthenticationService authenticationService, ClientRegistrationRepository clientRegistrationRepository) {
+        return new TokenAuthenticationProvider(customOAuth2UserService(authenticationService), clientRegistrationRepository.findByRegistrationId("my-provider"));
+    }
 
-        @Autowired
-        protected void configure(
-            final AuthenticationManagerBuilder auth,
-            final InMemoryUserDetailsService authService
-        ) throws Exception {
-            auth.userDetailsService(authService);
-        }
+    @Bean
+    public AuthenticationManager authenticationManager(TokenAuthenticationProvider tokenAuthenticationProvider) {
+        return new ProviderManager(Collections.singletonList(tokenAuthenticationProvider));
+    }
 
-        @Bean
-        public SecurityFilterChain securityFilterChainOAuth2Sso(final HttpSecurity http, OAuth2UserDetailsService oAuth2UserDetailsService) throws Exception {
-            return http.oauth2ResourceServer(oauth2ResourceServerCustomizer -> oauth2ResourceServerCustomizer.jwt(Customizer.withDefaults()))
-                .userDetailsService(oAuth2UserDetailsService)
-                .build();
-        }
+    @Bean
+    @Order(1)
+    public SecurityFilterChain securityFilterChainOAuth2Sso(final HttpSecurity http, TokenAuthenticationProvider tokenAuthenticationProvider, AuthenticationManager authenticationManager) throws Exception {
+        ChutneyWebSecurityConfig chutneyWebSecurityConfig = new ChutneyWebSecurityConfig();
+        TokenAuthenticationFilter tokenFilter = new TokenAuthenticationFilter(authenticationManager);
+        chutneyWebSecurityConfig.configureBaseHttpSecurity(http, sslEnabled);
+        UserDto anonymous = chutneyWebSecurityConfig.anonymous();
+        http
+            .authenticationProvider(tokenAuthenticationProvider)
+            .addFilterBefore(tokenFilter, BasicAuthenticationFilter.class)
+            .anonymous(anonymousConfigurer -> anonymousConfigurer
+                .principal(anonymous)
+                .authorities(new ArrayList<>(anonymous.getAuthorities())))
+            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+            .authorizeHttpRequests(httpRequest -> {
+                HandlerMappingIntrospector introspector = new HandlerMappingIntrospector();
+                httpRequest
+                    .requestMatchers(new MvcRequestMatcher(introspector, LOGIN_URL)).permitAll()
+                    .requestMatchers(new MvcRequestMatcher(introspector, LOGOUT_URL)).permitAll()
+                    .requestMatchers(new MvcRequestMatcher(introspector, InfoController.BASE_URL + "/**")).permitAll()
+                    .requestMatchers(new MvcRequestMatcher(introspector, SsoOpenIdConnectController.BASE_URL)).permitAll()
+                    .requestMatchers(new MvcRequestMatcher(introspector, SsoOpenIdConnectController.BASE_URL + "/**")).permitAll()
+                    .requestMatchers(new MvcRequestMatcher(introspector, API_BASE_URL_PATTERN)).authenticated()
+                    .requestMatchers(new MvcRequestMatcher(introspector, ACTUATOR_BASE_URL + "/**")).hasAuthority(Authorization.ADMIN_ACCESS.name())
+                    .anyRequest().permitAll();
+            })
+            .httpBasic(Customizer.withDefaults());
+        return http.build();
     }
 }

@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '@env/environment';
-import { Observable, map, tap } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 interface SsoAuthConfig {
@@ -64,7 +64,7 @@ export class SsoOpenIdConnectService {
   }
 
   get token(): string {
-      return this.oauthService.getIdToken();
+      return this.oauthService.getAccessToken();
   }
 
   get isLoggedIn() {
