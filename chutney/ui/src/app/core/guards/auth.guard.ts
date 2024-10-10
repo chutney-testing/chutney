@@ -11,11 +11,8 @@ import { TranslateService } from '@ngx-translate/core';
 
 import { LoginService } from '@core/services';
 import { AlertService } from '@shared';
-import {Authorization, User} from '@model';
-import {OAuthService} from "angular-oauth2-oidc";
-import {SsoOpenIdConnectService} from "@core/services/sso-open-id-connect.service";
-import {HttpHeaders} from "@angular/common/http";
-import {firstValueFrom} from "rxjs";
+import { Authorization } from '@model';
+import { firstValueFrom } from "rxjs";
 
 
 export const authGuard: CanActivateFn = async (route: ActivatedRouteSnapshot, state: RouterStateSnapshot) => {

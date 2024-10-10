@@ -19,11 +19,11 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-public class TokenAuthenticationFilter extends OncePerRequestFilter {
+public class OAuth2TokenAuthenticationFilter extends OncePerRequestFilter {
 
     private final AuthenticationManager authenticationManager;
 
-    public TokenAuthenticationFilter(AuthenticationManager authenticationManager){
+    public OAuth2TokenAuthenticationFilter(AuthenticationManager authenticationManager){
         this.authenticationManager = authenticationManager;
     }
 
@@ -35,7 +35,7 @@ public class TokenAuthenticationFilter extends OncePerRequestFilter {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7);
-            TokenAuthenticationToken authRequest = new TokenAuthenticationToken(token);
+            OAuth2AuthenticationToken authRequest = new OAuth2AuthenticationToken(token);
             try {
                 Authentication authentication = authenticationManager.authenticate(authRequest);
                 SecurityContextHolder.getContext().setAuthentication(authentication);

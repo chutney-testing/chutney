@@ -93,28 +93,28 @@ public class OAuth2SsoSecurityConfiguration {
 
     @Bean
     public OAuth2UserService<OAuth2UserRequest, OAuth2User> customOAuth2UserService(AuthenticationService authenticationService) {
-        return new CustomOAuth2UserService(authenticationService);
+        return new OAuth2SsoUserService(authenticationService);
     }
 
     @Bean
-    public TokenAuthenticationProvider tokenAuthenticationProvider(AuthenticationService authenticationService, ClientRegistrationRepository clientRegistrationRepository) {
-        return new TokenAuthenticationProvider(customOAuth2UserService(authenticationService), clientRegistrationRepository.findByRegistrationId("my-provider"));
+    public OAuth2TokenAuthenticationProvider tokenAuthenticationProvider(AuthenticationService authenticationService, ClientRegistrationRepository clientRegistrationRepository) {
+        return new OAuth2TokenAuthenticationProvider(customOAuth2UserService(authenticationService), clientRegistrationRepository.findByRegistrationId("my-provider"));
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(TokenAuthenticationProvider tokenAuthenticationProvider) {
-        return new ProviderManager(Collections.singletonList(tokenAuthenticationProvider));
+    public AuthenticationManager authenticationManager(OAuth2TokenAuthenticationProvider OAuth2TokenAuthenticationProvider) {
+        return new ProviderManager(Collections.singletonList(OAuth2TokenAuthenticationProvider));
     }
 
     @Bean
     @Order(1)
-    public SecurityFilterChain securityFilterChainOAuth2Sso(final HttpSecurity http, TokenAuthenticationProvider tokenAuthenticationProvider, AuthenticationManager authenticationManager) throws Exception {
+    public SecurityFilterChain securityFilterChainOAuth2Sso(final HttpSecurity http, OAuth2TokenAuthenticationProvider OAuth2TokenAuthenticationProvider, AuthenticationManager authenticationManager) throws Exception {
         ChutneyWebSecurityConfig chutneyWebSecurityConfig = new ChutneyWebSecurityConfig();
-        TokenAuthenticationFilter tokenFilter = new TokenAuthenticationFilter(authenticationManager);
+        OAuth2TokenAuthenticationFilter tokenFilter = new OAuth2TokenAuthenticationFilter(authenticationManager);
         chutneyWebSecurityConfig.configureBaseHttpSecurity(http, sslEnabled);
         UserDto anonymous = chutneyWebSecurityConfig.anonymous();
         http
-            .authenticationProvider(tokenAuthenticationProvider)
+            .authenticationProvider(OAuth2TokenAuthenticationProvider)
             .addFilterBefore(tokenFilter, BasicAuthenticationFilter.class)
             .anonymous(anonymousConfigurer -> anonymousConfigurer
                 .principal(anonymous)

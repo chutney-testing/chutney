@@ -9,11 +9,11 @@ package com.chutneytesting.security.infra.sso;
 
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
-public class TokenAuthenticationToken extends AbstractAuthenticationToken {
+public class OAuth2AuthenticationToken extends AbstractAuthenticationToken {
 
     private final String token;
 
-    public TokenAuthenticationToken(String token) {
+    public OAuth2AuthenticationToken(String token) {
         super(null);
         this.token = token;
         setAuthenticated(false);
