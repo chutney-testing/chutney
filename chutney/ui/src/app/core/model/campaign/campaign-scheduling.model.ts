@@ -15,7 +15,9 @@ export class CampaignScheduling {
         public campaignsTitle: string[],
         public schedulingDate: Date,
         public frequency?: FREQUENCY,
-        public id?: number
+        public id?: number,
+        public environment?: string,
+        public datasetsId?: string[]
     ) {
     }
 }
