@@ -15,8 +15,10 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.AdditionalMatchers.and;
 import static org.mockito.AdditionalMatchers.or;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -38,10 +40,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import org.assertj.core.util.Lists;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.stubbing.OngoingStubbing;
 import org.springframework.util.ReflectionUtils;
 
@@ -81,17 +86,14 @@ public class RetryWithTimeOutStrategyTest {
 
     @Test
     public void step_succeeds_execute_only_once() {
-        // Given
         StrategyProperties strategyProperties = properties("100 sec", "50 ms");
         StepStrategyDefinition strategyDefinition = new StepStrategyDefinition("", strategyProperties);
 
-        // When
         Step step = mock(Step.class);
         when(step.strategy()).thenReturn(Optional.of(strategyDefinition));
         strategyUnderTest.execute(createScenarioExecution(null), step, null, null);
 
-        // Then
-        verify(step, times(1)).execute(any(), any(), any() );
+        verify(step, times(1)).execute(any(), any(), any());
     }
 
     @Test
@@ -278,6 +280,36 @@ public class RetryWithTimeOutStrategyTest {
                 ));
     }
 
+    @ParameterizedTest
+    @MethodSource("spelExpressionTestCases")
+    void should_evaluate_spel_expressions_in_strategy_properties(String timeOut, String retryDelay, String expectedTimeOut, String expectedRetryDelay) {
+        StrategyProperties strategyProperties = new StrategyProperties();
+        strategyProperties.setProperty("timeOut", timeOut);
+        strategyProperties.setProperty("retryDelay", retryDelay);
+        StepStrategyDefinition strategyDefinition = new StepStrategyDefinition("", strategyProperties);
+
+        Step step = mock(Step.class);
+        when(step.strategy()).thenReturn(Optional.of(strategyDefinition));
+
+        StepDataEvaluator evaluator = mock(StepDataEvaluator.class);
+        when(step.dataEvaluator()).thenReturn(evaluator);
+        when(evaluator.evaluate(eq(timeOut), any())).thenReturn(expectedTimeOut);
+        when(evaluator.evaluate(eq(retryDelay), any())).thenReturn(expectedRetryDelay);
+
+        strategyUnderTest.execute(ScenarioExecution.createScenarioExecution(null), step, new ScenarioContextImpl(), null);
+
+        verify(evaluator).evaluate(eq(timeOut), any());
+        verify(evaluator).evaluate(eq(retryDelay), any());
+        verify(step, atLeastOnce()).addInformation(anyString());
+
+        ArgumentCaptor<String> infoCaptor = ArgumentCaptor.forClass(String.class);
+        verify(step, atLeastOnce()).addInformation(infoCaptor.capture());
+
+        List<String> capturedInfos = infoCaptor.getAllValues();
+        String expectedInfo = String.format("Retry strategy definition : [timeOut %s] [delay %s]", timeOut, retryDelay);
+        assertThat(capturedInfos).anyMatch(info -> info.contains(expectedInfo));
+    }
+
     private StepExecutionStrategy mockStrategy(Status... expectedStatus) {
         StepExecutionStrategy strategyMock = mock(StepExecutionStrategy.class);
         OngoingStubbing<Status> stub = when(strategyMock.execute(any(), any(), any(), any(), any()));
@@ -302,7 +334,7 @@ public class RetryWithTimeOutStrategyTest {
 
     @SuppressWarnings("unused")
     private static Object[] retryStepParameters() {
-        return new Object[] {
+        return new Object[]{
             new Object[]{new Status[]{Status.SUCCESS}},
             new Object[]{new Status[]{Status.FAILURE, Status.SUCCESS}},
             new Object[]{new Status[]{Status.FAILURE, Status.FAILURE, Status.SUCCESS}},
@@ -317,4 +349,13 @@ public class RetryWithTimeOutStrategyTest {
         ReflectionUtils.setField(stopField, scenarioExecution, true);
     }
 
+
+    private static Stream<Arguments> spelExpressionTestCases() {
+        return Stream.of(
+            Arguments.of("${#TIMEOUT_VALUE}", "50 ms", "5 s", "50 ms"),
+            Arguments.of("10 s", "${#RETRY_DELAY}", "10 s", "100 ms"),
+            Arguments.of("${#BASE_TIMEOUT + ' s'}", "${#RETRY_DELAY * 2 + ' ms'}", "15 s", "200 ms"),
+            Arguments.of("20 s", "150 ms", "20 s", "150 ms")
+        );
+    }
 }
