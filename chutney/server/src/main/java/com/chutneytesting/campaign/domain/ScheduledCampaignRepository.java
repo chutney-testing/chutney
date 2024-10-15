@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * CRUD for SchedulingCampaign
  */
-public interface PeriodicScheduledCampaignRepository {
+public interface ScheduledCampaignRepository {
 
     PeriodicScheduledCampaign add(PeriodicScheduledCampaign periodicScheduledCampaign);
 

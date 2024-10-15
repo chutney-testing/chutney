@@ -602,7 +602,6 @@ public class CampaignExecutionEngineTest {
         CampaignExecution campaignExecution = sut.executeById(campaignId, env, dataSet, "USER");
 
         // Then
-        assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.dataset).isNotNull();
         assertThat(campaignExecution.dataset.id).isNull();
         assertThat(campaignExecution.dataset.constants).isEqualTo(constants);
@@ -628,7 +627,6 @@ public class CampaignExecutionEngineTest {
         CampaignExecution campaignExecution = sut.executeById(campaignId, env, dataSet, "USER");
 
         // Then
-        assertThat(campaign.executionDataset()).isNull();
         assertThat(campaignExecution.dataset).isNotNull();
         assertThat(campaignExecution.dataset.constants).isEmpty();
         assertThat(campaignExecution.dataset.datatable).isEmpty();

@@ -6,8 +6,8 @@
  */
 
 import { Component, Inject, OnInit } from '@angular/core';
-import { Campaign } from '@core/model';
-import { CampaignService } from '@core/services';
+import { Campaign, Environment } from '@core/model';
+import { CampaignService, EnvironmentService } from '@core/services';
 import { CampaignScheduling } from '@core/model/campaign/campaign-scheduling.model';
 import { CampaignSchedulingService } from '@core/services/campaign-scheduling.service';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -31,11 +31,12 @@ export class CampaignSchedulingComponent implements OnInit {
     submitted: boolean;
     frequencies = Object.values(FREQUENCY);
     campaigns: Array<Campaign> = [];
-
+    environments: Array<Environment> = [];
     model: NgbDateStruct;
 
     constructor(private campaignSchedulingService: CampaignSchedulingService,
                 private campaignService: CampaignService,
+                private environmentService: EnvironmentService,
                 private formBuilder: FormBuilder,
                 private configTime: NgbTimepickerConfig,
                 private configDate: NgbDatepickerConfig,
@@ -53,13 +54,15 @@ export class CampaignSchedulingComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.campaignService.findAllCampaigns().subscribe(
-            (res) => {
-                this.campaigns = res;
-            },
-            (error) => {
-                this.errorMessage = 'Cannot get campaign list - ' + error;
-            });
+        this.environmentService.list().subscribe({
+            next: (res) => this.environments = res,
+            error: (error) => this.errorMessage = 'Cannot get environment list - ' + error
+        });
+        
+        this.campaignService.findAllCampaigns().subscribe({
+            next: (res) => this.campaigns = res,
+            error: (error) => this.errorMessage = 'Cannot get campaign list - ' + error
+        });
 
         this.loadSchedulingCampaign();
 
