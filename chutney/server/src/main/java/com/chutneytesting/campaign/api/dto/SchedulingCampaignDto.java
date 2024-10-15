@@ -104,7 +104,7 @@ public class SchedulingCampaignDto {
     }
 
     private static String guardArrayOfBoundException(List<String> list, int i) {
-        if (i < list.size()) {
+        if (list != null && i < list.size()) {
             return list.get(i);
         }
         return "";
