@@ -55,7 +55,7 @@ public class DataSetController {
         return datasetService.findAllWithUsage()
             .stream()
             .map(DataSetMapper::toDataSetUsageDto)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     @PreAuthorize("hasAuthority('DATASET_WRITE')")

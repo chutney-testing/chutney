@@ -60,7 +60,7 @@ public class DatasetService {
             .map(dataset -> {
                 Set<String> campaignsUsingDataset = campaignRepository.findCampaignsByDatasetId(dataset.id).stream().map(campaign -> campaign.title).collect(Collectors.toSet());
                 Set<String> scenariosUsingDataset = testCaseRepository.findAllByDatasetId(dataset.id).stream().map(TestCaseMetadata::title).collect(Collectors.toSet());
-                List<Pair<String, String>> scenarioInCampaignUsingDataset = campaignScenarioJpaRepository.findAllByDatasetId(dataset.id).stream().map(t -> Pair.of(t.campaign().title(), testCaseRepository.findById(t.scenarioId()).map(scenario -> scenario.metadata.title).orElseThrow())).collect(Collectors.toList());
+                Set<Pair<String, String>> scenarioInCampaignUsingDataset = campaignScenarioJpaRepository.findAllByDatasetId(dataset.id).stream().map(t -> Pair.of(t.campaign().title(), testCaseRepository.findById(t.scenarioId()).map(scenario -> scenario.metadata.title).orElseThrow())).collect(Collectors.toSet());;
                 return DataSetUsage.builder()
                     .withDataset(dataset)
                     .withCampaignUsage(campaignsUsingDataset)

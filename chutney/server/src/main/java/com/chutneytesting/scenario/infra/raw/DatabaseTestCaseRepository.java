@@ -108,7 +108,7 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
 
     @Override
     public List<TestCaseMetadata> findAllByDatasetId(String datasetId) {
-        return scenarioJpaRepository.findMetaDataByActivatedTrueAndDatasetId(datasetId).stream()
+        return scenarioJpaRepository.findByActivatedTrueAndDefaultDataset(datasetId).stream()
             .map(ScenarioEntity::toTestCaseMetadata)
             .toList();
     }

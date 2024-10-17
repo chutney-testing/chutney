@@ -16,10 +16,10 @@ public class DataSetUsage {
 
     public final DataSet dataSet;
     public final Set<String> campaignUsage;
-    public final List<Pair<String, String>> scenarioInCampaignUsage;
+    public final Set<Pair<String, String>> scenarioInCampaignUsage; // Set of scenario title in campaign title where dataset is used as default
     public final Set<String> scenarioUsage;
 
-    protected DataSetUsage(DataSet dataset, Set<String> campaignUsage, List<Pair<String, String>> scenarioInCampaignUsage, Set<String> scenarioUsage) {
+    protected DataSetUsage(DataSet dataset, Set<String> campaignUsage, Set<Pair<String, String>> scenarioInCampaignUsage, Set<String> scenarioUsage) {
         this.dataSet = dataset;
         this.campaignUsage = campaignUsage;
         this.scenarioUsage = scenarioUsage;
@@ -46,7 +46,7 @@ public class DataSetUsage {
         public DataSet dataSet;
         public Set<String> campaignUsage;
         public Set<String> scenarioUsage;
-        public List<Pair<String, String>> scenarioInCampaignUsage;
+        public Set<Pair<String, String>> scenarioInCampaignUsage;
 
         public DataSetUsageBuilder withScenarioUsage(Set<String> scenarioUsage) {
             this.scenarioUsage = scenarioUsage;
@@ -63,7 +63,7 @@ public class DataSetUsage {
             return this;
         }
 
-        public DataSetUsageBuilder withScenarioInCampaign(List<Pair<String, String>> scenarioInCampaignUsage) {
+        public DataSetUsageBuilder withScenarioInCampaign(Set<Pair<String, String>> scenarioInCampaignUsage) {
             this.scenarioInCampaignUsage = scenarioInCampaignUsage;
             return this;
         }

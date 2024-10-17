@@ -40,12 +40,7 @@ public interface ScenarioJpaRepository extends CrudRepository<ScenarioEntity, Lo
         """)
     List<ScenarioEntity> findMetaDataByActivatedTrue();
 
-    @Query("""
-        SELECT new com.chutneytesting.scenario.infra.jpa.ScenarioEntity(s.id, s.title, s.description, s.tags, s.creationDate, s.activated, s.userId, s.updateDate, s.version, s.defaultDataset)
-        FROM SCENARIO s
-        WHERE s.activated = true AND s.defaultDataset = :datasetId
-        """)
-    List<ScenarioEntity> findMetaDataByActivatedTrueAndDatasetId(@Param("datasetId") String datasetId);
+    List<ScenarioEntity> findByActivatedTrueAndDefaultDataset(String defaultDataset);
 
     static Specification<ScenarioEntity> contentContains(String searchWord) {
         return (root, query, builder) -> {

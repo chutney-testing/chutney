@@ -93,7 +93,6 @@ public class TestCaseRepositoryAggregator implements TestCaseRepository {
     public List<TestCaseMetadata> findAllByDatasetId(String datasetId) {
         return aggregatedRepositories
             .stream()
-            .parallel()
             .flatMap(r ->
                 getTestCaseMetadataStream(r::findAll, r.getClass().getSimpleName())
             )
