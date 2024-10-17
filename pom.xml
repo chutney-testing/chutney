@@ -160,10 +160,10 @@
               <configuration>
                 <systemPropertyVariables>
                   <http.proxyHost>${http.proxyHost}</http.proxyHost>
-                  <http.proxyPort>${http.proxyHost}</http.proxyPort>
+                  <http.proxyPort>${http.proxyPort}</http.proxyPort>
                   <http.nonProxyHosts>${http.nonProxyHosts}</http.nonProxyHosts>
                   <https.proxyHost>${https.proxyHost}</https.proxyHost>
-                  <https.proxyPort>${https.proxyHost}</https.proxyPort>
+                  <https.proxyPort>${https.proxyPort}</https.proxyPort>
                   <https.nonProxyHosts>${https.nonProxyHosts}</https.nonProxyHosts>
                 </systemPropertyVariables>
               </configuration>

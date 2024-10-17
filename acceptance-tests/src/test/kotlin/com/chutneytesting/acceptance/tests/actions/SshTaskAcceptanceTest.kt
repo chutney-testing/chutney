@@ -54,11 +54,13 @@ fun `Scenario execution unable to login, status SUCCESS and command stderr`(): C
   }
 }
 
-fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
+fun `Scenario execution with multiple ssh action`(actionSshPort: Int): ChutneyScenario {
 
   return Scenario(title = "Scenario execution with multiple ssh action") {
     Given("an SSHD server is started") {
       SshServerStartAction(
+        port = "$actionSshPort",
+        host = "0.0.0.0",
         usernames = listOf("test"),
         passwords = listOf("test")
       )
@@ -70,7 +72,7 @@ fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
         [
             {
                 "name": "test_ssh",
-                "url": "ssh://${"sshServer.host()".spEL}:${"sshServer.port()".spEL}",
+                "url": "ssh://host.testcontainers.internal:${"sshServer.port()".spEL}",
                 "properties": [
                     { "key" : "username", "value": "test" },
                     { "key" : "password", "value": "test" }
@@ -169,14 +171,14 @@ fun `Scenario execution with multiple ssh action`(): ChutneyScenario {
       checkScenarioReportSuccess()
     }
     And("the SSHD server has received the commands") {
-      Step("Check first command"){
+      Step("Check first command") {
         CompareAction(
           mode = "equals",
           actual = "sshServer.command(0)".spEL,
           expected = "echo test"
         )
       }
-      Step("Check second command"){
+      Step("Check second command") {
         CompareAction(
           mode = "equals",
           actual = "sshServer.command(1)".spEL,
