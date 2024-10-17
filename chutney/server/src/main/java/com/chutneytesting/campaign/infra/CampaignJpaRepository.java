@@ -24,4 +24,5 @@ public interface CampaignJpaRepository extends CrudRepository<CampaignEntity, Lo
         String description);
 
     List<CampaignEntity> findByEnvironment(String environment);
+    List<CampaignEntity> findByDatasetId(String dataset);
 }

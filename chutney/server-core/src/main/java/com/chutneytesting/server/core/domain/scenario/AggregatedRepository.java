@@ -20,6 +20,8 @@ public interface AggregatedRepository<T extends TestCase> {
 
     List<TestCaseMetadata> findAll();
 
+    List<TestCaseMetadata> findAllByDatasetId(String datasetId);
+
     void removeById(String testCaseId);
 
     Optional<Integer> lastVersion(String testCaseId);

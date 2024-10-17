@@ -42,7 +42,10 @@
             <th scope="col" class="w10">&nbsp;</th>
             <th scope="col" class="w25">Name</th>
             <th scope="col" class="w10">Tags</th>
-            <th scope="col" class="w40">Description</th>
+            <th scope="col" class="w30">Description</th>
+            <th scope="col" class="w5">Scenario usage</th>
+            <th scope="col" class="w5">Campaign usage</th>
+            <th scope="col" class="w5">Scenario campaign usage</th>
             <th scope="col" class="w15">LastUpdated</th>
           </tr>
         </thead>
@@ -84,6 +87,49 @@
                 }
               </td>
               <td class="pt-2"><span>{{dataset.description}}</span></td>
+              <td class="pt-2">
+                  <ng-template #scenarioUsage>
+                      <div>
+                          @for (scenarioUsage of dataset.scenarioUsage; track scenarioUsage) {
+                              <span>Scenario <strong>{{scenarioUsage}}</strong></span><br/>
+                          }
+                      </div>
+                  </ng-template>
+                  <button type="button" class="btn btn-sm me-0"
+                          [ngbPopover]="scenarioUsage" placement="top"
+                          triggers="mouseenter:mouseleave">
+                      <span aria-hidden="true">{{dataset.scenarioUsage.length}}</span>
+                  </button>
+              </td>
+              <td class="pt-2">
+                  <ng-template #campaignUsage>
+                      <div>
+                          @for (campaignUsage of dataset.campaignUsage; track campaignUsage) {
+                              <span>Campaign <strong>{{campaignUsage}}</strong></span><br/>
+                          }
+                      </div>
+                  </ng-template>
+                  <button type="button" class="btn btn-sm me-0"
+                          [ngbPopover]="campaignUsage" placement="top"
+                          triggers="mouseenter:mouseleave">
+                      <span aria-hidden="true">{{dataset.campaignUsage.length}}</span>
+                  </button>
+              </td>
+              <td class="pt-2">
+                  <ng-template #scenarioInCampaignUsage>
+                      <div>
+                          @for (scenarioInCampaignUsage of dataset.scenarioInCampaignUsage; track scenarioInCampaignUsage.key) {
+                            <span>Scenario <strong>{{scenarioInCampaignUsage.value}}</strong> in campaign <strong>{{scenarioInCampaignUsage.key}}</strong></span>
+                              <br/>
+                          }
+                      </div>
+                  </ng-template>
+                  <button type="button" class="btn btn-sm me-0"
+                          [ngbPopover]="scenarioInCampaignUsage" placement="top"
+                          triggers="mouseenter:mouseleave">
+                      <span aria-hidden="true">{{dataset.scenarioInCampaignUsage.length}}</span>
+                  </button>
+              </td>
               <td class="pt-2"><span>{{dataset.lastUpdated | amDateFormat: 'YYYY-MM-DD HH:mm'}}</span></td>
             </tr>
           }

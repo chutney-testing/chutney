@@ -25,8 +25,8 @@ import { RouterModule } from '@angular/router';
 
 describe('DatasetListComponent', () => {
 
-  const dataSetService = jasmine.createSpyObj('DataSetService', ['findAll']);
-  dataSetService.findAll.and.returnValue(of([]));
+  const dataSetService = jasmine.createSpyObj('DataSetService', ['findAllWithUsage']);
+  dataSetService.findAllWithUsage.and.returnValue(of([]));
    beforeEach(waitForAsync(() => {
     TestBed.resetTestingModule();
 

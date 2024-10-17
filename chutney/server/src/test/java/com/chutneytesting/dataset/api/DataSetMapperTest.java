@@ -11,15 +11,18 @@ import static com.chutneytesting.dataset.api.DataSetMapper.fromDto;
 import static com.chutneytesting.dataset.api.DataSetMapper.toDto;
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.chutneytesting.dataset.domain.DataSetUsage;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.util.Pair;
 
 class DataSetMapperTest {
 
@@ -131,6 +134,43 @@ class DataSetMapperTest {
         assertThat(dataset.datatable.get(0)).containsValue("TUTU");
         assertThat(dataset.id).isEqualTo("dataset");
         assertThat(dataset.name).isEqualTo("");
+    }
+
+    @Test
+    public void should_build_dataset_usage_from_dataset() {
+
+        DataSet dataSet = DataSet.builder()
+            .withName("dataset")
+            .withId("id")
+            .withDatatable(List.of(Map.of("TOTO", "TUTU")))
+            .withConstants(Map.of("TOTO", "TUTU"))
+            .withDescription("description")
+            .withCreationDate(Instant.now())
+            .withTags(List.of("TAG"))
+            .build();
+
+        DataSetUsage dataSetUsage = DataSetUsage.builder()
+            .withDataset(dataSet)
+            .withCampaignUsage(Set.of("TOTO"))
+            .withScenarioInCampaign(List.of(Pair.of("TUTU", "BIBI")))
+            .withScenarioUsage(Set.of("JEJE"))
+            .build();
+
+        DataSetUsageDto datasetDtoUsage = DataSetMapper.toDataSetUsageDto(dataSetUsage);
+
+        assertThat(datasetDtoUsage.dataset()).isNotNull();
+        assertThat(datasetDtoUsage.dataset().constants().get(0).key()).isEqualTo("TOTO");
+        assertThat(datasetDtoUsage.dataset().constants().get(0).value()).isEqualTo("TUTU");
+        assertThat(datasetDtoUsage.dataset().datatable().get(0).get(0).key()).isEqualTo("TOTO");
+        assertThat(datasetDtoUsage.dataset().datatable().get(0).get(0).value()).isEqualTo("TUTU");
+        assertThat(datasetDtoUsage.dataset().tags().get(0)).isEqualTo("TAG");
+        assertThat(datasetDtoUsage.dataset().description()).isEqualTo("description");
+        assertThat(datasetDtoUsage.dataset().lastUpdated()).isAfter(Instant.now().minus(1, ChronoUnit.HOURS));
+        assertThat(datasetDtoUsage.dataset().id().get()).isEqualTo("id");
+        assertThat(datasetDtoUsage.dataset().name()).isEqualTo("dataset");
+        assertThat(datasetDtoUsage.campaignUsage()).containsExactly("TOTO");
+        assertThat(datasetDtoUsage.scenarioUsage()).containsExactly("JEJE");
+        assertThat(datasetDtoUsage.scenarioInCampaignUsage()).containsExactly(Pair.of("TUTU", "BIBI"));
     }
 
     private KeyValue keyOf(String key, String value) {

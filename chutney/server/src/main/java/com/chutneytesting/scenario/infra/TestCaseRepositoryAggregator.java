@@ -7,6 +7,8 @@
 
 package com.chutneytesting.scenario.infra;
 
+import static java.util.Optional.ofNullable;
+
 import com.chutneytesting.server.core.domain.scenario.AggregatedRepository;
 import com.chutneytesting.server.core.domain.scenario.ScenarioNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.TestCase;
@@ -84,6 +86,21 @@ public class TestCaseRepositoryAggregator implements TestCaseRepository {
             .flatMap(r ->
                 getTestCaseMetadataStream(r::findAll, r.getClass().getSimpleName())
             )
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TestCaseMetadata> findAllByDatasetId(String datasetId) {
+        return aggregatedRepositories
+            .stream()
+            .parallel()
+            .flatMap(r ->
+                getTestCaseMetadataStream(r::findAll, r.getClass().getSimpleName())
+            )
+            .filter(testCase ->
+                ofNullable(testCase.defaultDataset())
+                    .map(t -> t.equals(datasetId))
+                    .orElse(datasetId == null))
             .collect(Collectors.toList());
     }
 

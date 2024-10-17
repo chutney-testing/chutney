@@ -49,6 +49,15 @@ public class DataSetController {
             .collect(Collectors.toList());
     }
 
+    @PreAuthorize("hasAuthority('DATASET_READ') or hasAuthority('SCENARIO_WRITE') or hasAuthority('CAMPAIGN_WRITE')")
+    @GetMapping(path = "/withUsage", produces = MediaType.APPLICATION_JSON_VALUE)
+    public List<DataSetUsageDto> findAllWithUsage() {
+        return datasetService.findAllWithUsage()
+            .stream()
+            .map(DataSetMapper::toDataSetUsageDto)
+            .collect(Collectors.toList());
+    }
+
     @PreAuthorize("hasAuthority('DATASET_WRITE')")
     @PostMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
     public DataSetDto save(@RequestBody DataSetDto datasetDto) {
