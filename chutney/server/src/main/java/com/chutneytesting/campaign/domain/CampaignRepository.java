@@ -33,4 +33,6 @@ public interface CampaignRepository {
     List<Campaign> findCampaignsByScenarioId(String scenarioId);
 
     List<Campaign> findCampaignsByEnvironment(String environment);
+
+    List<Campaign> findCampaignsByDatasetId(String datasetId);
 }

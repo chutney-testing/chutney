@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import { Dataset, KeyValue } from '@model';
+import { Dataset, DatasetUsage, KeyValue } from '@model';
 import { HttpClient } from '@angular/common/http';
 
 @Injectable({
@@ -35,6 +35,29 @@ export class DataSetService {
                     dto.id
                 ));
 
+                return res;
+            }));
+    }
+
+    findAllWithUsage(): Observable<Array<DatasetUsage>> {
+        return this.httpClient.get<Array<DatasetUsage>>(environment.backend + this.resourceUrl + '/withUsage')
+            .pipe(map((res: Array<any>) => {
+                res = res.map(dto => {
+                    const scenarioInCampaignUsage = Array.from(dto.scenarioInCampaignUsage).map((v: {first: string, second: string}) => new KeyValue(v.first, v.second))
+                    return new DatasetUsage(
+                            dto.dataset.name,
+                            dto.dataset.description,
+                            dto.dataset.tags,
+                            dto.dataset.lastUpdated,
+                            dto.dataset.uniqueValues,
+                            dto.dataset.multipleValues,
+                            dto.scenarioUsage,
+                            dto.campaignUsage,
+                            scenarioInCampaignUsage,
+                            dto.dataset.id
+                        )
+                    }
+                );
                 return res;
             }));
     }

@@ -56,3 +56,19 @@ export class KeyValue implements Clonable<KeyValue> {
             && areEquals(this.value, obj.value);
     }
 }
+
+export class DatasetUsage extends Dataset {
+    constructor(
+        public override name: string = '',
+        public override description: string = '',
+        public override tags: Array<string> = [],
+        public override lastUpdated: Date,
+        public override uniqueValues: Array<KeyValue>,
+        public override multipleValues: Array<Array<KeyValue>>,
+        public scenarioUsage: Array<string>,
+        public campaignUsage: Array<string>,
+        public scenarioInCampaignUsage: Array<KeyValue>,
+        public override id?: string) {
+        super(name, description, tags, lastUpdated, uniqueValues, multipleValues, id)
+    }
+}

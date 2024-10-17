@@ -136,6 +136,12 @@ public class FakeCampaignRepository implements CampaignRepository, CampaignExecu
     }
 
     @Override
+    public List<Campaign> findCampaignsByDatasetId(String datasetId) {
+        // not needed in tests
+        return emptyList();
+    }
+
+    @Override
     public List<CampaignExecution> currentExecutions(Long campaignId) {
         // not needed in tests
         return emptyList();

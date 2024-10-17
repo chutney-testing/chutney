@@ -16,23 +16,30 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.chutneytesting.campaign.domain.CampaignRepository;
+import com.chutneytesting.campaign.infra.CampaignScenarioJpaRepository;
+import com.chutneytesting.campaign.infra.jpa.CampaignEntity;
+import com.chutneytesting.campaign.infra.jpa.CampaignScenarioEntity;
 import com.chutneytesting.scenario.domain.gwt.GwtScenario;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.scenario.AggregatedRepository;
+import com.chutneytesting.server.core.domain.scenario.TestCaseMetadata;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
 import java.util.List;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
+import org.springframework.data.util.Pair;
 
 class DatasetServiceTest {
 
     private final DataSetRepository datasetRepository = mock(DataSetRepository.class);
     private final CampaignRepository campaignRepository = mock(CampaignRepository.class);
     private final AggregatedRepository<GwtTestCase> testCaseRepository = mock(AggregatedRepository.class);
+    private final CampaignScenarioJpaRepository campaignScenarioJpaRepository = mock(CampaignScenarioJpaRepository.class);
 
-    DatasetService sut = new DatasetService(datasetRepository, campaignRepository, testCaseRepository);
+    DatasetService sut = new DatasetService(datasetRepository, campaignRepository, testCaseRepository, campaignScenarioJpaRepository);
 
     @Test
     public void should_sort_dataset_by_name() {
@@ -49,6 +56,48 @@ class DatasetServiceTest {
 
         // Then
         assertThat(actual).containsExactly(firstDataset, secondDataset, thirdDataset);
+    }
+
+    @Test
+    public void should_get_all_dataset_with_scenario_usage() {
+        // Given
+        DataSet firstDataset = DataSet.builder().withName("A").withId("A").build();
+        DataSet secondDataset = DataSet.builder().withName("B").withId("B").build();
+
+        Campaign campaign1 = new Campaign(1L, "campaign1", "description", List.of(), "env", false, false, "A", List.of());
+        Campaign campaign2 = new Campaign(1L, "campaign2", "description", List.of(), "env", false, false, "A", List.of());
+
+        CampaignEntity campaignEntity = new CampaignEntity(1L, "CampaignEntity", "desc", "env", false, false, "A", List.of(), 1, List.of());
+
+        CampaignScenarioEntity campaignScenario = new CampaignScenarioEntity(campaignEntity, "Scenario1", "A", 1);
+
+        TestCaseMetadata testCaseMetadata = TestCaseMetadataImpl.builder().withTitle("Scenario1").withId("Scenario1").withDefaultDataset("A").build();
+
+        GwtTestCase gwtTestCase = GwtTestCase.builder().withMetadata(TestCaseMetadataImpl.builder().withTitle("Scenario1").withId("testCaseId").build()).build();
+
+        when(datasetRepository.findAll())
+            .thenReturn(List.of(firstDataset, secondDataset));
+        when(testCaseRepository.findAllByDatasetId("A"))
+            .thenReturn(List.of(testCaseMetadata));
+        when(campaignRepository.findCampaignsByDatasetId("A"))
+            .thenReturn(List.of(campaign1, campaign2));
+        when(campaignScenarioJpaRepository.findAllByDatasetId("A"))
+            .thenReturn(List.of(campaignScenario));
+        when(testCaseRepository.findById("Scenario1"))
+            .thenReturn(Optional.ofNullable(gwtTestCase));
+
+        // When
+        List<DataSetUsage> actual = sut.findAllWithUsage();
+
+        // Then
+        assertThat(actual).hasSize(2);
+        assertThat(actual.get(0).scenarioUsage).hasSize(1);
+        assertThat(actual.get(0).scenarioUsage).contains("Scenario1");
+        assertThat(actual.get(0).campaignUsage).hasSize(2);
+        assertThat(actual.get(0).campaignUsage).contains("campaign1");
+        assertThat(actual.get(0).campaignUsage).contains("campaign2");
+        assertThat(actual.get(0).scenarioInCampaignUsage).hasSize(1);
+        assertThat(actual.get(0).scenarioInCampaignUsage).contains(Pair.of("CampaignEntity", "Scenario1"));
     }
 
     @Test
