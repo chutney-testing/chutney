@@ -11,7 +11,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { newInstance } from '@shared/tools';
 import { distinct, flatMap } from '@shared/tools/array-utils';
 import { DataSetService } from '@core/services';
-import { Authorization, Dataset } from '@model';
+import { Authorization, Dataset, DatasetUsage } from '@model';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
@@ -24,7 +24,7 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
 })
 export class DatasetListComponent implements OnInit, OnDestroy {
 
-    datasets: Array<Dataset> = [];
+    datasets: Array<DatasetUsage> = [];
 
     preview: Dataset = null;
 
@@ -44,7 +44,7 @@ export class DatasetListComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.dataSetService.findAll().subscribe(
+        this.dataSetService.findAllWithUsage().subscribe(
             (res) => {
                 this.datasets = res;
                 this.initTags();

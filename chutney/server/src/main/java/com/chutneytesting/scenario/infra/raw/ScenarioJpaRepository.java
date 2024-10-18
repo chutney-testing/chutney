@@ -40,6 +40,8 @@ public interface ScenarioJpaRepository extends CrudRepository<ScenarioEntity, Lo
         """)
     List<ScenarioEntity> findMetaDataByActivatedTrue();
 
+    List<ScenarioEntity> findByActivatedTrueAndDefaultDataset(String defaultDataset);
+
     static Specification<ScenarioEntity> contentContains(String searchWord) {
         return (root, query, builder) -> {
             Expression<String> content = builder.lower(root.get("content"));
