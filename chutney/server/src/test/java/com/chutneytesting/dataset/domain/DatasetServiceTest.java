@@ -16,9 +16,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.chutneytesting.campaign.domain.CampaignRepository;
-import com.chutneytesting.campaign.infra.CampaignScenarioJpaRepository;
+import com.chutneytesting.campaign.domain.CampaignScenarioRepository;
 import com.chutneytesting.campaign.infra.jpa.CampaignEntity;
-import com.chutneytesting.campaign.infra.jpa.CampaignScenarioEntity;
 import com.chutneytesting.scenario.domain.gwt.GwtScenario;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
@@ -27,6 +26,7 @@ import com.chutneytesting.server.core.domain.scenario.TestCaseMetadata;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignScenario;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Test;
@@ -37,9 +37,9 @@ class DatasetServiceTest {
     private final DataSetRepository datasetRepository = mock(DataSetRepository.class);
     private final CampaignRepository campaignRepository = mock(CampaignRepository.class);
     private final AggregatedRepository<GwtTestCase> testCaseRepository = mock(AggregatedRepository.class);
-    private final CampaignScenarioJpaRepository campaignScenarioJpaRepository = mock(CampaignScenarioJpaRepository.class);
+    private final CampaignScenarioRepository campaignScenarioRepository = mock(CampaignScenarioRepository.class);
 
-    DatasetService sut = new DatasetService(datasetRepository, campaignRepository, testCaseRepository, campaignScenarioJpaRepository);
+    DatasetService sut = new DatasetService(datasetRepository, campaignRepository, testCaseRepository, campaignScenarioRepository);
 
     @Test
     public void should_sort_dataset_by_name() {
@@ -67,9 +67,9 @@ class DatasetServiceTest {
         Campaign campaign1 = new Campaign(1L, "campaign1", "description", List.of(), "env", false, false, "A", List.of());
         Campaign campaign2 = new Campaign(1L, "campaign2", "description", List.of(), "env", false, false, "A", List.of());
 
-        CampaignEntity campaignEntity = new CampaignEntity(1L, "CampaignEntity", "desc", "env", false, false, "A", List.of(), 1, List.of());
+        Campaign campaign = new CampaignEntity(1L, "CampaignEntity", "desc", "env", false, false, "A", List.of(), 1, List.of()).toDomain();
 
-        CampaignScenarioEntity campaignScenario = new CampaignScenarioEntity(campaignEntity, "Scenario1", "A", 1);
+        CampaignScenario campaignScenario = new CampaignScenario(1L, campaign, "Scenario1", "A", 1);
 
         TestCaseMetadata testCaseMetadata = TestCaseMetadataImpl.builder().withTitle("Scenario1").withId("Scenario1").withDefaultDataset("A").build();
 
@@ -81,7 +81,7 @@ class DatasetServiceTest {
             .thenReturn(List.of(testCaseMetadata));
         when(campaignRepository.findCampaignsByDatasetId("A"))
             .thenReturn(List.of(campaign1, campaign2));
-        when(campaignScenarioJpaRepository.findAllByDatasetId("A"))
+        when(campaignScenarioRepository.findAllByDatasetId("A"))
             .thenReturn(List.of(campaignScenario));
         when(testCaseRepository.findById("Scenario1"))
             .thenReturn(Optional.ofNullable(gwtTestCase));

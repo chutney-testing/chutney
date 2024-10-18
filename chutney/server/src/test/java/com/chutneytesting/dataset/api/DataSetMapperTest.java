@@ -152,7 +152,7 @@ class DataSetMapperTest {
         DataSetUsage dataSetUsage = DataSetUsage.builder()
             .withDataset(dataSet)
             .withCampaignUsage(Set.of("TOTO"))
-            .withScenarioInCampaign(List.of(Pair.of("TUTU", "BIBI")))
+            .withScenarioInCampaign(Set.of(Pair.of("TUTU", "BIBI")))
             .withScenarioUsage(Set.of("JEJE"))
             .build();
 

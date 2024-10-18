@@ -8,6 +8,7 @@
 package com.chutneytesting.campaign.infra.jpa;
 
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
+import com.chutneytesting.server.core.domain.scenario.campaign.CampaignScenario;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -74,5 +75,15 @@ public class CampaignScenarioEntity {
         return IntStream.range(0, campaign.scenarios.size())
             .mapToObj(idx -> new CampaignScenarioEntity(campaign.scenarios.get(idx).scenarioId(), campaign.scenarios.get(idx).datasetId(), idx))
             .toList();
+    }
+
+    public CampaignScenario toDomain() {
+        return new CampaignScenario(
+            this.id,
+            this.campaign().toDomain(),
+            this.scenarioId,
+            this.datasetId,
+            this.rank
+        );
     }
 }
