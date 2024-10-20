@@ -21,6 +21,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 public class OAuth2TokenAuthenticationFilter extends OncePerRequestFilter {
 
+    private static final String BEARER = "Bearer ";
     private final AuthenticationManager authenticationManager;
 
     public OAuth2TokenAuthenticationFilter(AuthenticationManager authenticationManager){
@@ -33,8 +34,8 @@ public class OAuth2TokenAuthenticationFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
         throws ServletException, IOException {
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            String token = authorizationHeader.substring(7);
+        if (authorizationHeader != null && authorizationHeader.startsWith(BEARER)) {
+            String token = authorizationHeader.substring(BEARER.length());
             OAuth2AuthenticationToken authRequest = new OAuth2AuthenticationToken(token);
             try {
                 Authentication authentication = authenticationManager.authenticate(authRequest);

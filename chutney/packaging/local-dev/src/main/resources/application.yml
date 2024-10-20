@@ -55,7 +55,6 @@ spring:
       - ldap
       - mem-auth
       - db-sqlite
-      - sso-auth
 
 chutney:
   configuration-folder: .chutney/conf

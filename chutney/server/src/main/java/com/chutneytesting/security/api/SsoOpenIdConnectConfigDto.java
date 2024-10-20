@@ -5,10 +5,9 @@
  *
  */
 
-package com.chutneytesting.security.infra.sso;
+package com.chutneytesting.security.api;
 
-public class SsoOpenIdConnectConfig {
-
+public class SsoOpenIdConnectConfigDto {
     public final String issuer;
     public final String clientId;
     public final String clientSecret;
@@ -18,18 +17,7 @@ public class SsoOpenIdConnectConfig {
     public final String ssoProviderName;
     public final Boolean oidc;
 
-    public SsoOpenIdConnectConfig() {
-        this.issuer = null;
-        this.clientId = null;
-        this.clientSecret = null;
-        this.responseType = null;
-        this.scope = null;
-        this.redirectBaseUrl = null;
-        this.ssoProviderName = null;
-        this.oidc = null;
-    }
-
-    public SsoOpenIdConnectConfig(String issuer, String clientId, String clientSecret, String responseType, String scope, String redirectBaseUrl, String ssoProviderName, Boolean oidc) {
+    public SsoOpenIdConnectConfigDto(String issuer, String clientId, String clientSecret, String responseType, String scope, String redirectBaseUrl, String ssoProviderName, Boolean oidc) {
         this.issuer = issuer;
         this.clientId = clientId;
         this.clientSecret = clientSecret;

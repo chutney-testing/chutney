@@ -9,7 +9,7 @@ spring:
             client-id: my-client
             client-secret: my-client-secret
             authorization-grant-type: authorization_code
-            redirect-uri: "https://localhost:4200/login/oauth2/code/{registrationId}"
+            redirect-uri: "https://${server.http.interface}:${server.port}/login/oauth2/code/{registrationId}"
             scope: openid, profile, email
             client-name: My Provider
         provider:

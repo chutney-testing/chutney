@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
 import { AlertService } from '@shared';
 
 import { InfoService, LoginService } from '@core/services';
-import { SsoOpenIdConnectService } from '@core/services/sso-open-id-connect.service';
+import { SsoService } from '@core/services/sso.service';
 
 @Component({
   selector: 'chutney-login',
@@ -36,7 +36,7 @@ export class LoginComponent implements OnDestroy, OnInit {
     private infoService: InfoService,
     private route: ActivatedRoute,
     private alertService: AlertService,
-    private ssoService: SsoOpenIdConnectService
+    private ssoService: SsoService
   ) {
     this.paramsSubscription = this.route.params.subscribe(params => {
       this.action = params['action'];
@@ -56,6 +56,7 @@ export class LoginComponent implements OnDestroy, OnInit {
     if (this.loginService.isAuthenticated()) {
         this.loginService.navigateAfterLogin();
     }
+    this.ssoService.fetchSsoConfig()
   }
 
   ngOnDestroy() {
