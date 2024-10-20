@@ -8,13 +8,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
 import { catchError, delay, tap } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 import { Authorization, User } from '@model';
 import { contains, intersection, isNullOrBlankString } from '@shared/tools';
-import { SsoOpenIdConnectService } from "@core/services/sso-open-id-connect.service";
+import { SsoService } from "@core/services/sso.service";
 
 @Injectable({
   providedIn: 'root'
@@ -29,7 +29,7 @@ export class LoginService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private ssoOpenIdConnectService: SsoOpenIdConnectService
+    private ssoService: SsoService
   ) { }
 
   initLogin(url?: string, headers: HttpHeaders | {
@@ -38,9 +38,9 @@ export class LoginService {
     this.initLoginObservable(url, headers).subscribe()
   }
 
-  initLoginObservable(url?: string, headers: HttpHeaders | {
+  initLoginObservable(url?: string, headers?: HttpHeaders | {
       [header: string]: string | string[];
-  } = {}) {
+  }) {
       return this.currentUser(true, headers).pipe(
           tap(user => this.setUser(user)),
           tap(_ => this.navigateAfterLogin(url)),
@@ -54,7 +54,7 @@ export class LoginService {
   }
 
   get oauth2Token(): string {
-      return this.ssoOpenIdConnectService.token
+      return this.ssoService.token
   }
 
   login(username: string, password: string): Observable<User> {
@@ -93,7 +93,7 @@ export class LoginService {
   logout() {
     this.http.post(environment.backend + this.url + '/logout', null).pipe(
         tap(() => this.setUser(this.NO_USER)),
-        tap(() => this.ssoOpenIdConnectService.logout()),
+        tap(() => this.ssoService.logout()),
         delay(500)
     ).subscribe(
         () => {

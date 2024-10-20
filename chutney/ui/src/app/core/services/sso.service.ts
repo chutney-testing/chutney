@@ -18,7 +18,7 @@ interface SsoAuthConfig {
 @Injectable({
   providedIn: 'root'
 })
-export class SsoOpenIdConnectService {
+export class SsoService {
 
   private resourceUrl = '/api/v1/sso/config';
 
@@ -59,15 +59,7 @@ export class SsoOpenIdConnectService {
     return null
   }
 
-  get identityClaims() {
-      return this.oauthService.getIdentityClaims();
-  }
-
   get token(): string {
       return this.oauthService.getAccessToken();
-  }
-
-  get isLoggedIn() {
-      return this.oauthService.hasValidAccessToken();
   }
 }

@@ -28,7 +28,7 @@ import { ThemeService } from '@core/theme/theme.service';
 import { DefaultMissingTranslationHandler, HttpLoaderFactory } from '@core/initializer/app.translate.factory';
 import { themeInitializer } from '@core/initializer/theme.initializer';
 import { OAuthModule, OAuthService } from 'angular-oauth2-oidc';
-import { SsoOpenIdConnectService } from '@core/services/sso-open-id-connect.service';
+import { SsoService } from '@core/services/sso.service';
 import { tap } from 'rxjs';
 
 @NgModule({
@@ -77,7 +77,7 @@ import { tap } from 'rxjs';
 })
 export class ChutneyAppModule {
 
-  constructor(private oauthService: OAuthService, private ssoOpenIdConnectService: SsoOpenIdConnectService) {
+  constructor(private oauthService: OAuthService, private ssoOpenIdConnectService: SsoService) {
     this.configureOAuth();
   }
 
