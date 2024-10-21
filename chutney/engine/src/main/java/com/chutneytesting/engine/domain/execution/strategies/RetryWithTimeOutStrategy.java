@@ -10,6 +10,7 @@ package com.chutneytesting.engine.domain.execution.strategies;
 import com.chutneytesting.action.spi.time.Duration;
 import com.chutneytesting.engine.domain.execution.ScenarioExecution;
 import com.chutneytesting.engine.domain.execution.engine.scenario.ScenarioContext;
+import com.chutneytesting.engine.domain.execution.engine.scenario.ScenarioContextImpl;
 import com.chutneytesting.engine.domain.execution.engine.step.Step;
 import com.chutneytesting.engine.domain.execution.report.Status;
 import java.util.ArrayList;
@@ -61,21 +62,26 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
         String timeOut = strategyDefinition.strategyProperties.getProperty("timeOut", String.class);
         String retryDelay = strategyDefinition.strategyProperties.getProperty("retryDelay", String.class); // TODO - respect State of the art : provide number of retries policy instead
         if (timeOut == null) {
-            throw new IllegalStateException("Undefined parameter 'timeOut'"); // TODO - be friendly -> provide a default value instead
+            throw new IllegalStateException("Undefined parameter 'timeOut'"); // TODO - Provide a default value instead
         }
         if (retryDelay == null) {
-            throw new IllegalStateException("Undefined parameter 'retryDelay'"); // TODO - be friendly -> provide a default value instead
+            throw new IllegalStateException("Undefined parameter 'retryDelay'"); // TODO - Provide a default value instead
         }
 
-        Long timeOutMs = toMilliSeconds(timeOut);
-        Long retryDelayMs = toMilliSeconds(retryDelay);
-        Long timeLeft = timeOutMs;
-        Status st = Status.NOT_EXECUTED;
+        ScenarioContextImpl mergedContext = new ScenarioContextImpl();
+        mergedContext.putAll(scenarioContext);
+        mergedContext.putAll(localContext);
+
+        String evaluatedRetryDelay = step.dataEvaluator().evaluateString(retryDelay, mergedContext);
+        String evaluatedTimeOut = step.dataEvaluator().evaluateString(timeOut, mergedContext);
+        long retryDelayMs = toMilliSeconds(evaluatedRetryDelay);
+        long timeLeft = toMilliSeconds(evaluatedTimeOut);
+        Status st;
         int tries = 1;
         List<String> lastErrors = new ArrayList<>();
         do {
-            Long tryStartTime = System.currentTimeMillis();
-            step.addInformation("Retry strategy definition : [timeOut " + timeOut + "] [delay " + retryDelay + "]");
+            long tryStartTime = System.currentTimeMillis();
+            step.addInformation("Retry strategy definition : [timeOut " + evaluatedTimeOut + "] [delay " + evaluatedRetryDelay + "]");
             step.addInformation("Try number : " + (tries++));
 
             st = executeAll(scenarioExecution, step, scenarioContext, localContext, strategies);
@@ -90,7 +96,7 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
                 }
                 timeLeft -= System.currentTimeMillis() - tryStartTime;
             } else {
-                if(!lastErrors.isEmpty()){
+                if (!lastErrors.isEmpty()) {
                     step.addErrorMessage("Error(s) on last step execution:");
                     lastErrors.forEach(step::addErrorMessage);
                 }
@@ -104,6 +110,11 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
             }
         } while (timeLeft > 0); // TODO - needs to backoff a bit before retry
         return st;
+    }
+
+    private long toMilliSeconds(String duration) {
+        double durationInMS = Duration.parse(duration).toMilliseconds();
+        return Math.round(durationInMS);
     }
 
     private Status executeAll(ScenarioExecution scenarioExecution,
@@ -120,13 +131,6 @@ public class RetryWithTimeOutStrategy implements StepExecutionStrategy {
             return st;
         }
         return Status.SUCCESS;
-    }
-
-    // convert duration strings in strategy parameters to milliseconds
-    private long toMilliSeconds(String duration) {
-        double durationInMS = Duration.parse(duration).toMilliseconds();
-        return Math.round(durationInMS);
-
     }
 }
 
