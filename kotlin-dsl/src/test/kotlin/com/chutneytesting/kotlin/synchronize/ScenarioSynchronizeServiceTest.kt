@@ -19,6 +19,7 @@ import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder
 import com.github.tomakehurst.wiremock.matching.UrlPattern
 import org.assertj.core.api.Assertions.assertThat
 import org.json.JSONObject
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.io.TempDir
 import java.io.File
@@ -27,7 +28,7 @@ import kotlin.io.path.absolutePathString
 
 class ScenarioSynchronizeServiceTest : HttpTestBase() {
 
-    private val chutneyServerInfo = ChutneyServerInfo(url, "aUser", "aPassword")
+    private var chutneyServerInfo: ChutneyServerInfo? = null
 
     private val localScenario = Scenario(title = "A scenario") {
         When("Something happens") {
@@ -35,12 +36,17 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
         }
     }
 
+    @BeforeEach
+    fun beforeEach() {
+        chutneyServerInfo = ChutneyServerInfo(url, "aUser", "aPassword")
+    }
+
     @Test
     fun should_create_new_scenario_local_file(@TempDir tempDir: Path) {
         // When & then
         assertScenarioSynchronization(tempDir = tempDir, scenario = localScenario)
         wireMockServer.verify(0, RequestPatternBuilder.allRequests());
-}
+    }
 
     @Test
     fun should_update_scenario_local_file(@TempDir tempDir: Path) {
@@ -84,8 +90,11 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
             id = createdScenarioId,
             updateRemote = true
         )
-        wireMockServer.verify(RequestPatternBuilder.newRequestPattern(
-            RequestMethod.POST, UrlPattern.fromOneOf(null, null, "/api/scenario/v2/raw", null, null)))
+        wireMockServer.verify(
+            RequestPatternBuilder.newRequestPattern(
+                RequestMethod.POST, UrlPattern.fromOneOf(null, null, "/api/scenario/v2/raw", null, null)
+            )
+        )
         val requestJson = wireMockServer.allServeEvents.filter {
             it.request.url == "/api/scenario/v2/raw" && it.request.method.value() == "POST"
         }.map { it.request.bodyAsString }
@@ -157,13 +166,16 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
     fun should_create_scenario_with_explicit_id() {
         // Given
         val scenario = ChutneyScenario(123, "title", "description")
-        val expectedBodyRequest  = mapOf("content" to "{" + System.lineSeparator() + "  \"title\": \"title\"," + System.lineSeparator() + "  \"description\": \"description\"" + System.lineSeparator() + "}" + System.lineSeparator(),
-                "id" to "123",
-                "title" to "title",
-                "description" to "description",
-                "tags" to listOf("KOTLIN"))
+        val expectedBodyRequest = mapOf(
+            "content" to "{" + System.lineSeparator() + "  \"title\": \"title\"," + System.lineSeparator() + "  \"description\": \"description\"" + System.lineSeparator() + "}" + System.lineSeparator(),
+            "id" to "123",
+            "title" to "title",
+            "description" to "description",
+            "tags" to listOf("KOTLIN")
+        )
         wireMockServer.stubFor(
-            WireMock.post(WireMock.urlEqualTo("/api/scenario/v2/raw")).withRequestBody(WireMock.equalToJson(JSONObject(expectedBodyRequest ).toString()))
+            WireMock.post(WireMock.urlEqualTo("/api/scenario/v2/raw"))
+                .withRequestBody(WireMock.equalToJson(JSONObject(expectedBodyRequest).toString()))
                 .willReturn(
                     WireMock.aResponse()
                         .withBody("123")
@@ -175,11 +187,7 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
                     WireMock.aResponse().withStatus(404)
                 )
         )
-        val chutneyServerInfo = ChutneyServerInfo(
-                url,
-                "aUser",
-                "aPassword"
-        )
+        val chutneyServerInfo = ChutneyServerInfo(url, "aUser", "aPassword")
 
         // When
         ChutneyServerServiceImpl.createOrUpdateJsonScenario(chutneyServerInfo, scenario)
@@ -198,7 +206,7 @@ class ScenarioSynchronizeServiceTest : HttpTestBase() {
     ) {
         // When
         if (updateRemote) {
-            val syncScenario = scenario.synchronise(serverInfo = chutneyServerInfo)
+            val syncScenario = scenario.synchronise(serverInfo = chutneyServerInfo!!)
             syncScenario.jsonSerialize(path = tempDir.absolutePathString())
         } else {
             scenario.jsonSerialize(path = tempDir.absolutePathString())
