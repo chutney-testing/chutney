@@ -17,6 +17,7 @@ import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutio
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -42,6 +43,7 @@ public class ScenarioExecutionReportEntity {
 
     @Column(name = "REPORT")
     @Basic(fetch = FetchType.LAZY)
+    @Convert(converter = ReportConverter.class)
     private String report;
 
     @Column(name = "VERSION")

@@ -1071,4 +1071,11 @@
             <column name="DATASET_DATATABLE" type="TEXT" defaultValueComputed="NULL"/>
         </addColumn>
     </changeSet>
+
+    <changeSet id="scenario-execution-report-as-blob" author="ICG">
+        <modifyDataType
+            tableName="SCENARIO_EXECUTIONS_REPORTS"
+            columnName="REPORT"
+            newDataType="BLOB"/>
+    </changeSet>
 </databaseChangeLog>
