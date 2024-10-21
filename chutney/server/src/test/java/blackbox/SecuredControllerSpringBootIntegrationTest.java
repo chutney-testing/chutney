@@ -113,7 +113,10 @@ public class SecuredControllerSpringBootIntegrationTest {
             {GET, "/api/ui/campaign/v1/lastexecutions/20", "CAMPAIGN_READ", null, OK},
             {GET, "/api/ui/campaign/v1/scenario/scenarioId", "SCENARIO_READ", null, OK},
             {GET, "/api/ui/campaign/v1/scheduling", "CAMPAIGN_READ", null, OK},
-            {POST, "/api/ui/campaign/v1/scheduling", "CAMPAIGN_WRITE", "{\"campaignsId\" : [ 1 ], \"campaignsTitle\" : [ \"cpg 1ta\" ], \"schedulingDate\" : [ 2024, 1, 30, 13, 1 ]}", OK},
+            {POST, "/api/ui/campaign/v1/scheduling", "CAMPAIGN_WRITE",
+                 """
+                {"id":1,"schedulingDate":[2024,10,12,14,30,45],"frequency":"Daily","environment":"PROD","campaignsId":[1],"campaignsTitle":["title"],"datasetsId":["datasetId"]}
+                """, OK},
             {DELETE, "/api/ui/campaign/v1/scheduling/666", "CAMPAIGN_WRITE", null, OK},
 
             {GET, "/api/ui/campaign/execution/v1/campaignName", "CAMPAIGN_EXECUTE", null, OK},
