@@ -40,7 +40,7 @@ public class DatabaseManagementController {
     @PreAuthorize("hasAuthority('ADMIN_ACCESS')")
     @GetMapping(path = "/execution", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<ExecutionSummaryDto> getExecutionReportMatchQuery(@QueryParam("query") String query) {
-        return executionHistoryRepository.getExecutionReportMatchQuery(query).stream().map(ExecutionSummaryDto::toDto).toList();
+        return executionHistoryRepository.getExecutionReportMatchKeyword(query).stream().map(ExecutionSummaryDto::toDto).toList();
     }
 
     @PreAuthorize("hasAuthority('ADMIN_ACCESS')")
