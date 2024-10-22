@@ -8,12 +8,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { delay, tap } from 'rxjs/operators';
+import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
+import { catchError, delay, tap } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 import { Authorization, User } from '@model';
 import { contains, intersection, isNullOrBlankString } from '@shared/tools';
+import { SsoService } from "@core/services/sso.service";
 
 @Injectable({
   providedIn: 'root'
@@ -27,20 +28,33 @@ export class LoginService {
 
   constructor(
     private http: HttpClient,
-    private router: Router
+    private router: Router,
+    private ssoService: SsoService
   ) { }
 
-  initLogin(url?: string) {
-    this.currentUser(true).pipe(
-        tap(user => this.setUser(user))
-    ).subscribe(
-        () => this.navigateAfterLogin(url),
-        () => {
-            const nextUrl = this.nullifyLoginUrl(url);
-            const queryParams: Object = isNullOrBlankString(nextUrl) ? {} : { queryParams: { url: nextUrl } };
-            this.router.navigate(['login'], queryParams);
-        }
-    );
+  initLogin(url?: string, headers: HttpHeaders | {
+      [header: string]: string | string[];
+  } = {}) {
+    this.initLoginObservable(url, headers).subscribe()
+  }
+
+  initLoginObservable(url?: string, headers?: HttpHeaders | {
+      [header: string]: string | string[];
+  }) {
+      return this.currentUser(true, headers).pipe(
+          tap(user => this.setUser(user)),
+          tap(_ => this.navigateAfterLogin(url)),
+          catchError(error => {
+              const nextUrl = this.nullifyLoginUrl(url);
+              const queryParams: Object = isNullOrBlankString(nextUrl) ? {} : {queryParams: {url: nextUrl}};
+              this.router.navigate(['login'], queryParams);
+              return error
+          })
+      );
+  }
+
+  get oauth2Token(): string {
+      return this.ssoService.token
   }
 
   login(username: string, password: string): Observable<User> {
@@ -79,6 +93,7 @@ export class LoginService {
   logout() {
     this.http.post(environment.backend + this.url + '/logout', null).pipe(
         tap(() => this.setUser(this.NO_USER)),
+        tap(() => this.ssoService.logout()),
         delay(500)
     ).subscribe(
         () => {
@@ -109,15 +124,18 @@ export class LoginService {
     return url.includes(this.loginUrl);
   }
 
-  private setUser(user: User) {
-    this.user$.next(user);
+  currentUser(skipInterceptor: boolean = false, headers: HttpHeaders | {
+      [header: string]: string | string[];
+  } = {}): Observable<User> {
+    const headersInterceptor = skipInterceptor ? { 'no-intercept-error': ''} : {}
+      const options = {
+      headers: { ...headersInterceptor, ...headers}
+    };
+    return this.http.get<User>(environment.backend + this.url, options);
   }
 
-  private currentUser(skipInterceptor: boolean = false): Observable<User> {
-    const options = {
-      headers: { 'no-intercept-error': ''}
-    };
-    return this.http.get<User>(environment.backend + this.url, skipInterceptor ? options : {});
+  private setUser(user: User) {
+    this.user$.next(user);
   }
 
   private defaultForwardUrl(user: User): string {

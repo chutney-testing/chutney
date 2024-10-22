@@ -22,10 +22,12 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
 import { RouterModule } from '@angular/router';
+import { OAuthService } from "angular-oauth2-oidc";
 
 describe('DatasetListComponent', () => {
 
   const dataSetService = jasmine.createSpyObj('DataSetService', ['findAll']);
+  const oAuthService = jasmine.createSpyObj('OAuthService', ['loadDiscoveryDocumentAndTryLogin', 'configure', 'initCodeFlow', 'logOut', 'getAccessToken']);
   dataSetService.findAll.and.returnValue(of([]));
    beforeEach(waitForAsync(() => {
     TestBed.resetTestingModule();
@@ -48,6 +50,7 @@ describe('DatasetListComponent', () => {
       ],
       providers: [
         { provide: DataSetService, useValue: dataSetService },
+        { provide: OAuthService, useValue: oAuthService },
         {provide: DROPDOWN_SETTINGS, useClass: DropdownSettings}
       ]
     }).compileComponents();
