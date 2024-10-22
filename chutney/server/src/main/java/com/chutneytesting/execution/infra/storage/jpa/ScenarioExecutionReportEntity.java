@@ -67,6 +67,11 @@ public class ScenarioExecutionReportEntity {
         return report;
     }
 
+    public Long scenarioExecutionId() {
+        return scenarioExecutionId;
+    }
+
+
     public ExecutionHistory.Execution toDomain() {
         return ImmutableExecutionHistory.Execution.builder()
             .executionId(scenarioExecutionId)

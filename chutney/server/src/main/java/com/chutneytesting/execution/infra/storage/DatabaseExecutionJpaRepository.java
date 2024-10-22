@@ -53,9 +53,8 @@ public interface DatabaseExecutionJpaRepository extends JpaRepository<ScenarioEx
                   inner join ser.scenarioExecution se
                 where s.activated = true
                   and cast(s.id as string) = se.scenarioId
-                  and ser.report like '%' || :query || '%'
+                  and ser.scenarioExecutionId in (:executionsIds)
                 order by se.id desc
-                limit 100
         """)
-    List<ScenarioExecutionEntity> getExecutionReportMatchQuery(@Param("query") String query);
+    List<ScenarioExecutionEntity> getExecutionReportByIds(@Param("executionsIds") List<Long> executionsIds);
 }
