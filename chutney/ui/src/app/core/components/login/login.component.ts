@@ -56,7 +56,6 @@ export class LoginComponent implements OnDestroy, OnInit {
     if (this.loginService.isAuthenticated()) {
         this.loginService.navigateAfterLogin();
     }
-    this.ssoService.fetchSsoConfig()
   }
 
   ngOnDestroy() {

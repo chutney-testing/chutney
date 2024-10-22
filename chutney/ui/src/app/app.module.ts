@@ -27,9 +27,9 @@ import { BsModalService, ModalModule } from 'ngx-bootstrap/modal';
 import { ThemeService } from '@core/theme/theme.service';
 import { DefaultMissingTranslationHandler, HttpLoaderFactory } from '@core/initializer/app.translate.factory';
 import { themeInitializer } from '@core/initializer/theme.initializer';
-import { OAuthModule, OAuthService } from 'angular-oauth2-oidc';
-import { SsoService } from '@core/services/sso.service';
-import { tap } from 'rxjs';
+import { OAuthModule } from 'angular-oauth2-oidc';
+import { ssoInitializer } from "@core/initializer/sso.initializer";
+import { SsoService } from "@core/services/sso.service";
 
 @NgModule({
   declarations: [
@@ -71,25 +71,17 @@ import { tap } from 'rxjs';
           useFactory: themeInitializer,
           deps: [ThemeService],
           multi: true
+      },
+      {
+          provide: APP_INITIALIZER,
+          useFactory: ssoInitializer,
+          deps: [SsoService],
+          multi: true
       }
   ],
   bootstrap: [AppComponent]
 })
-export class ChutneyAppModule {
-
-  constructor(private oauthService: OAuthService, private ssoOpenIdConnectService: SsoService) {
-    this.configureOAuth();
-  }
-
-  private configureOAuth() {
-    this.ssoOpenIdConnectService.fetchSsoConfig().pipe(
-      tap(ssoConfig => {
-        this.oauthService.configure(ssoConfig)
-        this.oauthService.loadDiscoveryDocumentAndTryLogin();
-      })
-    ).subscribe()
-  }
- }
+export class ChutneyAppModule {}
 
 
 

@@ -8,7 +8,7 @@
 import { HttpClient } from '@angular/common/http';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '@env/environment';
-import { Observable, map } from 'rxjs';
+import {Observable, map, tap} from 'rxjs';
 import { Injectable } from '@angular/core';
 
 interface SsoAuthConfig {
@@ -34,8 +34,8 @@ export class SsoService {
 
   constructor(private oauthService: OAuthService, private http: HttpClient) {}
 
-  fetchSsoConfig(): Observable<AuthConfig> {
-      return this.http.get<SsoAuthConfig>(environment.backend + this.resourceUrl).pipe(
+  fetchSsoConfig(): void {
+    this.http.get<SsoAuthConfig>(environment.backend + this.resourceUrl).pipe(
         map(ssoConfig => {
           this.ssoConfig = ssoConfig
           return {
@@ -47,8 +47,12 @@ export class SsoService {
             dummyClientSecret: ssoConfig.clientSecret,
             oidc: ssoConfig.oidc
           }
+        }),
+        tap(ssoConfig => {
+          this.oauthService.configure(ssoConfig)
+          this.oauthService.loadDiscoveryDocumentAndTryLogin();
         })
-      )
+    ).subscribe()
   }
 
   login() {
