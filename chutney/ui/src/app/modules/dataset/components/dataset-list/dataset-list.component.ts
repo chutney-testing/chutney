@@ -11,11 +11,12 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { newInstance } from '@shared/tools';
 import { distinct, flatMap } from '@shared/tools/array-utils';
 import { DataSetService } from '@core/services';
-import { Authorization, Dataset, DatasetUsage } from '@model';
+import { Authorization, Dataset } from '@model';
 import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import {ExecutionStatus} from "@core/model/scenario/execution-status";
 
 @Component({
     selector: 'chutney-dataset-list',
@@ -24,7 +25,7 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
 })
 export class DatasetListComponent implements OnInit, OnDestroy {
 
-    datasets: Array<DatasetUsage> = [];
+    datasets: Array<Dataset> = [];
 
     preview: Dataset = null;
 
@@ -44,7 +45,7 @@ export class DatasetListComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.dataSetService.findAllWithUsage().subscribe(
+        this.dataSetService.findAll(true).subscribe(
             (res) => {
                 this.datasets = res;
                 this.initTags();

@@ -9,8 +9,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
-import { Dataset, DatasetUsage, KeyValue } from '@model';
-import { HttpClient } from '@angular/common/http';
+import { Dataset, KeyValue } from '@model';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root'
@@ -22,42 +22,26 @@ export class DataSetService {
     constructor(private httpClient: HttpClient) {
     }
 
-    findAll(): Observable<Array<Dataset>> {
-        return this.httpClient.get<Array<Dataset>>(environment.backend + this.resourceUrl)
-            .pipe(map((res: Array<any>) => {
-                res = res.map(dto => new Dataset(
-                    dto.name,
-                    dto.description,
-                    dto.tags,
-                    dto.lastUpdated,
-                    dto.uniqueValues,
-                    dto.multipleValues,
-                    dto.id
-                ));
-
-                return res;
-            }));
-    }
-
-    findAllWithUsage(): Observable<Array<DatasetUsage>> {
-        return this.httpClient.get<Array<DatasetUsage>>(environment.backend + this.resourceUrl + '/withUsage')
+    findAll(usage: boolean = false): Observable<Array<Dataset>> {
+        let params = new HttpParams();
+        params = params.append('usage', usage ? 'true' : 'false');
+        return this.httpClient.get<Array<Dataset>>(environment.backend + this.resourceUrl, { params })
             .pipe(map((res: Array<any>) => {
                 res = res.map(dto => {
-                    const scenarioInCampaignUsage = Array.from(dto.scenarioInCampaignUsage).map((v: {first: string, second: string}) => new KeyValue(v.first, v.second))
-                    return new DatasetUsage(
-                            dto.dataset.name,
-                            dto.dataset.description,
-                            dto.dataset.tags,
-                            dto.dataset.lastUpdated,
-                            dto.dataset.uniqueValues,
-                            dto.dataset.multipleValues,
-                            dto.scenarioUsage,
-                            dto.campaignUsage,
-                            scenarioInCampaignUsage,
-                            dto.dataset.id
-                        )
-                    }
-                );
+                    return new Dataset(
+                        dto.name,
+                        dto.description,
+                        dto.tags,
+                        dto.lastUpdated,
+                        dto.uniqueValues,
+                        dto.multipleValues,
+                        dto.id,
+                        dto.scenarioUsage,
+                        dto.campaignUsage,
+                        dto.scenarioInCampaignUsage,
+                    )
+                });
+
                 return res;
             }));
     }

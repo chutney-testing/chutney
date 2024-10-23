@@ -42,20 +42,11 @@ public class DataSetController {
 
     @PreAuthorize("hasAuthority('DATASET_READ') or hasAuthority('SCENARIO_WRITE') or hasAuthority('CAMPAIGN_WRITE')")
     @GetMapping(path = "", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<DataSetDto> findAll() {
-        return datasetService.findAll()
+    public List<DataSetDto> findAll(@RequestParam("usage") Optional<Boolean> query) {
+        return datasetService.findAll(query.orElse(false))
             .stream()
             .map(DataSetMapper::toDto)
             .collect(Collectors.toList());
-    }
-
-    @PreAuthorize("hasAuthority('DATASET_READ') or hasAuthority('SCENARIO_WRITE') or hasAuthority('CAMPAIGN_WRITE')")
-    @GetMapping(path = "/withUsage", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<DataSetUsageDto> findAllWithUsage() {
-        return datasetService.findAllWithUsage()
-            .stream()
-            .map(DataSetMapper::toDataSetUsageDto)
-            .toList();
     }
 
     @PreAuthorize("hasAuthority('DATASET_WRITE')")

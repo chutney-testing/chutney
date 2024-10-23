@@ -8,22 +8,22 @@
 package com.chutneytesting.dataset.domain;
 
 import static java.util.Optional.ofNullable;
-import static java.util.stream.Collectors.toList;
 
 import com.chutneytesting.campaign.domain.CampaignRepository;
-import com.chutneytesting.campaign.domain.CampaignScenarioRepository;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.dataset.DataSetNotFoundException;
 import com.chutneytesting.server.core.domain.scenario.AggregatedRepository;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadata;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
+import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import org.springframework.data.util.Pair;
+import java.util.stream.Stream;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -32,35 +32,52 @@ public class DatasetService {
     private final DataSetRepository datasetRepository;
     private final CampaignRepository campaignRepository;
     private final AggregatedRepository<GwtTestCase> testCaseRepository;
-    private final CampaignScenarioRepository campaignScenarioRepository;
 
-    public DatasetService(DataSetRepository dataSetRepository, CampaignRepository campaignRepository, AggregatedRepository<GwtTestCase> testCaseRepository, CampaignScenarioRepository campaignScenarioJpaRepository) {
+    public DatasetService(DataSetRepository dataSetRepository, CampaignRepository campaignRepository, AggregatedRepository<GwtTestCase> testCaseRepository) {
         this.datasetRepository = dataSetRepository;
         this.campaignRepository = campaignRepository;
         this.testCaseRepository = testCaseRepository;
-        this.campaignScenarioRepository = campaignScenarioJpaRepository;
     }
 
     public DataSet findById(String id) {
         return datasetRepository.findById(id);
     }
 
-    public List<DataSet> findAll() {
-        return datasetRepository.findAll()
+    public List<DataSet> findAll(Boolean usage) {
+        Stream<DataSet> datasets = datasetRepository.findAll()
             .stream()
-            .sorted(DataSet.datasetComparator)
-            .collect(toList());
-    }
-
-    public List<DataSetUsage> findAllWithUsage() {
-        return findAll()
-            .stream()
+            .sorted(DataSet.datasetComparator);
+        if (!usage) {
+            return datasets.toList();
+        }
+        return datasets
             .map(dataset -> {
-                Set<String> campaignsUsingDataset = campaignRepository.findCampaignsByDatasetId(dataset.id).stream().map(campaign -> campaign.title).collect(Collectors.toSet());
-                Set<String> scenariosUsingDataset = testCaseRepository.findAllByDatasetId(dataset.id).stream().map(TestCaseMetadata::title).collect(Collectors.toSet());
-                Set<Pair<String, String>> scenarioInCampaignUsingDataset = campaignScenarioRepository.findAllByDatasetId(dataset.id).stream().map(t -> Pair.of(t.getCampaign().title, testCaseRepository.findById(t.getScenarioId()).map(scenario -> scenario.metadata.title).orElseThrow())).collect(Collectors.toSet());;
-                return DataSetUsage.builder()
-                    .withDataset(dataset)
+                List<Campaign> campaigns = campaignRepository.findAll();
+                Set<String> campaignsUsingDataset = campaigns
+                    .stream()
+                    .filter(campaign -> dataset.id.equals(campaign.executionDataset()))
+                    .map(campaign -> campaign.title)
+                    .collect(Collectors.toSet());
+
+                Map<String, Set<String>> scenarioInCampaignUsingDataset = campaigns.stream()
+                    .filter(campaign -> campaign.scenarios.stream()
+                        .anyMatch(scenario -> dataset.id.equals(scenario.datasetId())))
+                    .collect(Collectors.groupingBy(
+                        campaign -> campaign.title,
+                        Collectors.flatMapping(
+                            campaign -> campaign.scenarios.stream()
+                                .filter(campaignScenario -> dataset.id.equals(campaignScenario.datasetId()))
+                                .map(campaignScenario -> testCaseRepository.findById(campaignScenario.scenarioId()))
+                                .map(scenario -> scenario.map(s -> s.metadata.title).orElseThrow()),
+                            Collectors.toSet()
+                        )
+                    ));
+                Set<String> scenariosUsingDataset = testCaseRepository.findAllByDatasetId(dataset.id)
+                    .stream()
+                    .map(TestCaseMetadata::title)
+                    .collect(Collectors.toSet());
+                return DataSet.builder()
+                    .fromDataSet(dataset)
                     .withCampaignUsage(campaignsUsingDataset)
                     .withScenarioUsage(scenariosUsingDataset)
                     .withScenarioInCampaign(scenarioInCampaignUsingDataset)

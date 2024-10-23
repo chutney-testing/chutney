@@ -10,6 +10,7 @@ package com.chutneytesting.server.core.domain.dataset;
 import static java.time.temporal.ChronoUnit.MILLIS;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptyMap;
+import static java.util.Collections.emptySet;
 import static java.util.Optional.ofNullable;
 import static java.util.stream.Collectors.toList;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -19,13 +20,14 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.lang3.StringUtils;
 
 public class DataSet {
 
     public static Comparator<DataSet> datasetComparator = Comparator.comparing(DataSet::getName, String.CASE_INSENSITIVE_ORDER);
-    public static DataSet NO_DATASET = new DataSet(null, null, null, null, null, emptyMap(), emptyList());
+    public static DataSet NO_DATASET = new DataSet(null, null, null, null, null, emptyMap(), emptyList(), emptySet(), emptyMap(), emptySet());
 
     public final String id;
     public final String name;
@@ -34,8 +36,11 @@ public class DataSet {
     public final List<String> tags;
     public final Map<String, String> constants;
     public final List<Map<String, String>> datatable;
+    public final Set<String> campaignUsage;
+    public final Map<String, Set<String>> scenarioInCampaignUsage;
+    public final Set<String> scenarioUsage;
 
-    private DataSet(String id, String name, String description, Instant creationDate, List<String> tags, Map<String, String> constants, List<Map<String, String>> datatable) {
+    private DataSet(String id, String name, String description, Instant creationDate, List<String> tags, Map<String, String> constants, List<Map<String, String>> datatable, Set<String> campaignUsage, Map<String, Set<String>> scenarioInCampaignUsage, Set<String> scenarioUsage) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -43,6 +48,9 @@ public class DataSet {
         this.tags = tags;
         this.constants = constants;
         this.datatable = datatable;
+        this.campaignUsage = campaignUsage;
+        this.scenarioInCampaignUsage = scenarioInCampaignUsage;
+        this.scenarioUsage = scenarioUsage;
     }
 
     private String getName() {
@@ -88,6 +96,9 @@ public class DataSet {
         private List<String> tags;
         private Map<String, String> constants;
         private List<Map<String, String>> datatable;
+        public Set<String> campaignUsage;
+        public Set<String> scenarioUsage;
+        public Map<String, Set<String>> scenarioInCampaignUsage;
 
         private DataSetBuilder() {
         }
@@ -104,7 +115,10 @@ public class DataSet {
                 ofNullable(creationDate).orElseGet(() -> Instant.now().truncatedTo(MILLIS)),
                 (ofNullable(tags).orElse(emptyList())).stream().map(String::toUpperCase).map(String::strip).collect(toList()),
                 cleanConstants(ofNullable(constants).orElse(emptyMap())),
-                cleanDatatable(ofNullable(datatable).orElse(emptyList()))
+                cleanDatatable(ofNullable(datatable).orElse(emptyList())),
+                ofNullable(campaignUsage).orElse(emptySet()),
+                ofNullable(scenarioInCampaignUsage).orElse(emptyMap()),
+                ofNullable(scenarioUsage).orElse(emptySet())
             );
         }
 
@@ -147,6 +161,21 @@ public class DataSet {
             return this;
         }
 
+        public DataSetBuilder withScenarioUsage(Set<String> scenarioUsage) {
+            this.scenarioUsage = scenarioUsage;
+            return this;
+        }
+
+        public DataSetBuilder withCampaignUsage(Set<String> campaignUsage) {
+            this.campaignUsage = campaignUsage;
+            return this;
+        }
+
+        public DataSetBuilder withScenarioInCampaign(Map<String, Set<String>> scenarioInCampaignUsage) {
+            this.scenarioInCampaignUsage = scenarioInCampaignUsage;
+            return this;
+        }
+
         public DataSetBuilder fromDataSet(DataSet dataset) {
             return new DataSetBuilder()
                 .withId(dataset.id)
@@ -155,7 +184,10 @@ public class DataSet {
                 .withCreationDate(dataset.creationDate)
                 .withTags(dataset.tags)
                 .withConstants(dataset.constants)
-                .withDatatable(dataset.datatable);
+                .withDatatable(dataset.datatable)
+                .withCampaignUsage(dataset.campaignUsage)
+                .withScenarioUsage(dataset.scenarioUsage)
+                .withScenarioInCampaign(dataset.scenarioInCampaignUsage);
         }
 
         private Map<String, String> cleanConstants(Map<String, String> constants) {

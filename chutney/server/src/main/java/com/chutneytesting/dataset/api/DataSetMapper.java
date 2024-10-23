@@ -12,19 +12,9 @@ import static java.util.Collections.emptyList;
 import static java.util.Optional.ofNullable;
 
 import com.chutneytesting.server.core.domain.dataset.DataSet;
-import com.chutneytesting.dataset.domain.DataSetUsage;
 import org.springframework.util.CollectionUtils;
 
 public class DataSetMapper {
-
-    public static DataSetUsageDto toDataSetUsageDto(DataSetUsage dataSetUsage) {
-        ImmutableDataSetUsageDto.Builder datasetBuilder = ImmutableDataSetUsageDto.builder();
-        if (dataSetUsage.dataSet != null) datasetBuilder.dataset(toDto(dataSetUsage.dataSet));
-        if (dataSetUsage.campaignUsage != null) datasetBuilder.campaignUsage(dataSetUsage.campaignUsage);
-        if (dataSetUsage.scenarioUsage != null) datasetBuilder.scenarioUsage(dataSetUsage.scenarioUsage);
-        if (dataSetUsage.scenarioInCampaignUsage != null) datasetBuilder.scenarioInCampaignUsage(dataSetUsage.scenarioInCampaignUsage);
-        return datasetBuilder.build();
-    }
 
     public static DataSetDto toDto(DataSet dataSet) {
         if (dataSet == null) {
@@ -38,6 +28,9 @@ public class DataSetMapper {
         if (dataSet.tags != null) datasetBuilder.tags(dataSet.tags);
         if (dataSet.description != null) datasetBuilder.description(dataSet.description);
         if (dataSet.creationDate != null) datasetBuilder.lastUpdated(dataSet.creationDate);
+        if (dataSet.campaignUsage != null) datasetBuilder.campaignUsage(dataSet.campaignUsage);
+        if (dataSet.scenarioUsage != null) datasetBuilder.scenarioUsage(dataSet.scenarioUsage);
+        if (dataSet.scenarioInCampaignUsage != null) datasetBuilder.scenarioInCampaignUsage(dataSet.scenarioInCampaignUsage);
         return datasetBuilder.build();
     }
 

@@ -15,7 +15,10 @@ export class Dataset {
         public lastUpdated: Date,
         public uniqueValues: Array<KeyValue>,
         public multipleValues: Array<Array<KeyValue>>,
-        public id?: string) {
+        public id?: string,
+        public scenarioUsage?: Array<string>,
+        public campaignUsage?: Array<string>,
+        public scenarioInCampaignUsage?: { [key: string]: string[] }) {
     }
 
     getMultipleValueHeader(): Array<string> {
@@ -54,21 +57,5 @@ export class KeyValue implements Clonable<KeyValue> {
         return obj
             && areEquals(this.key, obj.key)
             && areEquals(this.value, obj.value);
-    }
-}
-
-export class DatasetUsage extends Dataset {
-    constructor(
-        public override name: string = '',
-        public override description: string = '',
-        public override tags: Array<string> = [],
-        public override lastUpdated: Date,
-        public override uniqueValues: Array<KeyValue>,
-        public override multipleValues: Array<Array<KeyValue>>,
-        public scenarioUsage: Array<string>,
-        public campaignUsage: Array<string>,
-        public scenarioInCampaignUsage: Array<KeyValue>,
-        public override id?: string) {
-        super(name, description, tags, lastUpdated, uniqueValues, multipleValues, id)
     }
 }
