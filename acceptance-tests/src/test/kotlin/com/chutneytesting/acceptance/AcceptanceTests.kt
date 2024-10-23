@@ -17,8 +17,9 @@ import com.chutneytesting.kotlin.launcher.Launcher
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
 import com.chutneytesting.kotlin.util.HttpClient
 import com.chutneytesting.tools.SocketUtils
-import org.junit.jupiter.api.*
-import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.api.AfterAll
+import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.Test
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.MountableFile
@@ -39,6 +40,7 @@ class AcceptanceTests {
     private var actionHttpPort: Int? = null
     private var actionAmqpPort: Int? = null
     private var actionJakartaPort: Int? = null
+    private var actionSshPort: Int? = null
 
     @JvmStatic
     @BeforeAll
@@ -64,12 +66,10 @@ class AcceptanceTests {
       actionHttpPort = SocketUtils.freePortFromSystem()
       actionAmqpPort = SocketUtils.freePortFromSystem()
       System.setProperty("qpid.amqp_port", actionAmqpPort.toString())
-
       actionJakartaPort = SocketUtils.freePortFromSystem()
+      actionSshPort = SocketUtils.freePortFromSystem()
       org.testcontainers.Testcontainers.exposeHostPorts(
-        actionHttpPort!!,
-        actionAmqpPort!!,
-        actionJakartaPort!!
+        actionHttpPort!!, actionAmqpPort!!, actionJakartaPort!!, actionSshPort!!
       )
 
       chutneyServer!!.start()
@@ -106,7 +106,8 @@ class AcceptanceTests {
       chutneyServer?.stop()
     }
   }
-  
+
+  @Test
   fun `Execution by campaign id with 2 scenarios`() {
     listOf(
       executeCampaignById,
@@ -332,7 +333,7 @@ class AcceptanceTests {
   fun `SSH Task test`() {
     listOf(
       `Scenario execution unable to login, status SUCCESS and command stderr`(),
-      `Scenario execution with multiple ssh action`()
+      `Scenario execution with multiple ssh action`(actionSshPort!!)
     ).forEach {
       Launcher().run(it, environment)
     }

@@ -74,6 +74,7 @@
         <!-- test dependencies versions -->
         <jqwik.version>1.9.1</jqwik.version>
         <wiremock.version>3.9.1</wiremock.version>
+        <lucene.version>9.12.0</lucene.version>
     </properties>
 
     <dependencies>
@@ -260,6 +261,21 @@
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-core</artifactId>
                 <version>${liquibase.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-core</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-analysis-common</artifactId>
+                <version>${lucene.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.lucene</groupId>
+                <artifactId>lucene-queryparser</artifactId>
+                <version>${lucene.version}</version>
             </dependency>
             <!-- Test dependencies -->
             <dependency>

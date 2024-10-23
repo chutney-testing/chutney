@@ -62,8 +62,12 @@ public class StepDataEvaluator {
         return evaluate(o, contextVariables, false);
     }
 
+    public String evaluateString(final String s, final Map<String, Object> contextVariables) throws EvaluationException {
+        return (String) this.evaluate(s, contextVariables);
+    }
+
     public String silentEvaluateString(final String s, final Map<String, Object> contextVariables) throws EvaluationException {
-        return (String) this.evaluate((Object) s, contextVariables, true);
+        return (String) this.evaluate(s, contextVariables, true);
     }
 
     public Target evaluateTarget(final Target target, final Map<String, Object> contextVariables) throws EvaluationException {
@@ -103,16 +107,16 @@ public class StepDataEvaluator {
         Object inputEvaluatedValue;
         if (object instanceof String stringValue) {
             if (hasOnlyOneSpel(stringValue)) {
-              inputEvaluatedValue = Strings.replaceExpression(stringValue, s -> evaluate(parser, evaluationContext, s), EVALUATION_STRING_PREFIX, EVALUATION_STRING_SUFFIX, EVALUATION_STRING_ESCAPE, silentResolve);
+                inputEvaluatedValue = Strings.replaceExpression(stringValue, s -> evaluate(parser, evaluationContext, s), EVALUATION_STRING_PREFIX, EVALUATION_STRING_SUFFIX, EVALUATION_STRING_ESCAPE, silentResolve);
             } else {
-              inputEvaluatedValue = Strings.replaceExpressions(stringValue, s -> evaluate(parser, evaluationContext, s), EVALUATION_STRING_PREFIX, EVALUATION_STRING_SUFFIX, EVALUATION_STRING_ESCAPE, silentResolve);
+                inputEvaluatedValue = Strings.replaceExpressions(stringValue, s -> evaluate(parser, evaluationContext, s), EVALUATION_STRING_PREFIX, EVALUATION_STRING_SUFFIX, EVALUATION_STRING_ESCAPE, silentResolve);
             }
         } else if (object instanceof Map map) {
             Map evaluatedMap = new LinkedHashMap();
             map.forEach(
                 (key, value) -> {
-                  Object keyValue = evaluateObject(key, evaluationContext, silentResolve);
-                  Object valueValue = evaluateObject(value, evaluationContext, silentResolve);
+                    Object keyValue = evaluateObject(key, evaluationContext, silentResolve);
+                    Object valueValue = evaluateObject(value, evaluationContext, silentResolve);
                     evaluatedMap.put(keyValue, valueValue);
                     if (keyValue instanceof String stringKeyValue) {
                         evaluationContext.setVariable(stringKeyValue, valueValue);

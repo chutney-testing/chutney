@@ -47,7 +47,7 @@ public interface ExecutionHistoryRepository {
      */
     ExecutionHistory.Execution getExecution(String scenarioId, Long reportId) throws ReportNotFoundException;
 
-    List<ExecutionHistory.ExecutionSummary> getExecutionReportMatchQuery(String query);
+    List<ExecutionHistory.ExecutionSummary> getExecutionReportMatchKeyword(String query);
 
     /**
      * Override a previously stored {@link ExecutionHistory.Execution}.

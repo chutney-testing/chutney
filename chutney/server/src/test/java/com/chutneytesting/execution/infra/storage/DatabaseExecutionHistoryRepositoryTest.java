@@ -25,6 +25,7 @@ import com.chutneytesting.campaign.infra.jpa.CampaignEntity;
 import com.chutneytesting.execution.domain.campaign.CampaignExecutionNotFoundException;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionReportEntity;
+import com.chutneytesting.index.infra.ScenarioExecutionReportIndexRepository;
 import com.chutneytesting.scenario.infra.jpa.ScenarioEntity;
 import com.chutneytesting.scenario.infra.raw.DatabaseTestCaseRepository;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
@@ -60,6 +61,7 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.CannotAcquireLockException;
@@ -90,6 +92,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
     abstract class AllTests extends AbstractLocalDatabaseTest {
         @Autowired
         private DatabaseExecutionHistoryRepository sut;
+
         @Autowired
         private CampaignExecutionDBRepository campaignExecutionDBRepository;
 
@@ -550,7 +553,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 var exec1 = sut.store(scenarioId1, buildDetachedExecution("toto"));
                 sut.store(scenarioId2, buildDetachedExecution("tutu"));
 
-                var executionSummaryList = sut.getExecutionReportMatchQuery("to");
+                var executionSummaryList = sut.getExecutionReportMatchKeyword("to");
 
                 assertThat(executionSummaryList).hasSize(1);
                 assertThat(executionSummaryList.get(0).executionId()).isEqualTo(exec1.executionId());
@@ -565,7 +568,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 sut.store(scenarioId2, buildDetachedExecution("tutu"));
                 databaseTestCaseRepository.removeById(scenarioId2);
 
-                var executionSummaryList = sut.getExecutionReportMatchQuery("t");
+                var executionSummaryList = sut.getExecutionReportMatchKeyword("t");
 
                 assertThat(executionSummaryList).hasSize(1);
                 assertThat(executionSummaryList.get(0).executionId()).isEqualTo(exec1.executionId());
@@ -579,7 +582,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                     sut.store(scenarioId, buildDetachedExecution("report"));
                 });
 
-                var executionSummaryList = sut.getExecutionReportMatchQuery("ort");
+                var executionSummaryList = sut.getExecutionReportMatchKeyword("ort");
 
                 assertThat(executionSummaryList).hasSize(100);
             }
@@ -594,7 +597,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 });
                 var expectedOrder = executionsIds.stream().sorted(Comparator.<Long>naturalOrder().reversed()).toList();
 
-                var executionSummaryList = sut.getExecutionReportMatchQuery("ort");
+                var executionSummaryList = sut.getExecutionReportMatchKeyword("ort");
 
                 assertThat(executionSummaryList)
                     .map(ExecutionSummary::executionId)
