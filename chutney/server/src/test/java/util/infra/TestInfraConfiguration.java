@@ -10,8 +10,9 @@ package util.infra;
 import static util.infra.AbstractLocalDatabaseTest.DB_CHANGELOG_DB_CHANGELOG_MASTER_XML;
 
 import com.chutneytesting.ServerConfiguration;
+import com.chutneytesting.index.infra.IndexConfig;
 import com.chutneytesting.index.infra.IndexRepository;
-import com.chutneytesting.index.infra.OnDiskIndexRepository;
+import com.chutneytesting.index.infra.OnDiskIndexConfig;
 import com.chutneytesting.index.infra.ScenarioExecutionReportIndexRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.zaxxer.hikari.HikariConfig;
@@ -191,9 +192,10 @@ class TestInfraConfiguration {
     }
 
     @Bean
-    public OnDiskIndexRepository indexRepository() throws IOException {
+    public IndexRepository indexRepository() throws IOException {
         Path tempDirectory = Files.createTempDirectory("test-infra-index");
-        return new OnDiskIndexRepository(tempDirectory.toAbsolutePath().toString());
+        IndexConfig config = new OnDiskIndexConfig(tempDirectory.toString());
+        return new IndexRepository(config);
     }
 
     @Bean
