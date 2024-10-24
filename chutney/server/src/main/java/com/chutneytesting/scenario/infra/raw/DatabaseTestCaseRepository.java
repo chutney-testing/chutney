@@ -17,6 +17,7 @@ import com.chutneytesting.campaign.infra.CampaignScenarioJpaRepository;
 import com.chutneytesting.campaign.infra.jpa.CampaignScenarioEntity;
 import com.chutneytesting.execution.infra.storage.DatabaseExecutionJpaRepository;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
+import com.chutneytesting.index.infra.ScenarioExecutionReportIndexRepository;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.scenario.infra.jpa.ScenarioEntity;
 import com.chutneytesting.server.core.domain.scenario.AggregatedRepository;
@@ -49,17 +50,19 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     private final CampaignScenarioJpaRepository campaignScenarioJpaRepository;
     private final EntityManager entityManager;
     private final Pattern pattern = Pattern.compile("\"([^\"]*)\"");
+    private final ScenarioExecutionReportIndexRepository scenarioExecutionReportIndexRepository;
 
 
     public DatabaseTestCaseRepository(
         ScenarioJpaRepository jpa,
         DatabaseExecutionJpaRepository scenarioExecutionsJpaRepository,
-        CampaignScenarioJpaRepository campaignScenarioJpaRepository, EntityManager entityManager
-    ) {
+        CampaignScenarioJpaRepository campaignScenarioJpaRepository, EntityManager entityManager,
+        ScenarioExecutionReportIndexRepository scenarioExecutionReportIndexRepository) {
         this.scenarioJpaRepository = jpa;
         this.scenarioExecutionsJpaRepository = scenarioExecutionsJpaRepository;
         this.campaignScenarioJpaRepository = campaignScenarioJpaRepository;
         this.entityManager = entityManager;
+        this.scenarioExecutionReportIndexRepository = scenarioExecutionReportIndexRepository;
     }
 
     @Override
@@ -125,6 +128,7 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
                 allExecutions.forEach(e -> {
                     e.forCampaignExecution(null);
                     scenarioExecutionsJpaRepository.save(e);
+                    scenarioExecutionReportIndexRepository.remove(e.id());
                 });
 
                 List<CampaignScenarioEntity> allCampaignScenarioEntities = campaignScenarioJpaRepository.findAllByScenarioId(scenarioId);

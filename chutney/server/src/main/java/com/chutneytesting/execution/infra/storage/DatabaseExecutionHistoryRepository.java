@@ -61,7 +61,8 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
         DatabaseExecutionJpaRepository scenarioExecutionsJpaRepository,
         ScenarioExecutionReportJpaRepository scenarioExecutionReportJpaRepository,
         CampaignJpaRepository campaignJpaRepository, TestCaseRepository testCaseRepository,
-        CampaignExecutionJpaRepository campaignExecutionJpaRepository, ScenarioExecutionReportIndexRepository scenarioExecutionReportIndexRepository,
+        CampaignExecutionJpaRepository campaignExecutionJpaRepository,
+        ScenarioExecutionReportIndexRepository scenarioExecutionReportIndexRepository,
         @Qualifier("reportObjectMapper") ObjectMapper objectMapper) {
         this.scenarioExecutionsJpaRepository = scenarioExecutionsJpaRepository;
         this.scenarioExecutionReportJpaRepository = scenarioExecutionReportJpaRepository;
