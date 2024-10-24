@@ -60,7 +60,9 @@ class DatasetServiceTest {
         DataSet firstDataset = DataSet.builder().withName("A").withId("A").build();
         DataSet secondDataset = DataSet.builder().withName("B").withId("B").build();
 
-        Campaign campaign1 = new Campaign(1L, "campaign1", "description", List.of(), "env", false, false, "A", List.of());
+        Campaign.CampaignScenario campaignScenario = new Campaign.CampaignScenario("Scenario1", "A");
+
+        Campaign campaign1 = new Campaign(1L, "campaign1", "description", List.of(campaignScenario), "env", false, false, "A", List.of());
         Campaign campaign2 = new Campaign(1L, "campaign2", "description", List.of(), "env", false, false, "A", List.of());
 
         TestCaseMetadata testCaseMetadata = TestCaseMetadataImpl.builder().withTitle("Scenario1").withId("Scenario1").withDefaultDataset("A").build();
@@ -86,8 +88,7 @@ class DatasetServiceTest {
         assertThat(actual.get(0).campaignUsage).hasSize(2);
         assertThat(actual.get(0).campaignUsage).contains("campaign1");
         assertThat(actual.get(0).campaignUsage).contains("campaign2");
-        assertThat(actual.get(0).scenarioInCampaignUsage).hasSize(1);
-        assertThat(actual.get(0).scenarioInCampaignUsage).containsEntry("CampaignEntity", Set.of("Scenario1"));
+        assertThat(actual.get(0).scenarioInCampaignUsage).containsEntry("campaign1", Set.of("Scenario1"));
     }
 
     @Test
