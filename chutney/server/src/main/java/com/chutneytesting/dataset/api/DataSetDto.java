@@ -9,6 +9,7 @@ package com.chutneytesting.dataset.api;
 
 import static java.time.Instant.now;
 import static java.util.Collections.emptyList;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
 
@@ -19,6 +20,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import org.immutables.value.Value;
 
 @Value.Immutable
@@ -55,6 +57,21 @@ public interface DataSetDto {
     @JsonProperty("multipleValues")
     default List<List<KeyValue>> datatable() {
         return emptyList();
+    }
+
+    @Value.Default()
+    default List<String> scenarioUsage() {
+        return emptyList();
+    }
+
+    @Value.Default()
+    default List<String> campaignUsage() {
+        return emptyList();
+    }
+
+    @Value.Default()
+    default Map<String, Set<String>> scenarioInCampaignUsage() {
+        return emptyMap();
     }
 
     default List<String> duplicatedHeaders() {

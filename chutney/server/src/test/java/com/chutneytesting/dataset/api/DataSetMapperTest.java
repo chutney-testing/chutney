@@ -17,6 +17,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.IntStream;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -90,6 +91,9 @@ class DataSetMapperTest {
             .withDescription("description")
             .withCreationDate(Instant.now())
             .withTags(List.of("TAG"))
+            .withCampaignUsage(Set.of("TOTO"))
+            .withScenarioInCampaign(Map.of("TUTU", Set.of("BIBI")))
+            .withScenarioUsage(Set.of("JEJE"))
             .build();
 
         DataSetDto datasetDto = DataSetMapper.toDto(dataSet);
@@ -104,6 +108,9 @@ class DataSetMapperTest {
         assertThat(datasetDto.lastUpdated()).isAfter(Instant.now().minus(1, ChronoUnit.HOURS));
         assertThat(datasetDto.id().get()).isEqualTo("id");
         assertThat(datasetDto.name()).isEqualTo("dataset");
+        assertThat(datasetDto.campaignUsage()).containsExactly("TOTO");
+        assertThat(datasetDto.scenarioUsage()).containsExactly("JEJE");
+        assertThat(datasetDto.scenarioInCampaignUsage()).containsEntry("TUTU", Set.of("BIBI"));
     }
 
     @Test

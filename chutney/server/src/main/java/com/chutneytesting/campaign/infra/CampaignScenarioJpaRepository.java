@@ -15,4 +15,5 @@ import org.springframework.data.repository.CrudRepository;
 public interface CampaignScenarioJpaRepository extends CrudRepository<CampaignScenarioEntity, Long>, JpaSpecificationExecutor<CampaignScenarioEntity> {
 
     List<CampaignScenarioEntity> findAllByScenarioId(String scenarioId);
+    List<CampaignScenarioEntity> findAllByDatasetId(String datasetId);
 }

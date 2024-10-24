@@ -28,6 +28,9 @@ public class DataSetMapper {
         if (dataSet.tags != null) datasetBuilder.tags(dataSet.tags);
         if (dataSet.description != null) datasetBuilder.description(dataSet.description);
         if (dataSet.creationDate != null) datasetBuilder.lastUpdated(dataSet.creationDate);
+        if (dataSet.campaignUsage != null) datasetBuilder.campaignUsage(dataSet.campaignUsage);
+        if (dataSet.scenarioUsage != null) datasetBuilder.scenarioUsage(dataSet.scenarioUsage);
+        if (dataSet.scenarioInCampaignUsage != null) datasetBuilder.scenarioInCampaignUsage(dataSet.scenarioInCampaignUsage);
         return datasetBuilder.build();
     }
 

@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '@env/environment';
 import { Dataset, KeyValue } from '@model';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 @Injectable({
     providedIn: 'root'
@@ -22,18 +22,25 @@ export class DataSetService {
     constructor(private httpClient: HttpClient) {
     }
 
-    findAll(): Observable<Array<Dataset>> {
-        return this.httpClient.get<Array<Dataset>>(environment.backend + this.resourceUrl)
+    findAll(usage: boolean = false): Observable<Array<Dataset>> {
+        let params = new HttpParams();
+        params = params.append('usage', usage ? 'true' : 'false');
+        return this.httpClient.get<Array<Dataset>>(environment.backend + this.resourceUrl, { params })
             .pipe(map((res: Array<any>) => {
-                res = res.map(dto => new Dataset(
-                    dto.name,
-                    dto.description,
-                    dto.tags,
-                    dto.lastUpdated,
-                    dto.uniqueValues,
-                    dto.multipleValues,
-                    dto.id
-                ));
+                res = res.map(dto => {
+                    return new Dataset(
+                        dto.name,
+                        dto.description,
+                        dto.tags,
+                        dto.lastUpdated,
+                        dto.uniqueValues,
+                        dto.multipleValues,
+                        dto.id,
+                        dto.scenarioUsage,
+                        dto.campaignUsage,
+                        dto.scenarioInCampaignUsage,
+                    )
+                });
 
                 return res;
             }));

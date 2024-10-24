@@ -20,10 +20,13 @@ import com.chutneytesting.scenario.domain.gwt.GwtScenario;
 import com.chutneytesting.scenario.domain.gwt.GwtTestCase;
 import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.scenario.AggregatedRepository;
+import com.chutneytesting.server.core.domain.scenario.TestCaseMetadata;
 import com.chutneytesting.server.core.domain.scenario.TestCaseMetadataImpl;
 import com.chutneytesting.server.core.domain.scenario.campaign.Campaign;
 import com.chutneytesting.server.core.domain.scenario.campaign.CampaignBuilder;
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
 class DatasetServiceTest {
@@ -45,10 +48,47 @@ class DatasetServiceTest {
             .thenReturn(List.of(thirdDataset, secondDataset, firstDataset));
 
         // When
-        List<DataSet> actual = sut.findAll();
+        List<DataSet> actual = sut.findAll(false);
 
         // Then
         assertThat(actual).containsExactly(firstDataset, secondDataset, thirdDataset);
+    }
+
+    @Test
+    public void should_get_all_dataset_with_scenario_usage() {
+        // Given
+        DataSet firstDataset = DataSet.builder().withName("A").withId("A").build();
+        DataSet secondDataset = DataSet.builder().withName("B").withId("B").build();
+
+        Campaign.CampaignScenario campaignScenario = new Campaign.CampaignScenario("Scenario1", "A");
+
+        Campaign campaign1 = new Campaign(1L, "campaign1", "description", List.of(campaignScenario), "env", false, false, "A", List.of());
+        Campaign campaign2 = new Campaign(1L, "campaign2", "description", List.of(), "env", false, false, "A", List.of());
+
+        TestCaseMetadata testCaseMetadata = TestCaseMetadataImpl.builder().withTitle("Scenario1").withId("Scenario1").withDefaultDataset("A").build();
+
+        GwtTestCase gwtTestCase = GwtTestCase.builder().withMetadata(TestCaseMetadataImpl.builder().withTitle("Scenario1").withId("testCaseId").build()).build();
+
+        when(datasetRepository.findAll())
+            .thenReturn(List.of(firstDataset, secondDataset));
+        when(testCaseRepository.findAllByDatasetId("A"))
+            .thenReturn(List.of(testCaseMetadata));
+        when(campaignRepository.findAll())
+            .thenReturn(List.of(campaign1, campaign2));
+        when(testCaseRepository.findById("Scenario1"))
+            .thenReturn(Optional.ofNullable(gwtTestCase));
+
+        // When
+        List<DataSet> actual = sut.findAll(true);
+
+        // Then
+        assertThat(actual).hasSize(2);
+        assertThat(actual.get(0).scenarioUsage).hasSize(1);
+        assertThat(actual.get(0).scenarioUsage).contains("Scenario1");
+        assertThat(actual.get(0).campaignUsage).hasSize(2);
+        assertThat(actual.get(0).campaignUsage).contains("campaign1");
+        assertThat(actual.get(0).campaignUsage).contains("campaign2");
+        assertThat(actual.get(0).scenarioInCampaignUsage).containsEntry("campaign1", Set.of("Scenario1"));
     }
 
     @Test

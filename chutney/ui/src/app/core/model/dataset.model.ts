@@ -15,7 +15,10 @@ export class Dataset {
         public lastUpdated: Date,
         public uniqueValues: Array<KeyValue>,
         public multipleValues: Array<Array<KeyValue>>,
-        public id?: string) {
+        public id?: string,
+        public scenarioUsage?: Array<string>,
+        public campaignUsage?: Array<string>,
+        public scenarioInCampaignUsage?: { [key: string]: string[] }) {
     }
 
     getMultipleValueHeader(): Array<string> {

@@ -37,12 +37,18 @@
   <div class="d-flex flex-row mt-5">
     <div [ngClass]="preview ? 'w-75' : 'w-100'">
       <table class="table table-sm table-striped table-hover rounded align-middle">
+          <ng-template #usageInfo>
+              <div>
+                  Show usage of dataset in scenario, campaign and scenario in campaign
+              </div>
+          </ng-template>
         <thead>
-          <tr class="mb-1">
+          <tr class="mb-1 text-center">
             <th scope="col" class="w10">&nbsp;</th>
             <th scope="col" class="w25">Name</th>
             <th scope="col" class="w10">Tags</th>
-            <th scope="col" class="w40">Description</th>
+            <th scope="col" class="w25">Description</th>
+            <th scope="col" class="w15">Usage <span class="fa-solid fa fa-circle-info" [ngbTooltip]="usageInfo"></span></th>
             <th scope="col" class="w15">LastUpdated</th>
           </tr>
         </thead>
@@ -50,7 +56,7 @@
           @for (dataset of (datasets |  dataSetSearch : selectedTags | searchTextPipe  : dataSetFilter : ['name', 'description']); track dataset.id) {
             <tr
               (click)="showPreview(dataset)"
-              class="cursor-pointer">
+              class="cursor-pointer text-center">
               <td class="align-items-center">
                 <button *hasAuthorization="[Authorization.DATASET_WRITE]"
                   type="button" class="btn btn-primary btn-sm"
@@ -84,6 +90,61 @@
                 }
               </td>
               <td class="pt-2"><span>{{dataset.description}}</span></td>
+              <td class="pt-2">
+                  <ng-template #scenarioUsage>
+                      <div class="text-start">
+                          @for (scenarioUsage of dataset.scenarioUsage; track $index) {
+                              <span>Scenario <strong>{{scenarioUsage}}</strong></span><br/>
+                          }
+                      </div>
+                  </ng-template>
+                  @if (dataset.scenarioUsage.length > 0) {
+                      <div class="btn btn-sm position-relative"
+                           [ngbTooltip]="scenarioUsage" placement="top">
+                          <span class="fa-solid fa-2xl fa fa-film text-info"></span>
+                          <span class="position-absolute top-0 start-75 translate-middle badge border border-info rounded-circle text-info">
+                          {{ dataset.scenarioUsage.length }}
+                        </span>
+                      </div>
+                  }
+                  <ng-template #campaignUsage>
+                      <div class="text-start">
+                          @for (campaignUsage of dataset.campaignUsage; track campaignUsage) {
+                              <span>Campaign <strong>{{campaignUsage}}</strong></span><br/>
+                          }
+                      </div>
+                  </ng-template>
+                  @if (dataset.campaignUsage.length > 0) {
+                      <div class="btn btn-sm position-relative"
+                           [ngbTooltip]="campaignUsage" placement="top">
+                          <span class="fa-solid fa-2xl fa fa-clock text-success"></span>
+                          <span class="position-absolute top-0 start-75 translate-middle badge border border-success rounded-circle text-success">
+                          {{ dataset.campaignUsage.length }}
+                        </span>
+                      </div>
+                  }
+                  <ng-template #scenarioInCampaignUsage class="mw-100">
+                      <div class="text-start d-flex flex-column">
+                          @for (scenarioInCampaignUsage of Object.keys(dataset.scenarioInCampaignUsage); track scenarioInCampaignUsage) {
+                              <span class="pb-1 pt-1">Campaign <strong>{{scenarioInCampaignUsage}}</strong> :</span>
+                              <div class="d-flex flex-column">
+                                  @for (scenario of dataset.scenarioInCampaignUsage[scenarioInCampaignUsage]; track $index) {
+                                    <span class="ps-4">Scenario <strong>{{scenario}}</strong></span>
+                                  }
+                              </div>
+                          }
+                      </div>
+                  </ng-template>
+                  @if (Object.keys(dataset.scenarioInCampaignUsage).length > 0) {
+                      <div class="btn btn-sm position-relative"
+                           [ngbTooltip]="scenarioInCampaignUsage" placement="top">
+                          <span class="fa-solid fa-2xl fa-scroll text-warning"></span>
+                          <span class="position-absolute top-0 start-75 translate-middle badge border border-warning rounded-circle text-warning">
+                          {{ Object.values(dataset.scenarioInCampaignUsage).flat().length }}
+                        </span>
+                      </div>
+                  }
+              </td>
               <td class="pt-2"><span>{{dataset.lastUpdated | amDateFormat: 'YYYY-MM-DD HH:mm'}}</span></td>
             </tr>
           }
