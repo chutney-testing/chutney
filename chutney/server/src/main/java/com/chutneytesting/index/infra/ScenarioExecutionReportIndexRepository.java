@@ -7,22 +7,26 @@
 
 package com.chutneytesting.index.infra;
 
+import static org.apache.lucene.document.Field.Store;
+
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionReportEntity;
-import com.chutneytesting.index.domain.IndexRepository;
 import java.util.List;
-import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.StoredField;
+import org.apache.lucene.document.SortedDocValuesField;
+import org.apache.lucene.document.StringField;
+import org.apache.lucene.document.TextField;
 import org.apache.lucene.index.Term;
-import org.apache.lucene.queryparser.classic.ParseException;
-import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TermQuery;
-import org.springframework.stereotype.Component;
+import org.apache.lucene.search.WildcardQuery;
+import org.apache.lucene.util.BytesRef;
+import org.springframework.stereotype.Repository;
 
-@Component
+@Repository
 public class ScenarioExecutionReportIndexRepository {
 
     public static final String SCENARIO_EXECUTION_REPORT = "scenario_execution_report";
@@ -37,9 +41,13 @@ public class ScenarioExecutionReportIndexRepository {
 
     public void save(ScenarioExecutionReportEntity report) {
         Document document = new Document();
-        document.add(new StoredField(SCENARIO_EXECUTION_ID, report.scenarioExecutionId()));
-        document.add(new StoredField(REPORT, report.getReport()));
-        document.add(new StoredField(WHAT, SCENARIO_EXECUTION_REPORT));
+        document.add(new StringField(WHAT, SCENARIO_EXECUTION_REPORT, Store.NO));
+        document.add(new StringField(SCENARIO_EXECUTION_ID, report.scenarioExecutionId().toString(),Store.YES));
+        document.add(new TextField(REPORT, report.getReport(), Store.NO));
+        // for sorting
+        document.add(new SortedDocValuesField(SCENARIO_EXECUTION_ID, new BytesRef(report.scenarioExecutionId().toString().getBytes()) ));
+
+
         indexRepository.index(document);
     }
 
@@ -55,26 +63,21 @@ public class ScenarioExecutionReportIndexRepository {
 
 
     public List<Long> idsByKeywordInReport(String keyword) {
+        Query whatQuery = new TermQuery(new Term(WHAT, SCENARIO_EXECUTION_REPORT));
+        Query reportQuery = new WildcardQuery(new Term(REPORT,  "*" + keyword + "*"));
 
-        try {
-            Query whatQuery = new TermQuery(new Term(WHAT, SCENARIO_EXECUTION_REPORT));
+        BooleanQuery query = new BooleanQuery.Builder()
+            .add(reportQuery, BooleanClause.Occur.MUST)
+            .add(whatQuery, BooleanClause.Occur.MUST)
+            .build();
 
-            QueryParser parser = new QueryParser(REPORT, new StandardAnalyzer());
-            Query reportQuery = parser.parse(keyword);
+        Sort sort = new Sort(SortField.FIELD_SCORE, new SortField(SCENARIO_EXECUTION_ID, SortField.Type.STRING, true));
 
-            BooleanQuery query = new BooleanQuery.Builder()
-                .add(reportQuery, BooleanClause.Occur.MUST)
-                .add(whatQuery, BooleanClause.Occur.MUST)
-                .build();
+        return indexRepository.search(query, 100, sort)
+            .stream()
+            .map(doc -> doc.get(SCENARIO_EXECUTION_ID))
+            .map(Long::parseLong)
+            .toList();
 
-            return indexRepository.search(query, 100)
-                .stream()
-                .map(doc -> doc.get(SCENARIO_EXECUTION_ID))
-                .map(Long::parseLong)
-                .toList();
-
-        } catch (ParseException e) {
-            throw new RuntimeException("Could not parse keyword: " + keyword, e);
-        }
     }
 }
