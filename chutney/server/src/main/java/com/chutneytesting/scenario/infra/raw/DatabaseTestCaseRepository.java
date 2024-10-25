@@ -128,7 +128,6 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
                 allExecutions.forEach(e -> {
                     e.forCampaignExecution(null);
                     scenarioExecutionsJpaRepository.save(e);
-                    scenarioExecutionReportIndexRepository.delete(e.id());
                 });
 
                 List<CampaignScenarioEntity> allCampaignScenarioEntities = campaignScenarioJpaRepository.findAllByScenarioId(scenarioId);

@@ -10,6 +10,7 @@ package util.infra;
 import static util.infra.AbstractLocalDatabaseTest.DB_CHANGELOG_DB_CHANGELOG_MASTER_XML;
 
 import com.chutneytesting.ServerConfiguration;
+import com.chutneytesting.execution.infra.aop.IndexingAspect;
 import com.chutneytesting.index.infra.IndexConfig;
 import com.chutneytesting.index.infra.IndexRepository;
 import com.chutneytesting.index.infra.OnDiskIndexConfig;
@@ -44,6 +45,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -61,6 +63,7 @@ import util.SocketUtil;
 @Configuration
 @EnableTransactionManagement(proxyTargetClass = true)
 @EnableJpa
+@EnableAspectJAutoProxy
 @Profile("test-infra")
 class TestInfraConfiguration {
 
@@ -201,6 +204,11 @@ class TestInfraConfiguration {
     @Bean
     public ScenarioExecutionReportIndexRepository scenarioExecutionReportIndexRepository(IndexRepository indexRepository) {
         return new ScenarioExecutionReportIndexRepository(indexRepository);
+    }
+
+    @Bean
+    public IndexingAspect indexingAspect(ScenarioExecutionReportIndexRepository indexRepository) {
+        return new IndexingAspect(indexRepository);
     }
 
 

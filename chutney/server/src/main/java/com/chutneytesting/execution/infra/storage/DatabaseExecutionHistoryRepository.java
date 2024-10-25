@@ -134,7 +134,6 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
         scenarioExecution = scenarioExecutionsJpaRepository.save(scenarioExecution);
         ScenarioExecutionReportEntity reportEntity = new ScenarioExecutionReportEntity(scenarioExecution, detachedExecution.report());
         scenarioExecutionReportJpaRepository.save(reportEntity);
-        scenarioExecutionReportIndexRepository.save(reportEntity);
         Execution execution = detachedExecution.attach(scenarioExecution.id(), scenarioId);
         return ImmutableExecutionHistory.Execution.builder().from(execution).build();
     }
@@ -186,7 +185,6 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
         );
         scenarioExecutionReport.updateReport(execution);
         scenarioExecutionReportJpaRepository.save(scenarioExecutionReport);
-        scenarioExecutionReportIndexRepository.save(scenarioExecutionReport);
     }
 
     @Override
@@ -213,7 +211,6 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
 
         campaignExecutionJpaRepository.deleteAllByIdInBatch(campaignExecutionsIds);
         scenarioExecutionReportJpaRepository.deleteAllById(executionsIds);
-        scenarioExecutionReportIndexRepository.deleteAllById(executionsIds);
         scenarioExecutionsJpaRepository.deleteAllByIdInBatch(executionsIds);
     }
 
