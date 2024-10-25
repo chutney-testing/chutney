@@ -41,6 +41,45 @@
                         "dataset": "${#dataset}"
                     }
                 }
+            },
+            {
+                "name": "Preserve boolean inputs",
+                "type": "context-put",
+                "inputs": {
+                    "entries": {
+                        "bool": true
+                    }
+                },
+                "outputs": {
+                    "bool_<i>": "${#bool}"
+                },
+                "strategy": {
+                    "type": "for",
+                    "parameters": {
+                        "index": "i",
+                        "dataset": "${#dataset}"
+                    }
+                }
+            },
+            {
+                "name": "Preserve integer inputs",
+                "type": "context-put",
+                "inputs": {
+                    "entries": {
+                        "integer1": 1,
+                        "integer2": 2
+                    }
+                },
+                "outputs": {
+                    "int_<i>": "${#integer1 + #integer2}"
+                },
+                "strategy": {
+                    "type": "for",
+                    "parameters": {
+                        "index": "i",
+                        "dataset": "${#dataset}"
+                    }
+                }
             }
         ]
     },

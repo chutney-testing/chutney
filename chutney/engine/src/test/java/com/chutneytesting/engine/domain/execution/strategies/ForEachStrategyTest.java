@@ -19,6 +19,8 @@ import com.chutneytesting.engine.api.execution.TestEngine;
 import com.chutneytesting.tools.Jsons;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.BooleanNode;
+import com.fasterxml.jackson.databind.node.IntNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import java.time.ZonedDateTime;
@@ -222,6 +224,20 @@ class ForEachStrategyTest {
         assertThat(iterationWithList.status).isEqualTo(SUCCESS);
         assertThat(iterationWithList.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).isInstanceOf(ArrayNode.class);
         assertDoesNotThrow(() -> ZonedDateTime.parse(((ArrayNode) iterationWithList.steps.get(0).context.evaluatedInputs.values().stream().toList().get(0)).elements().next().asText()));
+
+        StepExecutionReportDto iterationWithBoolean = result.steps.get(2);
+        assertThat(iterationWithBoolean.steps).hasSize(2);
+        assertThat(iterationWithBoolean.status).isEqualTo(SUCCESS);
+        assertThat(iterationWithBoolean.steps.get(0).context.stepResults.get("bool")).isInstanceOf(BooleanNode.class);
+        assertThat(iterationWithBoolean.steps.get(0).context.stepResults.get("bool_0")).isInstanceOf(BooleanNode.class);
+        assertThat(((BooleanNode) iterationWithBoolean.steps.get(0).context.stepResults.get("bool_0")).asBoolean()).isEqualTo(true);
+
+        StepExecutionReportDto iterationWithInteger = result.steps.get(3);
+        assertThat(iterationWithInteger.steps).hasSize(2);
+        assertThat(iterationWithInteger.status).isEqualTo(SUCCESS);
+        assertThat(iterationWithInteger.steps.get(0).context.stepResults.get("integer1")).isInstanceOf(IntNode.class);
+        assertThat(iterationWithInteger.steps.get(0).context.stepResults.get("int_0")).isInstanceOf(IntNode.class);
+        assertThat(((IntNode) iterationWithInteger.steps.get(0).context.stepResults.get("int_0")).asInt()).isEqualTo(3);
     }
 
     @Test
@@ -301,11 +317,11 @@ class ForEachStrategyTest {
         assertThat(firstIteration.steps.get(0).name).startsWith("0 -");
         assertThat(firstIteration.steps.get(0).context.stepResults).containsKey("environment_0.0");
         assertThat(firstIteration.steps.get(0).context.stepResults.get("environment_0.0")).isInstanceOf(TextNode.class);
-        assertThat(((TextNode)firstIteration.steps.get(0).context.stepResults.get("environment_0.0")).asText()).isEqualTo("overriddenEnvX");
+        assertThat(((TextNode) firstIteration.steps.get(0).context.stepResults.get("environment_0.0")).asText()).isEqualTo("overriddenEnvX");
         assertThat(firstIteration.steps.get(1).name).startsWith("1 -");
         assertThat(firstIteration.steps.get(1).context.stepResults).containsKey("environment_0.1");
         assertThat(firstIteration.steps.get(1).context.stepResults.get("environment_0.1")).isInstanceOf(TextNode.class);
-        assertThat(((TextNode)firstIteration.steps.get(1).context.stepResults.get("environment_0.1")).asText()).isEqualTo("overriddenEnvY");
+        assertThat(((TextNode) firstIteration.steps.get(1).context.stepResults.get("environment_0.1")).asText()).isEqualTo("overriddenEnvY");
 
         // And the second iteration contains 2 nested iterations
         StepExecutionReportDto secondIteration = parentIterativeStep.steps.get(1).steps.get(0);
@@ -313,11 +329,11 @@ class ForEachStrategyTest {
         assertThat(secondIteration.steps.get(0).name).startsWith("0 -");
         assertThat(secondIteration.steps.get(0).context.stepResults).containsKey("environment_1.0");
         assertThat(secondIteration.steps.get(0).context.stepResults.get("environment_1.0")).isInstanceOf(TextNode.class);
-        assertThat(((TextNode)secondIteration.steps.get(0).context.stepResults.get("environment_1.0")).asText()).isEqualTo("overriddenEnvX");
+        assertThat(((TextNode) secondIteration.steps.get(0).context.stepResults.get("environment_1.0")).asText()).isEqualTo("overriddenEnvX");
         assertThat(secondIteration.steps.get(1).name).startsWith("1 -");
         assertThat(secondIteration.steps.get(1).context.stepResults).containsKey("environment_1.1");
         assertThat(secondIteration.steps.get(1).context.stepResults.get("environment_1.1")).isInstanceOf(TextNode.class);
-        assertThat(((TextNode)secondIteration.steps.get(1).context.stepResults.get("environment_1.1")).asText()).contains("overriddenEnvY");
+        assertThat(((TextNode) secondIteration.steps.get(1).context.stepResults.get("environment_1.1")).asText()).contains("overriddenEnvY");
     }
 
     @Test
