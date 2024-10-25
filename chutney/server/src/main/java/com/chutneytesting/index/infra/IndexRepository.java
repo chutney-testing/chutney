@@ -55,6 +55,17 @@ public class IndexRepository {
         return result;
     }
 
+    public int count(Query query) {
+        int count = 0;
+        try (DirectoryReader reader = DirectoryReader.open(indexDirectory)) {
+            IndexSearcher searcher = new IndexSearcher(reader);
+            count  = searcher.count(query);
+
+        } catch (IOException ignored) {
+        }
+        return count;
+    }
+
     public void delete(Query query) {
         try {
             indexWriter.deleteDocuments(query);

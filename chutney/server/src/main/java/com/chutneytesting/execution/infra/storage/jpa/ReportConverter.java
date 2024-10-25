@@ -8,39 +8,49 @@
 package com.chutneytesting.execution.infra.storage.jpa;
 
 import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
-import org.apache.commons.lang3.StringUtils;
 
+@Converter
 public class ReportConverter implements AttributeConverter<String, byte[]> {
     @Override
     public byte[] convertToDatabaseColumn(String report) {
-        if (StringUtils.isNoneEmpty()) {
-            try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                 GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream)) {
-
-                gzipOutputStream.write(report.getBytes(StandardCharsets.UTF_8));
-                gzipOutputStream.finish();
-                return byteArrayOutputStream.toByteArray();
-
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to compress report content", e);
-            }
-        }
-        return null;
+        return compress(report);
     }
 
     @Override
     public String convertToEntityAttribute(byte[] zippedReport) {
-        if (zippedReport == null || zippedReport.length == 0) {
-            return null;
+        if (!isCompressed(zippedReport)) {
+            return new String(zippedReport, StandardCharsets.UTF_8);
         }
+        return decompress(zippedReport);
+    }
 
-        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(zippedReport);
+    private boolean isCompressed(byte[] data) {
+        return (data != null && data.length >= 2 &&
+            (data[0] == (byte) 0x1f && data[1] == (byte) 0x8b));
+    }
+
+    private byte[] compress(String report) {
+        try (ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+             GZIPOutputStream gzipOutputStream = new GZIPOutputStream(byteArrayOutputStream)) {
+
+            gzipOutputStream.write(report.getBytes(StandardCharsets.UTF_8));
+            gzipOutputStream.finish();
+            return byteArrayOutputStream.toByteArray();
+
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to compress report content", e);
+        }
+    }
+
+    private String decompress(byte[] compressedData) {
+        try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(compressedData);
              GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
 

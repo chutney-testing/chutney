@@ -11,6 +11,7 @@ import static org.apache.lucene.document.Field.Store;
 
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionReportEntity;
 import java.util.List;
+import java.util.Set;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.SortedDocValuesField;
 import org.apache.lucene.document.StringField;
@@ -31,8 +32,8 @@ public class ScenarioExecutionReportIndexRepository {
 
     public static final String SCENARIO_EXECUTION_REPORT = "scenario_execution_report";
     public static final String WHAT = "what";
-    public static final String SCENARIO_EXECUTION_ID = "scenarioExecutionId";
-    public static final String REPORT = "report";
+    private static final String SCENARIO_EXECUTION_ID = "scenarioExecutionId";
+    private static final String REPORT = "report";
     private final IndexRepository indexRepository;
 
     public ScenarioExecutionReportIndexRepository(IndexRepository indexRepository) {
@@ -51,7 +52,11 @@ public class ScenarioExecutionReportIndexRepository {
         indexRepository.index(document);
     }
 
-    public void remove(Long scenarioExecutionId) {
+    public void saveAll(List<ScenarioExecutionReportEntity> reports) {
+        reports.forEach(this::save);
+    }
+
+    public void delete(Long scenarioExecutionId) {
         Query whatQuery = new TermQuery(new Term(WHAT, SCENARIO_EXECUTION_REPORT));
         Query idQuery = new TermQuery(new Term(SCENARIO_EXECUTION_ID, scenarioExecutionId.toString()));
         BooleanQuery query = new BooleanQuery.Builder()
@@ -59,6 +64,10 @@ public class ScenarioExecutionReportIndexRepository {
             .add(whatQuery, BooleanClause.Occur.MUST)
             .build();
         indexRepository.delete(query);
+    }
+
+    public void deleteAllById(Set<Long> scenarioExecutionIds) {
+        scenarioExecutionIds.forEach(this::delete);
     }
 
 

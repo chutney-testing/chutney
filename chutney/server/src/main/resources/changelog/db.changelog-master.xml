@@ -1072,7 +1072,14 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="scenario-execution-report-as-blob" author="ICG">
+    <changeSet id="scenario-execution-report-as-blob-postgres" author="ICG" dbms="postgresql">
+        <modifyDataType
+            tableName="SCENARIO_EXECUTIONS_REPORTS"
+            columnName="REPORT"
+            newDataType="BYTEA"/>
+    </changeSet>
+
+    <changeSet id="scenario-execution-report-as-blob-h2-postgres" author="ICG" dbms="h2">
         <modifyDataType
             tableName="SCENARIO_EXECUTIONS_REPORTS"
             columnName="REPORT"

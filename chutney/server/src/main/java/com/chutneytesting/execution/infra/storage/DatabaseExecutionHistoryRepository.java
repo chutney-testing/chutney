@@ -186,6 +186,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
         );
         scenarioExecutionReport.updateReport(execution);
         scenarioExecutionReportJpaRepository.save(scenarioExecutionReport);
+        scenarioExecutionReportIndexRepository.save(scenarioExecutionReport);
     }
 
     @Override
@@ -212,6 +213,7 @@ class DatabaseExecutionHistoryRepository implements ExecutionHistoryRepository {
 
         campaignExecutionJpaRepository.deleteAllByIdInBatch(campaignExecutionsIds);
         scenarioExecutionReportJpaRepository.deleteAllById(executionsIds);
+        scenarioExecutionReportIndexRepository.deleteAllById(executionsIds);
         scenarioExecutionsJpaRepository.deleteAllByIdInBatch(executionsIds);
     }
 
