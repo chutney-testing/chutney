@@ -161,7 +161,11 @@ public class ForEachStrategy implements StepExecutionStrategy {
             return index(indexName, index, (List) value);
         }
 
-        return index(indexName, index, (String) value);
+        if (value instanceof String) {
+            return index(indexName, index, (String) value);
+        }
+
+        return value;
 
     }
 }
