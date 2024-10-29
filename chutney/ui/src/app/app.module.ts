@@ -28,7 +28,6 @@ import { ThemeService } from '@core/theme/theme.service';
 import { DefaultMissingTranslationHandler, HttpLoaderFactory } from '@core/initializer/app.translate.factory';
 import { themeInitializer } from '@core/initializer/theme.initializer';
 import { OAuthModule } from 'angular-oauth2-oidc';
-import { ssoInitializer } from "@core/initializer/sso.initializer";
 import { SsoService } from "@core/services/sso.service";
 
 @NgModule({
@@ -71,17 +70,15 @@ import { SsoService } from "@core/services/sso.service";
           useFactory: themeInitializer,
           deps: [ThemeService],
           multi: true
-      },
-      {
-          provide: APP_INITIALIZER,
-          useFactory: ssoInitializer,
-          deps: [SsoService],
-          multi: true
       }
   ],
   bootstrap: [AppComponent]
 })
-export class ChutneyAppModule {}
+export class ChutneyAppModule {
+    constructor(private ssoOpenIdConnectService: SsoService) {
+        this.ssoOpenIdConnectService.fetchSsoConfig()
+    }
+}
 
 
 

@@ -7,8 +7,10 @@
 
 package com.chutneytesting.security.api;
 
+import com.chutneytesting.security.infra.sso.SsoOpenIdConnectConfigProperties;
+
 public class SsoOpenIdConnectMapper {
-    public static SsoOpenIdConnectConfigDto toDto(com.chutneytesting.security.domain.SsoOpenIdConnectConfig ssoOpenIdConnectConfig) {
+    public static SsoOpenIdConnectConfigDto toDto(SsoOpenIdConnectConfigProperties ssoOpenIdConnectConfig) {
         if (ssoOpenIdConnectConfig == null) {
             return null;
         }

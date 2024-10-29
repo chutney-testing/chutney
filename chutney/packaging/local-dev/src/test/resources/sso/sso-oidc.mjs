@@ -7,19 +7,22 @@
 
 import express from 'express';
 import { Provider } from 'oidc-provider';
+import * as dotenv from 'dotenv';
+
+dotenv.config()
 
 const oidc = new Provider('http://localhost:3000', {
     clients: [{
-        client_id: 'my-client',
-        client_secret: 'my-client-secret',
-        grant_types: ['authorization_code'],
-        redirect_uris: ['https://localhost:4200/'],
-        post_logout_redirect_uris: ['https://localhost:4200/'],
+        client_id: process.env.CLIENT_ID,
+        client_secret: process.env.CLIENT_SECRET,
+        grant_types: [process.env.GRANT_TYPE],
+        redirect_uris: [process.env.REDIRECT_URI],
+        post_logout_redirect_uris: [process.env.REDIRECT_URI],
     }],
     formats: {
-        AccessToken: 'opaque',
-        RefreshToken: 'opaque',
-        IdToken: 'opaque'
+        AccessToken: process.env.TOKEN_FORMAT,
+        RefreshToken: process.env.TOKEN_FORMAT,
+        IdToken: process.env.TOKEN_FORMAT
     },
     features: {
         introspection: {
@@ -29,7 +32,7 @@ const oidc = new Provider('http://localhost:3000', {
         userinfo: { enabled: true },
     },
     clientBasedCORS(ctx, origin, client) {
-        const allowedOrigins = ['https://localhost:4200'];
+        const allowedOrigins = [process.env.REDIRECT_URI];
         return allowedOrigins.includes(origin);
     },
     async findAccount(ctx, id) {
@@ -42,6 +45,7 @@ const oidc = new Provider('http://localhost:3000', {
 
 const app = express();
 app.use(oidc.callback());
-app.listen(3000, () => {
-    console.log('OIDC provider listening on port 3000');
+const port = parseInt(process.env.PORT, 10)
+app.listen(port, () => {
+    console.log(`OIDC provider listening on port ${port}`);
 });

@@ -6,9 +6,9 @@
  */
 
 import { HttpClient } from '@angular/common/http';
-import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
+import { OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '@env/environment';
-import {Observable, map, tap} from 'rxjs';
+import { map, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 interface SsoAuthConfig {
@@ -48,9 +48,13 @@ export class SsoService {
             oidc: ssoConfig.oidc
           }
         }),
-        tap(ssoConfig => {
-          this.oauthService.configure(ssoConfig)
-          this.oauthService.loadDiscoveryDocumentAndTryLogin();
+        tap(async ssoConfig => {
+            try {
+                this.oauthService.configure(ssoConfig)
+                await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+            } catch (e) {
+                console.error("SSO provider not available")
+            }
         })
     ).subscribe()
   }

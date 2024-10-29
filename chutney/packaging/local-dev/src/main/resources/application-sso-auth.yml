@@ -8,38 +8,37 @@ spring:
         registration:
           my-provider:
             provider: my-provider
-            client-id: my-client
-            client-secret: my-client-secret
+            client-id: "${auth.sso.clientId}"
+            client-secret: "${auth.sso.clientSecret}"
             authorization-grant-type: authorization_code
             redirect-uri: "https://${server.http.interface}:${server.port}/login/oauth2/code/{registrationId}"
             scope: openid, profile, email
             client-name: My Provider
         provider:
           my-provider:
-            issuer-uri: http://localhost:3000
-            authorization-uri: http://localhost:3000/auth
-            token-uri: http://localhost:3000/token
-            user-info-uri: http://localhost:3000/me
+            authorization-uri: ${auth.sso.issuer}/auth
+            token-uri: ${auth.sso.issuer}/token
+            user-info-uri: ${auth.sso.issuer}/me
             user-name-attribute: sub
-            jwk-set-uri: http://localhost:3000/jwks
+            jwk-set-uri: ${auth.sso.issuer}/jwks
       resourceserver:
         opaque-token:
-          introspection-uri: http://localhost:3000/token/introspection
-          client-id: 'my-client'
-          client-secret: 'my-client-secret'
+          introspection-uri: "${auth.sso.issuer}/token/introspection"
+          client-id: "${auth.sso.clientId}"
+          client-secret: "${auth.sso.clientSecret}"
       authorizationserver:
-        issuer: http://localhost:3000
+        issuer: "${auth.sso.issuer}"
         endpoint:
           oidc:
-            user-info-uri: http://localhost:3000/userinfo
+            user-info-uri: "${auth.sso.issuer}/userinfo"
 
 auth:
   sso:
-    issuer: 'http://localhost:3000'
+    issuer: "http://localhost:3000"
     clientId: 'my-client'
     clientSecret: 'my-client-secret'
     responseType: 'code'
     scope: 'openid profile email'
-    redirectBaseUrl: 'https://localhost:4200'
-    ssoProviderName: 'SSO OIDC'
+    redirectBaseUrl: "https://localhost:4200"
+    ssoProviderName: 'SSO OpenID Connect'
     oidc: true

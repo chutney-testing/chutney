@@ -9,8 +9,8 @@ import { Injectable } from '@angular/core';
 import { HttpErrorResponse, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
-import { EMPTY, Observable, throwError } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { EMPTY, from, Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
 
 import { LoginService } from '@core/services';
 import { AlertService } from '@shared';
@@ -45,11 +45,13 @@ export class ErrorInterceptor implements HttpInterceptor {
                             if (this.loginService.isAuthenticated()) {
                                 this.loginService.logout();
                                 this.alertService.error(this.sessionExpiredMessage, { timeOut: 0, extendedTimeOut: 0, closeButton: true });
+                                return EMPTY
                             } else {
                                 const requestURL = this.router.url !== undefined ? this.router.url : '';
-                                this.loginService.initLogin(requestURL);
+                                return from(this.loginService.initLogin(requestURL)).pipe(
+                                    switchMap(() => EMPTY)
+                                );
                             }
-                            return EMPTY;
                         }
                     }
                     return throwError(err);
