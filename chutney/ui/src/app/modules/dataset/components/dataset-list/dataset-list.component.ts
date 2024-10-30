@@ -25,6 +25,8 @@ import {ExecutionStatus} from "@core/model/scenario/execution-status";
 })
 export class DatasetListComponent implements OnInit, OnDestroy {
 
+    readonly Object = Object;
+
     datasets: Array<Dataset> = [];
 
     preview: Dataset = null;
