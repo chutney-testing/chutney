@@ -27,6 +27,7 @@ import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
 import { OAuthService } from "angular-oauth2-oidc";
+import { AlertService } from '@shared';
 
 function getScenarios(html: HTMLElement) {
     return html.querySelectorAll('.scenario-title');
@@ -44,6 +45,7 @@ describe('ScenariosComponent', () => {
         TestBed.resetTestingModule();
         const scenarioService = jasmine.createSpyObj('ScenarioService', ['findScenarios', 'search']);
         const oAuthService = jasmine.createSpyObj('OAuthService', ['loadDiscoveryDocumentAndTryLogin', 'configure', 'initCodeFlow', 'logOut', 'getAccessToken']);
+        const alertService = jasmine.createSpyObj('AlertService', ['error']);
         const jiraPluginService = jasmine.createSpyObj('JiraPluginService', ['findScenarios', 'findCampaigns']);
         const jiraPluginConfigurationService = jasmine.createSpyObj('JiraPluginConfigurationService', ['getUrl']);
         const mockScenarioIndex = [new ScenarioIndex('1', 'title1', 'description', 'source', new Date(), new Date(), 1, 'guest', [], []),
@@ -73,6 +75,7 @@ describe('ScenariosComponent', () => {
                 NgbPopoverConfig,
                 {provide: ScenarioService, useValue: scenarioService},
                 {provide: OAuthService, useValue: oAuthService},
+                {provide: AlertService, useValue: alertService},
                 {provide: JiraPluginService, useValue: jiraPluginService},
                 {provide: JiraPluginConfigurationService, useValue: jiraPluginConfigurationService},
                 {provide: ActivatedRoute, useValue: activatedRouteStub},

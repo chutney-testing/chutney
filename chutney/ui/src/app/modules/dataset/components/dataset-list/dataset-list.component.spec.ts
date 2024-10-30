@@ -23,11 +23,14 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
 import { RouterModule } from '@angular/router';
 import { OAuthService } from "angular-oauth2-oidc";
+import { ToastrService } from 'ngx-toastr';
+import { AlertService } from '@shared';
 
 describe('DatasetListComponent', () => {
 
   const dataSetService = jasmine.createSpyObj('DataSetService', ['findAll']);
   const oAuthService = jasmine.createSpyObj('OAuthService', ['loadDiscoveryDocumentAndTryLogin', 'configure', 'initCodeFlow', 'logOut', 'getAccessToken']);
+  const alertService = jasmine.createSpyObj('AlertService', ['error']);
   dataSetService.findAll.and.returnValue(of([]));
    beforeEach(waitForAsync(() => {
     TestBed.resetTestingModule();
@@ -50,6 +53,7 @@ describe('DatasetListComponent', () => {
       ],
       providers: [
         { provide: DataSetService, useValue: dataSetService },
+        { provide: AlertService, useValue: alertService },
         { provide: OAuthService, useValue: oAuthService },
         {provide: DROPDOWN_SETTINGS, useClass: DropdownSettings}
       ]

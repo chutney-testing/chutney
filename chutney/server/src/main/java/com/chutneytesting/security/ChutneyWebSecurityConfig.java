@@ -22,6 +22,8 @@ import com.chutneytesting.security.infra.sso.OAuth2TokenAuthenticationProvider;
 import com.chutneytesting.security.infra.sso.SsoOpenIdConnectConfigProperties;
 import com.chutneytesting.server.core.domain.security.Authorization;
 import com.chutneytesting.server.core.domain.security.User;
+import java.net.InetSocketAddress;
+import java.net.Proxy;
 import java.util.ArrayList;
 import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +31,9 @@ import org.springframework.boot.autoconfigure.security.oauth2.server.servlet.OAu
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.lang.Nullable;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
@@ -48,6 +52,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.MvcRequestMatcher;
+import org.springframework.web.client.RestOperations;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 
 @Configuration
@@ -72,8 +78,8 @@ public class ChutneyWebSecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(final HttpSecurity http, AuthenticationService authenticationService, @Nullable ClientRegistrationRepository clientRegistrationRepository) throws Exception {
-        configureSso(http, authenticationService, clientRegistrationRepository);
+    public SecurityFilterChain securityFilterChain(final HttpSecurity http, AuthenticationService authenticationService, @Nullable ClientRegistrationRepository clientRegistrationRepository, @Nullable RestOperations restOperations) throws Exception {
+        configureSso(http, authenticationService, clientRegistrationRepository, restOperations);
         configureBaseHttpSecurity(http);
         UserDto anonymous = anonymous();
         http.anonymous(anonymousConfigurer -> anonymousConfigurer
@@ -124,9 +130,9 @@ public class ChutneyWebSecurityConfig {
         }
     }
 
-    private void configureSso(final HttpSecurity http, AuthenticationService authenticationService, ClientRegistrationRepository clientRegistrationRepository) throws Exception {
+    private void configureSso(final HttpSecurity http, AuthenticationService authenticationService, ClientRegistrationRepository clientRegistrationRepository, RestOperations restOperations) throws Exception {
         if (clientRegistrationRepository != null) {
-            OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new OAuth2SsoUserService(authenticationService);
+            OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new OAuth2SsoUserService(authenticationService, restOperations);
             OAuth2TokenAuthenticationProvider oAuth2TokenAuthenticationProvider = new OAuth2TokenAuthenticationProvider(oAuth2UserService, clientRegistrationRepository.findByRegistrationId("my-provider"));
             AuthenticationManager authenticationManager = new ProviderManager(Collections.singletonList(oAuth2TokenAuthenticationProvider));
             OAuth2TokenAuthenticationFilter tokenFilter = new OAuth2TokenAuthenticationFilter(authenticationManager);
@@ -134,6 +140,20 @@ public class ChutneyWebSecurityConfig {
                 .authenticationProvider(oAuth2TokenAuthenticationProvider)
                 .addFilterBefore(tokenFilter, BasicAuthenticationFilter.class)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED));
+        }
+    }
+
+    @Configuration
+    @Profile("sso-auth")
+    public static class SsoConfiguration {
+        @Bean
+        public RestOperations restOperations(SsoOpenIdConnectConfigProperties ssoOpenIdConnectConfigProperties) {
+            SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
+            if (ssoOpenIdConnectConfigProperties.proxyHost != null && !ssoOpenIdConnectConfigProperties.proxyHost.isEmpty()) {
+                Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(ssoOpenIdConnectConfigProperties.proxyHost, ssoOpenIdConnectConfigProperties.proxyPort));
+                requestFactory.setProxy(proxy);
+            }
+            return new RestTemplate(requestFactory);
         }
     }
 }
