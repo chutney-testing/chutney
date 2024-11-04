@@ -16,6 +16,7 @@ import { Subscription } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { DROPDOWN_SETTINGS } from '@core/model/dropdown-settings';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
+import {ExecutionStatus} from "@core/model/scenario/execution-status";
 
 @Component({
     selector: 'chutney-dataset-list',
@@ -23,6 +24,8 @@ import { IDropdownSettings } from 'ng-multiselect-dropdown';
     styleUrls: ['./dataset-list.component.scss']
 })
 export class DatasetListComponent implements OnInit, OnDestroy {
+
+    readonly Object = Object;
 
     datasets: Array<Dataset> = [];
 
@@ -44,7 +47,7 @@ export class DatasetListComponent implements OnInit, OnDestroy {
     ) {}
 
     ngOnInit(): void {
-        this.dataSetService.findAll().subscribe(
+        this.dataSetService.findAll(true).subscribe(
             (res) => {
                 this.datasets = res;
                 this.initTags();

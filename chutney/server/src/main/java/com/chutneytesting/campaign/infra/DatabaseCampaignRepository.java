@@ -136,4 +136,14 @@ public class DatabaseCampaignRepository implements CampaignRepository {
             .map(CampaignEntity::toDomain)
             .toList();
     }
+
+    @Override
+    public List<Campaign> findCampaignsByDatasetId(String datasetId) {
+        if (isNullOrEmpty(datasetId)) {
+            return emptyList();
+        }
+        return campaignJpaRepository.findByDatasetId(datasetId).stream()
+            .map(CampaignEntity::toDomain)
+            .toList();
+    }
 }

@@ -107,6 +107,13 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     }
 
     @Override
+    public List<TestCaseMetadata> findAllByDatasetId(String datasetId) {
+        return scenarioJpaRepository.findByActivatedTrueAndDefaultDataset(datasetId).stream()
+            .map(ScenarioEntity::toTestCaseMetadata)
+            .toList();
+    }
+
+    @Override
     @Transactional
     public void removeById(String scenarioId) {
         if (checkIdInput(scenarioId)) {

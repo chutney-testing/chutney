@@ -254,5 +254,45 @@ public class DatabaseCampaignRepositoryTest {
             // Then
             Assertions.assertThat(scenarioCampaignNames).isEmpty();
         }
+
+        @Test
+        public void should_find_campaigns_related_to_a_given_dataset() {
+            // Given
+            Campaign campaign1 = new Campaign(null, "campaignTestName1", "campaignDesc1", emptyList(), "env", false, false, "dataset1", null);
+            Campaign campaign2 = new Campaign(null, "campaignTestName2", "campaignDesc2", emptyList(), "env", false, false, "dataset2", null);
+            Campaign campaign3 = new Campaign(null, "campaignTestName3", "campaignDesc3", emptyList(), "env", false, false, "dataset2", null);
+            Campaign campaign4 = new Campaign(null, "campaignTestName4", "campaignDesc4", emptyList(), "env", false, false, "dataset3", null);
+            sut.createOrUpdate(campaign1);
+            sut.createOrUpdate(campaign2);
+            sut.createOrUpdate(campaign3);
+            sut.createOrUpdate(campaign4);
+
+            // When
+            List<String> scenarioCampaignNames = sut.findCampaignsByDatasetId("dataset2").stream()
+                .map(sc -> sc.title)
+                .collect(Collectors.toList());
+
+            // Then
+            Assertions.assertThat(scenarioCampaignNames).containsExactlyInAnyOrder(
+                campaign2.title,
+                campaign3.title
+            );
+        }
+
+        @Test
+        public void should_find_no_campaigns_related_to_a_given_dataset() {
+            // Given
+            ScenarioEntity s1 = givenScenario();
+            Campaign campaign1 = new Campaign(null, "campaignTestName2", "campaignDesc2", scenariosIds(s1), "env", false, false, "dataset", null);
+            sut.createOrUpdate(campaign1);
+
+            // When
+            List<String> scenarioCampaignNames = sut.findCampaignsByDatasetId("unknown").stream()
+                .map(sc -> sc.title)
+                .collect(Collectors.toList());
+
+            // Then
+            Assertions.assertThat(scenarioCampaignNames).isEmpty();
+        }
     }
 }
