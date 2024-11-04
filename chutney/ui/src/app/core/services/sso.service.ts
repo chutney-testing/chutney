@@ -5,10 +5,10 @@
  *
  */
 
-import { HttpClient } from '@angular/common/http';
-import { OAuthService } from 'angular-oauth2-oidc';
+import { HttpClient, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '@env/environment';
-import { map, tap } from 'rxjs';
+import { map, Observable, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
 
 interface SsoAuthConfig {
@@ -45,8 +45,9 @@ export class SsoService {
             scope: ssoConfig.scope,
             redirectUri: ssoConfig.redirectBaseUrl + '/',
             dummyClientSecret: ssoConfig.clientSecret,
-            oidc: ssoConfig.oidc
-          }
+            oidc: ssoConfig.oidc,
+            useHttpBasicAuth: true,
+          } as AuthConfig
         }),
         tap(async ssoConfig => {
             try {
@@ -77,4 +78,20 @@ export class SsoService {
   get token(): string {
       return this.oauthService.getAccessToken();
   }
+}
+
+@Injectable()
+export class OAuth2ContentTypeInterceptor implements HttpInterceptor {
+    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+        const isOAuth2Service = req.url.includes('/oauth2/multiauth/access_token');
+        if (isOAuth2Service) {
+            const modifiedReq = req.clone({
+                setHeaders: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            });
+            return next.handle(modifiedReq);
+        }
+        return next.handle(req);
+    }
 }
