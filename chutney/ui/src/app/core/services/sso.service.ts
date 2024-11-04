@@ -76,7 +76,7 @@ export class SsoService {
   }
 
   get token(): string {
-      return this.oauthService.getAccessToken();
+      return this.oauthService.getIdToken();
   }
 }
 
