@@ -121,8 +121,9 @@ export class OAuth2ContentTypeInterceptor implements HttpInterceptor {
             });
             return next.handle(modifiedReq);
         }
-        const isEndSessionUri = this.ssoService.uriRequireHeader && req.url.includes('oauth2/multiauth/connect/endSession');
+        const isEndSessionUri = req.url.includes('oauth2/multiauth/connect/endSession');
         if (isEndSessionUri) {
+            console.log('TOTOTOTOOTOTTOTOT')
             const modifiedReq = req.clone({
                 setParams: {'id_token_hint': this.ssoService.idToken}
             });
