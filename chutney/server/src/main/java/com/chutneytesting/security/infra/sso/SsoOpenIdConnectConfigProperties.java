@@ -7,6 +7,7 @@
 
 package com.chutneytesting.security.infra.sso;
 
+import java.util.Map;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
@@ -23,8 +24,12 @@ public class SsoOpenIdConnectConfigProperties implements InitializingBean  {
     public final String proxyHost;
     public final Integer proxyPort;
     public final Boolean oidc;
+    public final String uriRequireHeader;
+    public final Map<String, String> headers;
+    public final Map<String, String> additionalQueryParams;
+    public final String ssoProviderImageUrl;
 
-    public SsoOpenIdConnectConfigProperties(String issuer, String clientId, String clientSecret, String responseType, String scope, String redirectBaseUrl, String ssoProviderName, String proxyHost, Integer proxyPort, Boolean oidc) {
+    public SsoOpenIdConnectConfigProperties(String issuer, String clientId, String clientSecret, String responseType, String scope, String redirectBaseUrl, String ssoProviderName, String proxyHost, Integer proxyPort, Boolean oidc, String uriRequireHeader, Map<String, String> headers, Map<String, String> additionalQueryParams, String ssoProviderImageUrl) {
         this.issuer = issuer;
         this.clientId = clientId;
         this.clientSecret = clientSecret;
@@ -35,6 +40,10 @@ public class SsoOpenIdConnectConfigProperties implements InitializingBean  {
         this.proxyHost = proxyHost;
         this.proxyPort = proxyPort;
         this.oidc = oidc;
+        this.uriRequireHeader = uriRequireHeader;
+        this.headers = headers;
+        this.additionalQueryParams = additionalQueryParams;
+        this.ssoProviderImageUrl = ssoProviderImageUrl;
     }
 
     @Override

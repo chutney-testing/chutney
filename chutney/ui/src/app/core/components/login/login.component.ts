@@ -88,4 +88,8 @@ export class LoginComponent implements OnDestroy, OnInit {
   getSsoProviderName() {
     return this.ssoService.getSsoProviderName()
   }
+
+  getSsoProviderImageUrl() {
+    return this.ssoService.getSsoProviderImageUrl()
+  }
 }

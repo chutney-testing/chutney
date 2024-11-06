@@ -19,6 +19,10 @@ interface SsoAuthConfig {
   scope: string,
   redirectBaseUrl: string,
   ssoProviderName: string,
+  ssoProviderImageUrl: string,
+  uriRequireHeader: string,
+  headers: { [name: string]: string | string[]; },
+  additionalQueryParams: { [name: string]: string | string[]; }
   oidc: boolean
 }
 
@@ -47,6 +51,11 @@ export class SsoService {
             dummyClientSecret: ssoConfig.clientSecret,
             oidc: ssoConfig.oidc,
             useHttpBasicAuth: true,
+            postLogoutRedirectUri: ssoConfig.redirectBaseUrl,
+            sessionChecksEnabled: true,
+            logoutUrl: ssoConfig.redirectBaseUrl,
+            customQueryParams: ssoConfig.additionalQueryParams,
+            useIdTokenHintForSilentRefresh: true
           } as AuthConfig
         }),
         tap(async ssoConfig => {
@@ -75,20 +84,36 @@ export class SsoService {
     return null
   }
 
+  getSsoProviderImageUrl() {
+    if (this.ssoConfig) {
+      return this.ssoConfig.ssoProviderImageUrl
+    }
+    return null
+  }
+
   get token(): string {
       return this.oauthService.getAccessToken();
+  }
+
+  get uriRequireHeader() {
+      return this.ssoConfig?.uriRequireHeader
+  }
+
+  get headers() {
+      return this.ssoConfig?.headers
   }
 }
 
 @Injectable()
 export class OAuth2ContentTypeInterceptor implements HttpInterceptor {
+
+    constructor(private ssoService: SsoService) {}
+
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        const isOAuth2Service = req.url.includes('/oauth2/multiauth/access_token');
+        const isOAuth2Service = this.ssoService.uriRequireHeader && req.url.includes(this.ssoService.uriRequireHeader);
         if (isOAuth2Service) {
             const modifiedReq = req.clone({
-                setHeaders: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
+                setHeaders: this.ssoService.headers
             });
             return next.handle(modifiedReq);
         }

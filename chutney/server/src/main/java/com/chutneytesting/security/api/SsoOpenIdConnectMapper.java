@@ -22,7 +22,11 @@ public class SsoOpenIdConnectMapper {
             ssoOpenIdConnectConfig.scope,
             ssoOpenIdConnectConfig.redirectBaseUrl,
             ssoOpenIdConnectConfig.ssoProviderName,
-            ssoOpenIdConnectConfig.oidc
+            ssoOpenIdConnectConfig.oidc,
+            ssoOpenIdConnectConfig.uriRequireHeader,
+            ssoOpenIdConnectConfig.headers,
+            ssoOpenIdConnectConfig.ssoProviderImageUrl,
+            ssoOpenIdConnectConfig.additionalQueryParams
         );
     }
 }
