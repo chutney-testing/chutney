@@ -91,8 +91,12 @@ export class SsoService {
     return null
   }
 
-  get token(): string {
+  get accessToken(): string {
       return this.oauthService.getAccessToken();
+  }
+
+  get idToken(): string {
+      return this.oauthService.getIdToken();
   }
 
   get uriRequireHeader() {
@@ -114,6 +118,13 @@ export class OAuth2ContentTypeInterceptor implements HttpInterceptor {
         if (isOAuth2Service) {
             const modifiedReq = req.clone({
                 setHeaders: this.ssoService.headers
+            });
+            return next.handle(modifiedReq);
+        }
+        const isEndSessionUri = this.ssoService.uriRequireHeader && req.url.includes('oauth2/multiauth/connect/endSession');
+        if (isEndSessionUri) {
+            const modifiedReq = req.clone({
+                setParams: {'id_token_hint': this.ssoService.idToken}
             });
             return next.handle(modifiedReq);
         }

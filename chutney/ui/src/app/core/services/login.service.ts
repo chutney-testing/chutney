@@ -81,7 +81,7 @@ export class LoginService {
     }
 
     get oauth2Token(): string {
-        return this.ssoService.token
+        return this.ssoService.accessToken
     }
 
     login(username: string, password: string): Observable<User> {
