@@ -20,7 +20,6 @@ interface SsoAuthConfig {
   redirectBaseUrl: string,
   ssoProviderName: string,
   ssoProviderImageUrl: string,
-  uriRequireHeader: string,
   headers: { [name: string]: string | string[]; },
   additionalQueryParams: { [name: string]: string | string[]; }
   oidc: boolean
@@ -55,7 +54,7 @@ export class SsoService {
             sessionChecksEnabled: true,
             logoutUrl: ssoConfig.redirectBaseUrl,
             customQueryParams: ssoConfig.additionalQueryParams,
-            useIdTokenHintForSilentRefresh: true
+            useIdTokenHintForSilentRefresh: true,
           } as AuthConfig
         }),
         tap(async ssoConfig => {
@@ -71,10 +70,15 @@ export class SsoService {
 
   login() {
       this.oauthService.initCodeFlow();
+      this.oauthService
   }
 
   logout() {
-      this.oauthService.logOut();
+      if (this.idToken) {
+          this.oauthService.logOut({
+              'id_token_hint': this.idToken
+          });
+      }
   }
 
   getSsoProviderName() {
@@ -99,8 +103,8 @@ export class SsoService {
       return this.oauthService.getIdToken();
   }
 
-  get uriRequireHeader() {
-      return this.ssoConfig?.uriRequireHeader
+  get tokenEndpoint(): string {
+      return this.oauthService.tokenEndpoint;
   }
 
   get headers() {
@@ -114,18 +118,10 @@ export class OAuth2ContentTypeInterceptor implements HttpInterceptor {
     constructor(private ssoService: SsoService) {}
 
     intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        const isOAuth2Service = this.ssoService.uriRequireHeader && req.url.includes(this.ssoService.uriRequireHeader);
-        if (isOAuth2Service) {
+        const isTokenEndpoint = this.ssoService.headers && req.url.startsWith(this.ssoService.tokenEndpoint);
+        if (isTokenEndpoint) {
             const modifiedReq = req.clone({
                 setHeaders: this.ssoService.headers
-            });
-            return next.handle(modifiedReq);
-        }
-        const isEndSessionUri = req.url.includes('oauth2/multiauth/connect/endSession');
-        if (isEndSessionUri) {
-            console.log('TOTOTOTOOTOTTOTOT')
-            const modifiedReq = req.clone({
-                setParams: {'id_token_hint': this.ssoService.idToken}
             });
             return next.handle(modifiedReq);
         }
