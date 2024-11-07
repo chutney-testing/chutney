@@ -171,6 +171,9 @@ public class HttpJiraXrayImpl implements JiraXrayApi {
 
     @Override
     public boolean isTestPlan(String issueId) {
+        if (issueId.isEmpty()) {
+            return false;
+        }
         return getIssue(issueId).getIssueType().getId().equals(getIssueTypeByName("Test Plan").getId());
     }
 
