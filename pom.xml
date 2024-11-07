@@ -12,7 +12,7 @@
 
   <groupId>com.chutneytesting</groupId>
   <artifactId>chutney-testing-parent</artifactId>
-  <version>2.9.1-SNAPSHOT</version>
+  <version>2.9.0.7</version>
   <packaging>pom</packaging>
 
   <name>chutney-testing</name>
@@ -59,7 +59,7 @@
     <url>https://github.com/chutney-testing/chutney.git</url>
     <connection>scm:git:git@github.com:chutney-testing/chutney.git</connection>
     <developerConnection>scm:git:git@github.com:chutney-testing/chutney.git</developerConnection>
-    <tag>HEAD</tag>
+    <tag>2.9.0.7</tag>
   </scm>
 
   <issueManagement>
