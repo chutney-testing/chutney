@@ -90,6 +90,28 @@ public class HttpJiraXrayImplTest {
                 .hasMessage("Unable to get issue [PRJ-666] : ")
                 .hasRootCauseExactlyInstanceOf(UnknownHostException.class);
         }
+
+        @Test
+        void test_empty_issue_as_test_plan() {
+            // Given
+            String issueId = "";
+
+            var config = new JiraServerConfiguration(
+                "http://fake-server-jira",
+                "user",
+                "password",
+                null,
+                "",
+                ""
+            );
+            var sut = new HttpJiraXrayImpl(config);
+
+            // When
+            boolean result = sut.isTestPlan(issueId);
+
+            // Then
+            assertThat(result).isFalse();
+        }
     }
 
     @Nested
