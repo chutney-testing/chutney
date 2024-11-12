@@ -23,6 +23,7 @@ import org.apache.sshd.server.auth.pubkey.AcceptAllPublickeyAuthenticator;
 import org.apache.sshd.server.auth.pubkey.PublickeyAuthenticator;
 import org.apache.sshd.server.auth.pubkey.RejectAllPublickeyAuthenticator;
 import org.apache.sshd.server.config.keys.AuthorizedKeysAuthenticator;
+import org.apache.sshd.server.forward.AcceptAllForwardingFilter;
 import org.apache.sshd.server.keyprovider.AbstractGeneratorHostKeyProvider;
 import org.apache.sshd.server.keyprovider.SimpleGeneratorHostKeyProvider;
 import org.apache.sshd.server.shell.InteractiveProcessShellFactory;
@@ -72,6 +73,17 @@ public class FakeServerSsh {
         sshd.setShellFactory(InteractiveProcessShellFactory.INSTANCE);
         sshd.setCommandFactory(ProcessShellCommandFactory.INSTANCE);
         CoreModuleProperties.MAX_AUTH_REQUESTS.set(sshd, maxAuthRequests);
+        return sshd;
+    }
+
+    public static SshServer buildLocalProxy(String proxyUser, String proxyPassword) throws IOException {
+        SshServer sshd = SshServer.setUpDefaultServer();
+        sshd.setHost(getHostIPAddress());
+        sshd.setPort(getFreePort());
+        AbstractGeneratorHostKeyProvider hostKeyProvider = prepareKeyPairProvider();
+        sshd.setKeyPairProvider(hostKeyProvider);
+        sshd.setPasswordAuthenticator((username, password, session) -> proxyUser.equals(username) && proxyPassword.equals(password));
+        sshd.setForwardingFilter(AcceptAllForwardingFilter.INSTANCE);
         return sshd;
     }
 
