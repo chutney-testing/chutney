@@ -1,0 +1,50 @@
+#
+# This file is executed via TestContainers framework.
+# It aims to define the test environment of Chutney's acceptances tests.
+#
+# Chutney server is in a specific network and its exposure is made from 'AcceptanceTests' class.
+#
+# For SSH tests, we define 2 services :
+#   * jump-host : A ssh service with shell and which is meant to be accessible via Chutney network on port 22.
+#   * intern-host : A ssh service with shell and which is meant to be accessible only by the jump-host on port 22.
+# Access keys are in test resources under blackbox/env/ssh directory.
+# see https://github.com/threatpatrols/docker-sshjumphost
+#
+
+services:
+
+  chutney-server:
+    image: ghcr.io/chutney-testing/chutney/chutney-server:latest
+    restart: unless-stopped
+    #network_mode: "host"
+    networks:
+      - chutney_network
+    volumes:
+      - ${CHUTNEY_CONFIG}:/config
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  jump-host:
+    image: threatpatrols/sshjumphost:latest
+    restart: unless-stopped
+    networks:
+      - chutney_network
+      - ssh_network
+    environment:
+      SSH_USERNAME: "jumpuser"
+      SSH_SHELL: "/bin/bash"
+      SSH_AUTHORIZED_KEYS: "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBADaBy1DpPb29kn1+AK4OjVc+XzimEtkyTMPZ2hkRXWTKFw66seQfj1RszxYDXxKCzHrlw5zq+/M3EG3D53s/5ae3wEmYjjgNdZvN9O9sjPA3D40mZp8Hd8kRdOWCRVKuJMMyUlbGzpEPLg6n+heTe1WCd7KN3Hdeaej/wyUb+yG/lKSDw=="
+
+  intern-host:
+    image: threatpatrols/sshjumphost:latest
+    restart: unless-stopped
+    networks:
+      - ssh_network
+    environment:
+      SSH_USERNAME: "internuser"
+      SSH_SHELL: "/bin/bash"
+      SSH_AUTHORIZED_KEYS: "ecdsa-sha2-nistp521 AAAAE2VjZHNhLXNoYTItbmlzdHA1MjEAAAAIbmlzdHA1MjEAAACFBADjHKpgLYX9tIClPRq+ZMkFSlRAGbS9Bhb+hQL0jzhyR7XqQiu8lLpQNCs70h6afqQlAfd96Eli3PLHUyp0ABdgiQFVeG0GLevHhisLG/b5HprIIF9+BMIb+Hn+pcaM0EgeR/BzI/y+Ff+Kg6TqJbTypw/IsBd6Wz3OCRdmBKcEfp5LqA=="
+
+networks:
+  chutney_network:
+  ssh_network:

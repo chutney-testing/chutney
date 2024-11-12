@@ -11,20 +11,29 @@ import com.chutneytesting.acceptance.tests.*
 import com.chutneytesting.acceptance.tests.actions.*
 import com.chutneytesting.acceptance.tests.edition.*
 import com.chutneytesting.acceptance.tests.engine.*
+import com.chutneytesting.environment.api.environment.dto.EnvironmentDto
+import com.chutneytesting.environment.api.target.dto.TargetDto
 import com.chutneytesting.kotlin.dsl.ChutneyEnvironment
+import com.chutneytesting.kotlin.dsl.ChutneyScenario
 import com.chutneytesting.kotlin.dsl.ChutneyTarget
 import com.chutneytesting.kotlin.launcher.Launcher
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
 import com.chutneytesting.kotlin.util.HttpClient
+import com.chutneytesting.tools.Entry
 import com.chutneytesting.tools.SocketUtils
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.paranamer.ParanamerModule
+import org.assertj.core.api.SoftAssertions
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
+import org.testcontainers.containers.ComposeContainer
 import org.testcontainers.containers.GenericContainer
+import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.MountableFile
 import java.io.File
-import java.nio.file.Files
 import java.time.Duration
 
 @Testcontainers
@@ -32,9 +41,12 @@ class AcceptanceTests {
 
   companion object {
     private const val ENVIRONMENT_NAME = "DEFAULT"
+    private val om = jacksonObjectMapper()
+      .registerModule(JavaTimeModule())
+      .registerModule(ParanamerModule())
 
-    private var adminServerInfo: ChutneyServerInfo? = null
     private var chutneyServer: GenericContainer<Nothing>? = null
+    private var testContainer: ComposeContainer? = null
     private var environment: ChutneyEnvironment = ChutneyEnvironment(ENVIRONMENT_NAME)
 
     private var actionHttpPort: Int? = null
@@ -45,24 +57,10 @@ class AcceptanceTests {
     @JvmStatic
     @BeforeAll
     fun setUp() {
-      val tempDirectory = Files.createTempDirectory("chutney-acceptance-test-")
-      val memAuthConfigFile = File(AcceptanceTests::class.java.getResource("/blackbox/application-mem-auth.yml")!!.path)
+      // Start system under test : Chutney server + test env //
+      val chutneyEnvTargets = startChutneyTestEnvironment()
+      val chutneyTestEnvironment = EnvironmentDto("ACCEPTANCE", "The acceptance tests environment", chutneyEnvTargets)
 
-      // Copy mem-auth config
-      Files.copy(memAuthConfigFile.toPath(), tempDirectory.resolve("application-mem-auth.yml"))
-
-      // Start server
-      chutneyServer = GenericContainer<Nothing>("ghcr.io/chutney-testing/chutney/chutney-server:latest").apply {
-        withStartupTimeout(Duration.ofSeconds(80))
-        withExposedPorts(
-          8443, // Chutney
-        )
-        withNetwork(network)
-        withCopyFileToContainer(
-          MountableFile.forClasspathResource("/blackbox/"),
-          "/config"
-        )
-      }
       actionHttpPort = SocketUtils.freePortFromSystem()
       actionAmqpPort = SocketUtils.freePortFromSystem()
       System.setProperty("qpid.amqp_port", actionAmqpPort.toString())
@@ -72,38 +70,76 @@ class AcceptanceTests {
         actionHttpPort!!, actionAmqpPort!!, actionJakartaPort!!, actionSshPort!!
       )
 
-      chutneyServer!!.start()
-      adminServerInfo = ChutneyServerInfo(
-        "https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}",
-        "admin",
-        "admin",
-        null,
-        null,
-        null
-      )
+      // Setup system under test : Chutney server //
+      val chutneyServerHost = testContainer!!.getServiceHost("chutney-server", 8443)
+      val chutneyServerPort = testContainer!!.getServicePort("chutney-server", 8443)
+      ChutneyServerInfo(
+        "https://$chutneyServerHost:$chutneyServerPort", "admin", "admin",
+        null, null, null
+      ).let {
+        // Authorizations
+        val roles = AcceptanceTests::class.java.getResource("/blackbox/roles.json")!!.path
+        HttpClient.post<Any>(it, "/api/v1/authorizations", File(roles).readText())
+        // Environment
+        HttpClient.post<Any>(it, "/api/v2/environments", om.writeValueAsString(chutneyTestEnvironment))
+      }
 
-      // Set authorizations
-      val roles = AcceptanceTests::class.java.getResource("/blackbox/roles.json")!!.path
-      HttpClient.post<Any>(adminServerInfo!!, "/api/v1/authorizations", File(roles).readText())
-
-      val mappedPort = chutneyServer?.getMappedPort(8443)
+      // Build launcher test environment //
       environment = ChutneyEnvironment(
         name = ENVIRONMENT_NAME, targets =
         listOf(
           ChutneyTarget(
             "CHUTNEY_LOCAL",
-            "https://${chutneyServer?.host}:$mappedPort",
+            "https://$chutneyServerHost:$chutneyServerPort",
             mapOf("username" to "admin", "password" to "admin")
           ),
-          ChutneyTarget("CHUTNEY_LOCAL_NO_USER", "https://${chutneyServer?.host}:$mappedPort", emptyMap())
+          ChutneyTarget("CHUTNEY_LOCAL_NO_USER", "https://$chutneyServerHost:$chutneyServerPort", emptyMap())
         )
       )
+    }
+
+    private fun startChutneyTestEnvironment(): List<TargetDto> {
+      //@formatter:off
+      testContainer =
+        ComposeContainer(File("src/test/resources/blackbox/ssh-jumphost-compose.yml"))
+          .withExposedService("chutney-server", 8443,
+            Wait.forListeningPort().forPorts(8443).withStartupTimeout(Duration.ofSeconds(80))
+          )
+          .withEnv("CHUTNEY_CONFIG", MountableFile.forClasspathResource("/blackbox/").resolvedPath)
+      testContainer!!.start()
+
+      val jumpServerUrl = "ssh://jump-host"
+      return listOf(
+        TargetDto("SSH_JUMP_SERVER", jumpServerUrl,
+          setOf(
+            Entry("user", "jumpuser"),
+            Entry("privateKey", "/config/env/ssh/client-jump-id_ecdsa")
+          )
+        ),
+        TargetDto("SSH_INTERN_SERVER", "ssh://intern-host",
+          setOf(
+            Entry("user", "internuser"),
+            Entry("privateKey", "/config/env/ssh/client-intern-id_edcsa"),
+            Entry("proxy", jumpServerUrl),
+            Entry("proxyUser", "jumpuser"),
+            Entry("proxyPrivateKey", "/config/env/ssh/client-jump-id_ecdsa")
+          )
+        ),
+        TargetDto("SSH_INTERN_SERVER_DIRECT", "ssh://intern-host",
+          setOf(
+            Entry("user", "internuser"),
+            Entry("privateKey", "/config/env/ssh/client-intern-id_edcsa")
+          )
+        )
+      )
+      //@formatter:on
     }
 
     @JvmStatic
     @AfterAll
     fun cleanUp() {
       chutneyServer?.stop()
+      testContainer?.stop()
     }
   }
 
@@ -331,16 +367,26 @@ class AcceptanceTests {
 
   @Test
   fun `SSH Task test`() {
-    listOf(
-      `Scenario execution unable to login, status SUCCESS and command stderr`(),
-      `Scenario execution with multiple ssh action`(actionSshPort!!)
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      `SSH - Execute commands on server`() +
+          `SSH - Execute shell on server`() +
+          `SSH - Server is unreachable`() +
+          `SSH - Start server and Execute some commands`(actionSshPort!!)
+    )
   }
 
   @Test
   fun `Agent test`() {
     Launcher().run(`We receive a network configuration to persist`(), environment)
+  }
+
+  private fun softlyAssertLauncherRun(scenarios: List<ChutneyScenario>) {
+    SoftAssertions.assertSoftly { softly ->
+      scenarios.forEach {
+        softly.assertThatCode {
+          Launcher().run(it, environment)
+        }.`as` { it.title }.doesNotThrowAnyException()
+      }
+    }
   }
 }

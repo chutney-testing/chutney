@@ -26,7 +26,7 @@ fun `amqp test all steps`(
         [
             {
                 "name": "test_amqp",
-                "url": "amqp://host.testcontainers.internal:$actionAmqpPort",
+                "url": "amqp://host.docker.internal:$actionAmqpPort",
                 "properties": [
                     { "key" : "user", "value": "guest" },
                     { "key" : "password", "value": "guest" }
