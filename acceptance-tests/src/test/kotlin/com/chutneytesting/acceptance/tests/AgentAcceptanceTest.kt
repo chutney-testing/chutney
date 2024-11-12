@@ -34,6 +34,7 @@ fun `We receive a network configuration to persist`(): ChutneyScenario {
           uri = "/api/v1/agentnetwork/configuration",
           headers = jsonHeader(),
           body = "jsonSerialize(#networkConfiguration)".spEL,
+          timeout = "5 s",
           outputs = mapOf(
             "networkConfiguration" to "body".spEL
           )
@@ -82,7 +83,7 @@ fun `We receive a network configuration to persist`(): ChutneyScenario {
       Step("Check target is present") {
         CompareAction(
           mode = "equals",
-          actual = "json(#environments, '\$[0].targets[0].name')".spEL,
+          actual = "json(#environments, '\$[?(@.name==''AGENT_ENV'')].targets[*].name')[0]".spEL,
           expected = "fake_target"
         )
       }

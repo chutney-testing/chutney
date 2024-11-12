@@ -75,7 +75,7 @@ fun `Jakarta sender then clean then send and listen it on embedded broker`(
   return Scenario(title = "Jakarta sender then clean then send and listen it on embedded broker") {
     Given("a jakarta endpoint") {
       JakartaBrokerStartAction(
-        configUri ="tcp://localhost:$port"
+        configUri ="tcp://0.0.0.0:$port"
       )
     }
     And("An associated target") {
