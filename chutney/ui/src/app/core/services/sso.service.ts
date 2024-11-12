@@ -50,11 +50,12 @@ export class SsoService {
             dummyClientSecret: ssoConfig.clientSecret,
             oidc: ssoConfig.oidc,
             useHttpBasicAuth: true,
-            postLogoutRedirectUri: ssoConfig.redirectBaseUrl,
+            postLogoutRedirectUri: ssoConfig.redirectBaseUrl + '/',
             sessionChecksEnabled: true,
-            logoutUrl: ssoConfig.redirectBaseUrl,
+            logoutUrl: ssoConfig.redirectBaseUrl + '/',
             customQueryParams: ssoConfig.additionalQueryParams,
             useIdTokenHintForSilentRefresh: true,
+            redirectUriAsPostLogoutRedirectUriFallback: true,
           } as AuthConfig
         }),
         tap(async ssoConfig => {
