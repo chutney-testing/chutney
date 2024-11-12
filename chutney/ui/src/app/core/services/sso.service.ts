@@ -8,8 +8,9 @@
 import { HttpClient, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '@env/environment';
-import { map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, map, Observable, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
+import { filter } from 'rxjs/operators';
 
 interface SsoAuthConfig {
   issuer: string,
@@ -34,8 +35,17 @@ export class SsoService {
 
   private ssoConfig: SsoAuthConfig
 
+  private tokenLoadedSubject = new BehaviorSubject<boolean>(false);
+  public tokenLoaded$ = this.tokenLoadedSubject.asObservable();
 
-  constructor(private oauthService: OAuthService, private http: HttpClient) {}
+
+  constructor(private oauthService: OAuthService, private http: HttpClient) {
+      this.oauthService.events
+          .pipe(filter(e => e.type === 'token_received'))
+          .subscribe(() => {
+              this.tokenLoadedSubject.next(true);
+          });
+  }
 
   fetchSsoConfig(): void {
     this.http.get<SsoAuthConfig>(environment.backend + this.resourceUrl).pipe(
@@ -62,6 +72,9 @@ export class SsoService {
             try {
                 this.oauthService.configure(ssoConfig)
                 await this.oauthService.loadDiscoveryDocumentAndTryLogin();
+                if (this.oauthService.hasValidAccessToken()) {
+                    this.tokenLoadedSubject.next(true);
+                }
             } catch (e) {
                 console.error("SSO provider not available")
             }

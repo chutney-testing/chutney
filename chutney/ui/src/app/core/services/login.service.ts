@@ -8,8 +8,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { ActivatedRouteSnapshot, Router } from '@angular/router';
-import { BehaviorSubject, firstValueFrom, Observable } from 'rxjs';
-import { catchError, delay, tap } from 'rxjs/operators';
+import { BehaviorSubject, firstValueFrom, Observable, timeout } from 'rxjs';
+import { catchError, delay, filter, first, tap } from 'rxjs/operators';
 
 import { environment } from '@env/environment';
 import { Authorization, User } from '@model';
@@ -41,12 +41,19 @@ export class LoginService {
         const unauthorizedMessage = this.translateService.instant('login.unauthorized')
         if (!this.isAuthenticated()) {
             if (this.oauth2Token) {
-                await firstValueFrom(this.initLoginObservable(requestURL, {
-                    'Authorization': 'Bearer ' + this.oauth2Token
-                }));
+                await this.initLoginWithToken(requestURL)
             } else {
-                await this.initLogin(requestURL);
-                return false;
+                await firstValueFrom(this.ssoService.tokenLoaded$.pipe(
+                    timeout(1000),
+                    filter(tokenLoaded => tokenLoaded === true),
+                    first(),
+                    catchError(async error => this.initLogin(requestURL))));
+                if (this.oauth2Token) {
+                    await this.initLoginWithToken(requestURL)
+                } else {
+                    await this.initLogin(requestURL);
+                    return false;
+                }
             }
         }
         const authorizations: Array<Authorization> = route.data['authorizations'] || [];
@@ -57,6 +64,12 @@ export class LoginService {
             this.navigateAfterLogin();
             return false;
         }
+    }
+
+    private async initLoginWithToken(requestURL: string) {
+        await firstValueFrom(this.initLoginObservable(requestURL, {
+            Authorization: 'Bearer ' + this.oauth2Token,
+        }));
     }
 
     async initLogin(url?: string, headers: HttpHeaders | {
