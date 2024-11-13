@@ -113,22 +113,22 @@ class AcceptanceTests {
         TargetDto("SSH_JUMP_SERVER", jumpServerUrl,
           setOf(
             Entry("user", "jumpuser"),
-            Entry("privateKey", "/config/env/ssh/client-jump-id_ecdsa")
+            Entry("privateKey", "/config/env/ssh/client-jump-id_ecdsa.key")
           )
         ),
         TargetDto("SSH_INTERN_SERVER", "ssh://intern-host",
           setOf(
             Entry("user", "internuser"),
-            Entry("privateKey", "/config/env/ssh/client-intern-id_edcsa"),
+            Entry("privateKey", "/config/env/ssh/client-intern-id_edcsa.key"),
             Entry("proxy", jumpServerUrl),
             Entry("proxyUser", "jumpuser"),
-            Entry("proxyPrivateKey", "/config/env/ssh/client-jump-id_ecdsa")
+            Entry("proxyPrivateKey", "/config/env/ssh/client-jump-id_ecdsa.key")
           )
         ),
         TargetDto("SSH_INTERN_SERVER_DIRECT", "ssh://intern-host",
           setOf(
             Entry("user", "internuser"),
-            Entry("privateKey", "/config/env/ssh/client-intern-id_edcsa")
+            Entry("privateKey", "/config/env/ssh/client-intern-id_edcsa.key")
           )
         )
       )
