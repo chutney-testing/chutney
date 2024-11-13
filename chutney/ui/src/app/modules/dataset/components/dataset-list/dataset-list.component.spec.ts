@@ -17,7 +17,7 @@ import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 import { DatasetListComponent } from './dataset-list.component';
 import { DataSetService } from '@core/services';
-import { of } from 'rxjs';
+import { of, Subject } from 'rxjs';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
@@ -28,8 +28,10 @@ import { AlertService } from '@shared';
 
 describe('DatasetListComponent', () => {
 
+
+  const eventsSubject = new Subject<any>();
   const dataSetService = jasmine.createSpyObj('DataSetService', ['findAll']);
-  const oAuthService = jasmine.createSpyObj('OAuthService', ['loadDiscoveryDocumentAndTryLogin', 'configure', 'initCodeFlow', 'logOut', 'getAccessToken']);
+  const oAuthService = jasmine.createSpyObj('OAuthService', ['loadDiscoveryDocumentAndTryLogin', 'configure', 'initCodeFlow', 'logOut', 'getAccessToken'], {events: eventsSubject.asObservable()});
   const alertService = jasmine.createSpyObj('AlertService', ['error']);
   dataSetService.findAll.and.returnValue(of([]));
    beforeEach(waitForAsync(() => {

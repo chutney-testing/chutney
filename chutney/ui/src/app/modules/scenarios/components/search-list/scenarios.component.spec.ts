@@ -15,7 +15,7 @@ import { MoleculesModule } from '../../../../molecules/molecules.module';
 
 import { MomentModule } from 'ngx-moment';
 import { NgbModule, NgbPopoverConfig } from '@ng-bootstrap/ng-bootstrap';
-import { EMPTY, of } from 'rxjs';
+import { EMPTY, of, Subject } from 'rxjs';
 import { ScenarioIndex } from '@core/model';
 import { ScenarioService } from '@core/services';
 
@@ -43,8 +43,9 @@ describe('ScenariosComponent', () => {
 
     beforeEach(waitForAsync(() => {
         TestBed.resetTestingModule();
+        const eventsSubject = new Subject<any>();
         const scenarioService = jasmine.createSpyObj('ScenarioService', ['findScenarios', 'search']);
-        const oAuthService = jasmine.createSpyObj('OAuthService', ['loadDiscoveryDocumentAndTryLogin', 'configure', 'initCodeFlow', 'logOut', 'getAccessToken']);
+        const oAuthService = jasmine.createSpyObj('OAuthService', ['loadDiscoveryDocumentAndTryLogin', 'configure', 'initCodeFlow', 'logOut', 'getAccessToken'], {events: eventsSubject.asObservable()});
         const alertService = jasmine.createSpyObj('AlertService', ['error']);
         const jiraPluginService = jasmine.createSpyObj('JiraPluginService', ['findScenarios', 'findCampaigns']);
         const jiraPluginConfigurationService = jasmine.createSpyObj('JiraPluginConfigurationService', ['getUrl']);
