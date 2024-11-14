@@ -23,7 +23,6 @@ import { NgMultiSelectDropDownModule } from 'ng-multiselect-dropdown';
 import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
 import { RouterModule } from '@angular/router';
 import { OAuthService } from "angular-oauth2-oidc";
-import { ToastrService } from 'ngx-toastr';
 import { AlertService } from '@shared';
 
 describe('DatasetListComponent', () => {

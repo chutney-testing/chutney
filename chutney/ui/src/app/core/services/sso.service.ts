@@ -84,7 +84,6 @@ export class SsoService {
 
   login() {
       this.oauthService.initCodeFlow();
-      this.oauthService
   }
 
   logout() {
