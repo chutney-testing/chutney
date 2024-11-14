@@ -15,6 +15,7 @@ import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
+import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
@@ -69,6 +70,10 @@ public class ScenarioExecutionReportEntity {
 
     public Long scenarioExecutionId() {
         return scenarioExecutionId;
+    }
+
+    public ServerReportStatus status(){
+        return scenarioExecution.status();
     }
 
 

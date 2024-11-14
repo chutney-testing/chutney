@@ -53,12 +53,7 @@ public class ReportConverter implements AttributeConverter<String, byte[]> {
         try (ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(compressedData);
              GZIPInputStream gzipInputStream = new GZIPInputStream(byteArrayInputStream);
              ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream()) {
-
-            byte[] buffer = new byte[1024];
-            int len;
-            while ((len = gzipInputStream.read(buffer)) != -1) {
-                byteArrayOutputStream.write(buffer, 0, len);
-            }
+            byteArrayOutputStream.write(gzipInputStream.readAllBytes());
             return byteArrayOutputStream.toString(StandardCharsets.UTF_8);
 
         } catch (IOException e) {

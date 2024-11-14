@@ -22,6 +22,9 @@ import org.apache.lucene.search.TermQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,24 +50,31 @@ public class ZipReportMigration implements CommandLineRunner {
     @Transactional
     public void run(String... args) {
         if (isMigrationDone()) {
-            LOGGER.info("Report compression already done, skipping...");
+            LOGGER.info("Report compression & indexing already done, skipping...");
             return;
         }
-        List<ScenarioExecutionReportEntity> reportsInDb = scenarioExecutionReportJpaRepository.findAll();
-        compressAndSaveInDb(reportsInDb);
-        index(reportsInDb);
-        LOGGER.info("{} report(s) successfully compressed and indexed", reportsInDb.size());
+        PageRequest firstPage = PageRequest.of(0, 10);
+        int count = 0;
+        compressAndIndex(firstPage, count);
     }
 
-    private void index(List<ScenarioExecutionReportEntity> reportsInDb) {
-        LOGGER.info("{} report(s) will be indexed", reportsInDb.size());
-        scenarioExecutionReportIndexRepository.saveAll(reportsInDb);
+    private void compressAndIndex(Pageable pageable, int previousCount) {
+        Slice<ScenarioExecutionReportEntity> slice = scenarioExecutionReportJpaRepository.findAll(pageable);
+        List<ScenarioExecutionReportEntity> reports = slice.getContent();
+
+        compressAndSaveInDb(reports);
+        index(reports);
+
+        int count = previousCount + slice.getNumberOfElements();
+        if (slice.hasNext()) {
+            compressAndIndex(slice.nextPageable(), count);
+        } else {
+            LOGGER.info("{} report(s) successfully compressed and indexed", count);
+        }
     }
 
     private void compressAndSaveInDb(List<ScenarioExecutionReportEntity> reportsInDb) {
-        LOGGER.info("{} report(s) will be compressed", reportsInDb.size());
-
-        // calling scenarioExecutionReportJpaRepository save/saveAll doesn't call ReportConverter
+        // calling scenarioExecutionReportJpaRepository find() and then save() doesn't call ReportConverter
         // ReportConverter will be called by entityManager update. So compression will be done
         reportsInDb.forEach(report -> {
             entityManager.createQuery(
@@ -73,6 +83,10 @@ public class ZipReportMigration implements CommandLineRunner {
                 .setParameter("id", report.scenarioExecutionId())
                 .executeUpdate();
         });
+    }
+
+    private void index(List<ScenarioExecutionReportEntity> reportsInDb) {
+        scenarioExecutionReportIndexRepository.saveAll(reportsInDb);
     }
 
     private boolean isMigrationDone() {

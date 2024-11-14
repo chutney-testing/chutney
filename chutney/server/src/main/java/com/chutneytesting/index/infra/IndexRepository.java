@@ -61,7 +61,8 @@ public class IndexRepository {
             IndexSearcher searcher = new IndexSearcher(reader);
             count  = searcher.count(query);
 
-        } catch (IOException ignored) {
+        } catch (IOException e) {
+            throw new RuntimeException("Couldn't count elements in index", e);
         }
         return count;
     }

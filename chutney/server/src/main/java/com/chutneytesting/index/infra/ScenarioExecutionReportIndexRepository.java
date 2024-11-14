@@ -44,7 +44,7 @@ public class ScenarioExecutionReportIndexRepository {
         Document document = new Document();
         document.add(new StringField(WHAT, SCENARIO_EXECUTION_REPORT, Store.NO));
         document.add(new StringField(SCENARIO_EXECUTION_ID, report.scenarioExecutionId().toString(),Store.YES));
-        document.add(new TextField(REPORT, report.getReport(), Store.NO));
+        document.add(new TextField(REPORT, report.getReport().toLowerCase(), Store.NO));
         // for sorting
         document.add(new SortedDocValuesField(SCENARIO_EXECUTION_ID, new BytesRef(report.scenarioExecutionId().toString().getBytes()) ));
 
@@ -73,7 +73,7 @@ public class ScenarioExecutionReportIndexRepository {
 
     public List<Long> idsByKeywordInReport(String keyword) {
         Query whatQuery = new TermQuery(new Term(WHAT, SCENARIO_EXECUTION_REPORT));
-        Query reportQuery = new WildcardQuery(new Term(REPORT,  "*" + keyword + "*"));
+        Query reportQuery = new WildcardQuery(new Term(REPORT,  "*" + keyword.toLowerCase() + "*"));
 
         BooleanQuery query = new BooleanQuery.Builder()
             .add(reportQuery, BooleanClause.Occur.MUST)

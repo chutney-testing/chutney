@@ -10,7 +10,8 @@ package util.infra;
 import static util.infra.AbstractLocalDatabaseTest.DB_CHANGELOG_DB_CHANGELOG_MASTER_XML;
 
 import com.chutneytesting.ServerConfiguration;
-import com.chutneytesting.execution.infra.aop.IndexingAspect;
+import com.chutneytesting.execution.infra.aop.ScenarioExecutionReportIndexingAspect;
+import com.chutneytesting.execution.infra.storage.DatabaseExecutionJpaRepository;
 import com.chutneytesting.index.infra.IndexConfig;
 import com.chutneytesting.index.infra.IndexRepository;
 import com.chutneytesting.index.infra.OnDiskIndexConfig;
@@ -207,8 +208,8 @@ class TestInfraConfiguration {
     }
 
     @Bean
-    public IndexingAspect indexingAspect(ScenarioExecutionReportIndexRepository indexRepository) {
-        return new IndexingAspect(indexRepository);
+    public ScenarioExecutionReportIndexingAspect indexingAspect(ScenarioExecutionReportIndexRepository indexRepository, DatabaseExecutionJpaRepository scenarioExecutionsJpaRepository) {
+        return new ScenarioExecutionReportIndexingAspect(indexRepository, scenarioExecutionsJpaRepository);
     }
 
 

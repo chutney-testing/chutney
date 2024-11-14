@@ -32,6 +32,7 @@ public class OnDiskIndexConfig implements  IndexConfig{
             this.indexDirectory = FSDirectory.open(path);
             IndexWriterConfig config = new IndexWriterConfig(new StandardAnalyzer());
             this.indexWriter = new IndexWriter(indexDirectory, config);
+            this.indexWriter.commit();
         } catch (IOException e) {
             throw new RuntimeException("Couldn't open index directory", e);
         }
