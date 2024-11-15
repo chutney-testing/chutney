@@ -17,13 +17,15 @@
 services:
 
   chutney-server:
-    image: ghcr.io/chutney-testing/chutney/chutney-server:latest
+    image: ghcr.io/chutney-testing/chutney/chutney-server
     restart: unless-stopped
     #network_mode: "host"
     networks:
       - chutney_network
     volumes:
       - ${CHUTNEY_CONFIG}:/config
+    environment:
+      SPRING_CONFIG_LOCATION: "file:/config/"
     extra_hosts:
       - "host.docker.internal:host-gateway"
 

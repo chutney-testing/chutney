@@ -17,7 +17,6 @@ import org.openqa.selenium.firefox.FirefoxOptions
 import org.testcontainers.containers.BrowserWebDriverContainer
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.Network
-import org.testcontainers.images.PullPolicy
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 import java.time.Duration
@@ -27,12 +26,11 @@ class SeleniumTest {
 
     private val network = Network.newNetwork()
     private val chutneyServer =
-        GenericContainer(DockerImageName.parse("ghcr.io/chutney-testing/chutney/chutney-server:latest"))
-        .withImagePullPolicy(PullPolicy.alwaysPull())
-        .withNetworkAliases("chutneyServer")
-        .withExposedPorts(8443)
-        .withNetwork(network)
-        .withStartupTimeout(Duration.ofSeconds(80))
+        GenericContainer(DockerImageName.parse("ghcr.io/chutney-testing/chutney/chutney-server"))
+            .withNetworkAliases("chutneyServer")
+            .withExposedPorts(8443)
+            .withNetwork(network)
+            .withStartupTimeout(Duration.ofSeconds(80))
 
     private val webDriverContainer = BrowserWebDriverContainer()
         .withCapabilities(FirefoxOptions().setAcceptInsecureCerts(true))

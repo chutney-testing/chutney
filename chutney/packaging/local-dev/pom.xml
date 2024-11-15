@@ -124,7 +124,7 @@
                         <goals>
                             <goal>reserve-network-port</goal>
                         </goals>
-                        <phase>pre-integration-test</phase>
+                        <phase>test</phase>
                         <configuration>
                             <portNames>
                                 <portName>jmx.port.local-dev</portName>
@@ -139,7 +139,25 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <jmxPort>${jmx.port.local-dev}</jmxPort>
+                    <image>
+                        <name>ghcr.io/chutney-testing/chutney/chutney-server</name>
+                        <env>
+                            <BP_JVM_VERSION>17</BP_JVM_VERSION>
+                            <http_proxy>http://${http.proxyHost}:${http.proxyPort}</http_proxy>
+                            <https_proxy>http://${https.proxyHost}:${https.proxyPort}</https_proxy>
+                        </env>
+                        <runImage>eclipse-temurin:17-jre</runImage>
+                    </image>
                 </configuration>
+                <executions>
+                    <execution>
+                        <id>docker-test-build</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>build-image-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>com.github.ulisesbocchio</groupId>

@@ -87,14 +87,14 @@ class AcceptanceTests {
       // Build launcher test environment //
       environment = ChutneyEnvironment(
         name = ENVIRONMENT_NAME, targets =
-        listOf(
-          ChutneyTarget(
-            "CHUTNEY_LOCAL",
-            "https://$chutneyServerHost:$chutneyServerPort",
-            mapOf("username" to "admin", "password" to "admin")
-          ),
-          ChutneyTarget("CHUTNEY_LOCAL_NO_USER", "https://$chutneyServerHost:$chutneyServerPort", emptyMap())
-        )
+          listOf(
+            ChutneyTarget(
+              "CHUTNEY_LOCAL",
+              "https://$chutneyServerHost:$chutneyServerPort",
+              mapOf("username" to "admin", "password" to "admin")
+            ),
+            ChutneyTarget("CHUTNEY_LOCAL_NO_USER", "https://$chutneyServerHost:$chutneyServerPort", emptyMap())
+          )
       )
     }
 
@@ -145,58 +145,58 @@ class AcceptanceTests {
 
   @Test
   fun `Execution by campaign id with 2 scenarios`() {
-    listOf(
-      executeCampaignById,
-      executeCampaignByName,
-      executeForSurefireReport,
-      unknownCampaignById,
-      unknownCampaignByName
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        executeCampaignById,
+        executeCampaignByName,
+        executeForSurefireReport,
+        unknownCampaignById,
+        unknownCampaignByName
+      )
+    )
   }
 
   @Test
   fun `Support testcase edition metadata`() {
-    listOf(
-      readTestCaseMetadataScenario,
-      readTestCaseAfterUpdateScenario,
-      updateTestCaseWithBadVersionScenario
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        readTestCaseMetadataScenario,
+        readTestCaseAfterUpdateScenario,
+        updateTestCaseWithBadVersionScenario
+      )
+    )
   }
 
   @Test
   fun `Support testcase editions`() {
-    listOf(
-      `Request testcase edition`,
-      `Request for a second time testcase edition`,
-      `End testcase edition`,
-      `Edition time to live`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Request testcase edition`,
+        `Request for a second time testcase edition`,
+        `End testcase edition`,
+        `Edition time to live`
+      )
+    )
   }
 
   @Test
   fun `SQL Task test`() {
-    listOf(
-      `Sql query success`,
-      `Sql query wrong table`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Sql query success`,
+        `Sql query wrong table`
+      )
+    )
   }
 
   @Test
   fun `Success feature`() {
-    listOf(
-      `Direct Success`,
-      `Substeps Success`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Direct Success`,
+        `Substeps Success`
+      )
+    )
   }
 
   @Test
@@ -206,34 +206,34 @@ class AcceptanceTests {
 
   @Test
   fun `Kafka all Tasks test`() {
-    listOf(
-      `Kafka basic publish wrong url failure`,
-      `Kafka basic publish success`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Kafka basic publish wrong url failure`,
+        `Kafka basic publish success`
+      )
+    )
   }
 
   @Test
   fun `Roles declarations and users associations`() {
-    listOf(
-      `Declare a new role with its authorizations`,
-      `Add and remove user to-from an existing role`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Declare a new role with its authorizations`,
+        `Add and remove user to-from an existing role`
+      )
+    )
   }
 
   @Test
   fun `Execution success action`() {
-    listOf(
-      `Action instantiation and execution of a success scenario`,
-      `Task instantiation and execution of a failed scenario`,
-      `Task instantiation and execution of a sleep scenario`,
-      `Task instantiation and execution of a debug scenario`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Action instantiation and execution of a success scenario`,
+        `Task instantiation and execution of a failed scenario`,
+        `Task instantiation and execution of a sleep scenario`,
+        `Task instantiation and execution of a debug scenario`
+      )
+    )
   }
 
   @Test
@@ -243,13 +243,13 @@ class AcceptanceTests {
 
   @Test
   fun `Execution with jsonPath function`() {
-    listOf(
-      `Scenario execution with simple json value extraction`,
-      `Scenario execution with multiple json value extraction`,
-      `Scenario execution with json object value extraction`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Scenario execution with simple json value extraction`,
+        `Scenario execution with multiple json value extraction`,
+        `Scenario execution with json object value extraction`
+      )
+    )
   }
 
   @Test
@@ -305,37 +305,37 @@ class AcceptanceTests {
 
   @Test
   fun `Micrometer Tasks test`() {
-    listOf(
-      `Micrometer counter meter`,
-      `Micrometer timer meter`,
-      `Micrometer timer meter with start and stop`,
-      `Micrometer gauge meter`,
-      `Micrometer distribution summary meter`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Micrometer counter meter`,
+        `Micrometer timer meter`,
+        `Micrometer timer meter with start and stop`,
+        `Micrometer gauge meter`,
+        `Micrometer distribution summary meter`
+      )
+    )
   }
 
   @Test
   fun `Assertions Task test`() {
-    listOf(
-      `Execution by UI controller`,
-      `All in one assertions`,
-      `Test xsd actions`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Execution by UI controller`,
+        `All in one assertions`,
+        `Test xsd actions`
+      )
+    )
   }
 
   @Test
   fun `Final action for registering final actions for a testcase`() {
-    listOf(
-      `Register simple success action`,
-      `Register multiple actions with one complex, ie with inputs and strategy`,
-      `Register final action with validations on outputs`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Register simple success action`,
+        `Register multiple actions with one complex, ie with inputs and strategy`,
+        `Register final action with validations on outputs`
+      )
+    )
   }
 
   @Test
@@ -372,6 +372,16 @@ class AcceptanceTests {
           `SSH - Execute shell on server`() +
           `SSH - Server is unreachable`() +
           `SSH - Start server and Execute some commands`(actionSshPort!!)
+    )
+  }
+
+  @Test
+  fun `Create scenario-campaign with specific ids`() {
+    softlyAssertLauncherRun(
+      listOf(
+        createUpdateScenarioWithSpecificId(1234),
+        createUpdateCampaignWithSpecificId(1234)
+      )
     )
   }
 

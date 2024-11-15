@@ -14,7 +14,7 @@ jobs:
     with:
       skipTests: true
       cache-artifacts: |
-        chutney/packaging/local-dev/target/chutney-local-dev-*.jar
+        chutney/packaging/local-dev/target/local-dev-*.jar
         idea-plugin/build/distributions/*.zip
         chutney/ui/dist
 

@@ -33,6 +33,8 @@ fun createExecuteAndCheckReportStatusOf(
 private fun ChutneyScenario.cleanSpELForJsonRawCreateHttpPostAction() =
   escapeJson(this.toString()).replace("\\\\\\\\\${", "\\\${")
 
+val emptyScenario = Scenario(title = "Empty") { When { } }
+
 fun ChutneyStepBuilder.createScenario(outputScenarioId: String, scenario: ChutneyScenario) {
   HttpPostAction(
     target = "CHUTNEY_LOCAL",

@@ -4,7 +4,7 @@
 version: '3.7'
 services:
   server:
-    image: ghcr.io/chutney-testing/chutney/chutney-server:latest
+    image: ghcr.io/chutney-testing/chutney/chutney-server
     container_name: server
     ports:
       - "8081:8443"

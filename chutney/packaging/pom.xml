@@ -122,27 +122,28 @@
                         <executable>true</executable>
                         <layout>ZIP</layout>
                         <mainClass>${mainClass}</mainClass>
-                        <finalName>${chutney.package.file}</finalName>
                         <wait>2000</wait>
                     </configuration>
                     <executions>
                         <!-- Create packaging archive -->
                         <execution>
+                            <id>fatjar</id>
+                            <phase>package</phase>
                             <goals>
                                 <goal>repackage</goal>
                             </goals>
                         </execution>
                         <!-- Test start of packaging -->
                         <execution>
-                            <id>before-it</id>
-                            <phase>pre-integration-test</phase>
+                            <id>test-start</id>
+                            <phase>test</phase>
                             <goals>
                                 <goal>start</goal>
                             </goals>
                         </execution>
                         <execution>
-                            <id>after-it</id>
-                            <phase>post-integration-test</phase>
+                            <id>test-stop</id>
+                            <phase>test</phase>
                             <goals>
                                 <goal>stop</goal>
                             </goals>
