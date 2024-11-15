@@ -14,7 +14,11 @@ import static org.apache.commons.lang3.ClassUtils.isPrimitiveOrWrapper;
 
 import com.chutneytesting.tools.NotEnoughMemoryException;
 import com.zaxxer.hikari.HikariDataSource;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.math.BigDecimal;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.Date;
 import java.sql.ResultSet;
@@ -136,6 +140,9 @@ public class SqlClient {
             if (isPrimitiveOrWrapper(type) || isJDBCNumericType(type) || isJDBCDateType(type)) {
                 return o;
             }
+            if (o instanceof Blob) {
+                return new String(readBlob((Blob) o));
+            }
 
             return Optional.ofNullable(rs.getString(i)).orElse("null");
         }
@@ -158,6 +165,19 @@ public class SqlClient {
                 // We take here classic java representation.
                 type.equals(Period.class) ||        // INTERVAL
                 type.equals(Duration.class);        // INTERVAL
+        }
+
+        private static byte[] readBlob(Blob blob) throws SQLException {
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); InputStream inputStream = blob.getBinaryStream()) {
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+                return outputStream.toByteArray();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
 
     }
