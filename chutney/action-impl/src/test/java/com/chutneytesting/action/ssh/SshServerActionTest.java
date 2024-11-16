@@ -61,7 +61,10 @@ class SshServerActionTest {
         startSshServer(null, null, null);
 
         Target targetMock = buildInfoWithPasswordFor(sshServer);
-        List<Object> commands = Arrays.asList("echo Hello\r\nexit\n", "cat a_file\nexit\r\n");
+        List<Object> commands = Arrays.asList(
+            "echo Hello" + System.lineSeparator() + "exit" + System.lineSeparator(),
+            "cat a_file" + System.lineSeparator() + "exit" + System.lineSeparator()
+        );
         SshClientAction action = new SshClientAction(targetMock, new TestLogger(), commands, "shell");
 
         ActionExecutionResult actualResult = action.execute();
@@ -73,7 +76,7 @@ class SshServerActionTest {
         assertThat(commandsResults.get(1).exitCode).isEqualTo(0);
 
         assertThat(sshServer.commands()).containsExactlyElementsOf(
-            commands.stream().map(Object::toString).map(s -> s.replaceAll("\r", "")).collect(toList())
+            commands.stream().map(Object::toString).collect(toList())
         );
         assertThat(sshServer.allStubsUsed()).isFalse();
     }

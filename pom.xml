@@ -176,6 +176,7 @@
           <executions>
             <execution>
               <id>integration-test</id>
+              <phase>integration-test</phase>
               <goals>
                 <goal>integration-test</goal>
                 <goal>verify</goal>
@@ -412,6 +413,14 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>behind-proxy</id>
+      <activation>
+        <property>
+          <name>http.proxyHost</name>
+        </property>
+      </activation>
     </profile>
   </profiles>
 </project>

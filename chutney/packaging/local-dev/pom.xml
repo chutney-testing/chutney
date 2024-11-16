@@ -143,8 +143,6 @@
                         <name>ghcr.io/chutney-testing/chutney/chutney-server</name>
                         <env>
                             <BP_JVM_VERSION>17</BP_JVM_VERSION>
-                            <http_proxy>http://${http.proxyHost}:${http.proxyPort}</http_proxy>
-                            <https_proxy>http://${https.proxyHost}:${https.proxyPort}</https_proxy>
                         </env>
                         <runImage>eclipse-temurin:17-jre</runImage>
                     </image>
@@ -156,6 +154,9 @@
                         <goals>
                             <goal>build-image-no-fork</goal>
                         </goals>
+                        <configuration>
+                            <skip>!${maven.test.skip}</skip>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
@@ -163,7 +164,7 @@
                 <groupId>com.github.ulisesbocchio</groupId>
                 <artifactId>jasypt-maven-plugin</artifactId>
             </plugin>
-            <plugin>
+            <!--plugin>
                 <artifactId>maven-install-plugin</artifactId>
                 <executions>
                     <execution>
@@ -173,8 +174,29 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin-->
         </plugins>
     </build>
 
+    <profiles>
+        <profile>
+            <id>behind-proxy</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                        <configuration>
+                            <image>
+                                <env>
+                                    <http_proxy>http://${http.proxyHost}:${http.proxyPort}</http_proxy>
+                                    <https_proxy>http://${https.proxyHost}:${https.proxyPort}</https_proxy>
+                                </env>
+                            </image>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

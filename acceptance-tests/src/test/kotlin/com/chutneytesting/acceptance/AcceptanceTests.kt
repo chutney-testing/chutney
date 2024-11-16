@@ -99,13 +99,13 @@ class AcceptanceTests {
     }
 
     private fun startChutneyTestEnvironment(): List<TargetDto> {
-      //@formatter:off
       testContainer =
         ComposeContainer(File("src/test/resources/blackbox/ssh-jumphost-compose.yml"))
-          .withExposedService("chutney-server", 8443,
-            Wait.forListeningPort().forPorts(8443).withStartupTimeout(Duration.ofSeconds(80))
-          )
           .withEnv("CHUTNEY_CONFIG", MountableFile.forClasspathResource("/blackbox/").resolvedPath)
+          .withExposedService("chutney-server", 8443,
+            Wait.forLogMessage(".*Started ServerBootstrap.*", 1)
+          )
+      //@formatter:off
       testContainer!!.start()
 
       val jumpServerUrl = "ssh://jump-host"
