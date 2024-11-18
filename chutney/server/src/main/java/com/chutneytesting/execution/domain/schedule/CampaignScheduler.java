@@ -63,7 +63,6 @@ public class CampaignScheduler {
     }
 
     private Callable<Void> executeScheduledCampaign(Pair<List<CampaignExecutionRequest>, String> executionRequests) {
-        LOGGER.info(executionRequests.toString());
         String environment = executionRequests.getRight();
         return () -> {
             executionRequests.getLeft().forEach(executionRequest -> {
