@@ -54,8 +54,7 @@ public class DatabaseTestCaseRepository implements AggregatedRepository<GwtTestC
     public DatabaseTestCaseRepository(
         ScenarioJpaRepository jpa,
         DatabaseExecutionJpaRepository scenarioExecutionsJpaRepository,
-        CampaignScenarioJpaRepository campaignScenarioJpaRepository, EntityManager entityManager
-    ) {
+        CampaignScenarioJpaRepository campaignScenarioJpaRepository, EntityManager entityManager) {
         this.scenarioJpaRepository = jpa;
         this.scenarioExecutionsJpaRepository = scenarioExecutionsJpaRepository;
         this.campaignScenarioJpaRepository = campaignScenarioJpaRepository;

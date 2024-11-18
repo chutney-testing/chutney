@@ -90,6 +90,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
     abstract class AllTests extends AbstractLocalDatabaseTest {
         @Autowired
         private DatabaseExecutionHistoryRepository sut;
+
         @Autowired
         private CampaignExecutionDBRepository campaignExecutionDBRepository;
 
@@ -550,7 +551,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 var exec1 = sut.store(scenarioId1, buildDetachedExecution("toto"));
                 sut.store(scenarioId2, buildDetachedExecution("tutu"));
 
-                var executionSummaryList = sut.getExecutionReportMatchQuery("to");
+                var executionSummaryList = sut.getExecutionReportMatchKeyword("to");
 
                 assertThat(executionSummaryList).hasSize(1);
                 assertThat(executionSummaryList.get(0).executionId()).isEqualTo(exec1.executionId());
@@ -565,7 +566,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 sut.store(scenarioId2, buildDetachedExecution("tutu"));
                 databaseTestCaseRepository.removeById(scenarioId2);
 
-                var executionSummaryList = sut.getExecutionReportMatchQuery("t");
+                var executionSummaryList = sut.getExecutionReportMatchKeyword("t");
 
                 assertThat(executionSummaryList).hasSize(1);
                 assertThat(executionSummaryList.get(0).executionId()).isEqualTo(exec1.executionId());
@@ -579,7 +580,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                     sut.store(scenarioId, buildDetachedExecution("report"));
                 });
 
-                var executionSummaryList = sut.getExecutionReportMatchQuery("ort");
+                var executionSummaryList = sut.getExecutionReportMatchKeyword("ort");
 
                 assertThat(executionSummaryList).hasSize(100);
             }
@@ -594,7 +595,7 @@ public class DatabaseExecutionHistoryRepositoryTest {
                 });
                 var expectedOrder = executionsIds.stream().sorted(Comparator.<Long>naturalOrder().reversed()).toList();
 
-                var executionSummaryList = sut.getExecutionReportMatchQuery("ort");
+                var executionSummaryList = sut.getExecutionReportMatchKeyword("ort");
 
                 assertThat(executionSummaryList)
                     .map(ExecutionSummary::executionId)

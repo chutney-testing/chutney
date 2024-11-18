@@ -12,6 +12,7 @@ import static java.time.Instant.now;
 import com.chutneytesting.campaign.infra.jpa.CampaignEntity;
 import com.chutneytesting.campaign.infra.jpa.CampaignScenarioEntity;
 import com.chutneytesting.execution.infra.storage.jpa.ScenarioExecutionEntity;
+import com.chutneytesting.index.infra.IndexRepository;
 import com.chutneytesting.scenario.infra.jpa.ScenarioEntity;
 import com.chutneytesting.scenario.infra.raw.TagListMapper;
 import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
@@ -58,6 +59,9 @@ public abstract class AbstractLocalDatabaseTest {
     @Autowired
     private Liquibase liquibase;
 
+    @Autowired
+    private IndexRepository indexRepository;
+
     @BeforeEach
     void setTransactionTemplate() {
         transactionTemplate.setTransactionManager(transactionManager);
@@ -71,6 +75,11 @@ public abstract class AbstractLocalDatabaseTest {
         jdbcTemplate.execute("DELETE FROM CAMPAIGN_SCENARIOS");
         jdbcTemplate.execute("DELETE FROM CAMPAIGN");
         jdbcTemplate.execute("DELETE FROM SCENARIO");
+        clearIndexes();
+    }
+
+    private void clearIndexes() {
+        indexRepository.deleteAll();
     }
 
     protected void liquibaseUpdate() throws LiquibaseException, SQLException {

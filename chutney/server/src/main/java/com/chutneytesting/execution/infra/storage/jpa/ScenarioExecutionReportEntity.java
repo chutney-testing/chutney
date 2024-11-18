@@ -15,8 +15,10 @@ import com.chutneytesting.server.core.domain.dataset.DataSet;
 import com.chutneytesting.server.core.domain.execution.history.ExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.history.ImmutableExecutionHistory;
 import com.chutneytesting.server.core.domain.execution.report.ScenarioExecutionReport;
+import com.chutneytesting.server.core.domain.execution.report.ServerReportStatus;
 import jakarta.persistence.Basic;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
@@ -42,6 +44,7 @@ public class ScenarioExecutionReportEntity {
 
     @Column(name = "REPORT")
     @Basic(fetch = FetchType.LAZY)
+    @Convert(converter = ReportConverter.class)
     private String report;
 
     @Column(name = "VERSION")
@@ -64,6 +67,15 @@ public class ScenarioExecutionReportEntity {
     public String getReport() {
         return report;
     }
+
+    public Long scenarioExecutionId() {
+        return scenarioExecutionId;
+    }
+
+    public ServerReportStatus status(){
+        return scenarioExecution.status();
+    }
+
 
     public ExecutionHistory.Execution toDomain() {
         return ImmutableExecutionHistory.Execution.builder()

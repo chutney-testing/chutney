@@ -62,7 +62,7 @@ chutney:
     configuration-folder: ${chutney.configuration-folder}/environment
   jira:
     configuration-folder: ${chutney.configuration-folder}/jira
-
+  index-folder: .chutney/index
   server:
     editions:
       ttl:
