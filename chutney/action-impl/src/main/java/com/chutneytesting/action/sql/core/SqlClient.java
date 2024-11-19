@@ -32,12 +32,15 @@ import java.time.Period;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class SqlClient {
 
     private final HikariDataSource dataSource;
     private final int maxFetchSize;
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SqlClient.class);
 
 
     public SqlClient(HikariDataSource dataSource, int maxFetchSize) {
@@ -141,10 +144,10 @@ public class SqlClient {
                 return o;
             }
             if (o instanceof Blob) {
-                return new String(readBlob((Blob) o));
+                return readBlob((Blob) o);
             }
 
-            return Optional.ofNullable(rs.getString(i)).orElse("null");
+            return String.valueOf(rs.getString(i));
         }
 
         private static boolean isJDBCNumericType(Class<?> type) {
@@ -167,16 +170,23 @@ public class SqlClient {
                 type.equals(Duration.class);        // INTERVAL
         }
 
-        private static byte[] readBlob(Blob blob) throws SQLException {
+        private static String readBlob(Blob blob) {
             try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream(); InputStream inputStream = blob.getBinaryStream()) {
                 byte[] buffer = new byte[4096];
                 int bytesRead;
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, bytesRead);
                 }
-                return outputStream.toByteArray();
-            } catch (IOException e) {
+                return outputStream.toString();
+            } catch (IOException | SQLException e) {
                 throw new RuntimeException(e);
+            }
+            finally {
+                try {
+                    blob.free(); // (JDBC 4.0+)
+                } catch (SQLException e) {
+                    LOGGER.warn("Failed to free Blob resources: {}", e.getMessage());
+                }
             }
         }
 
