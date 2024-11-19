@@ -34,7 +34,7 @@ public class OAuth2SsoUserService implements OAuth2UserService<OAuth2UserRequest
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
-        org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
+        DefaultOAuth2UserService delegate = new DefaultOAuth2UserService();
         if (restOperations != null) {
             delegate.setRestOperations(restOperations);
         }

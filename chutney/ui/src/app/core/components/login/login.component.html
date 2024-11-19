@@ -46,11 +46,15 @@
           <button type="submit" class="btn btn-primary btn-lg w-100">Login</button>
         </div>
       </form>
-      @if (getSsoProviderName()) {
+      @if (displaySsoButton()) {
         <div class="text-center text-lg-start mt-2 pt-2 d-flex justify-content-center">
-          <button class="btn btn-secondary btn-lg w-100" (click)="connectSso()">
-              <img src="{{getSsoProviderImageUrl()}}" class="ssoImage" alt="sso image"/>
-              <span class="ms-2">{{getSsoProviderName()}}</span>
+          <button class="btn btn-lg" [ngClass]="getSsoProviderName() ? 'btn-secondary' : ''" (click)="connectSso()">
+              @if (getSsoProviderImageUrl()) {
+                <img src="{{getSsoProviderImageUrl()}}" class="ssoImage" alt="sso"/>
+              }
+              @if (getSsoProviderName()) {
+                <span class="ms-2">{{getSsoProviderName()}}</span>
+              }
           </button>
         </div>
       }

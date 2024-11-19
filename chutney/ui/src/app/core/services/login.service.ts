@@ -160,10 +160,6 @@ export class LoginService {
         return false;
     }
 
-    isLoginUrl(url: string): boolean {
-        return url.includes(this.loginUrl);
-    }
-
     currentUser(skipInterceptor: boolean = false, headers: HttpHeaders | {
         [header: string]: string | string[];
     } = {}): Observable<User> {

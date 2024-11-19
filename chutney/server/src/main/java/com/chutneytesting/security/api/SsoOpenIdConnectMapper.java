@@ -7,26 +7,26 @@
 
 package com.chutneytesting.security.api;
 
+import static java.util.Optional.ofNullable;
+
 import com.chutneytesting.security.infra.sso.SsoOpenIdConnectConfigProperties;
 
 public class SsoOpenIdConnectMapper {
     public static SsoOpenIdConnectConfigDto toDto(SsoOpenIdConnectConfigProperties ssoOpenIdConnectConfig) {
-        if (ssoOpenIdConnectConfig == null) {
-            return null;
-        }
-        return new SsoOpenIdConnectConfigDto(
-            ssoOpenIdConnectConfig.issuer,
-            ssoOpenIdConnectConfig.clientId,
-            ssoOpenIdConnectConfig.clientSecret,
-            ssoOpenIdConnectConfig.responseType,
-            ssoOpenIdConnectConfig.scope,
-            ssoOpenIdConnectConfig.redirectBaseUrl,
-            ssoOpenIdConnectConfig.ssoProviderName,
-            ssoOpenIdConnectConfig.oidc,
-            ssoOpenIdConnectConfig.uriRequireHeader,
-            ssoOpenIdConnectConfig.headers,
-            ssoOpenIdConnectConfig.ssoProviderImageUrl,
-            ssoOpenIdConnectConfig.additionalQueryParams
-        );
+        return ofNullable(ssoOpenIdConnectConfig)
+            .map(config -> new SsoOpenIdConnectConfigDto(
+                ssoOpenIdConnectConfig.issuer,
+                ssoOpenIdConnectConfig.clientId,
+                ssoOpenIdConnectConfig.clientSecret,
+                ssoOpenIdConnectConfig.responseType,
+                ssoOpenIdConnectConfig.scope,
+                ssoOpenIdConnectConfig.redirectBaseUrl,
+                ssoOpenIdConnectConfig.ssoProviderName,
+                ssoOpenIdConnectConfig.oidc,
+                ssoOpenIdConnectConfig.uriRequireHeader,
+                ssoOpenIdConnectConfig.headers,
+                ssoOpenIdConnectConfig.ssoProviderImageUrl,
+                ssoOpenIdConnectConfig.additionalQueryParams
+            )).orElse(null);
     }
 }

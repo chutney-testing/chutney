@@ -15,7 +15,7 @@ import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { ParentComponent } from './components/parent/parent.component';
 import { DROPDOWN_SETTINGS, DropdownSettings } from '@core/model/dropdown-settings';
-import { OAuth2ContentTypeInterceptor } from '@core/services/sso.service';
+import { OAuth2ContentTypeInterceptor } from '@core/services/oauth2-content-type-interceptor.service';
 
 @NgModule({
     declarations: [

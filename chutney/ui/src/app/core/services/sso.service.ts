@@ -5,12 +5,12 @@
  *
  */
 
-import { HttpClient, HttpEvent, HttpHandler, HttpInterceptor, HttpRequest } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { AuthConfig, OAuthService } from 'angular-oauth2-oidc';
 import { environment } from '@env/environment';
-import { BehaviorSubject, map, Observable, tap } from 'rxjs';
+import { BehaviorSubject, map, tap } from 'rxjs';
 import { Injectable } from '@angular/core';
-import { filter } from 'rxjs/operators';
+import { filter, switchMap } from 'rxjs/operators';
 
 interface SsoAuthConfig {
   issuer: string,
@@ -37,6 +37,7 @@ export class SsoService {
 
   private tokenLoadedSubject = new BehaviorSubject<boolean>(false);
   public tokenLoaded$ = this.tokenLoadedSubject.asObservable();
+  private enableSso = false
 
 
   constructor(private oauthService: OAuthService, private http: HttpClient) {
@@ -68,17 +69,11 @@ export class SsoService {
             redirectUriAsPostLogoutRedirectUriFallback: true,
           } as AuthConfig
         }),
-        tap(async ssoConfig => {
-            try {
-                this.oauthService.configure(ssoConfig)
-                await this.oauthService.loadDiscoveryDocumentAndTryLogin();
-                if (this.oauthService.hasValidAccessToken()) {
-                    this.tokenLoadedSubject.next(true);
-                }
-            } catch (e) {
-                console.error("SSO provider not available")
-            }
-        })
+        tap(ssoConfig => this.oauthService.configure(ssoConfig)),
+          switchMap(() => this.oauthService.loadDiscoveryDocumentAndTryLogin()),
+          tap(res => this.enableSso = res),
+          filter(() => this.oauthService.hasValidAccessToken() ),
+          tap(() =>  this.tokenLoadedSubject.next(true) )
     ).subscribe()
   }
 
@@ -95,17 +90,11 @@ export class SsoService {
   }
 
   getSsoProviderName() {
-    if (this.ssoConfig) {
-      return this.ssoConfig.ssoProviderName
-    }
-    return null
+    return this.ssoConfig?.ssoProviderName
   }
 
   getSsoProviderImageUrl() {
-    if (this.ssoConfig) {
-      return this.ssoConfig.ssoProviderImageUrl
-    }
-    return null
+      return this.ssoConfig?.ssoProviderImageUrl
   }
 
   get accessToken(): string {
@@ -123,21 +112,8 @@ export class SsoService {
   get headers() {
       return this.ssoConfig?.headers
   }
-}
 
-@Injectable()
-export class OAuth2ContentTypeInterceptor implements HttpInterceptor {
-
-    constructor(private ssoService: SsoService) {}
-
-    intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        const isTokenEndpoint = this.ssoService.headers && req.url.startsWith(this.ssoService.tokenEndpoint);
-        if (isTokenEndpoint) {
-            const modifiedReq = req.clone({
-                setHeaders: this.ssoService.headers
-            });
-            return next.handle(modifiedReq);
-        }
-        return next.handle(req);
-    }
+  get getEnableSso() {
+      return this.enableSso
+  }
 }
