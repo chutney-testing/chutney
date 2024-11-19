@@ -67,7 +67,7 @@
       <artifactId>chutney-kotlin-dsl</artifactId>
     </dependency>
 
-    <dependency> <!-- in fact, dependency on the maven docker build of local-dev -->
+    <dependency> <!-- Here to be sure that oci image is built before testing -->
       <groupId>com.chutneytesting</groupId>
       <artifactId>local-dev</artifactId>
       <version>${chutney.version}</version>

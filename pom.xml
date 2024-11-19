@@ -414,13 +414,5 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>behind-proxy</id>
-      <activation>
-        <property>
-          <name>http.proxyHost</name>
-        </property>
-      </activation>
-    </profile>
   </profiles>
 </project>

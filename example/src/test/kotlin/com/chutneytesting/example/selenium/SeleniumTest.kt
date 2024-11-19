@@ -17,6 +17,7 @@ import org.openqa.selenium.firefox.FirefoxOptions
 import org.testcontainers.containers.BrowserWebDriverContainer
 import org.testcontainers.containers.GenericContainer
 import org.testcontainers.containers.Network
+import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.junit.jupiter.Testcontainers
 import org.testcontainers.utility.DockerImageName
 import java.time.Duration
@@ -30,6 +31,7 @@ class SeleniumTest {
             .withNetworkAliases("chutneyServer")
             .withExposedPorts(8443)
             .withNetwork(network)
+            .waitingFor(Wait.forLogMessage(".*Started ServerBootstrap.*", 1))
             .withStartupTimeout(Duration.ofSeconds(80))
 
     private val webDriverContainer = BrowserWebDriverContainer()

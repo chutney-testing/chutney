@@ -3,7 +3,7 @@
 
 #
 # This file is executed via TestContainers framework.
-# It aims to define the test environment of Chutney's acceptances tests.
+# It aims to define the test environment of Chutney's SSH acceptances tests.
 #
 # Chutney server is in a specific network and its exposure is made from 'AcceptanceTests' class.
 #
@@ -15,19 +15,6 @@
 #
 
 services:
-
-  chutney-server:
-    image: ghcr.io/chutney-testing/chutney/chutney-server
-    restart: unless-stopped
-    #network_mode: "host"
-    networks:
-      - chutney_network
-    volumes:
-      - ${CHUTNEY_CONFIG}:/config
-    environment:
-      SPRING_CONFIG_LOCATION: "file:/config/"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
 
   jump-host:
     image: threatpatrols/sshjumphost:latest
@@ -52,4 +39,6 @@ services:
 
 networks:
   chutney_network:
+    name: chutney_network
+    external: true
   ssh_network:

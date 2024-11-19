@@ -85,7 +85,7 @@ fun `Jakarta sender then clean then send and listen it on embedded broker`(
         [
           {
               "name": "test_jakarta",
-              "url": "tcp://host.docker.internal:$port",
+              "url": "tcp://host.testcontainers.internal:$port",
               "properties": [
                   {
                       "key": "java.naming.factory.initial",

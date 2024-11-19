@@ -10,7 +10,7 @@ package com.chutneytesting.acceptance.common
 import com.chutneytesting.kotlin.dsl.*
 
 fun validateSshCommandExitCode(cmdIdx: Int = 0, comparison: String = "==", expectedCode: Int = 0) =
-  "exitCode_ok-$cmdIdx" to "results.get($cmdIdx).exitCode $comparison $expectedCode".escapedSpEL()
+  "exitCode_ok-$cmdIdx" to "results.get($cmdIdx).exitCode $comparison $expectedCode".spEL()
 
 fun ChutneyStepBuilder.assertSshCommand(
   description: String = "Assert SSH command",
@@ -30,7 +30,7 @@ fun ChutneyStepBuilder.assertSshCommand(
       Step("Assert command") {
         CompareAction(
           mode = "equals",
-          actual = "$sshCommandELVarName.command.command".escapedSpEL(),
+          actual = "$sshCommandELVarName.command.command".spEL(),
           expected = it
         )
       }
@@ -39,7 +39,7 @@ fun ChutneyStepBuilder.assertSshCommand(
       Step("Assert command timeout") {
         CompareAction(
           mode = "equals",
-          actual = "$sshCommandELVarName.command.timeout.toString()".escapedSpEL(),
+          actual = "$sshCommandELVarName.command.timeout.toString()".spEL(),
           expected = it
         )
       }
@@ -48,17 +48,17 @@ fun ChutneyStepBuilder.assertSshCommand(
       Step("Assert command exit code") {
         CompareAction(
           mode = "equals",
-          actual = """T(Integer).toString(${"$sshCommandELVarName.exitCode".spELVar})""".escapedElEval(),
+          actual = """T(Integer).toString(${"$sshCommandELVarName.exitCode".spELVar})""".elEval(),
           expected = "$it"
         )
       }
     }
     Step("Assert command stdout") {
-      CompareAction(mode = expectedStdoutCompare, actual = "$sshCommandELVarName.stdout".escapedSpEL(), expected = expectedStdout)
+      CompareAction(mode = expectedStdoutCompare, actual = "$sshCommandELVarName.stdout".spEL(), expected = expectedStdout)
     }
     expectedStderr?.let {
       Step("Assert command stderr") {
-        CompareAction(mode = expectedStderrCompare, actual = "$sshCommandELVarName.stderr".escapedSpEL(), expected = it)
+        CompareAction(mode = expectedStderrCompare, actual = "$sshCommandELVarName.stderr".spEL(), expected = it)
       }
     }
   }

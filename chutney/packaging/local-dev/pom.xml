@@ -139,12 +139,13 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <jmxPort>${jmx.port.local-dev}</jmxPort>
+                    <pullPolicy>IF_NOT_PRESENT</pullPolicy>
                     <image>
                         <name>ghcr.io/chutney-testing/chutney/chutney-server</name>
+                        <runImage>eclipse-temurin:17-jre</runImage>
                         <env>
                             <BP_JVM_VERSION>17</BP_JVM_VERSION>
                         </env>
-                        <runImage>eclipse-temurin:17-jre</runImage>
                     </image>
                 </configuration>
                 <executions>
@@ -164,23 +165,17 @@
                 <groupId>com.github.ulisesbocchio</groupId>
                 <artifactId>jasypt-maven-plugin</artifactId>
             </plugin>
-            <!--plugin>
-                <artifactId>maven-install-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-install</id>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin-->
         </plugins>
     </build>
 
     <profiles>
         <profile>
             <id>behind-proxy</id>
+            <activation>
+                <property>
+                    <name>http.proxyHost</name>
+                </property>
+            </activation>
             <build>
                 <plugins>
                     <plugin>

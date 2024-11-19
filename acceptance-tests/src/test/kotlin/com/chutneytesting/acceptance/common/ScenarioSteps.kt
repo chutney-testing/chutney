@@ -30,8 +30,8 @@ fun createExecuteAndCheckReportStatusOf(
 }
 
 // Take into account escaped spEL in scenario
-private fun ChutneyScenario.cleanSpELForJsonRawCreateHttpPostAction() =
-  escapeJson(this.toString()).replace("\\\\\\\\\${", "\\\${")
+private fun ChutneyScenario.escapeJsonSpEL() =
+  escapeJson(this.toString()).replace("\${", "\\\${")
 
 val emptyScenario = Scenario(title = "Empty") { When { } }
 
@@ -39,7 +39,7 @@ fun ChutneyStepBuilder.createScenario(outputScenarioId: String, scenario: Chutne
   HttpPostAction(
     target = "CHUTNEY_LOCAL",
     uri = "/api/scenario/v2/raw",
-    body = """{ "title": "${scenario.title}", "content": "${scenario.cleanSpELForJsonRawCreateHttpPostAction()}" }""",
+    body = """{ "title": "${scenario.title}", "content": "${scenario.escapeJsonSpEL()}" }""",
     headers = jsonHeader(),
     validations = mapOf(statusValidation(200)),
     outputs = mapOf(

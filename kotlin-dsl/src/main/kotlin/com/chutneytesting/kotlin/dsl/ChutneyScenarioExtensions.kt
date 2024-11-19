@@ -18,8 +18,6 @@ val String.hjsonSpEL: String
 @Deprecated("Duplicate", ReplaceWith("spEL()"))
 fun String.spELString(): String = "\${#$this}"
 fun String.spEL(): String = "\${#$this}"
-fun String.escapedSpEL(): String = this.spEL().escapeEL()
-fun String.escapeEL(): String = this.replace("\${", "\\\${")
 fun String.spELVar(): String = "#$this"
 @Deprecated("ContextPut task specific", ReplaceWith(""))
 fun Map<String, Any>.toEntries(): Map<String, Map<String, Any>> = mapOf("entries" to this)
@@ -29,7 +27,6 @@ fun retryTimeOutStrategy(timeout: String = "30 sec", retryDelay: String = "5 sec
     RetryTimeOutStrategy(timeout, retryDelay)
 
 fun String.elEval(): String = "\${$this}"
-fun String.escapedElEval(): String = this.elEval().escapeEL()
 fun String.elString(): String = "'${this.replace("'", "''")}'"
 fun Map<String, String>.elMap(): String {
     return this.map {

@@ -88,7 +88,7 @@ fun `Http (verb) request local valid endpoint`(
         [
             {
                 "name": "test_http",
-                "url": "https://host.docker.internal:$port",
+                "url": "https://host.testcontainers.internal:$port",
                 "properties": [
                     { "key" : "keyStore", "value": "/config/keystores/client.jks" },
                     { "key" : "keyStorePassword", "value": "client" },
