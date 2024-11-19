@@ -8,6 +8,7 @@
 
 package com.chutneytesting.execution.domain.campaign;
 
+import static com.chutneytesting.server.core.domain.dataset.DataSet.NO_DATASET;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singleton;
 import static java.util.Optional.ofNullable;
@@ -83,7 +84,8 @@ public class CampaignExecutionEngine {
                                    JiraXrayEmbeddedApi jiraXrayEmbeddedApi,
                                    ChutneyMetrics metrics,
                                    ExecutorService executorService,
-                                   DataSetRepository datasetRepository, ObjectMapper objectMapper) {
+                                   DataSetRepository datasetRepository,
+                                   ObjectMapper objectMapper) {
         this.campaignRepository = campaignRepository;
         this.campaignExecutionRepository = campaignExecutionRepository;
         this.scenarioExecutionEngine = scenarioExecutionEngine;
@@ -117,17 +119,21 @@ public class CampaignExecutionEngine {
     public CampaignExecution executeById(Long campaignId, String environment, DataSet dataset, String userId) {
         return ofNullable(campaignRepository.findById(campaignId))
             .map(campaign -> selectExecutionEnvironment(campaign, environment))
-            .map(campaign -> {
-                if (dataset != null) {
-                    campaign.executionDataset(null);
-                }
-                return executeScenarioInCampaign(campaign, userId, dataset);
-            })
+            .map(campaign -> executeScenarioInCampaign(campaign, userId, dataset))
             .orElseThrow(() -> new CampaignNotFoundException(campaignId));
     }
 
     public CampaignExecution executeById(Long campaignId, String userId) {
         return executeById(campaignId, null, null, userId);
+    }
+
+    public void executeScheduledCampaign(Long campaignId, String environment, String datasetId, String userId) {
+        if (datasetId != null) {
+            DataSet dataset = datasetRepository.findById(datasetId); //TODO need to manage DatasetNotFound ?
+            executeById(campaignId, environment, dataset, userId);
+        } else {
+            executeById(campaignId, environment, null, userId);
+        }
     }
 
     public Optional<CampaignExecution> currentExecution(Long campaignId, String environment) {
@@ -234,7 +240,7 @@ public class CampaignExecutionEngine {
         List<TestCaseDataset> testCaseDatasets = scenariosToExecute.stream()
             .map(cs ->
                 testCaseRepository.findExecutableById(cs.scenarioId())
-                    .map(tc -> new TestCaseDataset(tc, resolveDataset(cs, campaignExecution)))
+                    .map(tc -> new TestCaseDataset(tc, resolveScenarioDataset(cs, campaignExecution)))
             )
             .filter(Optional::isPresent)
             .map(Optional::get)
@@ -335,7 +341,7 @@ public class CampaignExecutionEngine {
         return new ScenarioExecutionCampaign(testCaseDataset.testcase().id(), scenarioName, execution.summary());
     }
 
-    private DataSet resolveDataset(Campaign.CampaignScenario campaignScenario, CampaignExecution campaignExecution) {
+    private DataSet resolveScenarioDataset(Campaign.CampaignScenario campaignScenario, CampaignExecution campaignExecution) {
         return
             ofNullable(campaignScenario.datasetId())
                 .map(datasetId -> DataSet.builder().withId(datasetId).withName("").build())
@@ -351,7 +357,7 @@ public class CampaignExecutionEngine {
                         .withConstants(ds.constants)
                         .build();
                 })
-                .orElseGet(() -> DataSet.NO_DATASET);
+                .orElseGet(() -> NO_DATASET);
     }
 
     private ExecutionRequest buildExecutionRequest(Campaign campaign, TestCaseDataset testCaseDataset, CampaignExecution campaignExecution) {

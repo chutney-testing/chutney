@@ -71,11 +71,6 @@ public class SchedulingConfiguration implements AsyncConfigurer {
         return builder.threadNamePrefix("app-task-exec").build();
     }
 
-    @Bean
-    public ApplicationRunner scheduledMissedCampaignToExecute(CampaignScheduler campaignScheduler) {
-        return arg -> campaignScheduler.scheduledMissedCampaignIds();
-    }
-
     /**
      * @see ScheduleCampaign#executeScheduledCampaign()
      */

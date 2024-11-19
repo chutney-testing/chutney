@@ -94,6 +94,9 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
     }
 
     ngOnInit() {
+        this.dropdownDatasetSettings = {...this.dropdownSettings, singleSelection: true};
+        this.dropdownDatasetSettings.textField = 'text'; // not mandatory
+
         this.submitted = false;
         this.loadEnvironment();
         this.loadAllScenarios();
@@ -102,7 +105,6 @@ export class CampaignEditionComponent implements OnInit, OnDestroy {
                 return {"id": dataset.id, "text": dataset.name}
             });
         });
-        this.dropdownDatasetSettings = {...this.dropdownSettings, singleSelection: true}
     }
 
     onItemSelect(item: any) {

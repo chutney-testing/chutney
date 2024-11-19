@@ -89,7 +89,7 @@ export class CampaignListComponent implements OnInit, OnDestroy {
     }
 
     scheduledCampaignHasMissingEnv(scheduledCampaign: CampaignScheduling): boolean {
-        return scheduledCampaign.campaignsId.some(campaignId => {
+        return scheduledCampaign.campaignExecutionRequest.map(cer => cer.campaignId).some(campaignId => {
             const campaign = this.campaigns.find(campaign => campaign.id === campaignId);
             return campaign == null || campaign.environment == null;
         });
@@ -285,5 +285,10 @@ export class CampaignListComponent implements OnInit, OnDestroy {
 
     toIsoDate(date: string) {
         return new Date(date);
+    }
+
+    getCampaignTitles(scheduledCampaign: CampaignScheduling) {
+        const titles = scheduledCampaign.campaignExecutionRequest.map(req => req.campaignTitle);
+        return titles.join(', ');
     }
 }

@@ -7,15 +7,17 @@
 
 import { FREQUENCY } from '@core/model/campaign/FREQUENCY';
 
-
-export class CampaignScheduling {
-
-    constructor(
-        public campaignsId: number[],
-        public campaignsTitle: string[],
-        public schedulingDate: Date,
-        public frequency?: FREQUENCY,
-        public id?: number
-    ) {
-    }
+export interface CampaignExecutionRequest {
+    campaignId: number;
+    campaignTitle: string;
+    datasetId: string;
 }
+
+export interface CampaignScheduling {
+    id?: number;
+    schedulingDate: Date; 
+    frequency: FREQUENCY;
+    environment: string;
+    campaignExecutionRequest: CampaignExecutionRequest[];
+}
+

@@ -24,7 +24,6 @@ export class CampaignSchedulingService {
 
     findAll(): Observable<Array<CampaignScheduling>> {
         return this.http.get<Array<CampaignScheduling>>(environment.backend + this.resourceUrl).pipe(map((res: Array<CampaignScheduling>) => {
-            //res.sort((a, b) => a.executionScheduled < b.executionScheduled));
             return res;
         }));
     }
@@ -36,6 +35,4 @@ export class CampaignSchedulingService {
     delete(id: number): Observable<Object> {
         return this.http.delete(environment.backend + `${this.resourceUrl}/${id}`);
     }
-
-
 }

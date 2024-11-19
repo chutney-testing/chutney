@@ -7,6 +7,10 @@
 
 package com.chutneytesting.campaign.infra;
 
+import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toCollection;
+
+import com.chutneytesting.campaign.infra.SchedulingCampaignDto.CampaignExecutionRequestDto;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationContext;
@@ -18,8 +22,11 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+import java.util.stream.StreamSupport;
 
-// TODO : Implemented for retro compatibility - to remove in future version
 class SchedulingCampaignsDtoDeserializer extends StdDeserializer<SchedulingCampaignDto> {
 
     protected SchedulingCampaignsDtoDeserializer() {
@@ -31,40 +38,48 @@ class SchedulingCampaignsDtoDeserializer extends StdDeserializer<SchedulingCampa
         JsonNode node = parser.readValueAsTree();
 
         String id = node.get("id").asText();
-        List<Long> campaignsId;
-        List<String> campaignsTitle;
         LocalDateTime schedulingDate = getSchedulingDate(node);
         String frequency = getFrequency(node);
+        List<Long> campaignsId = getLongList(node.get("campaignsId"));
+        List<String> campaignsTitle = getStringList(node.get("campaignsTitle"));
+        String environment = node.has("environment") ? node.get("environment").asText() : null;
+        List<String> datasetIds = getStringList(node.get("datasetsId"));
 
-        if (node.has("campaignId")) {
-            campaignsId = List.of(node.get("campaignId").asLong());
-        } else {
-            campaignsId = getCampaignsId(node.get("campaignsId"));
-        }
+        List<CampaignExecutionRequestDto> campaignExecutionRequestDto =
+            IntStream.range(0, campaignsId.size())
+                .mapToObj(i -> new CampaignExecutionRequestDto(
+                    campaignsId.get(i),
+                    campaignsTitle.get(i),
+                    guardArrayOfBoundException(datasetIds, i))
+                )
+                .collect(Collectors.toList());
 
-        if (node.has("campaignTitle")) {
-            campaignsTitle = List.of(node.get("campaignTitle").asText());
-        } else {
-            campaignsTitle = getCampaignsTitle(node.get("campaignsTitle"));
-        }
 
-        return new SchedulingCampaignDto(id, campaignsId, campaignsTitle, schedulingDate, frequency);
+        return new SchedulingCampaignDto(id, schedulingDate, frequency, environment, campaignExecutionRequestDto);
     }
 
-    private List<Long> getCampaignsId(JsonNode node) {
-        List<Long> campaignsId = new ArrayList<>();
-        for (JsonNode id : node) {
-            campaignsId.add(id.asLong());
+    private String guardArrayOfBoundException(List<String> list, int i) {
+        if (i < list.size()) {
+            return list.get(i);
         }
-        return campaignsId;
+        return "";
     }
 
-    private List<String> getCampaignsTitle(JsonNode node) {
-        List<String> campaignsTitle = new ArrayList<>();
-        for (JsonNode title : node) {
-            campaignsTitle.add(title.asText());
+    private List<Long> getLongList(JsonNode node) {
+        return extractList(node, JsonNode::asLong);
+    }
+
+    private List<String> getStringList(JsonNode node) {
+        return extractList(node, JsonNode::asText);
+    }
+
+    private <T> List<T> extractList(JsonNode node, Function<JsonNode, T> mapper) {
+        if (node == null) {
+            return emptyList();
         }
-        return campaignsTitle;
+        return StreamSupport.stream(node.spliterator(), false)
+            .map(mapper)
+            .collect(toCollection(ArrayList::new));
     }
 
     private LocalDateTime getSchedulingDate(JsonNode node) throws JsonProcessingException {
@@ -72,7 +87,7 @@ class SchedulingCampaignsDtoDeserializer extends StdDeserializer<SchedulingCampa
         return objectMapper.readValue(node.get("schedulingDate").toString(), LocalDateTime.class);
     }
 
-    private String getFrequency(JsonNode node) throws JsonProcessingException {
+    private String getFrequency(JsonNode node) {
         return node.has("frequency") ? node.get("frequency").asText() : null;
     }
 }

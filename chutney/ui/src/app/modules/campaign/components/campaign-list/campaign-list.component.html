@@ -133,7 +133,7 @@
           <tbody>
             @for (scheduledCampaign of scheduledCampaigns; track scheduledCampaign.id) {
               <tr>
-                <td [ngClass]="{'scheduled-campaign-error': scheduledCampaignHasMissingEnv(scheduledCampaign)}" class="w80">#{{scheduledCampaign.campaignId}}
+                <td [ngClass]="{'scheduled-campaign-error': scheduledCampaignHasMissingEnv(scheduledCampaign)}" class="w80">#{{scheduledCampaign.id}}
                   @if (isFrequencyCampaign(scheduledCampaign)) {
                     <span data-toggle="tooltip"
                       title="{{scheduledCampaign.frequency.toLowerCase()}}"
@@ -145,7 +145,7 @@
                                 }"
                     aria-hidden="true"></span>
                   }
-                  - {{scheduledCampaign.campaignsTitle}}
+                  - {{ getCampaignTitles(scheduledCampaign) }}
                 </td>
                 <td [ngClass]="{'scheduled-campaign-error': scheduledCampaignHasMissingEnv(scheduledCampaign)}" class="text-nowrap">{{scheduledCampaign.schedulingDate | amLocal | amDateFormat: 'YYYY-MM-DD HH:mm'}}</td>
                 <td>
