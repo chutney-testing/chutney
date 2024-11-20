@@ -11,156 +11,161 @@ import com.chutneytesting.acceptance.tests.*
 import com.chutneytesting.acceptance.tests.actions.*
 import com.chutneytesting.acceptance.tests.edition.*
 import com.chutneytesting.acceptance.tests.engine.*
+import com.chutneytesting.environment.api.environment.dto.EnvironmentDto
+import com.chutneytesting.environment.api.target.dto.TargetDto
 import com.chutneytesting.kotlin.dsl.ChutneyEnvironment
+import com.chutneytesting.kotlin.dsl.ChutneyScenario
 import com.chutneytesting.kotlin.dsl.ChutneyTarget
 import com.chutneytesting.kotlin.launcher.Launcher
 import com.chutneytesting.kotlin.util.ChutneyServerInfo
 import com.chutneytesting.kotlin.util.HttpClient
+import com.chutneytesting.tools.Entry
 import com.chutneytesting.tools.SocketUtils
-import org.junit.jupiter.api.AfterAll
-import org.junit.jupiter.api.BeforeAll
-import org.junit.jupiter.api.Test
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
+import com.fasterxml.jackson.module.paranamer.ParanamerModule
+import org.assertj.core.api.SoftAssertions
+import org.junit.jupiter.api.*
+import org.testcontainers.containers.ComposeContainer
 import org.testcontainers.containers.GenericContainer
-import org.testcontainers.junit.jupiter.Testcontainers
+import org.testcontainers.containers.Network
+import org.testcontainers.containers.wait.strategy.Wait
 import org.testcontainers.utility.MountableFile
 import java.io.File
-import java.nio.file.Files
 import java.time.Duration
 
-@Testcontainers
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class AcceptanceTests {
 
-  companion object {
-    private const val ENVIRONMENT_NAME = "DEFAULT"
+  private val om = jacksonObjectMapper()
+    .registerModule(JavaTimeModule())
+    .registerModule(ParanamerModule())
 
-    private var adminServerInfo: ChutneyServerInfo? = null
-    private var chutneyServer: GenericContainer<Nothing>? = null
-    private var environment: ChutneyEnvironment = ChutneyEnvironment(ENVIRONMENT_NAME)
+  private var chutneyServer: GenericContainer<Nothing>? = null
+  private var environment: ChutneyEnvironment = ChutneyEnvironment("DEFAULT")
+  private var chutneyServerInfo: ChutneyServerInfo? = null
 
-    private var actionHttpPort: Int? = null
-    private var actionAmqpPort: Int? = null
-    private var actionJakartaPort: Int? = null
-    private var actionSshPort: Int? = null
+  private var actionHttpPort: Int? = null
+  private var actionAmqpPort: Int? = null
+  private var actionJakartaPort: Int? = null
 
-    @JvmStatic
-    @BeforeAll
-    fun setUp() {
-      val tempDirectory = Files.createTempDirectory("chutney-acceptance-test-")
-      val memAuthConfigFile = File(AcceptanceTests::class.java.getResource("/blackbox/application-mem-auth.yml")!!.path)
-
-      // Copy mem-auth config
-      Files.copy(memAuthConfigFile.toPath(), tempDirectory.resolve("application-mem-auth.yml"))
-
-      // Start server
-      chutneyServer = GenericContainer<Nothing>("ghcr.io/chutney-testing/chutney/chutney-server:latest").apply {
-        withStartupTimeout(Duration.ofSeconds(80))
-        withExposedPorts(
-          8443, // Chutney
-        )
-        withNetwork(network)
-        withCopyFileToContainer(
-          MountableFile.forClasspathResource("/blackbox/"),
-          "/config"
-        )
+  @BeforeAll
+  fun setUp() {
+    // Start system under test : Chutney server + test env //
+    val chutneyNetwork = Network.builder()
+      .createNetworkCmdModifier {
+        it.withName("chutney_network")
       }
-      actionHttpPort = SocketUtils.freePortFromSystem()
-      actionAmqpPort = SocketUtils.freePortFromSystem()
-      System.setProperty("qpid.amqp_port", actionAmqpPort.toString())
-      actionJakartaPort = SocketUtils.freePortFromSystem()
-      actionSshPort = SocketUtils.freePortFromSystem()
-      org.testcontainers.Testcontainers.exposeHostPorts(
-        actionHttpPort!!, actionAmqpPort!!, actionJakartaPort!!, actionSshPort!!
+      .build()
+    chutneyServer = GenericContainer<Nothing>("ghcr.io/chutney-testing/chutney/chutney-server").apply {
+      waitingFor(Wait.forLogMessage(".*Started ServerBootstrap.*", 1))
+      withStartupTimeout(Duration.ofSeconds(80))
+      withExposedPorts(8443)
+      withNetwork(chutneyNetwork)
+      withAccessToHost(true)
+      withCopyFileToContainer(
+        MountableFile.forClasspathResource("/blackbox/"),
+        "/config"
       )
+      withEnv("SPRING_CONFIG_LOCATION", "file:/config/")
+    }
+    chutneyServer!!.start()
 
-      chutneyServer!!.start()
-      adminServerInfo = ChutneyServerInfo(
-        "https://${chutneyServer?.host}:${chutneyServer?.firstMappedPort}",
-        "admin",
-        "admin",
-        null,
-        null,
-        null
-      )
+    actionHttpPort = SocketUtils.freePortFromSystem()
+    actionAmqpPort = SocketUtils.freePortFromSystem()
+    System.setProperty("qpid.amqp_port", actionAmqpPort.toString())
+    actionJakartaPort = SocketUtils.freePortFromSystem()
+    org.testcontainers.Testcontainers.exposeHostPorts(
+      actionHttpPort!!, actionAmqpPort!!, actionJakartaPort!!
+    )
 
-      // Set authorizations
+    // Setup system under test : Chutney server //
+    val chutneyServerHost = chutneyServer!!.host
+    val chutneyServerPort = chutneyServer!!.getMappedPort(8443)
+    chutneyServerInfo = ChutneyServerInfo(
+      "https://$chutneyServerHost:$chutneyServerPort", "admin", "admin",
+      null, null, null
+    )
+
+    chutneyServerInfo?.let {
+      // Authorizations
       val roles = AcceptanceTests::class.java.getResource("/blackbox/roles.json")!!.path
-      HttpClient.post<Any>(adminServerInfo!!, "/api/v1/authorizations", File(roles).readText())
+      HttpClient.post<Any>(it, "/api/v1/authorizations", File(roles).readText())
+    }
 
-      val mappedPort = chutneyServer?.getMappedPort(8443)
-      environment = ChutneyEnvironment(
-        name = ENVIRONMENT_NAME, targets =
+    // Build launcher test environment //
+    environment = ChutneyEnvironment(
+      name = environment.name, targets =
         listOf(
           ChutneyTarget(
             "CHUTNEY_LOCAL",
-            "https://${chutneyServer?.host}:$mappedPort",
+            "https://$chutneyServerHost:$chutneyServerPort",
             mapOf("username" to "admin", "password" to "admin")
           ),
-          ChutneyTarget("CHUTNEY_LOCAL_NO_USER", "https://${chutneyServer?.host}:$mappedPort", emptyMap())
+          ChutneyTarget("CHUTNEY_LOCAL_NO_USER", "https://$chutneyServerHost:$chutneyServerPort", emptyMap())
         )
-      )
-    }
+    )
+  }
 
-    @JvmStatic
-    @AfterAll
-    fun cleanUp() {
-      chutneyServer?.stop()
-    }
+  @AfterAll
+  fun cleanUp() {
+    chutneyServer?.stop()
   }
 
   @Test
   fun `Execution by campaign id with 2 scenarios`() {
-    listOf(
-      executeCampaignById,
-      executeCampaignByName,
-      executeForSurefireReport,
-      unknownCampaignById,
-      unknownCampaignByName
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        executeCampaignById,
+        executeCampaignByName,
+        executeForSurefireReport,
+        unknownCampaignById,
+        unknownCampaignByName
+      )
+    )
   }
 
   @Test
   fun `Support testcase edition metadata`() {
-    listOf(
-      readTestCaseMetadataScenario,
-      readTestCaseAfterUpdateScenario,
-      updateTestCaseWithBadVersionScenario
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        readTestCaseMetadataScenario,
+        readTestCaseAfterUpdateScenario,
+        updateTestCaseWithBadVersionScenario
+      )
+    )
   }
 
   @Test
   fun `Support testcase editions`() {
-    listOf(
-      `Request testcase edition`,
-      `Request for a second time testcase edition`,
-      `End testcase edition`,
-      `Edition time to live`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Request testcase edition`,
+        `Request for a second time testcase edition`,
+        `End testcase edition`,
+        `Edition time to live`
+      )
+    )
   }
 
   @Test
   fun `SQL Task test`() {
-    listOf(
-      `Sql query success`,
-      `Sql query wrong table`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Sql query success`,
+        `Sql query wrong table`
+      )
+    )
   }
 
   @Test
   fun `Success feature`() {
-    listOf(
-      `Direct Success`,
-      `Substeps Success`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Direct Success`,
+        `Substeps Success`
+      )
+    )
   }
 
   @Test
@@ -170,34 +175,34 @@ class AcceptanceTests {
 
   @Test
   fun `Kafka all Tasks test`() {
-    listOf(
-      `Kafka basic publish wrong url failure`,
-      `Kafka basic publish success`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Kafka basic publish wrong url failure`,
+        `Kafka basic publish success`
+      )
+    )
   }
 
   @Test
   fun `Roles declarations and users associations`() {
-    listOf(
-      `Declare a new role with its authorizations`,
-      `Add and remove user to-from an existing role`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Declare a new role with its authorizations`,
+        `Add and remove user to-from an existing role`
+      )
+    )
   }
 
   @Test
   fun `Execution success action`() {
-    listOf(
-      `Action instantiation and execution of a success scenario`,
-      `Task instantiation and execution of a failed scenario`,
-      `Task instantiation and execution of a sleep scenario`,
-      `Task instantiation and execution of a debug scenario`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Action instantiation and execution of a success scenario`,
+        `Task instantiation and execution of a failed scenario`,
+        `Task instantiation and execution of a sleep scenario`,
+        `Task instantiation and execution of a debug scenario`
+      )
+    )
   }
 
   @Test
@@ -207,13 +212,13 @@ class AcceptanceTests {
 
   @Test
   fun `Execution with jsonPath function`() {
-    listOf(
-      `Scenario execution with simple json value extraction`,
-      `Scenario execution with multiple json value extraction`,
-      `Scenario execution with json object value extraction`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Scenario execution with simple json value extraction`,
+        `Scenario execution with multiple json value extraction`,
+        `Scenario execution with json object value extraction`
+      )
+    )
   }
 
   @Test
@@ -269,37 +274,37 @@ class AcceptanceTests {
 
   @Test
   fun `Micrometer Tasks test`() {
-    listOf(
-      `Micrometer counter meter`,
-      `Micrometer timer meter`,
-      `Micrometer timer meter with start and stop`,
-      `Micrometer gauge meter`,
-      `Micrometer distribution summary meter`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Micrometer counter meter`,
+        `Micrometer timer meter`,
+        `Micrometer timer meter with start and stop`,
+        `Micrometer gauge meter`,
+        `Micrometer distribution summary meter`
+      )
+    )
   }
 
   @Test
   fun `Assertions Task test`() {
-    listOf(
-      `Execution by UI controller`,
-      `All in one assertions`,
-      `Test xsd actions`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Execution by UI controller`,
+        `All in one assertions`,
+        `Test xsd actions`
+      )
+    )
   }
 
   @Test
   fun `Final action for registering final actions for a testcase`() {
-    listOf(
-      `Register simple success action`,
-      `Register multiple actions with one complex, ie with inputs and strategy`,
-      `Register final action with validations on outputs`
-    ).forEach {
-      Launcher().run(it, environment)
-    }
+    softlyAssertLauncherRun(
+      listOf(
+        `Register simple success action`,
+        `Register multiple actions with one complex, ie with inputs and strategy`,
+        `Register final action with validations on outputs`
+      )
+    )
   }
 
   @Test
@@ -329,18 +334,95 @@ class AcceptanceTests {
     }
   }
 
-  @Test
-  fun `SSH Task test`() {
-    listOf(
-      `Scenario execution unable to login, status SUCCESS and command stderr`(),
-      `Scenario execution with multiple ssh action`(actionSshPort!!)
-    ).forEach {
-      Launcher().run(it, environment)
+  @Nested
+  @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+  inner class SSHTests {
+    private var sshContainer: ComposeContainer? = null
+    private val jumpServerUrl = "ssh://jump-host"
+    private val sshEnv = EnvironmentDto(
+      "SSH_ENV", "The SSH tests environment", listOf(
+        TargetDto(
+          "SSH_JUMP_SERVER", jumpServerUrl,
+          setOf(
+            Entry("user", "jumpuser"),
+            Entry("privateKey", "/config/env/ssh/client-jump-id_ecdsa.key")
+          )
+        ),
+        TargetDto(
+          "SSH_INTERN_SERVER", "ssh://intern-host",
+          setOf(
+            Entry("user", "internuser"),
+            Entry("privateKey", "/config/env/ssh/client-intern-id_edcsa.key"),
+            Entry("proxy", jumpServerUrl),
+            Entry("proxyUser", "jumpuser"),
+            Entry("proxyPrivateKey", "/config/env/ssh/client-jump-id_ecdsa.key")
+          )
+        ),
+        TargetDto(
+          "SSH_INTERN_SERVER_DIRECT", "ssh://intern-host",
+          setOf(
+            Entry("user", "internuser"),
+            Entry("privateKey", "/config/env/ssh/client-intern-id_edcsa.key")
+          )
+        )
+      )
+    )
+
+    @BeforeAll
+    fun setUp() {
+      sshContainer =
+        ComposeContainer(File("src/test/resources/blackbox/env/ssh/ssh-env-compose.yml"))
+          .waitingFor("jump-host", Wait.forLogMessage(".*Server listening on.*", 1))
+          .waitingFor("intern-host", Wait.forLogMessage(".*Server listening on.*", 1))
+      sshContainer!!.start()
+
+      // Post environment for SSH tests
+      chutneyServerInfo?.let {
+        HttpClient.post<Any>(it, "/api/v2/environments", om.writeValueAsString(sshEnv))
+      }
     }
+
+    @AfterAll
+    fun cleanUp() {
+      sshContainer?.stop()
+      // Delete environment for SSH tests
+      chutneyServerInfo?.let {
+        HttpClient.delete<Any>(it, "/api/v2/environments/${sshEnv.name}", "")
+      }
+    }
+
+    @Test
+    fun `SSH Task test`() {
+      softlyAssertLauncherRun(
+        `SSH - Execute commands on server`() +
+            `SSH - Execute shell on server`() +
+            `SSH - Server is unreachable`()
+      )
+    }
+  }
+
+  @Test
+  fun `Create scenario-campaign with specific ids`() {
+    softlyAssertLauncherRun(
+      listOf(
+        createUpdateScenarioWithSpecificId(1234),
+        createUpdateCampaignWithSpecificId(1234)
+      )
+    )
   }
 
   @Test
   fun `Agent test`() {
     Launcher().run(`We receive a network configuration to persist`(), environment)
+  }
+
+  private fun softlyAssertLauncherRun(scenarios: List<ChutneyScenario>) {
+    SoftAssertions.assertSoftly { softly ->
+      scenarios.forEach {
+        softly.assertThatCode {
+          Launcher().run(it, environment)
+        }.`as` { it.title }.doesNotThrowAnyException()
+      }
+    }
   }
 }

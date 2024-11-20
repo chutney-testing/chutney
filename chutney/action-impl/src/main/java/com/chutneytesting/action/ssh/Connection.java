@@ -7,10 +7,12 @@
 
 package com.chutneytesting.action.ssh;
 
-
 import static org.junit.platform.commons.util.StringUtils.isNotBlank;
 
 import com.chutneytesting.action.spi.injectable.Target;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Optional;
 
 public class Connection {
 
@@ -43,6 +45,24 @@ public class Connection {
         final String passphrase = target.privateKeyPassword().orElse(EMPTY);
 
         return new Connection(host, port, username, password, privateKey, passphrase);
+    }
+
+    public static Optional<Connection> proxyFrom(Target target) {
+        return target.property("proxy").map(proxy -> {
+            try {
+                URI proxyUri = new URI(proxy);
+                final String proxyHost = proxyUri.getHost();
+                final int proxyPort = proxyUri.getPort() == -1 ? 22 : proxyUri.getPort();
+                final String proxyUsername = target.property("proxyUser").orElse(EMPTY);
+                final String proxyPassword = target.property("proxyPassword").orElse(EMPTY);
+                final String proxyPrivateKey = target.property("proxyPrivateKey").orElse(EMPTY);
+                final String proxyPassphrase = target.property("proxyPassphrase").orElse(EMPTY);
+
+                return new Connection(proxyHost, proxyPort, proxyUsername, proxyPassword, proxyPrivateKey, proxyPassphrase);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     public boolean usePrivateKey() {

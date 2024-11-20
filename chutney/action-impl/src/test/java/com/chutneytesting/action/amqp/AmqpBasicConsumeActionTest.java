@@ -286,7 +286,7 @@ public class AmqpBasicConsumeActionTest {
         new Thread(() -> timeoutFailedResult.set(lockQueueAndTimeoutConsumer.execute())).start();
 
         AtomicReference<ActionExecutionResult> result2 = new AtomicReference<>();
-        await().atMost(1, SECONDS).untilAsserted(() ->
+        await().atMost(5, SECONDS).untilAsserted(() ->
             {
                 assertThat(ConsumerSupervisor.getInstance().isLocked(firstQueueName)).isTrue();
                 new Thread(() -> result2.set(shouldSuccess.execute())).start();

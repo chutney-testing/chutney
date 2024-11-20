@@ -3,7 +3,7 @@
 name: chutney-testing
 services:
   server:
-    image: ghcr.io/chutney-testing/chutney/chutney-server:latest
+    image: ghcr.io/chutney-testing/chutney/chutney-server
     container_name: chutney-demo-server
     restart: unless-stopped
     ports:

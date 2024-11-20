@@ -6,7 +6,7 @@
   ~
   -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -31,7 +31,6 @@
     <kotlin.compiler.apiVersion>1.9</kotlin.compiler.apiVersion>
     <kotlin.compiler.jvmTarget>${maven.compiler.target}</kotlin.compiler.jvmTarget>
     <kotlin.version>1.9.25</kotlin.version>
-
   </properties>
 
   <dependencyManagement>
@@ -66,6 +65,13 @@
     <dependency>
       <groupId>com.chutneytesting</groupId>
       <artifactId>chutney-kotlin-dsl</artifactId>
+    </dependency>
+
+    <dependency> <!-- Here to be sure that oci image is built before testing -->
+      <groupId>com.chutneytesting</groupId>
+      <artifactId>local-dev</artifactId>
+      <version>${chutney.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.testcontainers</groupId>
@@ -116,16 +122,28 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skip>true</skip>
+        </configuration>
       </plugin>
       <plugin>
-        <!-- Has to be after the default-test surefire execution declaration -->
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <configuration>
+          <includes>
+            <include>AcceptanceTests.java</include>
+          </includes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <!-- Has to be after the failsafe execution declaration -->
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.2.0</version>
         <executions>
           <execution>
             <id>chutney-test-report</id>
-            <phase>test</phase>
+            <phase>integration-test</phase>
             <goals>
               <goal>java</goal>
             </goals>

@@ -55,8 +55,9 @@ public class SshClientAction implements Action {
     public ActionExecutionResult execute() {
         try {
             Connection connection = Connection.from(target);
+            Connection proxyConnection = Connection.proxyFrom(target).orElse(null);
             boolean isSshChannel = CHANNEL.SHELL.equals(CHANNEL.from(this.channel));
-            SshClient sshClient = new SshJClient(connection, isSshChannel, logger);
+            SshClient sshClient = new SshJClient(connection, proxyConnection, isSshChannel, logger);
 
             List<CommandResult> commandResults = Commands.from(this.commands).executeWith(sshClient);
 

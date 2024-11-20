@@ -20,6 +20,7 @@ import com.chutneytesting.action.TestLogger;
 import com.chutneytesting.action.spi.ActionExecutionResult;
 import com.chutneytesting.action.spi.injectable.Logger;
 import com.chutneytesting.action.spi.injectable.Target;
+import com.chutneytesting.action.ssh.fakes.FakeServerSsh;
 import com.chutneytesting.action.ssh.sshj.Command;
 import com.chutneytesting.action.ssh.sshj.CommandResult;
 import java.io.IOException;
@@ -145,5 +146,33 @@ public class SshClientActionTest {
         softly.assertThat(errors.get(4)).isEqualTo("No commands provided (List)");
         softly.assertThat(errors.get(5)).isEqualTo("[commands should not be empty] not applied because of exception java.lang.NullPointerException(Cannot invoke \"java.util.List.isEmpty()\" because \"m\" is null)");
         softly.assertAll();
+    }
+
+    @Test
+    public void should_succeed_to_execute_a_command_with_password_via_proxy() throws IOException {
+        // Given
+        SshServer proxy = FakeServerSsh.buildLocalProxy("proxySshUser", "proxySshPassword");
+        String proxyUrl = "ssh://" + proxy.getHost() + ":" + proxy.getPort();
+        try {
+            proxy.start();
+
+            Target targetMock = buildTargetWithPassword(fakeSshServer, proxyUrl, "proxySshUser", "proxySshPassword");
+            TestLogger logger = new TestLogger();
+            List<CommandResult> expectedResults = new ArrayList<>();
+            expectedResults.add(new CommandResult(new Command("echo Hello"), 0, "Hello\n", ""));
+
+            List<Object> commands = singletonList("echo Hello");
+
+            // When
+            SshClientAction action = new SshClientAction(targetMock, logger, commands, null);
+            ActionExecutionResult actualResult = action.execute();
+
+            // Then
+            assertThat(actualResult.outputs.get("results")).usingRecursiveComparison().isEqualTo(expectedResults);
+            assertThat(logger.info.get(0)).startsWith("Authentication via username/password as proxySshUser");
+            assertThat(logger.info.get(1)).startsWith("Authentication via username/password as mockssh");
+        } finally {
+            proxy.stop();
+        }
     }
 }

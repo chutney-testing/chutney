@@ -86,12 +86,12 @@ public class Command implements org.apache.sshd.server.command.Command, ServerSe
                     return;
                 } else {
                     if (in.available() > 0) {
-                        String t = IOUtils.toString(in, Charset.defaultCharset());
+                        String t = new String(IOUtils.readFully(in, in.available()), Charset.defaultCharset());
                         text.append(t);
                         continue;
                     }
 
-                    if (text.toString().endsWith("exit")) {
+                    if (text.toString().replaceAll("\\R", "").endsWith("exit")) {
                         addCommandAndExit(text.toString());
                         return;
                     }

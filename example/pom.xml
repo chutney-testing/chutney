@@ -66,6 +66,12 @@
             <artifactId>chutney-kotlin-dsl</artifactId>
         </dependency>
 
+        <dependency>  <!-- Here to be sure that oci image is built before testing -->
+            <groupId>com.chutneytesting</groupId>
+            <artifactId>local-dev</artifactId>
+            <version>${chutney.version}</version>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-params</artifactId>
@@ -147,6 +153,20 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>SeleniumTest</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <configuration>
+                    <includes>
+                        <include>SeleniumTest</include>
+                    </includes>
+                </configuration>
             </plugin>
             <plugin>
                 <!-- Has to be after the default-test surefire execution declaration -->

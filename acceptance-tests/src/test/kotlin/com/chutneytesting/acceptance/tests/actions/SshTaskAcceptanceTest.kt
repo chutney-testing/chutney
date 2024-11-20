@@ -7,184 +7,115 @@
 
 package com.chutneytesting.acceptance.tests.actions
 
-import com.chutneytesting.acceptance.common.*
+import com.chutneytesting.acceptance.common.assertSshCommand
+import com.chutneytesting.acceptance.common.createExecuteAndCheckReportStatusOf
+import com.chutneytesting.acceptance.common.validateSshCommandExitCode
 import com.chutneytesting.kotlin.dsl.*
 
-fun `Scenario execution unable to login, status SUCCESS and command stderr`(): ChutneyScenario {
-  return Scenario(title = "Scenario execution unable to login, status SUCCESS and command stderr") {
-    Given("Target containing SSHD connection information with wrong password") {
-      createEnvironment(
-        "SSH_ENV_KO",
-        """
-        [
-            {
-                "name": "test_ssh",
-                "url": "ssh://$UNKNOWN_TARGET",
-                "properties": [
-                    { "key" : "username", "value": "user" },
-                    { "key" : "password", "value": "wrongpass" }
-                ]
-            }
-        ]
-      """.trimIndent()
-      )
-    }
-    And("this scenario is saved") {
-      createScenario(
-        "scenarioId",
-        """
-        {
-            "when":{
-                "sentence":"Execute commands",
-                "implementation":{
-                    "task":"{\n type: ssh-client \n target: test_ssh \n inputs: {\n commands: [\n echo test \n] \n} \n}"
-                }
-            },
-            "thens":[]
+fun `SSH - Server is unreachable`(): ChutneyScenario {
+  return createExecuteAndCheckReportStatusOf(
+    environment = "SSH_ENV",
+    scenario =
+      Scenario(title = "SSH - Server is unreachable") {
+        When("Execute commands") {
+          SshClientAction(
+            target = "SSH_INTERN_SERVER_DIRECT",
+            channel = SSH_CLIENT_CHANNEL.COMMAND,
+            commands = listOf("echo test")
+          )
         }
-        """.trimIndent()
-      )
-    }
-    When("The scenario is executed") {
-      executeScenario("scenarioId".spEL, "SSH_ENV_KO")
-    }
-    Then("the report status is FAILURE") {
-      checkScenarioReportFailure()
-    }
+      },
+    reportStatusSuccess = false
+  )
+}
+
+fun `SSH - Execute shell on server`(): List<ChutneyScenario> {
+  return listOf("SSH_JUMP_SERVER", "SSH_INTERN_SERVER").mapIndexed { idx, target ->
+    createExecuteAndCheckReportStatusOf(
+      environment = "SSH_ENV",
+      scenario =
+        Scenario(title = "SSH - Execute shell on server${if (idx == 1) " via proxy" else ""}") {
+          When("open a shell and execute some commands") {
+            SshClientAction(
+              target = target,
+              commands = listOf(
+                """
+                export PS1=
+                whoami
+                cat /etc/debian_version
+                exit
+            """.trimIndent()
+              ),
+              channel = SSH_CLIENT_CHANNEL.SHELL,
+              outputs = mapOf(
+                "shellOutLines" to "results.get(0).stdout.lines().toList()".spEL()
+              ),
+              validations = mapOf(
+                "user-check" to "shellOutLines.contains('${if (idx == 1) "internuser" else "jumpuser"}')".spEL(),
+                "version-check" to "shellOutLines.contains('12.7')".spEL()
+              )
+            )
+          }
+        }
+    )
   }
 }
 
-fun `Scenario execution with multiple ssh action`(actionSshPort: Int): ChutneyScenario {
-
-  return Scenario(title = "Scenario execution with multiple ssh action") {
-    Given("an SSHD server is started") {
-      SshServerStartAction(
-        port = "$actionSshPort",
-        host = "0.0.0.0",
-        usernames = listOf("test"),
-        passwords = listOf("test")
-      )
-    }
-    And("Target containing SSHD connection information") {
-      createEnvironment(
-        "SSH_ENV_OK",
-        """
-        [
-            {
-                "name": "test_ssh",
-                "url": "ssh://host.testcontainers.internal:${"sshServer.port()".spEL}",
-                "properties": [
-                    { "key" : "username", "value": "test" },
-                    { "key" : "password", "value": "test" }
-                ]
-            }
-        ]
-      """.trimIndent()
-      )
-    }
-    And("This scenario is saved") {
-      createScenario(
-        "scenarioId",
-        """
-        {
-            "when":{
-                "sentence":"Execute commands",
-                "implementation":{
-                    "task":"{\n type: ssh-client \n target: test_ssh \n inputs: {\n commands: [\n {\n command: echo test \n timeout: 500 ms \n},{\n command: echo testbis \n} \n] \n} \n}"
-                }
-            },
-            "thens":[
-                {
-                    "sentence":"Assert results",
-                    "subSteps":[
-                        {
-                            "sentence": "Assert first command",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(0).command.command".hjsonSpEL} \n expected: echo test \n mode: equals \n} \n}"
-                            }
-                        },
-                        {
-                            "sentence": "Assert first command timeout",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(0).command.timeout.toString()".hjsonSpEL} \n expected: 500 ms \n mode: equals \n} \n}"
-                            }
-                        },
-                        {
-                            "sentence": "Assert first command exit code",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{T(Integer).toString(#results.get(0).exitCode)} \n expected: \"0\" \n mode: equals \n} \n}"
-                            }
-                        },
-                        {
-                            "sentence": "Assert first command stdout",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(0).stdout".hjsonSpEL} \n expected: \"\" \n mode: equals \n} \n}"
-                            }
-                        },
-                        {
-                            "sentence": "Assert first command sterr",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(0).stderr".hjsonSpEL} \n expected: \"\" \n mode: equals \n} \n}"
-                            }
-                        },
-                        {
-                            "sentence": "Assert second command",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(1).command.command".hjsonSpEL} \n expected: echo testbis \n mode: equals \n} \n}"
-                            }
-                        },
-                        {
-                            "sentence": "Assert second command timeout",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(1).command.timeout.toString()".hjsonSpEL} \n expected: 5000 ms \n mode: equals \n} \n}"
-                            }
-                        },
-                        {
-                            "sentence": "Assert second command exit code",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: \${'$'}{T(Integer).toString(#results.get(1).exitCode)} \n expected: \"0\" \n mode: equals \n} \n}"
-                            }
-                        },
-                        {
-                            "sentence": "Assert second command stdout",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(1).stdout".hjsonSpEL} \n expected: \"\" \n mode: equals \n} \n}"
-                            }
-                        },
-                        {
-                            "sentence": "Assert second command sterr",
-                            "implementation":{
-                                "task":"{\n type: compare \n inputs: {\n actual: ${"results.get(1).stderr".hjsonSpEL} \n expected: \"\" \n mode: equals \n} \n}"
-                            }
-                        }
-                    ]
-                }
-            ]
+fun `SSH - Execute commands on server`(): List<ChutneyScenario> {
+  return listOf("SSH_JUMP_SERVER", "SSH_INTERN_SERVER").mapIndexed { idx, target ->
+    createExecuteAndCheckReportStatusOf(
+      environment = "SSH_ENV",
+      scenario = Scenario(title = "SSH - Execute commands on server${if (idx == 1) " via proxy" else ""}") {
+        When("Execute commands") {
+          SshClientAction(
+            target = target,
+            channel = SSH_CLIENT_CHANNEL.COMMAND,
+            commands = listOf(
+              mapOf("command" to "whoami", "timeout" to "500 ms"),
+              "unknownCommand",
+              "cat /etc/debian_version"
+            ),
+            outputs = mapOf(
+              "firstCmdResults" to "results.get(0)".spEL(),
+              "secondCmdResults" to "results.get(1)".spEL(),
+              "thirdCmdResults" to "results.get(2)".spEL(),
+            ),
+            validations = mapOf(
+              validateSshCommandExitCode(),
+              validateSshCommandExitCode(1, ">", 0),
+              validateSshCommandExitCode(2)
+            )
+          )
         }
-        """.trimIndent()
-      )
-    }
-    When("The scenario is executed") {
-      executeScenario("scenarioId".spEL, "SSH_ENV_OK")
-    }
-    Then("the report status is SUCCESS") {
-      checkScenarioReportSuccess()
-    }
-    And("the SSHD server has received the commands") {
-      Step("Check first command") {
-        CompareAction(
-          mode = "equals",
-          actual = "sshServer.command(0)".spEL,
-          expected = "echo test"
-        )
+        Then("Assert commands results") {
+          assertSshCommand(
+            description = "First command",
+            sshCommandELVarName = "firstCmdResults",
+            expectedCommand = "whoami",
+            expectedTimeout = "500 ms",
+            expectedStdout = "${if (idx == 1) "internuser" else "jumpuser"}\n",
+            strategy = SoftAssertStrategy()
+          )
+          assertSshCommand(
+            description = "Second command",
+            sshCommandELVarName = "secondCmdResults",
+            expectedCommand = "unknownCommand",
+            expectedTimeout = "5000 ms",
+            expectedExitCode = 127,
+            expectedStdout = "",
+            expectedStderr = "command not found",
+            expectedStderrCompare = "contains",
+            strategy = SoftAssertStrategy()
+          )
+          assertSshCommand(
+            description = "Third command",
+            sshCommandELVarName = "thirdCmdResults",
+            expectedCommand = "cat /etc/debian_version",
+            expectedStdout = "12.7\n",
+            strategy = SoftAssertStrategy()
+          )
+        }
       }
-      Step("Check second command") {
-        CompareAction(
-          mode = "equals",
-          actual = "sshServer.command(1)".spEL,
-          expected = "echo testbis"
-        )
-      }
-    }
+    )
   }
 }

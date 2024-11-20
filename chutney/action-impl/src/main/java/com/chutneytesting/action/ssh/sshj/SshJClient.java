@@ -8,6 +8,7 @@
 package com.chutneytesting.action.ssh.sshj;
 
 import static java.util.Collections.emptyList;
+import static java.util.Optional.ofNullable;
 import static java.util.concurrent.TimeUnit.MILLISECONDS;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -16,9 +17,11 @@ import com.chutneytesting.action.ssh.Connection;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.security.PublicKey;
 import java.util.List;
+import java.util.Optional;
+import net.schmizz.concurrent.Event;
 import net.schmizz.sshj.SSHClient;
 import net.schmizz.sshj.common.IOUtils;
 import net.schmizz.sshj.common.LoggerFactory;
@@ -32,16 +35,13 @@ import net.schmizz.sshj.userauth.keyprovider.KeyProvider;
 public class SshJClient implements SshClient {
 
     private final Connection connection;
+    private final Connection proxyConnection;
     private final Logger logger;
     private final boolean shell;
 
-    @Deprecated
-    public SshJClient(Connection connection, Logger logger) {
-        this(connection, false, logger);
-    }
-
-    public SshJClient(Connection connection, boolean shell, Logger logger) {
+    public SshJClient(Connection connection, Connection proxyConnection, boolean shell, Logger logger) {
         this.connection = connection;
+        this.proxyConnection = proxyConnection;
         this.logger = logger;
         this.shell = shell;
     }
@@ -49,28 +49,41 @@ public class SshJClient implements SshClient {
     @Override
     public CommandResult execute(Command command) throws IOException {
         SSHClient sshClient = new SSHClient();
-        connect(sshClient, connection);
+        Optional<SSHClient> tunnel = connect(sshClient);
         try {
             authenticate(sshClient, connection);
             return executeCommand(sshClient, command);
         } finally {
             sshClient.disconnect();
+            if (tunnel.isPresent()) {
+                tunnel.get().disconnect();
+            }
         }
     }
 
-    private void connect(SSHClient client, Connection connection) throws IOException {
-        client.addHostKeyVerifier(new HostKeyVerifier() {
-            @Override
-            public boolean verify(String hostname, int port, PublicKey key) {
-                return true;
-            }
+    private Optional<SSHClient> connect(SSHClient client) throws IOException {
+        client.addHostKeyVerifier(alwaysVerified()); // TODO : Add best way host key verifier to really check.
+        Optional<SSHClient> tunnel = tunnel();
+        if (tunnel.isPresent()) {
+            client.connectVia(tunnel.get().newDirectConnection(connection.serverHost, connection.serverPort));
+        } else {
+            client.connect(connection.serverHost, connection.serverPort);
+        }
+        return tunnel;
+    }
 
-            @Override
-            public List<String> findExistingAlgorithms(String hostname, int port) {
-                return emptyList();
+    private Optional<SSHClient> tunnel() {
+        return ofNullable(proxyConnection).map(pc -> {
+            SSHClient sshClient = new SSHClient();
+            try {
+                sshClient.addHostKeyVerifier(alwaysVerified()); // TODO : Add best way host key verifier to really check.
+                sshClient.connect(pc.serverHost, pc.serverPort);
+                authenticate(sshClient, pc);
+            } catch (IOException e) {
+                logger.error("Error in proxy setup : " + e.getMessage());
             }
-        }); // TODO : Add best way host key verifier to really check.
-        client.connect(connection.serverHost, connection.serverPort);
+            return sshClient;
+        });
     }
 
     private void authenticate(SSHClient client, Connection connection) throws IOException {
@@ -109,31 +122,31 @@ public class SshJClient implements SshClient {
         session.allocateDefaultPTY();
         Session.Shell shell = session.startShell();
 
-        new StreamCopier(shell.getInputStream(), out, LoggerFactory.DEFAULT)
+        Event<IOException> outDone = new StreamCopier(shell.getInputStream(), out, LoggerFactory.DEFAULT)
             .bufSize(shell.getLocalMaxPacketSize())
             .spawn("out");
 
-        new StreamCopier(shell.getErrorStream(), err, LoggerFactory.DEFAULT)
+        Event<IOException> errDone = new StreamCopier(shell.getErrorStream(), err, LoggerFactory.DEFAULT)
             .bufSize(shell.getLocalMaxPacketSize())
             .spawn("err");
 
-        OutputStream shellOut = shell.getOutputStream();
-        shellOut.write(command.command.getBytes());
-        shellOut.flush();
+        PrintWriter shellOut = new PrintWriter(shell.getOutputStream());
+        command.command.lines().forEach(cmdLine -> {
+            shellOut.print(cmdLine);
+            shellOut.println();
+            shellOut.flush();
+        });
 
-        while (shell.getInputStream().available() > 0 && shell.getErrorStream().available() > 0) {
-            try {
-                Thread.sleep(100L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        }
+        long cmdTimeout = command.timeout.toMilliseconds() * command.command.lines().toList().size();
+        outDone.await(cmdTimeout, MILLISECONDS);
+        errDone.await(cmdTimeout, MILLISECONDS);
 
         return new CommandResult(
             command,
             err.size() > 0 ? -1 : 0,
-            out.toString(),
-            err.toString());
+            cleanShellOutput(out.toString()).replaceAll("\r", ""),
+            cleanShellOutput(err.toString()).replaceAll("\r", "")
+        );
     }
 
     private CommandResult execCommand(Command command, Session session) throws IOException {
@@ -153,4 +166,32 @@ public class SshJClient implements SshClient {
         return IOUtils.readFully(inputStream).toString().replaceAll("\r", "");
     }
 
+    private static HostKeyVerifier alwaysVerified() {
+        return new HostKeyVerifier() {
+            @Override
+            public boolean verify(String hostname, int port, PublicKey key) {
+                return true;
+            }
+
+            @Override
+            public List<String> findExistingAlgorithms(String hostname, int port) {
+                return emptyList();
+            }
+        };
+    }
+
+    private static final String BRACKETED_PASTE_ON = "\033[?2004h";
+    private static final String BRACKETED_PASTE_OFF = "\033[?2004l";
+    private static final String BRACKETED_PASTE_BEGIN = "\033[200~";
+    private static final String BRACKETED_PASTE_END = "\033[201~";
+    private static final String ESCAPE_SEQUENCE = "\\e\\[[\\d;]*[^\\d;]";
+
+    private static String cleanShellOutput(String output) {
+        return output
+            .replace(BRACKETED_PASTE_ON, "")
+            .replace(BRACKETED_PASTE_OFF, "")
+            .replace(BRACKETED_PASTE_BEGIN, "")
+            .replace(BRACKETED_PASTE_END, "")
+            .replaceAll(ESCAPE_SEQUENCE, "");
+    }
 }
