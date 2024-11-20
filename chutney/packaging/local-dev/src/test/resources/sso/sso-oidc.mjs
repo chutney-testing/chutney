@@ -16,8 +16,8 @@ const oidc = new Provider('http://localhost:3000', {
         client_id: process.env.CLIENT_ID,
         client_secret: process.env.CLIENT_SECRET,
         grant_types: [process.env.GRANT_TYPE],
-        redirect_uris: [process.env.REDIRECT_URI],
-        post_logout_redirect_uris: [process.env.REDIRECT_URI],
+        redirect_uris: process.env.REDIRECT_URI.split(' '),
+        post_logout_redirect_uris: process.env.REDIRECT_URI.split(' '),
     }],
     formats: {
         AccessToken: process.env.TOKEN_FORMAT,
@@ -32,7 +32,7 @@ const oidc = new Provider('http://localhost:3000', {
         userinfo: { enabled: true },
     },
     clientBasedCORS(ctx, origin, client) {
-        const allowedOrigins = [process.env.REDIRECT_URI];
+        const allowedOrigins = process.env.REDIRECT_URI.split(' ');
         return allowedOrigins.includes(origin);
     },
     async findAccount(ctx, id) {

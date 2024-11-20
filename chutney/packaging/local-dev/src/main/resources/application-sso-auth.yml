@@ -39,6 +39,6 @@ auth:
     clientSecret: 'my-client-secret'
     responseType: 'code'
     scope: 'openid profile email'
-    redirectBaseUrl: "https://localhost:4200"
+    redirectBaseUrl: "https://${server.http.interface}:${server.port}"
     ssoProviderName: 'SSO OpenID Connect'
     oidc: true
