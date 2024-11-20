@@ -44,7 +44,7 @@ val `Retry should stop after success assertion` = Scenario(title = "Retry should
                         {
                             "sentence":"Check current date get to stop date",
                             "implementation":{
-                                "task":"{\n type: string-assert \n inputs: {\n document: ${"secondsPlus5".hjsonSpEL} \n expected: \${'$'}{T(java.lang.String).format('%02d', new Integer(#currentSeconds) + 1)} \n} \n}"
+                                "task":"{\n type: string-assert \n inputs: {\n document: \${'$'}{T(java.lang.String).format('%02d', new Integer(#secondsPlus5) + 1)} \n expected: \${'$'}{T(java.lang.String).format('%02d', new Integer(#currentSeconds) + 2)} \n} \n}"
                             }
                         }
                     ]
