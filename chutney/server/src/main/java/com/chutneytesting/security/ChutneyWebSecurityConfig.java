@@ -62,9 +62,9 @@ import org.springframework.web.servlet.handler.HandlerMappingIntrospector;
 @EnableConfigurationProperties({OAuth2AuthorizationServerProperties.class, SsoOpenIdConnectConfigProperties.class})
 public class ChutneyWebSecurityConfig {
 
-    protected static final String LOGIN_URL = UserController.BASE_URL + "/login";
-    protected static final String LOGOUT_URL = UserController.BASE_URL + "/logout";
-    protected static final String API_BASE_URL_PATTERN = "/api/**";
+    private static final String LOGIN_URL = UserController.BASE_URL + "/login";
+    private static final String LOGOUT_URL = UserController.BASE_URL + "/logout";
+    private static final String API_BASE_URL_PATTERN = "/api/**";
 
     @Value("${management.endpoints.web.base-path:/actuator}")
     protected String actuatorBaseUrl;
@@ -133,7 +133,7 @@ public class ChutneyWebSecurityConfig {
     private void configureSso(final HttpSecurity http, AuthenticationService authenticationService, ClientRegistrationRepository clientRegistrationRepository, RestOperations restOperations) throws Exception {
         if (clientRegistrationRepository != null) {
             OAuth2UserService<OAuth2UserRequest, OAuth2User> oAuth2UserService = new OAuth2SsoUserService(authenticationService, restOperations);
-            OAuth2TokenAuthenticationProvider oAuth2TokenAuthenticationProvider = new OAuth2TokenAuthenticationProvider(oAuth2UserService, clientRegistrationRepository.findByRegistrationId("my-provider"));
+            OAuth2TokenAuthenticationProvider oAuth2TokenAuthenticationProvider = new OAuth2TokenAuthenticationProvider(oAuth2UserService, clientRegistrationRepository.findByRegistrationId("sso-provider"));
             AuthenticationManager authenticationManager = new ProviderManager(Collections.singletonList(oAuth2TokenAuthenticationProvider));
             OAuth2TokenAuthenticationFilter tokenFilter = new OAuth2TokenAuthenticationFilter(authenticationManager);
             http

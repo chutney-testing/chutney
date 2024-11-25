@@ -88,6 +88,7 @@ export class LoginService {
                 const nextUrl = this.nullifyLoginUrl(url);
                 const queryParams: Object = isNullOrBlankString(nextUrl) ? {} : {queryParams: {url: nextUrl}};
                 this.router.navigate(['login'], queryParams);
+                this.alertService.error("Unauthorized, you've been disconnected", {timeOut: 0, extendedTimeOut: 0, closeButton: true});
                 return error
             })
         );
