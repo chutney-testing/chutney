@@ -36,6 +36,7 @@
         <classgraph.version>4.8.171</classgraph.version>
         <mockito-kotlin.version>5.4.0</mockito-kotlin.version>
         <junit-pioneer.version>2.2.0</junit-pioneer.version>
+        <dokka-maven-plugin.version>1.9.20</dokka-maven-plugin.version>
     </properties>
 
     <dependencyManagement>
@@ -217,6 +218,41 @@
                         </goals>
                         <configuration>
                             <mainClass>com.chutneytesting.kotlin.execution.report.SiteGeneratorMain</mainClass>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.jetbrains.dokka</groupId>
+                <artifactId>dokka-maven-plugin</artifactId>
+                <version>${dokka-maven-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>pre-site</phase>
+                        <goals>
+                            <goal>dokka</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>dokka-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>javadoc</classifier>
+                            <classesDirectory>${project.build.directory}/dokka</classesDirectory>
                         </configuration>
                     </execution>
                 </executions>
