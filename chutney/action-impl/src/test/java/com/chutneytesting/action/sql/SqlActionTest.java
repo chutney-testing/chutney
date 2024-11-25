@@ -53,7 +53,7 @@ public class SqlActionTest {
             .setType(EmbeddedDatabaseType.H2)
             .setScriptEncoding("UTF-8")
             .ignoreFailedDrops(true)
-            .addScripts("db/sql/create_db.sql", "db/sql/insert_users.sql")
+            .addScripts("db/common/create_users.sql")
             .build();
     }
 
