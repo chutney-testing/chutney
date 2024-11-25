@@ -61,7 +61,7 @@ public class SqlClientTest {
 
     @Nested
     class OracleSqlClientTest extends AllTests {
-        private static OracleContainer oracle = new OracleContainer("gvenzl/oracle-free:23.4-slim-faststart")
+        private static OracleContainer oracle = new OracleContainer("gvenzl/oracle-free:23.5-slim-faststart")
             .withDatabaseName("testDB")
             .withUsername("testUser")
             .withPassword("testPassword")
