@@ -88,7 +88,7 @@
     <buildMetadataRequired>false</buildMetadataRequired>
     <chutney.version>${project.version}</chutney.version>
 
-    <testcontainers.version>1.20.2</testcontainers.version>
+    <testcontainers.version>1.20.4</testcontainers.version>
   </properties>
 
   <dependencyManagement>
