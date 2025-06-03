@@ -26,7 +26,7 @@
     
     
       
-        <title>SQL - </title>
+        <title>SQL - Chutney</title>
       
     
     
@@ -94,9 +94,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="" class="md-header__button md-logo" aria-label="" data-md-component="logo">
+    <a href="../../.." title="Chutney" class="md-header__button md-logo" aria-label="Chutney" data-md-component="logo">
       
-  <img src="../../../img/logo.svg" alt="logo">
+  <img src="../../../img/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -107,7 +107,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            
+            Chutney
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -316,12 +316,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="" class="md-nav__button md-logo" aria-label="" data-md-component="logo">
+    <a href="../../.." title="Chutney" class="md-nav__button md-logo" aria-label="Chutney" data-md-component="logo">
       
-  <img src="../../../img/logo.svg" alt="logo">
+  <img src="../../../img/logo.png" alt="logo">
 
     </a>
-    
+    Chutney
   </label>
   
     <div class="md-nav__source">
@@ -1973,8 +1973,8 @@
 <details class="info">
 <summary>Browse implementations</summary>
 <ul>
-<li><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/SqlAction.java" target="_blank">Action</a></li>
-<li><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/core/SqlClient.java" target="_blank">Client</a></li>
+<li><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/sql/SqlAction.java" target="_blank">Action</a></li>
+<li><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/sql/core/SqlClient.java" target="_blank">Client</a></li>
 </ul>
 </details>
 <div class="admonition note">
@@ -2066,6 +2066,13 @@ In order to provide more configuration you should prefix all other target proper
 <td style="text-align: center;">30</td>
 <td style="text-align: left;">Maximum number of rows to log in execution report</td>
 </tr>
+<tr>
+<td style="text-align: center;"></td>
+<td style="text-align: left;"><code>minimumMemoryPercentageRequired</code></td>
+<td style="text-align: left;">Integer</td>
+<td style="text-align: center;">0</td>
+<td style="text-align: left;">Minimum memory percentage required before executing the statement</td>
+</tr>
 </tbody>
 </table>
 </div>
@@ -2111,7 +2118,7 @@ See following sections for details about each case.</p>
 </div>
 <h3 id="rows">Rows<a class="headerlink" href="#rows" title="Permanent link">🔗</a></h3>
 <div class="admonition info">
-<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/core/Rows.java" target="_blank">Browse implementation</a></p>
+<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/sql/core/Rows.java" target="_blank">Browse implementation</a></p>
 </div>
 <p>One <code>Rows</code> instance contains results for <strong>one statement</strong>. Following attributes and methods are available in SpEL :</p>
 <ul>
@@ -2139,7 +2146,7 @@ See following sections for details about each case.</p>
 </ul>
 <h3 id="row">Row<a class="headerlink" href="#row" title="Permanent link">🔗</a></h3>
 <div class="admonition info">
-<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/core/Row.java" target="_blank">Browse implementation</a></p>
+<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/sql/core/Row.java" target="_blank">Browse implementation</a></p>
 </div>
 <p>A <code>Row</code> provides you access to a record values.</p>
 <ul>
@@ -2203,23 +2210,26 @@ See following sections for details about each case.</p>
 <span class="normal"><a href="#__codelineno-1-8"> 8</a></span>
 <span class="normal"><a href="#__codelineno-1-9"> 9</a></span>
 <span class="normal"><a href="#__codelineno-1-10">10</a></span>
-<span class="normal"><a href="#__codelineno-1-11">11</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="n">SqlAction</span><span class="p">(</span>
+<span class="normal"><a href="#__codelineno-1-11">11</a></span>
+<span class="normal"><a href="#__codelineno-1-12">12</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="n">SqlAction</span><span class="p">(</span>
 <a id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="w">    </span><span class="n">target</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;ghibli_movies_database&quot;</span><span class="p">,</span>
 <a id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">    </span><span class="n">statements</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">listOf</span><span class="p">(</span>
 <a id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="w">        </span><span class="s">&quot;SELECT * FROM movies WHERE rating &gt; 85&quot;</span><span class="w"> </span><span class="c1">// (1)</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="w">    </span><span class="p">),</span>
 <a id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="w">    </span><span class="n">nbLoggedRow</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">5</span><span class="p">,</span><span class="w"> </span><span class="c1">// (2)</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="w">    </span><span class="n">outputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapOf</span><span class="p">(</span>
-<a id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="w">        </span><span class="s">&quot;numberOfBest&quot;</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="s">&quot;rows.count()&quot;</span><span class="p">.</span><span class="na">spEL</span><span class="p">(),</span><span class="w"> </span><span class="c1">// (3)</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="w">        </span><span class="s">&quot;bestMoviesTitles&quot;</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="s">&quot;rows.get(\&quot;TITLE\&quot;)&quot;</span><span class="p">.</span><span class="na">spEL</span><span class="p">()</span><span class="w"> </span><span class="c1">// (4)</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10"></a><span class="w">    </span><span class="p">)</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11"></a><span class="p">)</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="w">    </span><span class="n">minimumMemoryPercentageRequired</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">3</span><span class="p">,</span><span class="w"> </span><span class="c1">// (3)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="w">    </span><span class="n">outputs</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">mapOf</span><span class="p">(</span>
+<a id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="w">        </span><span class="s">&quot;numberOfBest&quot;</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="s">&quot;rows.count()&quot;</span><span class="p">.</span><span class="na">spEL</span><span class="p">(),</span><span class="w"> </span><span class="c1">// (4)</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10"></a><span class="w">        </span><span class="s">&quot;bestMoviesTitles&quot;</span><span class="w"> </span><span class="n">to</span><span class="w"> </span><span class="s">&quot;rows.get(\&quot;TITLE\&quot;)&quot;</span><span class="p">.</span><span class="na">spEL</span><span class="p">()</span><span class="w"> </span><span class="c1">// (5)</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11"></a><span class="w">    </span><span class="p">)</span>
+<a id="__codelineno-1-12" name="__codelineno-1-12"></a><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <ol>
 <li><code>statements</code> has only one entry, so outputs <code>rows</code> and <code>firstRow</code> are available but <code>recordResult</code> is not</li>
 <li>Will locally override configuration <code>chutney.actions.sql.max-logged-rows</code></li>
-<li>Expected result is 2</li>
-<li>Expected result is ["Grave of the Fireflies", "My Neighbor Totoro"]</li>
+<li>Will locally override configuration <code>chutney.actions.sql.minimum-memory-percentage-required</code></li>
+<li>Expected result is 2 </li>
+<li>5 Expected result is ["Grave of the Fireflies", "My Neighbor Totoro"]</li>
 </ol>
 <h2 id="outputs-for-many-statements">Outputs for many statements<a class="headerlink" href="#outputs-for-many-statements" title="Permanent link">🔗</a></h2>
 <p>When you provide more than one statement in input, you get a <a href="#records"><code>Records</code></a> <strong>for each statement</strong>.</p>
@@ -2247,7 +2257,7 @@ See following sections for details about each case.</p>
 </div>
 <h3 id="records">Records<a class="headerlink" href="#records" title="Permanent link">🔗</a></h3>
 <div class="admonition info">
-<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/sql/core/Records.java" target="_blank">Browse implementation</a></p>
+<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/sql/core/Records.java" target="_blank">Browse implementation</a></p>
 </div>
 <p>One <code>Records</code> instance contains results for <strong>one statement</strong> and provides methods to retrieve and search them.<br />
 <code>Records</code> is different from <a href="#rows"><code>Rows</code></a> type, but you can convert it using the <code>rows()</code> method.  </p>
@@ -2376,7 +2386,7 @@ See following sections for details about each case.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 12, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">May 27, 2025</span>
   </span>
 
     

@@ -26,7 +26,7 @@
     
     
       
-        <title>Dates & Time - </title>
+        <title>Dates & Time - Chutney</title>
       
     
     
@@ -94,9 +94,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="" class="md-header__button md-logo" aria-label="" data-md-component="logo">
+    <a href="../../.." title="Chutney" class="md-header__button md-logo" aria-label="Chutney" data-md-component="logo">
       
-  <img src="../../../img/logo.svg" alt="logo">
+  <img src="../../../img/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -107,7 +107,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            
+            Chutney
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -316,12 +316,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="" class="md-nav__button md-logo" aria-label="" data-md-component="logo">
+    <a href="../../.." title="Chutney" class="md-nav__button md-logo" aria-label="Chutney" data-md-component="logo">
       
-  <img src="../../../img/logo.svg" alt="logo">
+  <img src="../../../img/logo.png" alt="logo">
 
     </a>
-    
+    Chutney
   </label>
   
     <div class="md-nav__source">
@@ -1482,6 +1482,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#durationbetween" class="md-nav__link">
+    <span class="md-ellipsis">
+      durationBetween
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1968,6 +1977,15 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#durationbetween" class="md-nav__link">
+    <span class="md-ellipsis">
+      durationBetween
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1996,14 +2014,14 @@
 -->
 
 <div class="admonition info">
-<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/function/DateTimeFunctions.java" target="_blank">Browse implementation</a></p>
+<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/function/DateTimeFunctions.java" target="_blank">Browse implementation</a></p>
 </div>
-<p>Following functions help you write and shorten SpEL when you need to handle time or date values.</p>
+<p>Following functions help you write and shorten SpEL when you need to handle time, date and duration values.</p>
 <h3 id="currenttimemillis">currentTimeMillis<a class="headerlink" href="#currenttimemillis" title="Permanent link">🔗</a></h3>
 <div class="admonition note">
 <p class="admonition-title">String currentTimeMillis()</p>
 <p>Returns a String of the difference, measured in milliseconds, between the current time and midnight, January 1, 1970 UTC.</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/System.html#currentTimeMillis()" target="_blank">System.currentTimeMillis()</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/lang/system#currentTimeMillis()" target="_blank">System.currentTimeMillis()</a> for further details</p>
 <p><strong>Returns</strong> :</p>
 <ul>
 <li>A String of the current time in milliseconds</li>
@@ -2015,8 +2033,8 @@
 <h3 id="date">date<a class="headerlink" href="#date" title="Permanent link">🔗</a></h3>
 <div class="admonition note">
 <p class="admonition-title">Temporal date(String date, String... format)</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/Temporal.html" target="_blank">Date(Temporal)</a>
-&amp; <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html#parseBest(java.lang.CharSequence,java.time.temporal.TemporalQuery...)" target="_blank">DateTimeFormatter.parseBest()</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/temporal/temporal" target="_blank">Date(Temporal)</a>
+&amp; <a href="https://devdocs.io/openjdk~21/java.base/java/time/format/datetimeformatter#parseBest(java.lang.CharSequence,java.time.temporal.TemporalQuery...)" target="_blank">DateTimeFormatter.parseBest()</a> for further details</p>
 <p><strong>Parameters</strong> :</p>
 <ul>
 <li><code>String date</code> : The date you want to get a Temporal from<ul>
@@ -2038,7 +2056,7 @@
 <p class="admonition-title">DateTimeFormatter dateFormatter(String pattern)</p>
 <p>Creates a formatter from a given pattern.<br />
 ex. Pattern <code>d MMM uuuu</code> will format date <code>2011-12-03</code> to <code>3 Dec 2011</code>.</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)" target="_blank">DateTimeFormatter.ofPattern()</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/format/datetimeformatter#ofPattern(java.lang.String)" target="_blank">DateTimeFormatter.ofPattern()</a> for further details</p>
 <p><strong>Returns</strong> :</p>
 <ul>
 <li>A <code>DateTimeFormatter</code></li>
@@ -2052,7 +2070,7 @@ ex. Pattern <code>d MMM uuuu</code> will format date <code>2011-12-03</code> to 
 <div class="admonition note">
 <p class="admonition-title">DateTimeFormatter dateFormatterWithLocale(String pattern, String locale)</p>
 <p>Creates a formatter from a given pattern and given locale.</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html#ofPattern(java.lang.String)" target="_blank">DateTimeFormatter.ofPattern()</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/format/datetimeformatter#ofPattern(java.lang.String)" target="_blank">DateTimeFormatter.ofPattern()</a> for further details</p>
 <p><strong>Returns</strong> :</p>
 <ul>
 <li>A <code>DateTimeFormatter</code></li>
@@ -2065,7 +2083,7 @@ ex. Pattern <code>d MMM uuuu</code> will format date <code>2011-12-03</code> to 
 <h3 id="isodateformatter">isoDateFormatter<a class="headerlink" href="#isodateformatter" title="Permanent link">🔗</a></h3>
 <div class="admonition note">
 <p class="admonition-title">DateTimeFormatter isoDateFormatter(String type)</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/format/DateTimeFormatter.html" target="_blank">isoDateFormatter(DateTimeFormatter)</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/format/datetimeformatter" target="_blank">isoDateFormatter(DateTimeFormatter)</a> for further details</p>
 <p><strong>Parameters</strong> :</p>
 <ul>
 <li>Possible values are :<ul>
@@ -2100,7 +2118,7 @@ ex. Pattern <code>d MMM uuuu</code> will format date <code>2011-12-03</code> to 
 <div class="admonition note">
 <p class="admonition-title">ZonedDateTime now()</p>
 <p>Returns the current date-time from the system clock.</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZonedDateTime.html#now()" target="_blank">ZonedDateTime.now()</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/zoneddatetime#now()" target="_blank">ZonedDateTime.now()</a> for further details</p>
 <p><strong>Returns</strong> :</p>
 <ul>
 <li>The current date-time as a <code>ZonedDateTime</code></li>
@@ -2114,7 +2132,7 @@ ex. Pattern <code>d MMM uuuu</code> will format date <code>2011-12-03</code> to 
 <p class="admonition-title">TemporalAmount timeAmount(String text)</p>
 <p>Create a TemporalAmount from a given string.<br />
 This is usefull when combine with other methods or functions.</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/TemporalAmount.html" target="_blank">timeAmount(TemporalAmount)</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/temporal/temporalamount" target="_blank">timeAmount(TemporalAmount)</a> for further details</p>
 <p><strong>Returns</strong> :</p>
 <ul>
 <li>A <code>TemporalAmount</code></li>
@@ -2126,7 +2144,7 @@ This is usefull when combine with other methods or functions.</p>
 <h3 id="timeunit">timeUnit<a class="headerlink" href="#timeunit" title="Permanent link">🔗</a></h3>
 <div class="admonition note">
 <p class="admonition-title">ChronoUnit timeUnit(String unit)</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/temporal/ChronoUnit.html" target="_blank">timeUnit(ChronoUnit)</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/temporal/chronounit" target="_blank">timeUnit(ChronoUnit)</a> for further details</p>
 <p><strong>Parameters</strong> :</p>
 <ul>
 <li>Possible values are :<ul>
@@ -2160,8 +2178,8 @@ This is usefull when combine with other methods or functions.</p>
 <div class="admonition note">
 <p class="admonition-title">ZoneRules zoneRules(String zoneId)</p>
 <p>Gets the time-zone rules for this zone id allowing calculations to be performed.</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZoneId.html#of(java.lang.String)" target="_blank">ZoneId.of(zoneId)</a> and
-    <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZoneId.html#getRules()" target="_blank">ZoneId.getRules()</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/zoneid#of(java.lang.String)" target="_blank">ZoneId.of(zoneId)</a> and
+    <a href="https://devdocs.io/openjdk~21/java.base/java/time/zoneid#getRules()" target="_blank">ZoneId.getRules()</a> for further details</p>
 <p><strong>Parameters</strong> :</p>
 <ul>
 <li><code>String zoneId</code> : The zone id you want to get rules from<ul>
@@ -2181,8 +2199,8 @@ This is usefull when combine with other methods or functions.</p>
 <div class="admonition note">
 <p class="admonition-title">ZoneRules systemZoneRules()</p>
 <p>Gets the time-zone rules for the system default zone id allowing calculations to be performed.</p>
-<p>See <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZoneId.html#systemDefault()" target="_blank">ZoneId.systemDefault()</a> and
-    <a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/time/ZoneId.html#getRules()" target="_blank">ZoneId.getRules()</a> for further details</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/zoneid#systemDefault()" target="_blank">ZoneId.systemDefault()</a> and
+    <a href="https://devdocs.io/openjdk~21/java.base/java/time/zoneid#getRules()" target="_blank">ZoneId.getRules()</a> for further details</p>
 <p><strong>Returns</strong> :</p>
 <ul>
 <li>A <code>ZoneRules</code></li>
@@ -2190,6 +2208,19 @@ This is usefull when combine with other methods or functions.</p>
 <p><strong>Examples</strong> :</p>
 <p>SpEL without : <code>${T(java.time.ZoneId).systemDefault().getRules().nextTransition(T(java.time.Instant).now())}</code></p>
 <p>SpEL with    : <code>${#systemDefault().nextTransition(#now())}</code></p>
+</div>
+<h3 id="durationbetween">durationBetween<a class="headerlink" href="#durationbetween" title="Permanent link">🔗</a></h3>
+<div class="admonition note">
+<p class="admonition-title">Duration durationBetween(Temporal startInclusive, Temporal endInclusive)</p>
+<p>Obtains a Duration representing the duration between two temporal objects.</p>
+<p>See <a href="https://devdocs.io/openjdk~21/java.base/java/time/duration#between(java.time.temporal.Temporal,java.time.temporal.Temporal)" target="_blank">Duration.durationBetween()</a> for further details</p>
+<p><strong>Returns</strong> :</p>
+<ul>
+<li>A <code>ZoneRules</code></li>
+</ul>
+<p><strong>Examples</strong> :</p>
+<p>SpEL without : <code>${T(java.time.Duration).durationBetween(T(java.time.Instant).now(), T(java.time.Instant).now().plusDays(1))}</code></p>
+<p>SpEL with    : <code>${#durationBetween(#now(), #now().plusDays(1))}</code></p>
 </div>
 
 
@@ -2211,7 +2242,7 @@ This is usefull when combine with other methods or functions.</p>
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 25, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">May 15, 2025</span>
   </span>
 
     

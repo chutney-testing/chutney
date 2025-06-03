@@ -26,7 +26,7 @@
     
     
       
-        <title>Kafka - </title>
+        <title>Kafka - Chutney</title>
       
     
     
@@ -94,9 +94,9 @@
 
 <header class="md-header" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Header">
-    <a href="../../.." title="" class="md-header__button md-logo" aria-label="" data-md-component="logo">
+    <a href="../../.." title="Chutney" class="md-header__button md-logo" aria-label="Chutney" data-md-component="logo">
       
-  <img src="../../../img/logo.svg" alt="logo">
+  <img src="../../../img/logo.png" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -107,7 +107,7 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            
+            Chutney
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
@@ -316,12 +316,12 @@
 
 <nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href="../../.." title="" class="md-nav__button md-logo" aria-label="" data-md-component="logo">
+    <a href="../../.." title="Chutney" class="md-nav__button md-logo" aria-label="Chutney" data-md-component="logo">
       
-  <img src="../../../img/logo.svg" alt="logo">
+  <img src="../../../img/logo.png" alt="logo">
 
     </a>
-    
+    Chutney
   </label>
   
     <div class="md-nav__source">
@@ -1854,27 +1854,32 @@
 <details class="info">
 <summary>Browse implementations</summary>
 <ul>
-<li><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/kafka/KafkaBasicPublishAction.java" target="_blank">Publish</a></li>
-<li><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/kafka/KafkaBasicConsumeAction.java" target="_blank">Consume</a></li>
+<li><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/kafka/KafkaBasicPublishAction.java" target="_blank">Publish</a></li>
+<li><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/kafka/KafkaBasicConsumeAction.java" target="_blank">Consume</a></li>
 </ul>
 </details>
 <div class="admonition important">
 <p class="admonition-title">Target Configuration</p>
-<p>For all actions, a target should be defined and have a <code>name</code> and a valid <code>url</code>.</p>
 </div>
-<div class="tabbed-set tabbed-alternate" data-tabs="1:2"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><input id="__tabbed_1_2" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">minimal config</label><label for="__tabbed_1_2">extended config</label></div>
+<p>For all actions, a target should be defined and have a <code>name</code> and a valid <code>url</code>.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1">minimal config</label></div>
 <div class="tabbed-content">
-<div class="tabbed-block">
+<div class="tabbed-block"></div>
+</div>
+</div>
 <div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Kafka target example</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-0-1">1</a></span>
 <span class="normal"><a href="#__codelineno-0-2">2</a></span>
 <span class="normal"><a href="#__codelineno-0-3">3</a></span>
 <span class="normal"><a href="#__codelineno-0-4">4</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1"></a><span class="p">{</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="w">  </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="nt">&quot;my_kafka_target&quot;</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">  </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tcp://localhost:60962&quot;</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;my_kafka_target&quot;</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3"></a><span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tcp://localhost:60962&quot;</span>
 <a id="__codelineno-0-4" name="__codelineno-0-4"></a><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:1"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">extended config</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block"></div>
 </div>
-<div class="tabbed-block">
+</div>
 <div class="highlight"><table class="highlighttable"><tr><th colspan="2" class="filename"><span class="filename">Kafka target example</span></th></tr><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"><a href="#__codelineno-1-1"> 1</a></span>
 <span class="normal"><a href="#__codelineno-1-2"> 2</a></span>
 <span class="normal"><a href="#__codelineno-1-3"> 3</a></span>
@@ -1909,49 +1914,46 @@
 <span class="normal"><a href="#__codelineno-1-32">32</a></span>
 <span class="normal"><a href="#__codelineno-1-33">33</a></span>
 <span class="normal"><a href="#__codelineno-1-34">34</a></span></pre></div></td><td class="code"><div><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1"></a><span class="p">{</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="s2">&quot;KAFKA&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="s2">&quot;tcp://kafka.server.fr:9095&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="w">    </span><span class="nt">&quot;properties&quot;</span><span class="p">:[</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2"></a><span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;KAFKA&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3"></a><span class="w">    </span><span class="nt">&quot;url&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;tcp://kafka.server.fr:9095&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4"></a><span class="w">    </span><span class="nt">&quot;properties&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
 <a id="__codelineno-1-5" name="__codelineno-1-5"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;ssl.keystore.location&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;/keystores/keys.jks&quot;</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6"></a><span class="w">            </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ssl.keystore.location&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7"></a><span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/keystores/keys.jks&quot;</span>
 <a id="__codelineno-1-8" name="__codelineno-1-8"></a><span class="w">        </span><span class="p">},</span>
 <a id="__codelineno-1-9" name="__codelineno-1-9"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-1-10" name="__codelineno-1-10"></a><span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;security.protocol&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-11" name="__codelineno-1-11"></a><span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;SSL&quot;</span>
+<a id="__codelineno-1-10" name="__codelineno-1-10"></a><span class="w">            </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;security.protocol&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11"></a><span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;SSL&quot;</span>
 <a id="__codelineno-1-12" name="__codelineno-1-12"></a><span class="w">        </span><span class="p">},</span>
 <a id="__codelineno-1-13" name="__codelineno-1-13"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;ssl.keystore.password&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-15" name="__codelineno-1-15"></a><span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;password&quot;</span>
+<a id="__codelineno-1-14" name="__codelineno-1-14"></a><span class="w">            </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ssl.keystore.password&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-15" name="__codelineno-1-15"></a><span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;password&quot;</span>
 <a id="__codelineno-1-16" name="__codelineno-1-16"></a><span class="w">        </span><span class="p">},</span>
 <a id="__codelineno-1-17" name="__codelineno-1-17"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-1-18" name="__codelineno-1-18"></a><span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;ssl.truststore.password&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-19" name="__codelineno-1-19"></a><span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;password&quot;</span>
+<a id="__codelineno-1-18" name="__codelineno-1-18"></a><span class="w">            </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ssl.truststore.password&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-19" name="__codelineno-1-19"></a><span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;password&quot;</span>
 <a id="__codelineno-1-20" name="__codelineno-1-20"></a><span class="w">        </span><span class="p">},</span>
 <a id="__codelineno-1-21" name="__codelineno-1-21"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-1-22" name="__codelineno-1-22"></a><span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;ssl.truststore.location&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-23" name="__codelineno-1-23"></a><span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;/truststores/trust.jks&quot;</span>
+<a id="__codelineno-1-22" name="__codelineno-1-22"></a><span class="w">            </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;ssl.truststore.location&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-23" name="__codelineno-1-23"></a><span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;/truststores/trust.jks&quot;</span>
 <a id="__codelineno-1-24" name="__codelineno-1-24"></a><span class="w">        </span><span class="p">},</span>
 <a id="__codelineno-1-25" name="__codelineno-1-25"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-1-26" name="__codelineno-1-26"></a><span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;auto.offset.reset&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-27" name="__codelineno-1-27"></a><span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;earliest&quot;</span>
+<a id="__codelineno-1-26" name="__codelineno-1-26"></a><span class="w">            </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;auto.offset.reset&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-27" name="__codelineno-1-27"></a><span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;earliest&quot;</span>
 <a id="__codelineno-1-28" name="__codelineno-1-28"></a><span class="w">        </span><span class="p">},</span>
 <a id="__codelineno-1-29" name="__codelineno-1-29"></a><span class="w">        </span><span class="p">{</span>
-<a id="__codelineno-1-30" name="__codelineno-1-30"></a><span class="w">        </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="s2">&quot;enable.auto.commit&quot;</span><span class="p">,</span>
-<a id="__codelineno-1-31" name="__codelineno-1-31"></a><span class="w">        </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="s2">&quot;true&quot;</span>
+<a id="__codelineno-1-30" name="__codelineno-1-30"></a><span class="w">            </span><span class="nt">&quot;key&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;enable.auto.commit&quot;</span><span class="p">,</span>
+<a id="__codelineno-1-31" name="__codelineno-1-31"></a><span class="w">            </span><span class="nt">&quot;value&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;true&quot;</span>
 <a id="__codelineno-1-32" name="__codelineno-1-32"></a><span class="w">        </span><span class="p">}</span>
 <a id="__codelineno-1-33" name="__codelineno-1-33"></a><span class="w">    </span><span class="p">]</span>
 <a id="__codelineno-1-34" name="__codelineno-1-34"></a><span class="p">}</span>
 </code></pre></div></td></tr></table></div>
-</div>
-</div>
-</div>
 <h2 id="publish">Publish<a class="headerlink" href="#publish" title="Permanent link">🔗</a></h2>
-<div class="admonition info">
-<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/kafka/KafkaBasicPublishAction.java" target="_blank">Browse implementation</a></p>
-</div>
+<p>!!!
+info "<a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/kafka/KafkaBasicPublishAction.java">Browse implementation</a>{:
+target="_blank"}"</p>
 <p>Use this action to publish a message to a Kafka topic.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">Inputs</label><label for="__tabbed_2_2">Outputs</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Inputs</label><label for="__tabbed_3_2">Outputs</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <table>
@@ -1992,7 +1994,7 @@
 <td style="text-align: center;"></td>
 <td style="text-align: left;"><code>properties</code></td>
 <td style="text-align: left;">Map &lt;String, String&gt;</td>
-<td style="text-align: left;"><a href="https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/clients/producer/ProducerConfig.java#:~:text=CONFIG%20%3D%20new,TRANSACTIONAL_ID_DOC" target="_blank">Configurations</a> for Kafka producer</td>
+<td style="text-align: left;"><a href="https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/clients/producer/ProducerConfig.java" target="_blank">Configurations</a> for Kafka producer. Override target properties.</td>
 </tr>
 <tr>
 <td style="text-align: center;"></td>
@@ -2029,7 +2031,7 @@
 </div>
 </div>
 <h4 id="example">Example<a class="headerlink" href="#example" title="Permanent link">🔗</a></h4>
-<div class="tabbed-set tabbed-alternate" data-tabs="3:1"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">Kotlin</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:1"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Kotlin</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block"></div>
 </div>
@@ -2065,11 +2067,11 @@
 <a id="__codelineno-2-15" name="__codelineno-2-15"></a><span class="p">)</span>
 </code></pre></div></td></tr></table></div>
 <h2 id="consume">Consume<a class="headerlink" href="#consume" title="Permanent link">🔗</a></h2>
-<div class="admonition info">
-<p class="admonition-title"><a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/com/chutneytesting/action/kafka/KafkaBasicConsumeAction.java" target="_blank">Browse implementation</a></p>
-</div>
+<p>!!!
+info "<a href="https://github.com/Enedis-OSS/chutney/blob/main/chutney/action-impl/src/main/java/fr/enedis/chutney/action/kafka/KafkaBasicConsumeAction.java">Browse implementation</a>{:
+target="_blank"}"</p>
 <p>Use this action to consume a message from a Kafka topic.</p>
-<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">Inputs</label><label for="__tabbed_4_2">Outputs</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:2"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><input id="__tabbed_5_2" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Inputs</label><label for="__tabbed_5_2">Outputs</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block">
 <table>
@@ -2102,14 +2104,14 @@
 <td style="text-align: left;"><code>group</code></td>
 <td style="text-align: left;">String</td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">Group id of the consumer</td>
+<td style="text-align: left;">Group id of the consumer (override target or properties configuration)</td>
 </tr>
 <tr>
 <td style="text-align: center;"></td>
 <td style="text-align: left;"><code>properties</code></td>
 <td style="text-align: left;">Map &lt;String, String&gt;</td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;"><a href="https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/clients/producer/ProducerConfig.java#:~:text=CONFIG%20%3D%20new,TRANSACTIONAL_ID_DOC" target="_blank">Configurations</a> for Kafka producer.</td>
+<td style="text-align: left;"><a href="https://github.com/apache/kafka/blob/trunk/clients/src/main/java/org/apache/kafka/clients/consumer/ConsumerConfig.java" target="_blank">Configurations</a> for Kafka consumer. Override target properties.</td>
 </tr>
 <tr>
 <td style="text-align: center;"></td>
@@ -2123,7 +2125,7 @@
 <td style="text-align: left;"><code>selector</code></td>
 <td style="text-align: left;">String</td>
 <td style="text-align: left;"></td>
-<td style="text-align: left;">Consume only messages whose <strong>headers</strong> or <strong>payload</strong> match this selector. Selector must be <a href="https://github.com/json-path/JsonPath" target="_blank">json paths</a> or <a href="https://www.w3schools.com/xml/xml_xpath.asp" target="_blank">xml paths</a>. The root node is the whole message.</td>
+<td style="text-align: left;">Consume only messages whose <strong>headers</strong> or <strong>payload</strong> match this selector for json mime type, selector must be <a href="https://github.com/json-path/JsonPath" target="_blank">json paths</a> with the root node as the whole message. Consume only messages whose <strong>payload</strong> match this selector for xml mime type, selector must be <a href="https://www.w3schools.com/xml/xml_xpath.asp" target="_blank">xml paths</a> with the root node as the payload. Ignored for bytes array pauload. Otherwise, check that payload contains the given selector.</td>
 </tr>
 <tr>
 <td style="text-align: center;"></td>
@@ -2199,7 +2201,7 @@
 </div>
 </div>
 <h4 id="example_1">Example<a class="headerlink" href="#example_1" title="Permanent link">🔗</a></h4>
-<div class="tabbed-set tabbed-alternate" data-tabs="5:1"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">Kotlin</label></div>
+<div class="tabbed-set tabbed-alternate" data-tabs="6:1"><input checked="checked" id="__tabbed_6_1" name="__tabbed_6" type="radio" /><div class="tabbed-labels"><label for="__tabbed_6_1">Kotlin</label></div>
 <div class="tabbed-content">
 <div class="tabbed-block"></div>
 </div>
@@ -2242,7 +2244,7 @@
     <span class="md-icon" title="Last update">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M21 13.1c-.1 0-.3.1-.4.2l-1 1 2.1 2.1 1-1c.2-.2.2-.6 0-.8l-1.3-1.3c-.1-.1-.2-.2-.4-.2m-1.9 1.8-6.1 6V23h2.1l6.1-6.1zM12.5 7v5.2l4 2.4-1 1L11 13V7zM11 21.9c-5.1-.5-9-4.8-9-9.9C2 6.5 6.5 2 12 2c5.3 0 9.6 4.1 10 9.3-.3-.1-.6-.2-1-.2s-.7.1-1 .2C19.6 7.2 16.2 4 12 4c-4.4 0-8 3.6-8 8 0 4.1 3.1 7.5 7.1 7.9l-.1.2z"/></svg>
     </span>
-    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">December 12, 2024</span>
+    <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">May 15, 2025</span>
   </span>
 
     
