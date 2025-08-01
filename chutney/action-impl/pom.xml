@@ -27,7 +27,7 @@
         </license>
     </licenses>
     <properties>
-        <ojdbc11.version>23.6.0.24.10</ojdbc11.version>
+        <ojdbc11.version>23.9.0.25.07</ojdbc11.version>
     </properties>
 
     <dependencies>
